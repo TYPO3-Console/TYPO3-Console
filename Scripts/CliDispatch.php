@@ -28,16 +28,26 @@ define('TYPO3_cliMode', TRUE);
 require __DIR__ . '/../../../../typo3/sysext/core/Classes/Core/CliBootstrap.php';
 \TYPO3\CMS\Core\Core\CliBootstrap::checkEnvironmentOrDie();
 
+
+
+
 require __DIR__ . '/../../../../typo3/sysext/core/Classes/Core/Bootstrap.php';
 \TYPO3\CMS\Core\Core\Bootstrap::getInstance()
 	->baseSetup($__pathPart)
 	->loadConfigurationAndInitialize()
-	->loadTypo3LoadedExtAndExtLocalconf(TRUE)
-	->applyAdditionalConfigurationSettings()
-	->initializeTypo3DbGlobal();
+	->loadTypo3LoadedExtAndExtLocalconf(TRUE);
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['productionExceptionHandler'] = '';
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['debugExceptionHandler'] = '';
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['errorHandler'] = '';
+//error_reporting(E_ALL);
+
+//var_dump(ini_get('display_errors'));
+ini_set('display_errors', 1);
+
+\TYPO3\CMS\Core\Core\Bootstrap::getInstance()
+	->applyAdditionalConfigurationSettings()
+	->initializeTypo3DbGlobal();
 
 
 \TYPO3\CMS\Core\Core\CliBootstrap::initializeCliKeyOrDie();
@@ -49,8 +59,9 @@ $GLOBALS['TYPO3_CONF_VARS']['SYS']['debugExceptionHandler'] = '';
 	->initializeBackendUserMounts()
 	->initializeLanguageObject();
 
-	// Make sure output is not buffered, so command-line output and interaction can take place
+// Make sure output is not buffered, so command-line output and interaction can take place
 \TYPO3\CMS\Core\Utility\GeneralUtility::flushOutputBuffers();
+
 
 try {
 	include(TYPO3_cliInclude);
