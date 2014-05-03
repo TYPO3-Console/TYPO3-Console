@@ -46,17 +46,18 @@ class SchedulerCommandController extends CommandController {
 	 *
 	 * @param int $taskId Uid of the task that should be executed (instead of all scheduled tasks)
 	 * @param bool $forceExecution When specifying a single task, the execution can be forced with this flag. The task will then be executed even if it is not scheduled for execution yet.
-	 * @throws \UnexpectedValueException
 	 */
 	public function runCommand($taskId = NULL, $forceExecution = FALSE) {
 		if ($taskId !== NULL) {
 			if ($taskId <= 0) {
-				throw new \UnexpectedValueException('Task Id must be higher than zero.', 1399128576);
+				$this->outputLine('Task Id must be higher than zero.');
+				$this->sendAndExit(1);
 			}
 			$this->executeSingleTask($taskId, $forceExecution);
 		} else {
 			if ($forceExecution) {
-				throw new \UnexpectedValueException('Execution can only be forced when a single task is specified.', 1399128576);
+				$this->outputLine('Execution can only be forced when a single task is specified.');
+				$this->sendAndExit(2);
 			}
 			$this->executeScheduledTasks();
 		}
