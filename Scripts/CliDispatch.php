@@ -28,27 +28,21 @@ define('TYPO3_cliMode', TRUE);
 require __DIR__ . '/../../../../typo3/sysext/core/Classes/Core/CliBootstrap.php';
 \TYPO3\CMS\Core\Core\CliBootstrap::checkEnvironmentOrDie();
 
-
-
-
 require __DIR__ . '/../../../../typo3/sysext/core/Classes/Core/Bootstrap.php';
 \TYPO3\CMS\Core\Core\Bootstrap::getInstance()
 	->baseSetup($__pathPart)
 	->loadConfigurationAndInitialize()
 	->loadTypo3LoadedExtAndExtLocalconf(TRUE);
 
+// TODO: Use proper error and exception handling
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['productionExceptionHandler'] = '';
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['debugExceptionHandler'] = '';
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['errorHandler'] = '';
-//error_reporting(E_ALL);
-
-//var_dump(ini_get('display_errors'));
 ini_set('display_errors', 1);
 
 \TYPO3\CMS\Core\Core\Bootstrap::getInstance()
 	->applyAdditionalConfigurationSettings()
 	->initializeTypo3DbGlobal();
-
 
 \TYPO3\CMS\Core\Core\CliBootstrap::initializeCliKeyOrDie();
 
