@@ -44,7 +44,7 @@ class CleanupCommandController extends CommandController {
 	 *
 	 */
 	public function initializeObject() {
-		$this->referenceIndex = $this->objectManager->get('TYPO3\\CMS\\Core\\Database\\ReferenceIndex');
+//		$this->referenceIndex = $this->objectManager->get('TYPO3\\CMS\\Core\\Database\\ReferenceIndex');
 	}
 
 	/**

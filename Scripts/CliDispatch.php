@@ -30,15 +30,21 @@ require __DIR__ . '/../../../../typo3/sysext/core/Classes/Core/CliBootstrap.php'
 
 require __DIR__ . '/../../../../typo3/sysext/core/Classes/Core/Bootstrap.php';
 \TYPO3\CMS\Core\Core\Bootstrap::getInstance()
-	->baseSetup($__pathPart)
+	->baseSetup($__pathPart);
+
+error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
+
+\TYPO3\CMS\Core\Core\Bootstrap::getInstance()
 	->loadConfigurationAndInitialize()
 	->loadTypo3LoadedExtAndExtLocalconf(TRUE);
 
-// TODO: Use proper error and exception handling
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['productionExceptionHandler'] = '';
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['debugExceptionHandler'] = '';
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['errorHandler'] = '';
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['errors']['exceptionHandler'] = '';
+$errorHandler = new \Helhum\Typo3Console\Error\ErrorHandler();
+$errorHandler->setExceptionalErrors(array(E_WARNING, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_STRICT, E_RECOVERABLE_ERROR));
 ini_set('display_errors', 1);
+if (((bool)ini_get('display_errors') && strtolower(ini_get('display_errors')) !== 'on' && strtolower(ini_get('display_errors')) !== '1') || !(bool)ini_get('display_errors')) {
+	echo 'WARNING: Fatal errors will be suppressed due to your PHP config. You should consider enabling display_errors in your php.ini file!' . chr(10);
+}
 
 \TYPO3\CMS\Core\Core\Bootstrap::getInstance()
 	->applyAdditionalConfigurationSettings()

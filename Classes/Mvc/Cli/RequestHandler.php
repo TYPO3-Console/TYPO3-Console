@@ -24,12 +24,52 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+
+use Helhum\Typo3Console\Core\ConsoleBootstrap;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\Flow\Core\Bootstrap;
+
 /**
  * The generic command line interface request handler for the MVC framework.
  *
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class RequestHandler extends \TYPO3\CMS\Extbase\Mvc\Cli\RequestHandler {
+class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface {
+
+	/**
+	 * @var ObjectManager
+	 */
+	protected $objectManager;
+
+	/**
+	 * @var \TYPO3\CMS\Extbase\Mvc\Dispatcher
+	 */
+	protected $dispatcher;
+
+	/**
+	 * @var \TYPO3\CMS\Extbase\Mvc\Cli\Request
+	 */
+	protected $request;
+
+	/**
+	 * @var \TYPO3\CMS\Extbase\Mvc\Cli\Response
+	 */
+	protected $response;
+
+	/**
+	 * @var ConsoleBootstrap
+	 */
+	protected $bootstrap;
+
+	/**
+	 * Constructor
+	 *
+	 * @param Bootstrap $bootstrap
+	 */
+	public function __construct(Bootstrap $bootstrap) {
+		$this->bootstrap = $bootstrap;
+	}
 
 	/**
 	 * Handles the request
@@ -37,17 +77,37 @@ class RequestHandler extends \TYPO3\CMS\Extbase\Mvc\Cli\RequestHandler {
 	 * @return \TYPO3\CMS\Extbase\Mvc\ResponseInterface
 	 */
 	public function handleRequest() {
+		$this->boot();
+
 		$commandLine = isset($_SERVER['argv']) ? $_SERVER['argv'] : array();
 		$callingScript = array_shift($commandLine);
 		if ($callingScript !== $_SERVER['_']) {
 			$callingScript = $_SERVER['_'] . ' ' . $callingScript;
 		}
-		$request = $this->requestBuilder->build($commandLine, $callingScript);
-		/** @var $response \TYPO3\CMS\Extbase\Mvc\Cli\Response */
-		$response = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Cli\\Response');
-		$this->dispatcher->dispatch($request, $response);
-		$response->send();
-		return $response;
+		$this->request = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Cli\\RequestBuilder')->build($commandLine, $callingScript);
+		$this->response = new \TYPO3\CMS\Extbase\Mvc\Cli\Response();
+		$this->dispatcher->dispatch($this->request, $this->response);
+		$this->response->send();
+
+		$this->shutdown();
+	}
+
+	/**
+	 *
+	 */
+	protected function boot() {
+		$this->bootstrap->invokeRuntimeSequence();
+		$this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+		$this->dispatcher = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Dispatcher');
+
+	}
+
+	/**
+	 *
+	 */
+	protected function shutdown() {
+		$this->bootstrap->shutdown();
+		exit($this->response->getExitCode());
 	}
 
 	/**
@@ -57,6 +117,16 @@ class RequestHandler extends \TYPO3\CMS\Extbase\Mvc\Cli\RequestHandler {
 	 * @return integer The priority of the request handler.
 	 */
 	public function getPriority() {
-		return 110;
+		return 100;
+	}
+
+	/**
+	 * Checks if the request handler can handle the current request.
+	 *
+	 * @return boolean TRUE if it can handle the request, otherwise FALSE
+	 * @api
+	 */
+	public function canHandleRequest() {
+		return PHP_SAPI === 'cli' ? 1 : 0;
 	}
 }
