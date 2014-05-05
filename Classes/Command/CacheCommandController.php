@@ -27,7 +27,11 @@ namespace Helhum\Typo3Console\Command;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use Helhum\Typo3Console\Parser\ParsingException;
+use Helhum\Typo3Console\Parser\PhpParser;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 
 /**
@@ -38,20 +42,20 @@ class CacheCommandController extends CommandController {
 
 	/**
 	 * @var \TYPO3\CMS\Core\Cache\CacheManager
+	 * @inject
 	 */
 	protected $cacheManager;
+
+	/**
+	 * @var \TYPO3\CMS\Core\Package\PackageManager
+	 * @inject
+	 */
+	protected $packageManager;
 
 	/**
 	 * @var
 	 */
 	protected $databaseConnection;
-
-	/**
-	 * @param \TYPO3\CMS\Core\Cache\CacheManager $cacheManager
-	 */
-	public function injectCacheManager(\TYPO3\CMS\Core\Cache\CacheManager $cacheManager) {
-		$this->cacheManager = $cacheManager;
-	}
 
 	/**
 	 * Flushes all caches, optionally only caches in specified groups.
@@ -109,6 +113,24 @@ class CacheCommandController extends CommandController {
 				}
 				if (!empty($invalidGroups)) {
 					$this->outputLine('The following invalid groups were ignored: "' . implode('","', $invalidGroups) . '"');
+				}
+			}
+		}
+	}
+
+	/**
+	 * Warmup class and core caches
+	 */
+	public function warmupCommand() {
+		$phpParser = new PhpParser();
+		foreach ($this->packageManager->getActivePackages() as $package) {
+			$classFiles = GeneralUtility::getAllFilesAndFoldersInPath(array(), $package->getClassesPath(), 'php');
+			foreach ($classFiles as $classFile) {
+				try {
+					$parsedResult = $phpParser->parseClassFile($classFile);
+					class_exists($parsedResult->getFullyQualifiedClassName());
+				} catch(ParsingException $e) {
+					$this->outputLine('Class file "' . PathUtility::stripPathSitePrefix($classFile) . '" does not contain a class defininition. Skipping …');
 				}
 			}
 		}

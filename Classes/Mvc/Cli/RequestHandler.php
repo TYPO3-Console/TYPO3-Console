@@ -103,14 +103,13 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface {
 	protected function boot($runLevel) {
 		if ($runLevel === ConsoleBootstrap::RUNLEVEL_LEGACY) {
 			$this->bootstrap->invokeLegacySequence();
+		} elseif ($runLevel === ConsoleBootstrap::RUNLEVEL_COMPILE) {
+			$this->bootstrap->invokeCompiletimeSequence();
 		} else {
 			for ($currentLevel = 0; $currentLevel <= $runLevel; $currentLevel++) {
 				$this->bootstrap->invokeSequence($currentLevel);
 			}
 		}
-//		$this->bootstrap->invokeEssentialSequence();
-//		$this->bootstrap->invokeBasicRuntimeSequence();
-//		$this->bootstrap->invokeExtendedRuntimeSequence();
 		$this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
 		$this->dispatcher = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Dispatcher');
 

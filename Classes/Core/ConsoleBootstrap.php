@@ -31,6 +31,7 @@ use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
 use TYPO3\CMS\Core\Cache\Frontend\StringFrontend;
 use TYPO3\CMS\Core\Core\ApplicationContext;
 use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility;
 use TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface;
 
@@ -141,22 +142,27 @@ class ConsoleBootstrap extends Bootstrap {
 
 	public function getRunlevelForCommand($commandIdentifier) {
 		$commandIdentifierParts = explode(':', $commandIdentifier);
-		if (count($commandIdentifierParts) === 2) {
-			$commandControllerName = $commandIdentifierParts[0];
-		} else {
-			$commandPackageName = $commandIdentifierParts[0];
-			$commandControllerName = $commandIdentifierParts[1];
+		if (count($commandIdentifierParts) < 2 || count($commandIdentifierParts) > 3) {
+			return self::RUNLEVEL_LEGACY;
 		}
-//		if (count($commandIdentifierParts) !== 3) {
-//			return FALSE;
-//		}
 		if (isset($this->commands[$commandIdentifier])) {
 			return $this->commands[$commandIdentifier]['runLevel'];
 		}
 
+		if (count($commandIdentifierParts) === 3) {
+			$currentCommandPackageName = $commandIdentifierParts[0];
+			$currentCommandControllerName = $commandIdentifierParts[1];
+			$currentCommandName = $commandIdentifierParts[2];
+		} else {
+			$currentCommandControllerName = $commandIdentifierParts[0];
+			$currentCommandName = $commandIdentifierParts[1];
+		}
+
 		foreach ($this->commands as $fullControllerIdentifier => $commandRegistry) {
 			list($packageKey, $controllerName, $commandName) = explode(':', $fullControllerIdentifier);
-			if ($controllerName === $commandControllerName) {
+			if ($controllerName === $currentCommandControllerName && $commandName === $currentCommandName) {
+				return $this->commands[$fullControllerIdentifier]['runLevel'];
+			} elseif ($controllerName === $currentCommandControllerName && $commandName === '*') {
 				return $this->commands[$fullControllerIdentifier]['runLevel'];
 			}
 		}
@@ -208,7 +214,11 @@ class ConsoleBootstrap extends Bootstrap {
 	 * Runlevel -1
 	 */
 	public function invokeCompiletimeSequence() {
-		$this->initializeUncachedClassLoader();
+		$this->disableCoreAndClassesCache();
+		$this->disableCachesForObjectManagement();
+		$this->initializeCachingFramework();
+		$this->initializeClassLoaderCaches();
+//		$this->initializeUncachedClassLoader();
 	}
 
 	/**
@@ -235,9 +245,7 @@ class ConsoleBootstrap extends Bootstrap {
 	 * Runlevel 10
 	 */
 	public function invokeLegacySequence() {
-		$this->populateLocalConfiguration();
-		$this->setDefaultTimezone();
-		$this->defineUserAgentConstant();
+		$this->initializeConfigurationManagement();
 		$this->defineDatabaseConstants();
 		$this->initializeCachingFramework();
 		$this->initializeClassLoaderCaches();
@@ -264,6 +272,30 @@ class ConsoleBootstrap extends Bootstrap {
 	 *  Additional Methods needed for the bootstrap sequences
 	 */
 
+
+	public function disableCachesForObjectManagement() {
+		/** @var PackageManager $packageManager */
+		$packageManager = $this->getEarlyInstance('TYPO3\\Flow\\Package\\PackageManager');
+		if ($packageManager->isPackageActive('dbal')) {
+			require $packageManager->getPackage('dbal')->getPackagePath() . 'ext_localconf.php';
+		}
+		require $packageManager->getPackage('extbase')->getPackagePath() . 'ext_localconf.php';
+
+		$cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
+
+		if ($packageManager->isPackageActive('dbal')) {
+			$cacheConfigurations['dbal']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
+			$cacheConfigurations['dbal']['options'] = array();
+		}
+		$cacheConfigurations['extbase_datamapfactory_datamap']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
+		$cacheConfigurations['extbase_datamapfactory_datamap']['options'] = array();
+		$cacheConfigurations['extbase_object']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
+		$cacheConfigurations['extbase_object']['options'] = array();
+		$cacheConfigurations['extbase_reflection']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
+		$cacheConfigurations['extbase_reflection']['options'] = array();
+		$cacheConfigurations['extbase_typo3dbbackend_tablecolumns']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
+		$cacheConfigurations['extbase_typo3dbbackend_tablecolumns']['options'] = array();
+	}
 
 	/**
 	 * Initializes the package system and loads the package configuration and settings

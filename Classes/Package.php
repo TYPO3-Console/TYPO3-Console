@@ -35,6 +35,9 @@ use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
  */
 class Package extends \TYPO3\CMS\Core\Package\Package {
 
+	/**
+	 * @var string
+	 */
 	protected $namespace = 'Helhum\\Typo3Console';
 
 	/**
@@ -48,8 +51,18 @@ class Package extends \TYPO3\CMS\Core\Package\Package {
 			require __DIR__ . '/../../../../typo3/sysext/extbase/Classes/Mvc/RequestHandlerInterface.php';
 			require __DIR__ . '/Mvc/Cli/RequestHandler.php';
 			$bootstrap->registerRequestHandler(new RequestHandler($bootstrap));
-
-			$bootstrap->registerCommandForRunLevel('typo3_console:backend:*', ConsoleBootstrap::RUNLEVEL_BASIC_RUNTIME);
+			$this->registerCommands($bootstrap);
 		}
+	}
+
+	/**
+	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
+	 */
+	protected function registerCommands(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
+		$bootstrap->registerCommandForRunLevel('typo3_console:cache:*', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
+		$bootstrap->registerCommandForRunLevel('typo3_console:backend:*', ConsoleBootstrap::RUNLEVEL_BASIC_RUNTIME);
+		$bootstrap->registerCommandForRunLevel('typo3_console:scheduler:*', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
+		$bootstrap->registerCommandForRunLevel('typo3_console:cleanup:checkreferenceindex', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
+		$bootstrap->registerCommandForRunLevel('typo3_console:cleanup:updatereferenceindex', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
 	}
 }
