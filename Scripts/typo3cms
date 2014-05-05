@@ -1,0 +1,8 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Bootstrap for the command line
+ */
+//require __DIR__ . '/typo3conf/ext/typo3_console/Scripts/CliDispatch.php';
+require __DIR__ . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php';
