@@ -43,7 +43,7 @@ class Package extends \TYPO3\CMS\Core\Package\Package {
 	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
 	 */
 	public function boot(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
-		if (defined('TYPO3_cliMode') && TYPO3_cliMode) {
+		if (defined('TYPO3_cliMode') && TYPO3_cliMode && is_callable(array($bootstrap, 'registerRequestHandler'))) {
 			parent::boot($bootstrap);
 			require __DIR__ . '/../../../../typo3/sysext/extbase/Classes/Mvc/RequestHandlerInterface.php';
 			require __DIR__ . '/Mvc/Cli/RequestHandler.php';

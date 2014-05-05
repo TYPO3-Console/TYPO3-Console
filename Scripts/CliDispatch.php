@@ -1,26 +1,5 @@
 <?php
 
-if (isset($_SERVER['argv'][1]) && $_SERVER['argv'][1] === 'legacy') {
-	$argv0 = './typo3/cli_dispatch.phpsh';
-	$pwd = __DIR__ . '/../../../../typo3';
-	$_SERVER['PHP_SELF'] = $pwd;
-	chdir($pwd);
-	$_SERVER['PHP_SELF'] =
-	$_SERVER['PATH_TRANSLATED'] =
-	$_SERVER['SCRIPT_FILENAME'] =
-	$_SERVER['SCRIPT_NAME'] = $argv0;
-	$_SERVER['argv'] = array_slice($_SERVER['argv'], 2);
-	array_unshift($_SERVER['argv'], $argv0);
-
-	$__pathPart = 'typo3/';
-} else {
-	$argv0 = array_shift($_SERVER['argv']);
-	array_unshift($_SERVER['argv'], $argv0, 'extbase');
-
-	$__pathPart = '';
-}
-
-
 // Starting from here this is basically a copy of typo3/cli_dispatch.phpsh
 define('TYPO3_MODE', 'BE');
 define('TYPO3_cliMode', TRUE);
@@ -30,7 +9,7 @@ require __DIR__ . '/../../../../typo3/sysext/core/Classes/Core/CliBootstrap.php'
 
 require __DIR__ . '/../../../../typo3/sysext/core/Classes/Core/Bootstrap.php';
 \TYPO3\CMS\Core\Core\Bootstrap::getInstance()
-	->baseSetup($__pathPart);
+	->baseSetup('typo3/');
 
 error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
 
@@ -49,6 +28,8 @@ if (((bool)ini_get('display_errors') && strtolower(ini_get('display_errors')) !=
 \TYPO3\CMS\Core\Core\Bootstrap::getInstance()
 	->applyAdditionalConfigurationSettings()
 	->initializeTypo3DbGlobal();
+
+unset($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['GLOBAL']['cliKeys']['extbase']);
 
 \TYPO3\CMS\Core\Core\CliBootstrap::initializeCliKeyOrDie();
 

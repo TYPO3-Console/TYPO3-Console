@@ -307,7 +307,6 @@ class ConsoleBootstrap extends Bootstrap {
 				$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][$commandRegistry['controllerClassName']] = $commandRegistry['controllerClassName'];
 			}
 		}
-
 	}
 
 	protected function initializePersistence() {
