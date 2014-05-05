@@ -1,7 +1,0 @@
-config.tx_extbase {
-	mvc {
-		requestHandlers {
-			Helhum\Typo3Console\Mvc\Cli\RequestHandler = Helhum\Typo3Console\Mvc\Cli\RequestHandler
-		}
-	}
-}

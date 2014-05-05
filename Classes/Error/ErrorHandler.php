@@ -17,7 +17,7 @@ use TYPO3\CMS\Core\SingletonInterface;
  * Global error handler for Flow
  *
  */
-class ErrorHandler implements SingletonInterface {
+class ErrorHandler {
 
 	/**
 	 * @var array

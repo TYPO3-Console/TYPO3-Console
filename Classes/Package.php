@@ -27,6 +27,7 @@ namespace typo3_console;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 
 /**
@@ -34,11 +35,21 @@ use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
  */
 class Package extends \TYPO3\CMS\Core\Package\Package {
 
-	public function boot(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
-		parent::boot($bootstrap);
-		require __DIR__ . '/../../../../typo3/sysext/extbase/Classes/Mvc/RequestHandlerInterface.php';
-		require __DIR__ . '/Mvc/Cli/RequestHandler.php';
-		$bootstrap->registerRequestHandler(new RequestHandler($bootstrap));
-	}
+	protected $namespace = 'Helhum\\Typo3Console';
 
-} 
+	/**
+	 * Register the cli request handler only when in cli mode
+	 *
+	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
+	 */
+	public function boot(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
+		if (defined('TYPO3_cliMode') && TYPO3_cliMode) {
+			parent::boot($bootstrap);
+			require __DIR__ . '/../../../../typo3/sysext/extbase/Classes/Mvc/RequestHandlerInterface.php';
+			require __DIR__ . '/Mvc/Cli/RequestHandler.php';
+			$bootstrap->registerRequestHandler(new RequestHandler($bootstrap));
+
+			$bootstrap->registerCommandForRunLevel('typo3_console:backend:*', ConsoleBootstrap::RUNLEVEL_BASIC_RUNTIME);
+		}
+	}
+}

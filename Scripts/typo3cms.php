@@ -6,6 +6,7 @@ $__boot = function() {
 	require __DIR__ . '/../../../../typo3/sysext/core/Classes/Core/ApplicationContext.php';
 	require __DIR__ . '/../../../../typo3/sysext/core/Classes/Exception.php';
 	require __DIR__ . '/../Classes/Core/ConsoleBootstrap.php';
+	require __DIR__ . '/../Classes/Error/ErrorHandler.php';
 
 	if (isset($_SERVER['argv'][1]) && $_SERVER['argv'][1] === 'legacy') {
 		$argv0 = './typo3/cli_dispatch.phpsh';

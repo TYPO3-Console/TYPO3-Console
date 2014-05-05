@@ -77,7 +77,8 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface {
 	 * @return \TYPO3\CMS\Extbase\Mvc\ResponseInterface
 	 */
 	public function handleRequest() {
-		$this->boot();
+		$runLevel = $this->bootstrap->getRunlevelForCommand(isset($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : '');
+		$this->boot($runLevel);
 
 		$commandLine = isset($_SERVER['argv']) ? $_SERVER['argv'] : array();
 		$callingScript = array_shift($commandLine);
@@ -95,8 +96,21 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface {
 	/**
 	 *
 	 */
-	protected function boot() {
-		$this->bootstrap->invokeRuntimeSequence();
+
+	/**
+	 * @param int $runLevel
+	 */
+	protected function boot($runLevel) {
+		if ($runLevel === ConsoleBootstrap::RUNLEVEL_LEGACY) {
+			$this->bootstrap->invokeLegacySequence();
+		} else {
+			for ($currentLevel = 0; $currentLevel <= $runLevel; $currentLevel++) {
+				$this->bootstrap->invokeSequence($currentLevel);
+			}
+		}
+//		$this->bootstrap->invokeEssentialSequence();
+//		$this->bootstrap->invokeBasicRuntimeSequence();
+//		$this->bootstrap->invokeExtendedRuntimeSequence();
 		$this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
 		$this->dispatcher = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Dispatcher');
 
