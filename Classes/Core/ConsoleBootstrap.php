@@ -302,6 +302,12 @@ class ConsoleBootstrap extends Bootstrap {
 		$this->populateLocalConfiguration();
 		$this->setDefaultTimezone();
 		$this->defineUserAgentConstant();
+		foreach ($this->commands as $identifier => $commandRegistry) {
+			if (!isset($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][$commandRegistry['controllerClassName']])) {
+				$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][$commandRegistry['controllerClassName']] = $commandRegistry['controllerClassName'];
+			}
+		}
+
 	}
 
 	protected function initializePersistence() {
