@@ -64,5 +64,6 @@ class Package extends \TYPO3\CMS\Core\Package\Package {
 		$bootstrap->registerCommandForRunLevel('typo3_console:scheduler:*', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
 		$bootstrap->registerCommandForRunLevel('typo3_console:cleanup:checkreferenceindex', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
 		$bootstrap->registerCommandForRunLevel('typo3_console:cleanup:updatereferenceindex', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
+		$bootstrap->registerCommandForRunLevel('typo3_console:documentation:generatexsd', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
 	}
 }
