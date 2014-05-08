@@ -57,7 +57,7 @@ class ErrorHandler {
 	 * @throws \Exception
 	 */
 	public function handleError($errorLevel, $errorMessage, $errorFile, $errorLine) {
-		if (true || error_reporting() === 0) {
+		if (error_reporting() === 0) {
 			return;
 		}
 
