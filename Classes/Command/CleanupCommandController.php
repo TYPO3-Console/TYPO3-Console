@@ -70,7 +70,7 @@ class CleanupCommandController extends CommandController {
 	 */
 	public function updateReferenceIndexCommand($verbose = TRUE) {
 		$this->outputLine('Updating reference index …');
-		list($header, $main, $errorCount) = $this->referenceIndex->updateIndex(TRUE, FALSE);
+		list($header, $main, $errorCount) = $this->referenceIndex->updateIndex(FALSE, FALSE);
 		if ($verbose) {
 			$this->output($main . LF);
 		}
