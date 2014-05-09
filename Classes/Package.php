@@ -59,7 +59,10 @@ class Package extends \TYPO3\CMS\Core\Package\Package {
 	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
 	 */
 	protected function registerCommands(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
-		$bootstrap->registerCommandForRunLevel('typo3_console:cache:*', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
+		$bootstrap->registerCommandForRunLevel('typo3_console:cache:flush', ConsoleBootstrap::RUNLEVEL_COMPILE);
+		$bootstrap->registerCommandForRunLevel('typo3_console:cache:flushbygroups', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
+		$bootstrap->registerCommandForRunLevel('typo3_console:cache:flushbytags', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
+		$bootstrap->registerCommandForRunLevel('typo3_console:cache:warmup', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
 		$bootstrap->registerCommandForRunLevel('typo3_console:backend:*', ConsoleBootstrap::RUNLEVEL_BASIC_RUNTIME);
 		$bootstrap->registerCommandForRunLevel('typo3_console:scheduler:*', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
 		$bootstrap->registerCommandForRunLevel('typo3_console:cleanup:checkreferenceindex', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);

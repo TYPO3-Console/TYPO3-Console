@@ -43,20 +43,30 @@ class CacheCommandController extends CommandController {
 	protected $cacheService;
 
 	/**
-	 * Flushes all caches, optionally only caches in specified groups.
+	 * Flushes all caches.
+	 */
+	public function flushCommand() {
+		try {
+			$this->cacheService->flush();
+			$this->outputLine('Flushed all caches.');
+		} catch (\Exception $e) {
+			$this->outputLine($e->getMessage());
+			$this->quit(1);
+		}
+	}
+
+	/**
+	 * Flushes all caches in specified groups.
 	 *
 	 * @param array $groups
 	 */
-	public function flushCommand(array $groups = NULL) {
+	public function flushGroupsCommand(array $groups) {
 		try {
-			$this->cacheService->flush($groups);
-			if (empty($groups)) {
-				$this->outputLine('Flushed all caches.');
-			} else {
-				$this->outputLine('Flushed all caches for group(s): "' . implode('","', $groups) . '"');
-			}
+			$this->cacheService->flushGroups($groups);
+			$this->outputLine('Flushed all caches for group(s): "' . implode('","', $groups) . '"');
 		} catch (NoSuchCacheGroupException $e) {
 			$this->outputLine($e->getMessage());
+			$this->quit(1);
 		}
 	}
 
@@ -66,12 +76,13 @@ class CacheCommandController extends CommandController {
 	 * @param array $tags
 	 * @param array $groups
 	 */
-	public function flushByTagsCommand(array $tags, array $groups = NULL) {
+	public function flushTagsCommand(array $tags, array $groups = NULL) {
 		try {
 			$this->cacheService->flushByTagsAndGroups($tags, $groups);
 			$this->outputLine('Flushed caches by tags "' . implode('","', $tags) . '" in groups: "' . implode('","', $groups) . '"');
 		} catch (NoSuchCacheGroupException $e) {
 			$this->outputLine($e->getMessage());
+			$this->quit(1);
 		}
 	}
 

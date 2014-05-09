@@ -31,6 +31,8 @@ use Helhum\Typo3Console\Parser\ParsingException;
 use Helhum\Typo3Console\Parser\PhpParser;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
+use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
@@ -60,7 +62,7 @@ class CacheService implements SingletonInterface {
 	protected $configurationManager;
 
 	/**
-	 * @var
+	 * @var DatabaseConnection
 	 */
 	protected $databaseConnection;
 
@@ -73,8 +75,9 @@ class CacheService implements SingletonInterface {
 	 * Fetches and sets the logger instance
 	 */
 	public function __construct() {
-		// TODO: fid a better way to inject the correct logger
+		// TODO: fid a better way to inject the correct logger and database connection
 		$this->logger = $this->getLogger();
+		$this->databaseConnection = $GLOBALS['TYPO3_DB'];
 	}
 
 	/**
@@ -85,19 +88,25 @@ class CacheService implements SingletonInterface {
 	}
 
 	/**
-	 * Flushes all caches, optionally only caches in specified groups.
+	 * Flushes all caches
+	 *
+	 * @throws NoSuchCacheGroupException
+	 */
+	public function flush() {
+		$this->forceFlushFileAndDatabaseCaches();
+		$this->cacheManager->flushCaches();
+	}
+
+	/**
+	 * Flushes all caches in specified groups.
 	 *
 	 * @param array $groups
 	 * @throws NoSuchCacheGroupException
 	 */
-	public function flush(array $groups = NULL) {
-		if ($groups === NULL) {
-			$this->cacheManager->flushCaches();
-		} else {
-			$this->ensureCacheGroupsExist($groups);
-			foreach ($groups as $group) {
-				$this->cacheManager->flushCachesInGroup($group);
-			}
+	public function flushGroups(array $groups) {
+		$this->ensureCacheGroupsExist($groups);
+		foreach ($groups as $group) {
+			$this->cacheManager->flushCachesInGroup($group);
 		}
 	}
 
@@ -137,15 +146,18 @@ class CacheService implements SingletonInterface {
 
 	/**
 	 * Warmup essential caches such as class and core caches
+	 *
+	 * @param bool $triggerRequire
 	 */
-	public function warmupEssentialCaches() {
+	public function warmupEssentialCaches($triggerRequire = FALSE) {
+		// TODO: This currently only builds the classes cache! Find a way to build other core caches as well (like package manager caches, package namespaces …)
 		$phpParser = new PhpParser();
 		foreach ($this->packageManager->getActivePackages() as $package) {
 			$classFiles = GeneralUtility::getAllFilesAndFoldersInPath(array(), $package->getClassesPath(), 'php');
 			foreach ($classFiles as $classFile) {
 				try {
 					$parsedResult = $phpParser->parseClassFile($classFile);
-					$this->writeCacheEntryForClass($parsedResult->getFullyQualifiedClassName());
+					$this->writeCacheEntryForClass($parsedResult->getFullyQualifiedClassName(), $classFile);
 				} catch(ParsingException $e) {
 					$this->logger->warning('Class file "' . PathUtility::stripPathSitePrefix($classFile) . '" does not contain a class defininition. Skipping …');
 				}
@@ -180,10 +192,39 @@ class CacheService implements SingletonInterface {
 	}
 
 	/**
-	 * @param string $className
+	 *
 	 */
-	protected function writeCacheEntryForClass($className) {
-		// TODO: use a better way to write the caches as this triggers a require, which fails for pseudo class files (which unfortuanately still exist)
-		class_exists($className);
+	protected function forceFlushFileAndDatabaseCaches() {
+		// Delete typo3temp/Cache
+		GeneralUtility::rmdir(PATH_site . 'typo3temp/Cache', TRUE);
+		// Get all table names starting with 'cf_' and truncate them
+		$tables = $this->databaseConnection->admin_get_tables();
+		foreach ($tables as $table) {
+			$tableName = $table['Name'];
+			if (substr($tableName, 0, 3) === 'cf_') {
+				$this->databaseConnection->exec_TRUNCATEquery($tableName);
+			}
+		}
+
+	}
+
+	/**
+	 * @param string $classFile
+	 * @param string $className
+	 * @param bool $triggerRequire
+	 */
+	protected function writeCacheEntryForClass($className, $classFile, $triggerRequire = FALSE) {
+		$classesCache = $this->cacheManager->getCache('cache_classes');
+		$cacheEntryIdentifier = strtolower(str_replace('\\', '_', $className));
+		$classLoadingInformation = array(
+			$classFile,
+			strtolower($className),
+			// TODO: consider aliases
+		);
+		// If we found class information, cache it
+		$classesCache->set(
+			$cacheEntryIdentifier,
+			implode("\xff", $classLoadingInformation)
+		);
 	}
 }

@@ -201,24 +201,26 @@ class ConsoleBootstrap extends Bootstrap {
 	}
 
 	/**
+	 * Runlevel -1
+	 */
+	public function invokeCompiletimeSequence() {
+		$this->initializeConfigurationManagement();
+		$this->disableCoreAndClassesCache();
+		$this->initializeUncachedClassLoader();
+		$this->disableCachesForObjectManagement();
+		$this->initializeCachingFramework();
+
+		// TODO: how to make this optional?
+		$this->initializeDatabaseConnection();
+	}
+
+	/**
 	 * Runlevel 0
 	 */
 	public function invokeEssentialSequence() {
 		$this->initializeConfigurationManagement();
 		$this->initializeCachingFramework();
 		$this->initializeErrorHandling();
-	}
-
-
-	/**
-	 * Runlevel -1
-	 */
-	public function invokeCompiletimeSequence() {
-		$this->disableCoreAndClassesCache();
-		$this->disableCachesForObjectManagement();
-		$this->initializeCachingFramework();
-		$this->initializeClassLoaderCaches();
-//		$this->initializeUncachedClassLoader();
 	}
 
 	/**
@@ -229,8 +231,9 @@ class ConsoleBootstrap extends Bootstrap {
 		$this->registerGlobalDebugFunctions();
 		$this->loadTypo3LoadedExtAndExtLocalconf();
 		$this->applyAdditionalConfigurationSettings();
-		$this->defineDatabaseConstants();
-		$this->initializeTypo3DbGlobal();
+
+		// TODO: how to make this optional?
+		$this->initializeDatabaseConnection();
 	}
 
 	/**
@@ -341,6 +344,11 @@ class ConsoleBootstrap extends Bootstrap {
 		}
 	}
 
+	protected function initializeDatabaseConnection() {
+		$this->defineDatabaseConstants();
+		$this->initializeTypo3DbGlobal();
+	}
+
 	protected function initializePersistence() {
 		$this->loadExtensionTables();
 	}
@@ -365,9 +373,9 @@ class ConsoleBootstrap extends Bootstrap {
 	 * @return void
 	 */
 	public function initializeUncachedClassLoader() {
-		parent::initializeClassLoaderCaches();
 		$this->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader')
-			->injectClassesCache(new StringFrontend('cache_classes', new TransientMemoryBackend($this->getApplicationContext())))
+			->injectClassesCache(new StringFrontend('cache_classes', new TransientMemoryBackend($this->getApplicationContext())));
+		$this->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader')
 			->setPackages($this->getEarlyInstance('TYPO3\\Flow\\Package\\PackageManager')->getActivePackages());
 	}
 
