@@ -27,11 +27,8 @@ namespace Helhum\Typo3Console\Command;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use Helhum\Typo3Console\Parser\ParsingException;
-use Helhum\Typo3Console\Parser\PhpParser;
+use Helhum\Typo3Console\Service;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 
 /**
@@ -41,21 +38,10 @@ use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 class CacheCommandController extends CommandController {
 
 	/**
-	 * @var \TYPO3\CMS\Core\Cache\CacheManager
+	 * @var \Helhum\Typo3Console\Service\CacheService
 	 * @inject
 	 */
-	protected $cacheManager;
-
-	/**
-	 * @var \TYPO3\CMS\Core\Package\PackageManager
-	 * @inject
-	 */
-	protected $packageManager;
-
-	/**
-	 * @var
-	 */
-	protected $databaseConnection;
+	protected $cacheService;
 
 	/**
 	 * Flushes all caches, optionally only caches in specified groups.
@@ -63,26 +49,15 @@ class CacheCommandController extends CommandController {
 	 * @param array $groups
 	 */
 	public function flushCommand(array $groups = NULL) {
-		if ($groups === NULL) {
-			$this->cacheManager->flushCaches();
-			$this->outputLine('Flushed all caches.');
-		} else {
-			$flushedGroups = array();
-			$invalidGroups = array();
-			foreach ($groups as $group) {
-				try {
-					$this->cacheManager->flushCachesInGroup($group);
-					$flushedGroups[] = $group;
-				} catch (NoSuchCacheGroupException $e) {
-					$invalidGroups[] = $group;
-				}
+		try {
+			$this->cacheService->flush($groups);
+			if (empty($groups)) {
+				$this->outputLine('Flushed all caches.');
+			} else {
+				$this->outputLine('Flushed all caches for group(s): "' . implode('","', $groups) . '"');
 			}
-			if (!empty($flushedGroups)) {
-				$this->outputLine('Flushed all caches for group(s): "' . implode('","', $flushedGroups) . '"');
-			}
-			if (!empty($invalidGroups)) {
-				$this->outputLine('The following invalid groups were ignored: "' . implode('","', $invalidGroups) . '"');
-			}
+		} catch (NoSuchCacheGroupException $e) {
+			$this->outputLine($e->getMessage());
 		}
 	}
 
@@ -92,47 +67,19 @@ class CacheCommandController extends CommandController {
 	 * @param array $tags
 	 * @param array $groups
 	 */
-	public function flushByTagCommand(array $tags, array $groups = NULL) {
-		foreach ($tags as $tag) {
-			if ($groups === NULL) {
-				$this->cacheManager->flushCachesByTag($tag);
-				$this->outputLine('Flushed all caches by tag "' . $tag . '"');
-			} else {
-				$flushedGroups = array();
-				$invalidGroups = array();
-				foreach ($groups as $group) {
-					try {
-						$this->cacheManager->flushCachesInGroupByTag($group, $tag);
-						$flushedGroups[] = $group;
-					} catch (NoSuchCacheGroupException $e) {
-						$invalidGroups[] = $group;
-					}
-				}
-				if (!empty($flushedGroups)) {
-					$this->outputLine('Cleared cache tag "' . $tag . '" for groups: "' . implode('","', $flushedGroups) . '"');
-				}
-				if (!empty($invalidGroups)) {
-					$this->outputLine('The following invalid groups were ignored: "' . implode('","', $invalidGroups) . '"');
-				}
-			}
+	public function flushByTagsCommand(array $tags, array $groups = NULL) {
+		try {
+			$this->cacheService->flushByTagsAndGroups($tags, $groups);
+			$this->outputLine('Flushed caches by tags "' . implode('","', $tags) . '" in groups: "' . implode('","', $groups) . '"');
+		} catch (NoSuchCacheGroupException $e) {
+			$this->outputLine($e->getMessage());
 		}
 	}
 
 	/**
-	 * Warmup class and core caches
+	 * Warmup essential caches such as class and core caches
 	 */
 	public function warmupCommand() {
-		$phpParser = new PhpParser();
-		foreach ($this->packageManager->getActivePackages() as $package) {
-			$classFiles = GeneralUtility::getAllFilesAndFoldersInPath(array(), $package->getClassesPath(), 'php');
-			foreach ($classFiles as $classFile) {
-				try {
-					$parsedResult = $phpParser->parseClassFile($classFile);
-					class_exists($parsedResult->getFullyQualifiedClassName());
-				} catch(ParsingException $e) {
-					$this->outputLine('Class file "' . PathUtility::stripPathSitePrefix($classFile) . '" does not contain a class defininition. Skipping …');
-				}
-			}
-		}
+		$this->cacheService->warmupEssentialCaches();
 	}
 }
