@@ -31,7 +31,6 @@ use Helhum\Typo3Console\Parser\ParsingException;
 use Helhum\Typo3Console\Parser\PhpParser;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
-use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -150,7 +149,7 @@ class CacheService implements SingletonInterface {
 	 * @param bool $triggerRequire
 	 */
 	public function warmupEssentialCaches($triggerRequire = FALSE) {
-		// TODO: This currently only builds the classes cache! Find a way to build other system caches as well (like package manager caches, reflection caches, datamap caches …)
+		// TODO: This currently only builds the classes cache! Find a way to build other system caches as well (like reflection caches, datamap caches …)
 		// package namespace and aliases caches are implicitely built in extended bootstrap before we reach this point
 		$phpParser = new PhpParser();
 		foreach ($this->packageManager->getActivePackages() as $package) {
@@ -164,6 +163,8 @@ class CacheService implements SingletonInterface {
 				}
 			}
 		}
+		$this->packageManager->injectCoreCache($this->cacheManager->getCache('cache_core'));
+		$this->packageManager->populatePackageCache();
 	}
 
 	/**
@@ -220,12 +221,13 @@ class CacheService implements SingletonInterface {
 		$classLoadingInformation = array(
 			$classFile,
 			strtolower($className),
-			// TODO: consider aliases
+			// TODO: consider aliases?
 		);
-		// If we found class information, cache it
-		$classesCache->set(
-			$cacheEntryIdentifier,
-			implode("\xff", $classLoadingInformation)
-		);
+		if (!$classesCache->has($cacheEntryIdentifier)) {
+			$classesCache->set(
+				$cacheEntryIdentifier,
+				implode("\xff", $classLoadingInformation)
+			);
+		}
 	}
 }

@@ -92,5 +92,6 @@ class CacheCommandController extends CommandController {
 	public function warmupCommand() {
 		//TODO: This loggs to the default logger currently. Find a good way to attach a console writer
 		$this->cacheService->warmupEssentialCaches();
+		$this->outputLine('Warmed up the following caches: classes, package manager, tca, ext_tables, ext_localconf');
 	}
 }

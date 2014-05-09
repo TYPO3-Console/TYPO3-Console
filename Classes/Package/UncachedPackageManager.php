@@ -46,19 +46,18 @@ class UncachedPackageManager extends PackageManager {
 		$this->initializePackageObjects();
 		$this->initializeCompatibilityLoadedExtArray();
 
-//		$cacheIdentifier = $this->getCacheIdentifier();
-//		if ($cacheIdentifier === NULL) {
-//			// Create an artificial cache identifier if the package states file is not available yet
-//			// in order that the class loader and class alias map can cache anyways.
-//			$cacheIdentifier = md5(implode('###', array_keys($this->activePackages)));
-//		}
-//		$this->classLoader->setCacheIdentifier($cacheIdentifier)->setPackages($this->activePackages);
-//		$this->classLoader->setPackages($this->activePackages);
-
 		foreach ($this->activePackages as $package) {
 			/** @var $package Package */
 			$package->boot($bootstrap);
 		}
+	}
+
+	/**
+	 * Intended to be called by the cache warmup only
+	 * @internal
+	 */
+	public function populatePackageCache() {
+		$this->saveToPackageCache();
 	}
 
 } 
