@@ -37,8 +37,10 @@ use TYPO3\CMS\Core\Utility\PathUtility;
 
 /**
  * Class CacheService
+ * TODO: This is not really a service in DDD terms: it does not act on domain models, it has dependencies and it holds som kind of state (logger) find a better name/pattern for that.
  */
 class CacheService implements SingletonInterface {
+
 	/**
 	 * @var \TYPO3\CMS\Core\Cache\CacheManager
 	 * @inject
@@ -71,6 +73,7 @@ class CacheService implements SingletonInterface {
 	 * Fetches and sets the logger instance
 	 */
 	public function __construct() {
+		// TODO: fid a better way to inject the correct logger
 		$this->logger = $this->getLogger();
 	}
 

@@ -32,8 +32,7 @@ use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 
 /**
- * CommandController for flushing caches through CLI/scheduler
- *
+ * CommandController for flushing caches
  */
 class CacheCommandController extends CommandController {
 
@@ -80,6 +79,7 @@ class CacheCommandController extends CommandController {
 	 * Warmup essential caches such as class and core caches
 	 */
 	public function warmupCommand() {
+		//TODO: This loggs to the default logger currently. Find a good way to attach a console writer
 		$this->cacheService->warmupEssentialCaches();
 	}
 }
