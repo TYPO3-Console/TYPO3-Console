@@ -150,7 +150,8 @@ class CacheService implements SingletonInterface {
 	 * @param bool $triggerRequire
 	 */
 	public function warmupEssentialCaches($triggerRequire = FALSE) {
-		// TODO: This currently only builds the classes cache! Find a way to build other core caches as well (like package manager caches, package namespaces …)
+		// TODO: This currently only builds the classes cache! Find a way to build other system caches as well (like package manager caches, reflection caches, datamap caches …)
+		// package namespace and aliases caches are implicitely built in extended bootstrap before we reach this point
 		$phpParser = new PhpParser();
 		foreach ($this->packageManager->getActivePackages() as $package) {
 			$classFiles = GeneralUtility::getAllFilesAndFoldersInPath(array(), $package->getClassesPath(), 'php');
