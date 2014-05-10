@@ -61,9 +61,10 @@ class Sequence {
 	public function removeStep($stepIdentifier) {
 		$removedOccurrences = 0;
 		foreach ($this->steps as $previousStepIdentifier => $steps) {
-			foreach ($steps as $step) {
+			// TODO: Report this bugfix to upstream!
+			foreach ($steps as $index => $step) {
 				if ($step->getIdentifier() === $stepIdentifier) {
-					unset($this->steps[$previousStepIdentifier][$stepIdentifier]);
+					unset($this->steps[$previousStepIdentifier][$index]);
 					$removedOccurrences ++;
 				}
 			}
