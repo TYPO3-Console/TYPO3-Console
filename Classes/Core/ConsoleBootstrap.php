@@ -27,6 +27,8 @@ namespace Helhum\Typo3Console\Core;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use Helhum\Typo3Console\Core\Booting\Sequence;
+use Helhum\Typo3Console\Core\Booting\Step;
 use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
 use TYPO3\CMS\Core\Cache\Frontend\StringFrontend;
 use TYPO3\CMS\Core\Core\ApplicationContext;
@@ -41,21 +43,23 @@ use TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface;
 class ConsoleBootstrap extends Bootstrap {
 
 	const RUNLEVEL_COMPILE = -1;
+	const RUNLEVEL_ESSENTIAL = 0;
 	const RUNLEVEL_BASIC_RUNTIME = 1;
 	const RUNLEVEL_EXTENDED_RUNTIME = 2;
 	const RUNLEVEL_LEGACY = 10;
 
 	protected $sequences = array(
-		0 => 'invokeEssentialSequence',
-		self::RUNLEVEL_COMPILE => 'invokeCompiletimeSequence',
-		self::RUNLEVEL_BASIC_RUNTIME => 'invokeBasicRuntimeSequence',
-		self::RUNLEVEL_EXTENDED_RUNTIME => 'invokeExtendedRuntimeSequence',
+		self::RUNLEVEL_ESSENTIAL => 'buildEssentialSequence',
+		self::RUNLEVEL_COMPILE => 'buildCompiletimeSequence',
+		self::RUNLEVEL_BASIC_RUNTIME => 'buildBasicRuntimeSequence',
+		self::RUNLEVEL_EXTENDED_RUNTIME => 'buildExtendedRuntimeSequence',
+		self::RUNLEVEL_LEGACY => 'buildLegacySequence',
 	);
 
 	/**
 	 * @var array
 	 */
-	protected $commands = array();
+	public $commands = array();
 
 	/**
 	 * @var RequestHandlerInterface[]
@@ -191,63 +195,108 @@ class ConsoleBootstrap extends Bootstrap {
 	}
 
 
-	public function invokeSequence($runLevel) {
+
+
+
+
+	/**
+	 * Runlevel -1
+	 *
+	 * @return Sequence
+	 */
+	public function buildCompiletimeSequence() {
+		$sequence = $this->buildEssentialSequence(self::RUNLEVEL_COMPILE);
+
+		$sequence->addStep(new Step('helhum.typo3console:disabledcaches', array('Helhum\Typo3Console\Core\Booting\Scripts', 'disableObjectCaches')), 'helhum.typo3console:configuration');
+
+		// TODO: make optional
+		$sequence->addStep(new Step('helhum.typo3console:database', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeDatabaseConnection')), 'helhum.typo3console:errorhandling');
+
+		return $sequence;
+	}
+
+	/**
+	 * Runlevel 0
+	 *
+	 * @param string $identifier
+	 * @return Sequence
+	 */
+	public function buildEssentialSequence($identifier) {
+		$sequence = new Sequence($identifier);
+
+		$sequence->addStep(new Step('helhum.typo3console:configuration', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeConfigurationManagement')));
+		$sequence->addStep(new Step('helhum.typo3console:caching', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeCachingFramework')), 'helhum.typo3console:configuration');
+		$sequence->addStep(new Step('helhum.typo3console:errorhandling', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeErrorHandling')), 'helhum.typo3console:caching');
+
+		return $sequence;
+	}
+
+	/**
+	 * Runlevel 1
+	 *
+	 * @param string $identifier
+	 * @return Sequence
+	 */
+	public function buildBasicRuntimeSequence($identifier = self::RUNLEVEL_BASIC_RUNTIME) {
+		$sequence = $this->buildEssentialSequence($identifier);
+
+		// TODO: make optional
+		$sequence->addStep(new Step('helhum.typo3console:database', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeDatabaseConnection')), 'helhum.typo3console:errorhandling');
+
+
+		$sequence->addStep(new Step('helhum.typo3console:classloadercache', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeClassLoaderCaches')), 'helhum.typo3console:errorhandling');
+		$sequence->addStep(new Step('helhum.typo3console:extensionconfiguration', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeDatabaseConnection')), 'helhum.typo3console:classloadercache');
+
+
+		return $sequence;
+	}
+
+	/**
+	 * Runlevel 2
+	 *
+	 * @param string $identifier
+	 * @return Sequence
+	 */
+	public function buildExtendedRuntimeSequence($identifier = self::RUNLEVEL_EXTENDED_RUNTIME) {
+		$sequence = $this->buildBasicRuntimeSequence($identifier);
+
+		$sequence->addStep(new Step('helhum.typo3console:persistence', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializePersistence')), 'helhum.typo3console:extensionconfiguration');
+		$sequence->addStep(new Step('helhum.typo3console:authentication', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeAuthenticatedOperations')), 'helhum.typo3console:persistence');
+
+		return $sequence;
+	}
+
+	/**
+	 * Runlevel 10
+	 * Complete bootstrap in traditional order and with no possibility to inject steps
+	 *
+	 * @return Sequence
+	 */
+	public function buildLegacySequence() {
+		$sequence = new Sequence(self::RUNLEVEL_LEGACY);
+		$sequence->addStep(new Step('helhum.typo3console:persistence', array('Helhum\Typo3Console\Core\Booting\Scripts', 'runLegacyBootstrap')));
+		return $sequence;
+	}
+
+	/**
+	 * Builds the sequence for the given run level
+	 *
+	 * @param $runLevel
+	 * @return Sequence
+	 */
+	public function buildSequence($runLevel) {
 		if (isset($this->sequences[$runLevel])) {
-			$this->{$this->sequences[$runLevel]}();
+			return $this->{$this->sequences[$runLevel]}($runLevel);
 		} else {
-			echo 'RUNLEVEL INVOCATION FAILED!' . PHP_EOL;
+			echo 'Invalid runLevel ' . $runLevel . PHP_EOL;
 			exit(1);
 		}
 	}
 
 	/**
-	 * Runlevel -1
+	 * Complete bootstrap in traditional order and with no possibility to inject steps
 	 */
-	public function invokeCompiletimeSequence() {
-		$this->initializeConfigurationManagement();
-		$this->disableCoreAndClassesCache();
-		$this->initializeUncachedClassLoader();
-		$this->disableCachesForObjectManagement();
-		$this->initializeCachingFramework();
-
-		// TODO: how to make this optional?
-		$this->initializeDatabaseConnection();
-	}
-
-	/**
-	 * Runlevel 0
-	 */
-	public function invokeEssentialSequence() {
-		$this->initializeConfigurationManagement();
-		$this->initializeCachingFramework();
-		$this->initializeErrorHandling();
-	}
-
-	/**
-	 * Runlevel 1
-	 */
-	public function invokeBasicRuntimeSequence() {
-		$this->initializeClassLoaderCaches();
-		$this->registerGlobalDebugFunctions();
-		$this->loadTypo3LoadedExtAndExtLocalconf();
-		$this->applyAdditionalConfigurationSettings();
-
-		// TODO: how to make this optional?
-		$this->initializeDatabaseConnection();
-	}
-
-	/**
-	 * Runlevel 2
-	 */
-	public function invokeExtendedRuntimeSequence() {
-		$this->initializePersistence();
-		$this->initializeAuthenticatedOperations();
-	}
-
-	/**
-	 * Runlevel 10
-	 */
-	public function invokeLegacySequence() {
+	public function runLegacyBootstrap() {
 		$this->initializeConfigurationManagement();
 		$this->defineDatabaseConstants();
 		$this->initializeCachingFramework();
@@ -275,8 +324,59 @@ class ConsoleBootstrap extends Bootstrap {
 	 *  Additional Methods needed for the bootstrap sequences
 	 */
 
+	/**
+	 * @param string $pathPart
+	 * @return void
+	 */
+	public function baseSetup($pathPart = '') {
+		define('TYPO3_MODE', 'BE');
+		define('TYPO3_cliMode', TRUE);
+		$GLOBALS['MCONF']['name'] = '_CLI_lowlevel';
+		class_alias(get_class($this), 'TYPO3\\Flow\\Core\\Bootstrap');
+		parent::baseSetup($pathPart);
+		// I want to see deprecation messages
+		error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
 
-	public function disableCachesForObjectManagement() {
+		require __DIR__ . '/Booting/Sequence.php';
+		require __DIR__ . '/Booting/Step.php';
+		require __DIR__ . '/Booting/Scripts.php';
+	}
+
+	/**
+	 * Initializes the package system and loads the package configuration and settings
+	 * provided by the packages.
+	 *
+	 * @param string $packageManagerClassName Define an alternative package manager implementation (usually for the installer)
+	 * @return void
+	 */
+	public function initializePackageManagement($packageManagerClassName = 'Helhum\\Typo3Console\\Package\\UncachedPackageManager') {
+		require __DIR__ . '/../Package/UncachedPackageManager.php';
+		$packageManager = new \Helhum\Typo3Console\Package\UncachedPackageManager();
+		$this->setEarlyInstance('TYPO3\\Flow\\Package\\PackageManager', $packageManager);
+		Utility\ExtensionManagementUtility::setPackageManager($packageManager);
+		$packageManager->injectClassLoader($this->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader'));
+		$packageManager->injectDependencyResolver(Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Package\\DependencyResolver'));
+		$packageManager->initialize($this);
+		Utility\GeneralUtility::setSingletonInstance('TYPO3\\CMS\\Core\\Package\\PackageManager', $packageManager);
+	}
+
+	public function disableObjectCaches() {
+		$this->disableCoreAndClassesCache();
+		$this->initializeUncachedClassLoader();
+		$this->disableCachesForObjectManagement();
+	}
+
+	/**
+	 *
+	 */
+	protected function initializeUncachedClassLoader() {
+		$this->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader')
+			->injectClassesCache(new StringFrontend('cache_classes', new TransientMemoryBackend($this->getApplicationContext())));
+		$this->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader')
+			->setPackages($this->getEarlyInstance('TYPO3\\Flow\\Package\\PackageManager')->getActivePackages());
+	}
+
+	protected function disableCachesForObjectManagement() {
 		/** @var PackageManager $packageManager */
 		$packageManager = $this->getEarlyInstance('TYPO3\\Flow\\Package\\PackageManager');
 		if ($packageManager->isPackageActive('dbal')) {
@@ -300,40 +400,8 @@ class ConsoleBootstrap extends Bootstrap {
 		$cacheConfigurations['extbase_typo3dbbackend_tablecolumns']['options'] = array();
 	}
 
-	/**
-	 * Initializes the package system and loads the package configuration and settings
-	 * provided by the packages.
-	 *
-	 * @param string $packageManagerClassName Define an alternative package manager implementation (usually for the installer)
-	 * @return void
-	 */
-	public function initializePackageManagement($packageManagerClassName = 'Helhum\\Typo3Console\\Package\\UncachedPackageManager') {
-		require __DIR__ . '/../Package/UncachedPackageManager.php';
-		$packageManager = new \Helhum\Typo3Console\Package\UncachedPackageManager();
-		$this->setEarlyInstance('TYPO3\\Flow\\Package\\PackageManager', $packageManager);
-		Utility\ExtensionManagementUtility::setPackageManager($packageManager);
-		$packageManager->injectClassLoader($this->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader'));
-		$packageManager->injectDependencyResolver(Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Package\\DependencyResolver'));
-		$packageManager->initialize($this);
-		Utility\GeneralUtility::setSingletonInstance('TYPO3\\CMS\\Core\\Package\\PackageManager', $packageManager);
-	}
 
-	/**
-	 * @param string $pathPart
-	 * @return void
-	 */
-	public function baseSetup($pathPart = '') {
-		define('TYPO3_MODE', 'BE');
-		define('TYPO3_cliMode', TRUE);
-		$GLOBALS['MCONF']['name'] = '_CLI_lowlevel';
-		class_alias(get_class($this), 'TYPO3\\Flow\\Core\\Bootstrap');
-		parent::baseSetup($pathPart);
-		// I want to see deprecation messages
-		error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
-	}
-
-
-	protected function initializeConfigurationManagement() {
+	public function initializeConfigurationManagement() {
 		$this->populateLocalConfiguration();
 		$this->setDefaultTimezone();
 		$this->defineUserAgentConstant();
@@ -344,45 +412,15 @@ class ConsoleBootstrap extends Bootstrap {
 		}
 	}
 
-	protected function initializeDatabaseConnection() {
+	public function initializeDatabaseConnection() {
 		$this->defineDatabaseConstants();
 		$this->initializeTypo3DbGlobal();
 	}
 
-	protected function initializePersistence() {
-		$this->loadExtensionTables();
-	}
-
-	protected function initializeAuthenticatedOperations() {
-		$this->initializeBackendUser();
-		$this->initializeBackendAuthentication();
-		$this->initializeBackendUserMounts();
-	}
-
 	/**
-	 * @return void
+	 *
 	 */
-	public function initializeClassLoaderCaches() {
-		parent::initializeClassLoaderCaches();
-		$this->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader')
-			->setCacheIdentifier(md5_file(PATH_typo3conf . 'PackageStates.php'))
-			->setPackages($this->getEarlyInstance('TYPO3\\Flow\\Package\\PackageManager')->getActivePackages());
-	}
-
-	/**
-	 * @return void
-	 */
-	public function initializeUncachedClassLoader() {
-		$this->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader')
-			->injectClassesCache(new StringFrontend('cache_classes', new TransientMemoryBackend($this->getApplicationContext())));
-		$this->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader')
-			->setPackages($this->getEarlyInstance('TYPO3\\Flow\\Package\\PackageManager')->getActivePackages());
-	}
-
-	/**
-	 * @return void
-	 */
-	protected function initializeErrorHandling() {
+	public function initializeErrorHandling() {
 		$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['errors']['exceptionHandler'] = '';
 		$errorHandler = new \Helhum\Typo3Console\Error\ErrorHandler();
 //		$errorHandler->setExceptionalErrors(array(E_WARNING, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_STRICT, E_RECOVERABLE_ERROR));
