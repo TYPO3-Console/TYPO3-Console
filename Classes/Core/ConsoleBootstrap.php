@@ -196,25 +196,6 @@ class ConsoleBootstrap extends Bootstrap {
 
 
 
-
-
-
-	/**
-	 * Runlevel -1
-	 *
-	 * @return Sequence
-	 */
-	public function buildCompiletimeSequence() {
-		$sequence = $this->buildEssentialSequence(self::RUNLEVEL_COMPILE);
-
-		$sequence->addStep(new Step('helhum.typo3console:disabledcaches', array('Helhum\Typo3Console\Core\Booting\Scripts', 'disableObjectCaches')), 'helhum.typo3console:configuration');
-
-		// TODO: make optional
-		$sequence->addStep(new Step('helhum.typo3console:database', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeDatabaseConnection')), 'helhum.typo3console:errorhandling');
-
-		return $sequence;
-	}
-
 	/**
 	 * Runlevel 0
 	 *
@@ -227,6 +208,25 @@ class ConsoleBootstrap extends Bootstrap {
 		$sequence->addStep(new Step('helhum.typo3console:configuration', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeConfigurationManagement')));
 		$sequence->addStep(new Step('helhum.typo3console:caching', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeCachingFramework')), 'helhum.typo3console:configuration');
 		$sequence->addStep(new Step('helhum.typo3console:errorhandling', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeErrorHandling')), 'helhum.typo3console:caching');
+		$sequence->addStep(new Step('helhum.typo3console:classloadercache', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeClassLoaderCaches')), 'helhum.typo3console:errorhandling');
+		// Only after this point we have a fully functional class loader
+
+		return $sequence;
+	}
+
+	/**
+	 * Runlevel -1
+	 *
+	 * @return Sequence
+	 */
+	public function buildCompiletimeSequence() {
+		$sequence = $this->buildEssentialSequence(self::RUNLEVEL_COMPILE);
+
+		$sequence->addStep(new Step('helhum.typo3console:disabledcaches', array('Helhum\Typo3Console\Core\Booting\Scripts', 'disableObjectCaches')), 'helhum.typo3console:configuration');
+		$sequence->removeStep('helhum.typo3console:classloadercache');
+
+		// TODO: make optional
+		$sequence->addStep(new Step('helhum.typo3console:database', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeDatabaseConnection')), 'helhum.typo3console:errorhandling');
 
 		return $sequence;
 	}
@@ -243,10 +243,8 @@ class ConsoleBootstrap extends Bootstrap {
 		// TODO: make optional
 		$sequence->addStep(new Step('helhum.typo3console:database', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeDatabaseConnection')), 'helhum.typo3console:errorhandling');
 
-
-		$sequence->addStep(new Step('helhum.typo3console:classloadercache', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeClassLoaderCaches')), 'helhum.typo3console:errorhandling');
-		$sequence->addStep(new Step('helhum.typo3console:extensionconfiguration', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeDatabaseConnection')), 'helhum.typo3console:classloadercache');
-
+		// Extension configuration is needed for legacy commands (registered in ext_localconf.php) to be found
+		$sequence->addStep(new Step('helhum.typo3console:extensionconfiguration', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeExtensionConfiguration')), 'helhum.typo3console:classloadercache');
 
 		return $sequence;
 	}

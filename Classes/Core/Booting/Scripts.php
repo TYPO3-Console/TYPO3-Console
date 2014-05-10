@@ -27,7 +27,6 @@ namespace Helhum\Typo3Console\Core\Booting;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
-use TYPO3\CMS\Core\Core\ClassLoader;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
