@@ -18,15 +18,15 @@ $__boot = function() {
 		require __DIR__ . '/../Scripts/CliDispatch.php';
 		exit(0);
 	} else {
+		// TODO: If we find a more reliable way finding this path it would be nice
+		// Maybe add the possibiliy to get this from env
 		define('PATH_site', realpath(__DIR__ . '/../../../../') . '/');
 		define('PATH_thisScript', realpath(__DIR__ . '/../../../../typo3cms'));
 	}
 
-	require __DIR__ . '/../../../../typo3/sysext/core/Classes/Core/Bootstrap.php';
-	require __DIR__ . '/../../../../typo3/sysext/core/Classes/Core/ApplicationContext.php';
-	require __DIR__ . '/../../../../typo3/sysext/core/Classes/Exception.php';
+	require PATH_site . 'typo3/sysext/core/Classes/Core/Bootstrap.php';
 	require __DIR__ . '/../Classes/Core/ConsoleBootstrap.php';
-	require __DIR__ . '/../Classes/Error/ErrorHandler.php';
+	require PATH_site . 'typo3/sysext/core/Classes/Core/ApplicationContext.php';
 
 	$context = getenv('TYPO3_CONTEXT') ?: (getenv('REDIRECT_TYPO3_CONTEXT') ?: 'Production');
 	$bootstrap = new \Helhum\Typo3Console\Core\ConsoleBootstrap($context);

@@ -47,6 +47,8 @@ typo3_console/Scripts/typo3cms.bat to the TYPO3 root directory and set the locat
 Currently only a few commands are delivered with the extension, but those delivered are quite useful already. And if any other extension
 adds Extbase command controllers, they will also be useable with the typo3cms command.
 
+* Argument mapping for compile time commands does currently not work due to Extbase constraints
+* Flush caches that are defined by extensions
 * convert lowlevel_cleaner to command controller
 * add basic package/extension kickstarting commands
 * add commands to upload extensions to TER (with user interaction for password)

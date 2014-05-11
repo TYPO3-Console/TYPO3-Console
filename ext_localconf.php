@@ -5,5 +5,4 @@ if (!defined('TYPO3_MODE')) {
 
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerTypeConverter('Helhum\\Typo3Console\\Property\\TypeConverter\\ArrayConverter');
 
-if (TYPO3_MODE === 'BE') {
-}
+

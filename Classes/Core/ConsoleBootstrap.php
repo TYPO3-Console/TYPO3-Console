@@ -27,8 +27,9 @@ namespace Helhum\Typo3Console\Core;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\Booting\Sequence;
-use Helhum\Typo3Console\Core\Booting\Step;
+use Helhum\Typo3Console\Mvc\Cli\CommandManager;
 use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
 use TYPO3\CMS\Core\Cache\Frontend\StringFrontend;
 use TYPO3\CMS\Core\Core\ApplicationContext;
@@ -42,20 +43,6 @@ use TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface;
  */
 class ConsoleBootstrap extends Bootstrap {
 
-	const RUNLEVEL_COMPILE = -1;
-	const RUNLEVEL_ESSENTIAL = 0;
-	const RUNLEVEL_BASIC_RUNTIME = 1;
-	const RUNLEVEL_EXTENDED_RUNTIME = 2;
-	const RUNLEVEL_LEGACY = 10;
-
-	protected $sequences = array(
-		self::RUNLEVEL_ESSENTIAL => 'buildEssentialSequence',
-		self::RUNLEVEL_COMPILE => 'buildCompiletimeSequence',
-		self::RUNLEVEL_BASIC_RUNTIME => 'buildBasicRuntimeSequence',
-		self::RUNLEVEL_EXTENDED_RUNTIME => 'buildExtendedRuntimeSequence',
-		self::RUNLEVEL_LEGACY => 'buildLegacySequence',
-	);
-
 	/**
 	 * @var array
 	 */
@@ -67,20 +54,23 @@ class ConsoleBootstrap extends Bootstrap {
 	protected $requestHandlers = array();
 
 	/**
-	 * @var array
+	 * @var RunLevel
 	 */
-	protected $namespacePrefixes = array();
+	protected $runLevel;
 
 	/**
 	 * @var string $context Application context
 	 */
 	public function __construct($context) {
 		self::$instance = $this;
-		$this->requestId = uniqid();
+		$this->ensureRequiredEnvironment();
 		$this->applicationContext = new ApplicationContext($context);
 		$this->baseSetup();
-		$this->ensureRequiredEnvironment();
+		$this->requireBaseClasses();
 		$this->defineTypo3RequestTypes();
+
+		$this->requestId = uniqid();
+		$this->runLevel = new RunLevel();
 	}
 
 	/**
@@ -89,10 +79,42 @@ class ConsoleBootstrap extends Bootstrap {
 	 */
 	public function run() {
 		$this->initializeClassLoader();
+		$this->initializeCommandManager();
 		$this->initializePackageManagement();
 
 		$requestHandler = $this->resolveRequestHandler();
 		$requestHandler->handleRequest();
+	}
+
+	/**
+	 * Builds the sequence for the given run level
+	 *
+	 * @param $commandIdentifier
+	 * @return Sequence
+	 */
+	public function buildBootingSequenceForCommand($commandIdentifier) {
+		return $this->runLevel->buildSequenceForCommand($commandIdentifier);
+	}
+
+	/**
+	 * Sets a run level for a specific command
+	 *
+	 * @param $commandIdentifier
+	 * @param $runLevel
+	 * @api
+	 */
+	public function setRunLevelForCommand($commandIdentifier, $runLevel) {
+		$this->runLevel->setRunLevelForCommand($commandIdentifier, $runLevel);
+	}
+
+	/**
+	 * Adds a step to the resolved booting sequence
+	 *
+	 * @param string $commandIdentifier
+	 * @param string $stepIdentifier
+	 */
+	public function addBootingStepForCommand($commandIdentifier, $stepIdentifier) {
+		$this->runLevel->addBootingStepForCommand($commandIdentifier, $stepIdentifier);
 	}
 
 	/**
@@ -122,56 +144,13 @@ class ConsoleBootstrap extends Bootstrap {
 	}
 
 	/**
-	 * @param string $commandIdentifier
-	 * @param int $runLevel
+	 * Returns the command manager which can be used to register commands during package management initialisation
+	 *
+	 * @return CommandManager
+	 * @api
 	 */
-	public function registerCommandForRunLevel($commandIdentifier, $runLevel) {
-		if (isset($this->sequences[$runLevel])) {
-			$this->commands[$commandIdentifier] = array(
-				'runLevel' => $runLevel,
-				'controllerClassName' => $this->getControllerClassNameFromCommandIdentifier($commandIdentifier),
-			);
-		} else {
-			echo 'ERROR: Invalid runLevel!' . PHP_EOL;
-			exit(1);
-		}
-	}
-
-	protected function getControllerClassNameFromCommandIdentifier($commandIdentifier) {
-		list($packageKey, $controllerName, $commandName) = explode(':', $commandIdentifier);
-		$package = $this->getEarlyInstance('TYPO3\\Flow\\Package\\PackageManager')->getPackage($packageKey);
-		return $package->getNamespace() . '\\Command\\' . ucfirst($controllerName) . 'CommandController';
-	}
-
-
-	public function getRunlevelForCommand($commandIdentifier) {
-		$commandIdentifierParts = explode(':', $commandIdentifier);
-		if (count($commandIdentifierParts) < 2 || count($commandIdentifierParts) > 3) {
-			return self::RUNLEVEL_LEGACY;
-		}
-		if (isset($this->commands[$commandIdentifier])) {
-			return $this->commands[$commandIdentifier]['runLevel'];
-		}
-
-		if (count($commandIdentifierParts) === 3) {
-			$currentCommandPackageName = $commandIdentifierParts[0];
-			$currentCommandControllerName = $commandIdentifierParts[1];
-			$currentCommandName = $commandIdentifierParts[2];
-		} else {
-			$currentCommandControllerName = $commandIdentifierParts[0];
-			$currentCommandName = $commandIdentifierParts[1];
-		}
-
-		foreach ($this->commands as $fullControllerIdentifier => $commandRegistry) {
-			list($packageKey, $controllerName, $commandName) = explode(':', $fullControllerIdentifier);
-			if ($controllerName === $currentCommandControllerName && $commandName === $currentCommandName) {
-				return $this->commands[$fullControllerIdentifier]['runLevel'];
-			} elseif ($controllerName === $currentCommandControllerName && $commandName === '*') {
-				return $this->commands[$fullControllerIdentifier]['runLevel'];
-			}
-		}
-
-		return self::RUNLEVEL_LEGACY;
+	public function getCommandManager() {
+		return $this->getEarlyInstance('TYPO3\CMS\Extbase\Mvc\Cli\CommandManager');
 	}
 
 	/**
@@ -197,108 +176,13 @@ class ConsoleBootstrap extends Bootstrap {
 
 
 	/**
-	 * Runlevel 0
-	 *
-	 * @param string $identifier
-	 * @return Sequence
-	 */
-	public function buildEssentialSequence($identifier) {
-		$sequence = new Sequence($identifier);
-
-		$sequence->addStep(new Step('helhum.typo3console:configuration', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeConfigurationManagement')));
-		$sequence->addStep(new Step('helhum.typo3console:caching', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeCachingFramework')), 'helhum.typo3console:configuration');
-		$sequence->addStep(new Step('helhum.typo3console:errorhandling', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeErrorHandling')), 'helhum.typo3console:caching');
-		$sequence->addStep(new Step('helhum.typo3console:classloadercache', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeClassLoaderCaches')), 'helhum.typo3console:errorhandling');
-		// Only after this point we have a fully functional class loader
-
-		return $sequence;
-	}
-
-	/**
-	 * Runlevel -1
-	 *
-	 * @return Sequence
-	 */
-	public function buildCompiletimeSequence() {
-		$sequence = $this->buildEssentialSequence(self::RUNLEVEL_COMPILE);
-
-		$sequence->addStep(new Step('helhum.typo3console:disabledcaches', array('Helhum\Typo3Console\Core\Booting\Scripts', 'disableObjectCaches')), 'helhum.typo3console:configuration');
-		$sequence->removeStep('helhum.typo3console:classloadercache');
-
-		// TODO: make optional
-		$sequence->addStep(new Step('helhum.typo3console:database', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeDatabaseConnection')), 'helhum.typo3console:errorhandling');
-
-		return $sequence;
-	}
-
-	/**
-	 * Runlevel 1
-	 *
-	 * @param string $identifier
-	 * @return Sequence
-	 */
-	public function buildBasicRuntimeSequence($identifier = self::RUNLEVEL_BASIC_RUNTIME) {
-		$sequence = $this->buildEssentialSequence($identifier);
-
-		// TODO: make optional
-		$sequence->addStep(new Step('helhum.typo3console:database', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeDatabaseConnection')), 'helhum.typo3console:errorhandling');
-
-		// Extension configuration is needed for legacy commands (registered in ext_localconf.php) to be found
-		$sequence->addStep(new Step('helhum.typo3console:extensionconfiguration', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeExtensionConfiguration')), 'helhum.typo3console:classloadercache');
-
-		return $sequence;
-	}
-
-	/**
-	 * Runlevel 2
-	 *
-	 * @param string $identifier
-	 * @return Sequence
-	 */
-	public function buildExtendedRuntimeSequence($identifier = self::RUNLEVEL_EXTENDED_RUNTIME) {
-		$sequence = $this->buildBasicRuntimeSequence($identifier);
-
-		$sequence->addStep(new Step('helhum.typo3console:persistence', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializePersistence')), 'helhum.typo3console:extensionconfiguration');
-		$sequence->addStep(new Step('helhum.typo3console:authentication', array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeAuthenticatedOperations')), 'helhum.typo3console:persistence');
-
-		return $sequence;
-	}
-
-	/**
-	 * Runlevel 10
-	 * Complete bootstrap in traditional order and with no possibility to inject steps
-	 *
-	 * @return Sequence
-	 */
-	public function buildLegacySequence() {
-		$sequence = new Sequence(self::RUNLEVEL_LEGACY);
-		$sequence->addStep(new Step('helhum.typo3console:persistence', array('Helhum\Typo3Console\Core\Booting\Scripts', 'runLegacyBootstrap')));
-		return $sequence;
-	}
-
-	/**
-	 * Builds the sequence for the given run level
-	 *
-	 * @param $runLevel
-	 * @return Sequence
-	 */
-	public function buildSequence($runLevel) {
-		if (isset($this->sequences[$runLevel])) {
-			return $this->{$this->sequences[$runLevel]}($runLevel);
-		} else {
-			echo 'Invalid runLevel ' . $runLevel . PHP_EOL;
-			exit(1);
-		}
-	}
-
-	/**
 	 * Complete bootstrap in traditional order and with no possibility to inject steps
 	 */
 	public function runLegacyBootstrap() {
 		$this->initializeConfigurationManagement();
 		$this->defineDatabaseConstants();
 		$this->initializeCachingFramework();
-		$this->initializeClassLoaderCaches();
+		\Helhum\Typo3Console\Core\Booting\Scripts::initializeClassLoaderCaches($this);
 		$this->registerExtDirectComponents();
 		$this->transferDeprecatedCurlSettings();
 		$this->setCacheHashOptions();
@@ -323,6 +207,14 @@ class ConsoleBootstrap extends Bootstrap {
 	 */
 
 	/**
+	 */
+	public function initializeCommandManager() {
+		$commandManager = Utility\GeneralUtility::makeInstance('Helhum\Typo3Console\Mvc\Cli\CommandManager');
+		$this->setEarlyInstance('TYPO3\CMS\Extbase\Mvc\Cli\CommandManager', $commandManager);
+		Utility\GeneralUtility::setSingletonInstance('TYPO3\CMS\Extbase\Mvc\Cli\CommandManager', $commandManager);
+	}
+
+	/**
 	 * @param string $pathPart
 	 * @return void
 	 */
@@ -335,9 +227,23 @@ class ConsoleBootstrap extends Bootstrap {
 		// I want to see deprecation messages
 		error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
 
-		require __DIR__ . '/Booting/Sequence.php';
-		require __DIR__ . '/Booting/Step.php';
-		require __DIR__ . '/Booting/Scripts.php';
+	}
+
+	/**
+	 * Classes required prior to class loader
+	 */
+	protected function requireBaseClasses() {
+		require_once PATH_site . 'typo3/sysext/core/Classes/Exception.php';
+		require_once PATH_site . 'typo3/sysext/extbase/Classes/Mvc/Cli/CommandManager.php';
+		require_once PATH_site . 'typo3/sysext/extbase/Classes/Mvc/RequestHandlerInterface.php';
+
+		require_once __DIR__ . '/../Error/ErrorHandler.php';
+		require_once __DIR__ . '/../Mvc/Cli/RequestHandler.php';
+		require_once __DIR__ . '/Booting/Sequence.php';
+		require_once __DIR__ . '/Booting/Step.php';
+		require_once __DIR__ . '/Booting/Scripts.php';
+		require_once __DIR__ . '/Booting/RunLevel.php';
+		require_once __DIR__ . '/../Mvc/Cli/CommandManager.php';
 	}
 
 	/**
@@ -375,39 +281,37 @@ class ConsoleBootstrap extends Bootstrap {
 	}
 
 	protected function disableCachesForObjectManagement() {
+		$cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
+
+		$cacheConfigurations['extbase_typo3dbbackend_tablecolumns'] = array(
+			'groups' => array('system'),
+			'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend'
+		);
+		$cacheConfigurations['extbase_typo3dbbackend_queries'] = array(
+			'groups' => array('system'),
+			'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend'
+		);
+		$cacheConfigurations['extbase_datamapfactory_datamap'] = array(
+			'groups' => array('system'),
+			'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend'
+		);
+		$cacheConfigurations['extbase_object']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
+		$cacheConfigurations['extbase_reflection']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
+
 		/** @var PackageManager $packageManager */
 		$packageManager = $this->getEarlyInstance('TYPO3\\Flow\\Package\\PackageManager');
 		if ($packageManager->isPackageActive('dbal')) {
-			require $packageManager->getPackage('dbal')->getPackagePath() . 'ext_localconf.php';
+			$cacheConfigurations['dbal'] = array(
+				'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\TransientMemoryBackend',
+				'groups' => array()
+			);
 		}
-		require $packageManager->getPackage('extbase')->getPackagePath() . 'ext_localconf.php';
-
-		$cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
-
-		if ($packageManager->isPackageActive('dbal')) {
-			$cacheConfigurations['dbal']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
-			$cacheConfigurations['dbal']['options'] = array();
-		}
-		$cacheConfigurations['extbase_datamapfactory_datamap']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
-		$cacheConfigurations['extbase_datamapfactory_datamap']['options'] = array();
-		$cacheConfigurations['extbase_object']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
-		$cacheConfigurations['extbase_object']['options'] = array();
-		$cacheConfigurations['extbase_reflection']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
-		$cacheConfigurations['extbase_reflection']['options'] = array();
-		$cacheConfigurations['extbase_typo3dbbackend_tablecolumns']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
-		$cacheConfigurations['extbase_typo3dbbackend_tablecolumns']['options'] = array();
 	}
-
 
 	public function initializeConfigurationManagement() {
 		$this->populateLocalConfiguration();
 		$this->setDefaultTimezone();
 		$this->defineUserAgentConstant();
-		foreach ($this->commands as $identifier => $commandRegistry) {
-			if (!isset($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][$commandRegistry['controllerClassName']])) {
-				$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][$commandRegistry['controllerClassName']] = $commandRegistry['controllerClassName'];
-			}
-		}
 	}
 
 	public function initializeDatabaseConnection() {

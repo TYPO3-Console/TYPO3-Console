@@ -28,6 +28,7 @@ namespace Helhum\Typo3Console\Core\Booting;
  ***************************************************************/
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class Scripts
@@ -39,15 +40,24 @@ class Scripts {
 	 */
 	static public function initializeConfigurationManagement(ConsoleBootstrap $bootstrap) {
 		$bootstrap->initializeConfigurationManagement();
-
-
-		// TODO: refactor to command manager
-		foreach ($bootstrap->commands as $identifier => $commandRegistry) {
-			if (!isset($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][$commandRegistry['controllerClassName']])) {
-				$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][$commandRegistry['controllerClassName']] = $commandRegistry['controllerClassName'];
-			}
-		}
+//		// Use file caches instead of DB
+//		$cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
+//		$cacheConfigurations['extbase_typo3dbbackend_tablecolumns'] = array(
+//			'groups' => array('system'),
+//			'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend'
+//		);
+//		$cacheConfigurations['extbase_typo3dbbackend_queries'] = array(
+//			'groups' => array('system'),
+//			'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend'
+//		);
+//		$cacheConfigurations['extbase_datamapfactory_datamap'] = array(
+//			'groups' => array('system'),
+//			'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend'
+//		);
+//		$cacheConfigurations['extbase_object']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend';
+//		$cacheConfigurations['extbase_reflection']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend';
 	}
+
 	/**
 	 * @param ConsoleBootstrap $bootstrap
 	 */
@@ -62,6 +72,12 @@ class Scripts {
 		}
 	}
 
+	/**
+	 * @param ConsoleBootstrap $bootstrap
+	 */
+	static public function disableObjectCaches(ConsoleBootstrap $bootstrap) {
+		$bootstrap->disableObjectCaches();
+	}
 
 	/**
 	 * @param ConsoleBootstrap $bootstrap
@@ -80,7 +96,6 @@ class Scripts {
 		$bootstrap->initializeDatabaseConnection();
 	}
 
-
 	/**
 	 * @param ConsoleBootstrap $bootstrap
 	 */
@@ -95,7 +110,7 @@ class Scripts {
 	 * @param ConsoleBootstrap $bootstrap
 	 */
 	static public function initializeExtensionConfiguration(ConsoleBootstrap $bootstrap) {
-		require_once __DIR__ . '/../../../../../../typo3/sysext/core/Classes/Core/GlobalDebugFunctions.php';
+		require_once PATH_site . 'typo3/sysext/core/Classes/Core/GlobalDebugFunctions.php';
 		ExtensionManagementUtility::loadExtLocalconf();
 		$bootstrap->applyAdditionalConfigurationSettings();
 	}
@@ -130,10 +145,4 @@ class Scripts {
 		$bootstrap->runLegacyBootstrap();
 	}
 
-	/**
-	 * @param ConsoleBootstrap $bootstrap
-	 */
-	static public function disableObjectCaches(ConsoleBootstrap $bootstrap) {
-		$bootstrap->disableObjectCaches();
-	}
 }

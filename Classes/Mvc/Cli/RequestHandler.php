@@ -77,14 +77,14 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface {
 	 * @return \TYPO3\CMS\Extbase\Mvc\ResponseInterface
 	 */
 	public function handleRequest() {
-		$runLevel = $this->bootstrap->getRunlevelForCommand(isset($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : '');
-		$this->boot($runLevel);
+		$this->boot(isset($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : '');
 
 		$commandLine = isset($_SERVER['argv']) ? $_SERVER['argv'] : array();
 		$callingScript = array_shift($commandLine);
 		if ($callingScript !== $_SERVER['_']) {
 			$callingScript = $_SERVER['_'] . ' ' . $callingScript;
 		}
+
 		$this->request = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Cli\\RequestBuilder')->build($commandLine, $callingScript);
 		$this->response = new \TYPO3\CMS\Extbase\Mvc\Cli\Response();
 		$this->dispatcher->dispatch($this->request, $this->response);
@@ -98,10 +98,10 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface {
 	 */
 
 	/**
-	 * @param int $runLevel
+	 * @param string $commandIdentifier
 	 */
-	protected function boot($runLevel) {
-		$sequence = $this->bootstrap->buildSequence($runLevel);
+	protected function boot($commandIdentifier) {
+		$sequence = $this->bootstrap->buildBootingSequenceForCommand($commandIdentifier);
 		$sequence->invoke($this->bootstrap);
 
 		$this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');

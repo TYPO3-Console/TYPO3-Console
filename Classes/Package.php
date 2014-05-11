@@ -27,6 +27,7 @@ namespace typo3_console;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 
@@ -48,8 +49,6 @@ class Package extends \TYPO3\CMS\Core\Package\Package {
 	public function boot(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
 		if (defined('TYPO3_cliMode') && TYPO3_cliMode && is_callable(array($bootstrap, 'registerRequestHandler'))) {
 			parent::boot($bootstrap);
-			require __DIR__ . '/../../../../typo3/sysext/extbase/Classes/Mvc/RequestHandlerInterface.php';
-			require __DIR__ . '/Mvc/Cli/RequestHandler.php';
 			$bootstrap->registerRequestHandler(new RequestHandler($bootstrap));
 			$this->registerCommands($bootstrap);
 		}
@@ -59,14 +58,18 @@ class Package extends \TYPO3\CMS\Core\Package\Package {
 	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
 	 */
 	protected function registerCommands(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
-		$bootstrap->registerCommandForRunLevel('typo3_console:cache:flush', ConsoleBootstrap::RUNLEVEL_COMPILE);
-		$bootstrap->registerCommandForRunLevel('typo3_console:cache:flushbygroups', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
-		$bootstrap->registerCommandForRunLevel('typo3_console:cache:flushbytags', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
-		$bootstrap->registerCommandForRunLevel('typo3_console:cache:warmup', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
-		$bootstrap->registerCommandForRunLevel('typo3_console:backend:*', ConsoleBootstrap::RUNLEVEL_BASIC_RUNTIME);
-		$bootstrap->registerCommandForRunLevel('typo3_console:scheduler:*', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
-		$bootstrap->registerCommandForRunLevel('typo3_console:cleanup:checkreferenceindex', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
-		$bootstrap->registerCommandForRunLevel('typo3_console:cleanup:updatereferenceindex', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
-		$bootstrap->registerCommandForRunLevel('typo3_console:documentation:generatexsd', ConsoleBootstrap::RUNLEVEL_EXTENDED_RUNTIME);
+		$bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\CacheCommandController');
+		$bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\BackendCommandController');
+		$bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\SchedulerCommandController');
+		$bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\CleanupCommandController');
+		$bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\DocumentationCommandController');
+
+		$bootstrap->setRunLevelForCommand('typo3_console:cache:flush', RunLevel::LEVEL_COMPILE);
+		$bootstrap->addBootingStepForCommand('typo3_console:cache:flush', 'helhum.typo3console:database');
+		$bootstrap->setRunLevelForCommand('typo3_console:backend:*', RunLevel::LEVEL_MINIMAL);
+		$bootstrap->setRunLevelForCommand('typo3_console:cache:*', RunLevel::LEVEL_FULL);
+		$bootstrap->setRunLevelForCommand('typo3_console:scheduler:*', RunLevel::LEVEL_FULL);
+		$bootstrap->setRunLevelForCommand('typo3_console:cleanup:*', RunLevel::LEVEL_FULL);
+		$bootstrap->setRunLevelForCommand('typo3_console:documentation:*', RunLevel::LEVEL_FULL);
 	}
 }
