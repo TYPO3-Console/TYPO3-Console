@@ -44,10 +44,11 @@ class CacheCommandController extends CommandController {
 
 	/**
 	 * Flushes all caches.
+	 * @param bool $force
 	 */
-	public function flushCommand() {
+	public function flushCommand($force = FALSE) {
 		try {
-			$this->cacheService->flush();
+			$this->cacheService->flush($force);
 			$this->outputLine('Flushed all caches.');
 		} catch (\Exception $e) {
 			$this->outputLine($e->getMessage());

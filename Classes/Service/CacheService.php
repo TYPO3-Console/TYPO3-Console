@@ -89,10 +89,13 @@ class CacheService implements SingletonInterface {
 	/**
 	 * Flushes all caches
 	 *
+	 * @param bool $force
 	 * @throws NoSuchCacheGroupException
 	 */
-	public function flush() {
-		$this->forceFlushFileAndDatabaseCaches();
+	public function flush($force = FALSE) {
+		if ($force) {
+			$this->forceFlushFileAndDatabaseCaches();
+		}
 		$this->cacheManager->flushCaches();
 	}
 
