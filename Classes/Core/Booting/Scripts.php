@@ -41,22 +41,20 @@ class Scripts {
 	static public function initializeConfigurationManagement(ConsoleBootstrap $bootstrap) {
 		$bootstrap->initializeConfigurationManagement();
 		// TODO: echeck if it is smart to load configuration from required extensions (e.g. Extbase) here
-//		// Use file caches instead of DB
-//		$cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
-//		$cacheConfigurations['extbase_typo3dbbackend_tablecolumns'] = array(
-//			'groups' => array('system'),
-//			'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend'
-//		);
-//		$cacheConfigurations['extbase_typo3dbbackend_queries'] = array(
-//			'groups' => array('system'),
-//			'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend'
-//		);
-//		$cacheConfigurations['extbase_datamapfactory_datamap'] = array(
-//			'groups' => array('system'),
-//			'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend'
-//		);
-//		$cacheConfigurations['extbase_object']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend';
-//		$cacheConfigurations['extbase_reflection']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend';
+
+		self::setObjectCacheConfigurationToFileBackend();
+	}
+
+	/**
+	 * Use file caches instead of DB caches for command line
+	 */
+	protected static function setObjectCacheConfigurationToFileBackend() {
+		$cacheConfigurations = & $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
+		$cacheConfigurations['extbase_typo3dbbackend_tablecolumns'] = array('groups' => array('system'), 'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend');
+		$cacheConfigurations['extbase_typo3dbbackend_queries'] = array('groups' => array('system'), 'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend');
+		$cacheConfigurations['extbase_datamapfactory_datamap'] = array('groups' => array('system'), 'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend');
+		$cacheConfigurations['extbase_object']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend';
+		$cacheConfigurations['extbase_reflection']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend';
 	}
 
 	/**
@@ -166,5 +164,4 @@ class Scripts {
 		$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][$originalClassName]['className'] = $overrideClassName;
 		class_alias($overrideClassName, $originalClassName);
 	}
-
 }

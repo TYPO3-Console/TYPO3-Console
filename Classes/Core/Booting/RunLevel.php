@@ -148,7 +148,6 @@ class RunLevel {
 		$this->addStep($sequence, 'helhum.typo3console:caching', $parentSequence ? TRUE : FALSE);
 		$this->addStep($sequence, 'helhum.typo3console:errorhandling', $parentSequence ? TRUE : FALSE);
 		$this->addStep($sequence, 'helhum.typo3console:classloadercache', $parentSequence ? TRUE : FALSE);
-		// Only after this point we have a fully functional class loader
 
 		$this->executedSequences[self::LEVEL_ESSENTIAL] = TRUE;
 		return $sequence;
@@ -164,10 +163,12 @@ class RunLevel {
 
 		$this->addStep($sequence, 'helhum.typo3console:disabledcaches');
 		$sequence->removeStep('helhum.typo3console:classloadercache');
+
 		$sequence->addStep(new Step('helhum.typo3console:loadextbaseconfiguration', function() {
 			// TODO: hack alarm :) We remove this in order to prevent double inclusion of the ext_localconf.php
 			// This should be fine although not very nice
 			// We should change that to include all ext_localconf of required exts in configuration step and reset this array key there then
+			// OK, this does not work when there is a cached file... of course, but in compile time we do not have caches
 			unset($GLOBALS['TYPO3_LOADED_EXT']['extbase']['ext_localconf.php']);
 			require PATH_site . 'typo3/sysext/extbase/ext_localconf.php';
 		}));
@@ -188,10 +189,9 @@ class RunLevel {
 		$sequence = $parentSequence ?: $this->buildEssentialSequence($identifier);
 
 		$this->addStep($sequence, 'helhum.typo3console:extensionconfiguration', $parentSequence ? TRUE : FALSE);
-		// TODO: database is (only) required for the framework
-		// * configuration manager needs it
-		// * several caches have database backends
-		$this->addStep($sequence, 'helhum.typo3console:database', $parentSequence ? TRUE : FALSE);
+		if ($parentSequence === NULL) {
+			$sequence->addStep(new Step('helhum.typo3console:providecleanclassimplementations', array('Helhum\Typo3Console\Core\Booting\Scripts', 'provideCleanClassImplementations')), 'helhum.typo3console:extensionconfiguration');
+		}
 
 		$this->executedSequences[self::LEVEL_MINIMAL] = TRUE;
 		return $sequence;
@@ -207,6 +207,7 @@ class RunLevel {
 	protected function buildExtendedRuntimeSequence($identifier = self::LEVEL_FULL, $parentSequence = NULL) {
 		$sequence = $parentSequence ?: $this->buildBasicRuntimeSequence($identifier);
 
+		$this->addStep($sequence, 'helhum.typo3console:database', $parentSequence ? TRUE : FALSE);
 		$this->addStep($sequence, 'helhum.typo3console:persistence', $parentSequence ? TRUE : FALSE);
 		$this->addStep($sequence, 'helhum.typo3console:authentication', $parentSequence ? TRUE : FALSE);
 
