@@ -94,7 +94,7 @@ class CacheService implements SingletonInterface {
 	 */
 	public function flush($force = FALSE) {
 		if ($force) {
-			$this->forceFlushFileAndDatabaseCaches();
+			$this->forceFlushCoreFileAndDatabaseCaches();
 		}
 		$this->cacheManager->flushCaches();
 	}
@@ -197,9 +197,9 @@ class CacheService implements SingletonInterface {
 	}
 
 	/**
-	 *
+	 * Recursively delete cache directory and truncate all DB tables prefixed with 'cf_'
 	 */
-	protected function forceFlushFileAndDatabaseCaches() {
+	protected function forceFlushCoreFileAndDatabaseCaches() {
 		// Delete typo3temp/Cache
 		GeneralUtility::rmdir(PATH_site . 'typo3temp/Cache', TRUE);
 		// Get all table names starting with 'cf_' and truncate them

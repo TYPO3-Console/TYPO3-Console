@@ -49,6 +49,13 @@ class CacheCommandController extends CommandController {
 	public function flushCommand($force = FALSE) {
 		try {
 			$this->cacheService->flush($force);
+
+			// TODO: use nicer API once available
+			\TYPO3\CMS\Core\Core\Bootstrap::getInstance()->requestRunLevel(\Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_FULL);
+
+			// Flush a second time to have extension caches cleared
+			$this->cacheService->flush();
+
 			$this->outputLine('Flushed all caches.');
 		} catch (\Exception $e) {
 			$this->outputLine($e->getMessage());

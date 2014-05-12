@@ -87,6 +87,16 @@ class ConsoleBootstrap extends Bootstrap {
 	}
 
 	/**
+	 * TODO: Add other API that does not depend on bootstrap
+	 *
+	 * @param string $runLevel
+	 */
+	public function requestRunLevel($runLevel) {
+		$sequence = $this->runLevel->buildDifferentialSquenceUpToLevel($runLevel);
+		$sequence->invoke($this);
+	}
+
+	/**
 	 * Builds the sequence for the given run level
 	 *
 	 * @param $commandIdentifier
