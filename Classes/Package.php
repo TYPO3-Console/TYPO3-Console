@@ -67,7 +67,7 @@ class Package extends \TYPO3\CMS\Core\Package\Package {
 		$bootstrap->setRunLevelForCommand('typo3_console:cache:flush', RunLevel::LEVEL_COMPILE);
 		$bootstrap->addBootingStepForCommand('typo3_console:cache:flush', 'helhum.typo3console:database');
 		$bootstrap->setRunLevelForCommand('typo3_console:backend:*', RunLevel::LEVEL_MINIMAL);
-		$bootstrap->setRunLevelForCommand('typo3_console:documentation:*', RunLevel::LEVEL_MINIMAL);
+		$bootstrap->setRunLevelForCommand('typo3_console:documentation:*', RunLevel::LEVEL_FULL);
 		$bootstrap->setRunLevelForCommand('typo3_console:cache:*', RunLevel::LEVEL_FULL);
 		$bootstrap->setRunLevelForCommand('typo3_console:scheduler:*', RunLevel::LEVEL_FULL);
 		$bootstrap->setRunLevelForCommand('typo3_console:cleanup:*', RunLevel::LEVEL_FULL);

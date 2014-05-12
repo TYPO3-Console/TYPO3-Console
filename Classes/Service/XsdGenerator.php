@@ -169,7 +169,7 @@ class XsdGenerator extends AbstractGenerator {
 		$delimiter = $this->getDelimiterFromNamespace($namespace);
 		$namespaceParts = explode($delimiter, $namespace);
 		if ($namespaceParts[0] === 'TYPO3' && $namespaceParts[1] === 'CMS') {
-			$packageKey = GeneralUtility::camelCaseToLowerCaseUnderscored($namespaceParts[3]);
+			$packageKey = GeneralUtility::camelCaseToLowerCaseUnderscored($namespaceParts[2]);
 		} else {
 			$packageKey = GeneralUtility::camelCaseToLowerCaseUnderscored($namespaceParts[1]);
 		}
@@ -184,8 +184,9 @@ class XsdGenerator extends AbstractGenerator {
 	 */
 	protected function getClassNameFromNamespaceAndPath($namespace, $filePath) {
 		$delimiter = $this->getDelimiterFromNamespace($namespace);
-		list($packagePath, $viewHelperPath) = explode('Classes/ViewHelpers/', $filePath);
-		$classSuffix = str_replace('/', $delimiter, str_replace('.php', '', $viewHelperPath));
+		list($packagePath, $classesPath) = explode('Classes/', $filePath);
+		// TODO: This is psr-4 style like in TYPO3 CMS, but what about others?
+		$classSuffix = str_replace('/', $delimiter, str_replace('.php', '', $classesPath));
 		return $namespace . $classSuffix;
 	}
 
