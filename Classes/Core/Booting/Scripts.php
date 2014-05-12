@@ -40,6 +40,7 @@ class Scripts {
 	 */
 	static public function initializeConfigurationManagement(ConsoleBootstrap $bootstrap) {
 		$bootstrap->initializeConfigurationManagement();
+		// TODO: echeck if it is smart to load configuration from required extensions (e.g. Extbase) here
 //		// Use file caches instead of DB
 //		$cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
 //		$cacheConfigurations['extbase_typo3dbbackend_tablecolumns'] = array(
@@ -143,6 +144,27 @@ class Scripts {
 	 */
 	static public function runLegacyBootstrap(ConsoleBootstrap $bootstrap) {
 		$bootstrap->runLegacyBootstrap();
+	}
+
+	/**
+	 * Provide cleaned imlementation of TYPO3 CMS core classes.
+	 * Can only be called *after* extension configuration is loaded (needs extbase configuration)!
+	 *
+	 * @param ConsoleBootstrap $bootstrap
+	 */
+	static public function provideCleanClassImplementations(ConsoleBootstrap $bootstrap) {
+		self::overrideImplementation('TYPO3\CMS\Extbase\Mvc\Controller\Argument', 'Helhum\Typo3Console\Mvc\Controller\Argument');
+	}
+
+	/**
+	 * Tell Extbase, TYPO3 and PHP that we have another implementation
+	 */
+	static protected function overrideImplementation($originalClassName, $overrideClassName) {
+		/** @var $extbaseObjectContainer \TYPO3\CMS\Extbase\Object\Container\Container */
+		$extbaseObjectContainer = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\Container\\Container');
+		$extbaseObjectContainer->registerImplementation($originalClassName, $overrideClassName);
+		$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][$originalClassName]['className'] = $overrideClassName;
+		class_alias($overrideClassName, $originalClassName);
 	}
 
 }

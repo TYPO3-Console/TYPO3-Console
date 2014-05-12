@@ -213,16 +213,10 @@ class RunLevel {
 
 		$this->addStep($sequence, 'helhum.typo3console:disabledcaches');
 		$sequence->removeStep('helhum.typo3console:classloadercache');
-
-		$sequence->addStep(new Step('replaceArgumentObject', function() {
-			// TODO: find a better place for that
+		$sequence->addStep(new Step('helhum.typo3console:loadextbaseconfiguration', function() {
 			require PATH_site . 'typo3/sysext/extbase/ext_localconf.php';
-			/** @var $extbaseObjectContainer \TYPO3\CMS\Extbase\Object\Container\Container */
-			$extbaseObjectContainer = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\Container\\Container');
-			$extbaseObjectContainer->registerImplementation('TYPO3\CMS\Extbase\Mvc\Controller\Argument', 'Helhum\Typo3Console\Mvc\Controller\Argument');
-			$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\CMS\Extbase\Mvc\Controller\Argument']['className'] = 'Helhum\Typo3Console\Mvc\Controller\Argument';
-			class_alias('Helhum\Typo3Console\Mvc\Controller\Argument', 'TYPO3\CMS\Extbase\Mvc\Controller\Argument');
-		}), 'helhum.typo3console:errorhandling');
+		}));
+		$sequence->addStep(new Step('helhum.typo3console:providecleanclassimplementations', array('Helhum\Typo3Console\Core\Booting\Scripts', 'runLegacyBootstrap')));
 
 		return $sequence;
 	}
