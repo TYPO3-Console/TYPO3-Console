@@ -9,7 +9,7 @@ A great step forward for developers is the possibility to register command contr
 also requires calling the cli_dispatcher. Another downside is, that until finally the command controller is reached,
 the framework jumps through several hoops to finally bootstrap Extbase and run the requested command.
 
-The goal of this project is to provide a clean API to register commands (using Extbase Command Controlers) and
+The goal of this project is to provide a clean API to register commands (using Extbase Command Controllers) and
 providing a sane way to call the commands through a single command line tool called "typo3cms"
 
 e.g.
