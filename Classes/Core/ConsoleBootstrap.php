@@ -225,8 +225,6 @@ class ConsoleBootstrap extends Bootstrap {
 	 *  Additional Methods needed for the bootstrap sequences
 	 */
 
-	/**
-	 */
 	public function initializeCommandManager() {
 		$commandManager = Utility\GeneralUtility::makeInstance('Helhum\Typo3Console\Mvc\Cli\CommandManager');
 		$this->setEarlyInstance('TYPO3\CMS\Extbase\Mvc\Cli\CommandManager', $commandManager);
@@ -283,15 +281,12 @@ class ConsoleBootstrap extends Bootstrap {
 		Utility\GeneralUtility::setSingletonInstance('TYPO3\\CMS\\Core\\Package\\PackageManager', $packageManager);
 	}
 
-	public function disableObjectCaches() {
+	public function disableCoreCaches() {
 		$this->disableCoreAndClassesCache();
 		$this->initializeUncachedClassLoader();
 		$this->disableCachesForObjectManagement();
 	}
 
-	/**
-	 *
-	 */
 	protected function initializeUncachedClassLoader() {
 		$this->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader')
 			->injectClassesCache(new StringFrontend('cache_classes', new TransientMemoryBackend($this->getApplicationContext())));
@@ -338,9 +333,6 @@ class ConsoleBootstrap extends Bootstrap {
 		$this->initializeTypo3DbGlobal();
 	}
 
-	/**
-	 *
-	 */
 	public function initializeErrorHandling() {
 		$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['errors']['exceptionHandler'] = '';
 		$errorHandler = new \Helhum\Typo3Console\Error\ErrorHandler();
@@ -352,9 +344,6 @@ class ConsoleBootstrap extends Bootstrap {
 		}
 	}
 
-	/**
-	 * @return void
-	 */
 	protected function flushOutputBuffers() {
 		\TYPO3\CMS\Core\Utility\GeneralUtility::flushOutputBuffers();
 	}

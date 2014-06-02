@@ -153,7 +153,7 @@ class RunLevel {
 	protected function buildCompiletimeSequence() {
 		$sequence = $this->buildEssentialSequence(self::LEVEL_COMPILE);
 
-		$this->addStep($sequence, 'helhum.typo3console:disabledcaches');
+		$this->addStep($sequence, 'helhum.typo3console:disablecorecaches');
 		$sequence->removeStep('helhum.typo3console:classloadercache');
 
 		$sequence->addStep(new Step('helhum.typo3console:loadextbaseconfiguration', function() {
@@ -181,7 +181,11 @@ class RunLevel {
 
 		$this->addStep($sequence, 'helhum.typo3console:extensionconfiguration', $parentSequence ? TRUE : FALSE);
 		if ($parentSequence === NULL) {
+			// Only execute if not already executed in compile time
 			$sequence->addStep(new Step('helhum.typo3console:providecleanclassimplementations', array('Helhum\Typo3Console\Core\Booting\Scripts', 'provideCleanClassImplementations')), 'helhum.typo3console:extensionconfiguration');
+		} else {
+			// Fix core caches that were disabled in compile time
+			$this->addStep($sequence, 'helhum.typo3console:enablecorecaches');
 		}
 
 		return $sequence;
@@ -243,14 +247,18 @@ class RunLevel {
 				break;
 
 			// Part of compiletime sequence
-			case 'helhum.typo3console:disabledcaches':
-				$sequence->addStep(new Step('helhum.typo3console:disabledcaches', array('Helhum\Typo3Console\Core\Booting\Scripts', 'disableObjectCaches')), 'helhum.typo3console:coreconfiguration');
+			case 'helhum.typo3console:disablecorecaches':
+				$sequence->addStep(new Step('helhum.typo3console:disablecorecaches', array('Helhum\Typo3Console\Core\Booting\Scripts', 'disableCoreCaches')), 'helhum.typo3console:coreconfiguration');
 				break;
 
 			// Part of basic runtime
 			case 'helhum.typo3console:extensionconfiguration':
 				$action = $isDummyStep ? function(){} : array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeExtensionConfiguration');
 				$sequence->addStep(new Step('helhum.typo3console:extensionconfiguration', $action), 'helhum.typo3console:classloadercache');
+				break;
+			case 'helhum.typo3console:enablecorecaches':
+				$action = $isDummyStep ? function(){} : array('Helhum\Typo3Console\Core\Booting\Scripts', 'enableCoreCaches');
+				$sequence->addStep(new Step('helhum.typo3console:enablecorecaches', $action), 'helhum.typo3console:coreconfiguration');
 				break;
 
 			// Part of full runtime

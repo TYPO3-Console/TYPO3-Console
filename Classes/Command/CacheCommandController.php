@@ -55,7 +55,7 @@ class CacheCommandController extends CommandController {
 			// TODO: use nicer API once available
 			ConsoleBootstrap::getInstance()->requestRunLevel(RunLevel::LEVEL_FULL);
 
-			// Flush a second time to have extension caches cleared
+			// Flush a second time to have extension caches and previously disabled core caches cleared when clearing not forced
 			$this->cacheService->flush();
 
 			$this->outputLine('Flushed all caches.');

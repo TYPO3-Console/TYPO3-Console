@@ -27,6 +27,10 @@ namespace Helhum\Typo3Console\Core\Booting;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
+use TYPO3\CMS\Core\Cache\Cache;
+use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Configuration\ConfigurationManager;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -74,8 +78,33 @@ class Scripts {
 	/**
 	 * @param ConsoleBootstrap $bootstrap
 	 */
-	static public function disableObjectCaches(ConsoleBootstrap $bootstrap) {
-		$bootstrap->disableObjectCaches();
+	static public function disableCoreCaches(ConsoleBootstrap $bootstrap) {
+		$bootstrap->disableCoreCaches();
+	}
+
+	/**
+	 * Reset the internal caches array in the object manager to
+	 * make it rebuild the caches with new configuration.
+	 *
+	 * @param ConsoleBootstrap $bootstrap
+	 */
+	static public function enableCoreCaches(ConsoleBootstrap $bootstrap) {
+		// Find original configuration TODO: Check if it would be better to store the config before changing it
+		/** @var ConfigurationManager $configurationManager */
+		$configurationManager = $bootstrap->getEarlyInstance('TYPO3\\CMS\\Core\\Configuration\\ConfigurationManager');
+		$defaultConfiguration = $configurationManager->getDefaultConfiguration();
+		$localConfiguration = $configurationManager->getLocalConfiguration();
+		ArrayUtility::mergeRecursiveWithOverrule($defaultConfiguration, $localConfiguration);
+		ArrayUtility::mergeRecursiveWithOverrule($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'], $defaultConfiguration['SYS']['caching']['cacheConfigurations']);
+
+		/** @var CacheManager $cacheManager */
+		$cacheManager = $bootstrap->getEarlyInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager');
+		$cacheManager->setCacheConfigurations($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']);
+
+		$reflectionObject = new \ReflectionObject($cacheManager);
+		$property = $reflectionObject->getProperty('caches');
+		$property->setAccessible(TRUE);
+		$property->setValue($cacheManager, array());
 	}
 
 	/**
