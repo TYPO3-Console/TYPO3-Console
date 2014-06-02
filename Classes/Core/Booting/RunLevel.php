@@ -41,13 +41,6 @@ class RunLevel {
 	const LEVEL_LEGACY = 'buildLegacySequence';
 
 	/**
-	 * Store sequences that have been executed
-	 *
-	 * @var array
-	 */
-	protected $executedSequences = array();
-
-	/**
 	 * @var array
 	 */
 	protected $commandOptions = array();
@@ -149,7 +142,6 @@ class RunLevel {
 		$this->addStep($sequence, 'helhum.typo3console:errorhandling', $parentSequence ? TRUE : FALSE);
 		$this->addStep($sequence, 'helhum.typo3console:classloadercache', $parentSequence ? TRUE : FALSE);
 
-		$this->executedSequences[self::LEVEL_ESSENTIAL] = TRUE;
 		return $sequence;
 	}
 
@@ -174,7 +166,6 @@ class RunLevel {
 		}));
 		$sequence->addStep(new Step('helhum.typo3console:providecleanclassimplementations', array('Helhum\Typo3Console\Core\Booting\Scripts', 'provideCleanClassImplementations')));
 
-		$this->executedSequences[self::LEVEL_COMPILE] = TRUE;
 		return $sequence;
 	}
 
@@ -193,7 +184,6 @@ class RunLevel {
 			$sequence->addStep(new Step('helhum.typo3console:providecleanclassimplementations', array('Helhum\Typo3Console\Core\Booting\Scripts', 'provideCleanClassImplementations')), 'helhum.typo3console:extensionconfiguration');
 		}
 
-		$this->executedSequences[self::LEVEL_MINIMAL] = TRUE;
 		return $sequence;
 	}
 
@@ -211,7 +201,6 @@ class RunLevel {
 		$this->addStep($sequence, 'helhum.typo3console:persistence', $parentSequence ? TRUE : FALSE);
 		$this->addStep($sequence, 'helhum.typo3console:authentication', $parentSequence ? TRUE : FALSE);
 
-		$this->executedSequences[self::LEVEL_FULL] = TRUE;
 		return $sequence;
 	}
 
@@ -224,7 +213,6 @@ class RunLevel {
 		$sequence = new Sequence(self::LEVEL_LEGACY);
 		$this->addStep($sequence, 'helhum.typo3console:runLegacyBootstrap');
 
-		$this->executedSequences[self::LEVEL_LEGACY] = TRUE;
 		return $sequence;
 	}
 
@@ -235,6 +223,7 @@ class RunLevel {
 	 */
 	protected function addStep($sequence, $stepIdentifier, $isDummyStep = FALSE) {
 		switch ($stepIdentifier) {
+
 			// Part of essential sequence
 			case 'helhum.typo3console:coreconfiguration':
 				$action = $isDummyStep ? function(){} : array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeConfigurationManagement');

@@ -27,6 +27,8 @@ namespace Helhum\Typo3Console\Command;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use Helhum\Typo3Console\Core\Booting\RunLevel;
+use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Helhum\Typo3Console\Service;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
@@ -51,7 +53,7 @@ class CacheCommandController extends CommandController {
 			$this->cacheService->flush($force);
 
 			// TODO: use nicer API once available
-			\TYPO3\CMS\Core\Core\Bootstrap::getInstance()->requestRunLevel(\Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_FULL);
+			ConsoleBootstrap::getInstance()->requestRunLevel(RunLevel::LEVEL_FULL);
 
 			// Flush a second time to have extension caches cleared
 			$this->cacheService->flush();

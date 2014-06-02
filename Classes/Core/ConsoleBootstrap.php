@@ -74,6 +74,15 @@ class ConsoleBootstrap extends Bootstrap {
 	}
 
 	/**
+	 * Override parent to calrify return type
+	 *
+	 * @return ConsoleBootstrap
+	 */
+	static public function getInstance() {
+		return parent::getInstance();
+	}
+
+	/**
 	 * Bootstraps the minimal infrastructure, resolves a fitting request handler and
 	 * then passes control over to that request handler.
 	 */
