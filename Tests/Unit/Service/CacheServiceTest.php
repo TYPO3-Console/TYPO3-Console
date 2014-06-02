@@ -91,6 +91,6 @@ class CacheServiceTest extends UnitTestCase {
 			)
 		);
 
-		$this->subject->flush(array('not', 'first'));
+		$this->subject->flushGroups(array('not', 'first'));
 	}
 } 
