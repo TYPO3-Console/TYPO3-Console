@@ -164,6 +164,9 @@ class Scripts {
 		$bootstrap->initializeBackendUser();
 		$bootstrap->initializeBackendAuthentication();
 		$bootstrap->initializeBackendUserMounts();
+
+		// Global language object on CLI? rly? but seems to be needed by some scheduler tasks :(
+		$bootstrap->initializeLanguageObject();
 	}
 
 	/**
