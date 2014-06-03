@@ -284,7 +284,14 @@ class ConsoleBootstrap extends Bootstrap {
 	public function disableCoreCaches() {
 		$this->disableCoreAndClassesCache();
 		$this->initializeUncachedClassLoader();
-		$this->disableCachesForObjectManagement();
+		/** @var PackageManager $packageManager */
+		$packageManager = $this->getEarlyInstance('TYPO3\\Flow\\Package\\PackageManager');
+		if ($packageManager->isPackageActive('dbal')) {
+			$cacheConfigurations['dbal'] = array(
+				'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\TransientMemoryBackend',
+				'groups' => array()
+			);
+		}
 	}
 
 	protected function initializeUncachedClassLoader() {
@@ -294,7 +301,7 @@ class ConsoleBootstrap extends Bootstrap {
 			->setPackages($this->getEarlyInstance('TYPO3\\Flow\\Package\\PackageManager')->getActivePackages());
 	}
 
-	protected function disableCachesForObjectManagement() {
+	public function disableCachesForObjectManagement() {
 		$cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
 
 		$cacheConfigurations['extbase_typo3dbbackend_tablecolumns'] = array(
@@ -311,15 +318,6 @@ class ConsoleBootstrap extends Bootstrap {
 		);
 		$cacheConfigurations['extbase_object']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
 		$cacheConfigurations['extbase_reflection']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
-
-		/** @var PackageManager $packageManager */
-		$packageManager = $this->getEarlyInstance('TYPO3\\Flow\\Package\\PackageManager');
-		if ($packageManager->isPackageActive('dbal')) {
-			$cacheConfigurations['dbal'] = array(
-				'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\TransientMemoryBackend',
-				'groups' => array()
-			);
-		}
 	}
 
 	public function initializeConfigurationManagement() {

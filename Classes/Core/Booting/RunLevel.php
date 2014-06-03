@@ -257,7 +257,7 @@ class RunLevel {
 				$sequence->addStep(new Step('helhum.typo3console:extensionconfiguration', $action), 'helhum.typo3console:classloadercache');
 				break;
 			case 'helhum.typo3console:enablecorecaches':
-				$action = $isDummyStep ? function(){} : array('Helhum\Typo3Console\Core\Booting\Scripts', 'enableCoreCaches');
+				$action = $isDummyStep ? function(){} : array('Helhum\Typo3Console\Core\Booting\Scripts', 'reEnableOriginalCoreCaches');
 				$sequence->addStep(new Step('helhum.typo3console:enablecorecaches', $action), 'helhum.typo3console:coreconfiguration');
 				break;
 

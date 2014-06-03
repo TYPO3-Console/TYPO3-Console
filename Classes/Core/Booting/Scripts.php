@@ -27,12 +27,9 @@ namespace Helhum\Typo3Console\Core\Booting;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
-use TYPO3\CMS\Core\Cache\Cache;
 use TYPO3\CMS\Core\Cache\CacheManager;
-use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class Scripts
@@ -40,25 +37,20 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class Scripts {
 
 	/**
+	 * @var array
+	 */
+	static protected $earlyCachesConfiguration = array();
+
+	/**
 	 * @param ConsoleBootstrap $bootstrap
 	 */
 	static public function initializeConfigurationManagement(ConsoleBootstrap $bootstrap) {
 		$bootstrap->initializeConfigurationManagement();
-		// TODO: echeck if it is smart to load configuration from required extensions (e.g. Extbase) here
 
-		self::setObjectCacheConfigurationToFileBackend();
-	}
+		// TODO: check if it is smart to load configuration from required extensions (e.g. Extbase) here
 
-	/**
-	 * Use file caches instead of DB caches for command line
-	 */
-	protected static function setObjectCacheConfigurationToFileBackend() {
-		$cacheConfigurations = & $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
-		$cacheConfigurations['extbase_typo3dbbackend_tablecolumns'] = array('groups' => array('system'), 'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend');
-		$cacheConfigurations['extbase_typo3dbbackend_queries'] = array('groups' => array('system'), 'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend');
-		$cacheConfigurations['extbase_datamapfactory_datamap'] = array('groups' => array('system'), 'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend');
-		$cacheConfigurations['extbase_object']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend';
-		$cacheConfigurations['extbase_reflection']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\FileBackend';
+		self::$earlyCachesConfiguration = $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
+		$bootstrap->disableCachesForObjectManagement();
 	}
 
 	/**
@@ -88,14 +80,8 @@ class Scripts {
 	 *
 	 * @param ConsoleBootstrap $bootstrap
 	 */
-	static public function enableCoreCaches(ConsoleBootstrap $bootstrap) {
-		// Find original configuration TODO: Check if it would be better to store the config before changing it
-		/** @var ConfigurationManager $configurationManager */
-		$configurationManager = $bootstrap->getEarlyInstance('TYPO3\\CMS\\Core\\Configuration\\ConfigurationManager');
-		$defaultConfiguration = $configurationManager->getDefaultConfiguration();
-		$localConfiguration = $configurationManager->getLocalConfiguration();
-		ArrayUtility::mergeRecursiveWithOverrule($defaultConfiguration, $localConfiguration);
-		ArrayUtility::mergeRecursiveWithOverrule($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'], $defaultConfiguration['SYS']['caching']['cacheConfigurations']);
+	static public function reEnableOriginalCoreCaches(ConsoleBootstrap $bootstrap) {
+		ArrayUtility::mergeRecursiveWithOverrule($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'], self::$earlyCachesConfiguration);
 
 		/** @var CacheManager $cacheManager */
 		$cacheManager = $bootstrap->getEarlyInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager');
