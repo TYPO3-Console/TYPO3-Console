@@ -88,8 +88,8 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface {
 		$this->request = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Cli\\RequestBuilder')->build($commandLine, $callingScript);
 		$this->response = new \TYPO3\CMS\Extbase\Mvc\Cli\Response();
 		$this->dispatcher->dispatch($this->request, $this->response);
-		$this->response->send();
 
+		$this->response->send();
 		$this->shutdown();
 	}
 

@@ -27,6 +27,7 @@ namespace Helhum\Typo3Console\Core\Booting;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
+use Helhum\Typo3Console\Error\ErrorHandler;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
@@ -58,7 +59,7 @@ class Scripts {
 	 */
 	static public function initializeErrorHandling(ConsoleBootstrap $bootstrap) {
 		$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['errors']['exceptionHandler'] = '';
-		$errorHandler = new \Helhum\Typo3Console\Error\ErrorHandler();
+		$errorHandler = new ErrorHandler();
 //		$errorHandler->setExceptionalErrors(array(E_WARNING, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_STRICT, E_RECOVERABLE_ERROR));
 		$errorHandler->setExceptionalErrors(array(E_WARNING, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_RECOVERABLE_ERROR));
 		ini_set('display_errors', 1);

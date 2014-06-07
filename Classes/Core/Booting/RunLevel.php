@@ -27,8 +27,6 @@ namespace Helhum\Typo3Console\Core\Booting;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use Helhum\Typo3Console\Core\ConsoleBootstrap;
-
 /**
  * Class RunLevel
  */
@@ -97,14 +95,14 @@ class RunLevel {
 	 *
 	 * @param string $runLevel
 	 * @return Sequence
+	 * @throws \InvalidArgumentException
 	 * @internal
 	 */
 	public function buildSequence($runLevel) {
 		if (is_callable(array($this, $runLevel))) {
 			return $this->{$runLevel}($runLevel);
 		} else {
-			echo 'Invalid run level "' . $runLevel . '"' . PHP_EOL;
-			exit(1);
+			throw new \InvalidArgumentException('Invalid run level "' . $runLevel . '"', 1402075492);
 		}
 	}
 
@@ -281,8 +279,7 @@ class RunLevel {
 				break;
 
 			default:
-				echo 'ERROR: cannot find step for identifier "' . $stepIdentifier . '"' . PHP_EOL;
-				exit(1);
+				throw new \InvalidArgumentException('ERROR: cannot find step for identifier "' . $stepIdentifier . '"', 1402075819);
 		}
 	}
 

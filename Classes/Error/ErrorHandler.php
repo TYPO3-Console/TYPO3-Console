@@ -11,8 +11,6 @@ namespace Helhum\Typo3Console\Error;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\CMS\Core\SingletonInterface;
-
 /**
  * Global error handler for Flow
  *

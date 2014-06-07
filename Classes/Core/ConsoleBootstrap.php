@@ -28,7 +28,9 @@ namespace Helhum\Typo3Console\Core;
  ***************************************************************/
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
+use Helhum\Typo3Console\Core\Booting\Scripts;
 use Helhum\Typo3Console\Core\Booting\Sequence;
+use Helhum\Typo3Console\Error\ExceptionHandler;
 use Helhum\Typo3Console\Mvc\Cli\CommandManager;
 use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
 use TYPO3\CMS\Core\Cache\Frontend\StringFrontend;
@@ -71,6 +73,7 @@ class ConsoleBootstrap extends Bootstrap {
 
 		$this->requestId = uniqid();
 		$this->runLevel = new RunLevel();
+		new ExceptionHandler();
 	}
 
 	/**
@@ -201,7 +204,7 @@ class ConsoleBootstrap extends Bootstrap {
 		$this->initializeConfigurationManagement();
 		$this->defineDatabaseConstants();
 		$this->initializeCachingFramework();
-		\Helhum\Typo3Console\Core\Booting\Scripts::initializeClassLoaderCaches($this);
+		Scripts::initializeClassLoaderCaches($this);
 		$this->registerExtDirectComponents();
 		$this->transferDeprecatedCurlSettings();
 		$this->setCacheHashOptions();
@@ -210,7 +213,7 @@ class ConsoleBootstrap extends Bootstrap {
 		$this->registerGlobalDebugFunctions();
 		$this->setMemoryLimit();
 		$this->loadTypo3LoadedExtAndExtLocalconf();
-		$this->initializeErrorHandling();
+		Scripts::initializeErrorHandling($this);
 		$this->applyAdditionalConfigurationSettings();
 		$this->initializeTypo3DbGlobal();
 		$this->loadExtensionTables();
@@ -255,6 +258,7 @@ class ConsoleBootstrap extends Bootstrap {
 		require_once PATH_site . 'typo3/sysext/extbase/Classes/Mvc/RequestHandlerInterface.php';
 
 		require_once __DIR__ . '/../Error/ErrorHandler.php';
+		require_once __DIR__ . '/../Error/ExceptionHandler.php';
 		require_once __DIR__ . '/../Mvc/Cli/RequestHandler.php';
 		require_once __DIR__ . '/Booting/Sequence.php';
 		require_once __DIR__ . '/Booting/Step.php';
@@ -330,17 +334,6 @@ class ConsoleBootstrap extends Bootstrap {
 	public function initializeDatabaseConnection() {
 		$this->defineDatabaseConstants();
 		$this->initializeTypo3DbGlobal();
-	}
-
-	public function initializeErrorHandling() {
-		$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['errors']['exceptionHandler'] = '';
-		$errorHandler = new \Helhum\Typo3Console\Error\ErrorHandler();
-//		$errorHandler->setExceptionalErrors(array(E_WARNING, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_STRICT, E_RECOVERABLE_ERROR));
-		$errorHandler->setExceptionalErrors(array(E_WARNING, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_RECOVERABLE_ERROR));
-		ini_set('display_errors', 1);
-		if (((bool)ini_get('display_errors') && strtolower(ini_get('display_errors')) !== 'on' && strtolower(ini_get('display_errors')) !== '1') || !(bool)ini_get('display_errors')) {
-			echo 'WARNING: Fatal errors will be suppressed due to your PHP config. You should consider enabling display_errors in your php.ini file!' . chr(10);
-		}
 	}
 
 	protected function flushOutputBuffers() {
