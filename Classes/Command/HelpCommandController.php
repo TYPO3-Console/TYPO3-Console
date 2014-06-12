@@ -94,7 +94,7 @@ class HelpCommandController extends \TYPO3\CMS\Extbase\Mvc\Controller\CommandCon
 	 */
 	protected function displayHelpIndex() {
 		$this->buildCommandsIndex();
-		$this->outputLine('Extbase %s', array(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getExtensionVersion('extbase')));
+		$this->outputLine('TYPO3 Console %s', array(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getExtensionVersion('typo3_console')));
 		$this->outputLine('usage: ' . $this->request->getCallingScript() . ' <command identifier>');
 		$this->outputLine();
 		$this->outputLine('The following commands are currently available:');

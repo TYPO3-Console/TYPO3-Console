@@ -80,6 +80,10 @@ class Package extends \TYPO3\CMS\Core\Package\Package {
 		$bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\CleanupCommandController');
 		$bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\DocumentationCommandController');
 
+		$bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\InstallCommandController');
+		$bootstrap->setRunLevelForCommand('typo3_console:install:*', RunLevel::LEVEL_COMPILE);
+		$bootstrap->setRunLevelForCommand('typo3_console:install:defaultconfiguration', RunLevel::LEVEL_FULL);
+
 		$bootstrap->setRunLevelForCommand('typo3_console:cache:flush', RunLevel::LEVEL_COMPILE);
 		$bootstrap->addBootingStepForCommand('typo3_console:cache:flush', 'helhum.typo3console:database');
 		$bootstrap->setRunLevelForCommand('typo3_console:backend:*', RunLevel::LEVEL_MINIMAL);

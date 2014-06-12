@@ -148,9 +148,9 @@ class Scripts {
 	 * @param ConsoleBootstrap $bootstrap
 	 */
 	static public function initializeAuthenticatedOperations(ConsoleBootstrap $bootstrap) {
-		$bootstrap->initializeBackendUser();
-		$bootstrap->initializeBackendAuthentication();
-		$bootstrap->initializeBackendUserMounts();
+//		$bootstrap->initializeBackendUser();
+//		$bootstrap->initializeBackendAuthentication();
+//		$bootstrap->initializeBackendUserMounts();
 
 		// Global language object on CLI? rly? but seems to be needed by some scheduler tasks :(
 		$bootstrap->initializeLanguageObject();
