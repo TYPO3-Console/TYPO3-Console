@@ -261,6 +261,7 @@ class ConsoleBootstrap extends Bootstrap {
 		require_once __DIR__ . '/Booting/Scripts.php';
 		require_once __DIR__ . '/Booting/RunLevel.php';
 		require_once __DIR__ . '/../Mvc/Cli/CommandManager.php';
+		require_once __DIR__ . '/../../Libraries/autoload.php';
 	}
 
 	/**

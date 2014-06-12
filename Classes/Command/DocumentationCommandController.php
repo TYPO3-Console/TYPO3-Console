@@ -12,7 +12,7 @@ namespace Helhum\Typo3Console\Command;
  *                                                                        */
 
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
+use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Helhum\Typo3Console\Service;
 
 /**

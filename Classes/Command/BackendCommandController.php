@@ -27,7 +27,7 @@ namespace Helhum\Typo3Console\Command;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
+use Helhum\Typo3Console\Mvc\Controller\CommandController;
 
 /**
  * Class SchedulerCommandController
