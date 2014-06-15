@@ -11,6 +11,10 @@ namespace Helhum\Typo3Console\Mvc\Controller;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Helhum\Typo3Console\Log\Writer\ConsoleWriter;
+use Psr\Log\LoggerInterface;
+use TYPO3\CMS\Core\Log\Logger;
+use TYPO3\CMS\Core\Log\LogLevel;
 use TYPO3\CMS\Extbase\Mvc\Cli\Request;
 use TYPO3\CMS\Extbase\Mvc\Cli\Response;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandControllerInterface;
@@ -520,6 +524,21 @@ class CommandController implements CommandControllerInterface {
 			$this->tableHelper = new TableHelper();
 		}
 		return $this->tableHelper;
+	}
+
+	/**
+	 * Creates a logger which outputs to the console
+	 *
+	 * @param int $minimumLevel Minimum log level that should trigger output
+	 * @param array $options Additional options for the console writer
+	 * @return LoggerInterface
+	 */
+	protected function createDefaultLogger($minimumLevel = LogLevel::DEBUG, $options = array()) {
+		$options['output'] = $this->output;
+		$logger = new Logger(get_class($this));
+		$logger->addWriter($minimumLevel, new ConsoleWriter($options));
+
+		return $logger;
 	}
 
 }
