@@ -4,5 +4,5 @@
 /**
  * Bootstrap for the command line
  */
-//require __DIR__ . '/typo3conf/ext/typo3_console/Scripts/CliDispatch.php';
+$__self_dir = __DIR__;
 require __DIR__ . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php';
