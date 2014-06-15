@@ -74,8 +74,7 @@ class CacheService implements SingletonInterface {
 	 * Fetches and sets the logger instance
 	 */
 	public function __construct() {
-		// TODO: fid a better way to inject the correct logger and database connection
-		$this->logger = $this->getLogger();
+		$this->logger = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Log\\LogManager')->getLogger(__CLASS__);
 		$this->databaseConnection = $GLOBALS['TYPO3_DB'];
 	}
 
@@ -83,7 +82,14 @@ class CacheService implements SingletonInterface {
 	 * @return LoggerInterface
 	 */
 	protected function getLogger() {
-		return GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Log\\LogManager')->getLogger(__CLASS__);
+		return $this->logger;
+	}
+
+	/**
+	 * @param LoggerInterface $logger
+	 */
+	public function setLogger(LoggerInterface $logger) {
+		$this->logger = $logger;
 	}
 
 	/**

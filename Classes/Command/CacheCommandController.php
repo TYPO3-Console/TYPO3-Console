@@ -45,6 +45,13 @@ class CacheCommandController extends CommandController {
 	protected $cacheService;
 
 	/**
+	 * Sets a custom logger for the service
+	 */
+	protected function initializeObject() {
+		$this->cacheService->setLogger($this->createDefaultLogger());
+	}
+
+	/**
 	 * Flushes all caches.
 	 * @param bool $force
 	 */
@@ -100,7 +107,6 @@ class CacheCommandController extends CommandController {
 	 * Warmup essential caches such as class and core caches
 	 */
 	public function warmupCommand() {
-		//TODO: This loggs to the default logger currently. Find a good way to attach a console writer
 		$this->cacheService->warmupEssentialCaches();
 		$this->outputLine('Warmed up the following caches: classes, package manager, tca, ext_tables, ext_localconf');
 	}

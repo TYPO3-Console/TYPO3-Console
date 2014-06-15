@@ -29,9 +29,8 @@ namespace Helhum\Typo3Console\Command;
 
 use Helhum\Typo3Console\Command\Delegation\ReferenceIndexUpdateDelegate;
 use Helhum\Typo3Console\Service\Persistence\PersistenceContext;
-use Helhum\Typo3Console\Log\Writer\ConsoleWriter;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
-use TYPO3\CMS\Core\Log\Logger;
+use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Log\LogLevel;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -116,17 +115,13 @@ class CleanupCommandController extends CommandController {
 	/**
 	 * @param bool $verbose
 	 * @param bool $addNewLines
-	 * @return Logger
+	 * @return LoggerInterface
 	 */
 	protected function createLogger($verbose, $addNewLines = FALSE) {
-		$options = array(
-			'output' => $this->output
-		);
+		$options = array();
 		if ($addNewLines) {
 			$options['messageWrap'] = LF . LF . '|' . LF;
 		}
-		$logger = new Logger(__CLASS__);
-		$logger->addWriter($verbose ? LogLevel::DEBUG : LogLevel::WARNING, new ConsoleWriter($options));
-		return $logger;
+		return parent::createDefaultLogger($verbose ? LogLevel::DEBUG : LogLevel::WARNING, $options);
 	}
 }
