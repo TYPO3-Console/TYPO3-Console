@@ -176,7 +176,7 @@ class Scripts {
 	/**
 	 * Tell Extbase, TYPO3 and PHP that we have another implementation
 	 */
-	static protected function overrideImplementation($originalClassName, $overrideClassName) {
+	static public function overrideImplementation($originalClassName, $overrideClassName) {
 		/** @var $extbaseObjectContainer \TYPO3\CMS\Extbase\Object\Container\Container */
 		$extbaseObjectContainer = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\Container\\Container');
 		$extbaseObjectContainer->registerImplementation($originalClassName, $overrideClassName);

@@ -14,13 +14,14 @@ notifications:
     - helmut@typo3.org
 
 before_script:
+  - sudo apt-get install parallel
+  - composer self-update
   - cd ..
   - git clone --single-branch --branch $TYPO3_BRANCH --depth 1 https://github.com/TYPO3/TYPO3.CMS.git typo3_core
   - mv typo3_core/* .
-  - sudo apt-get install parallel
-  - composer self-update
   - composer install
   - mkdir -p uploads typo3temp typo3conf/ext
+  - cp typo3_console/Scripts/typo3cms .
   - mv typo3_console typo3conf/ext/
 
 script:

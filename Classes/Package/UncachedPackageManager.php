@@ -60,4 +60,28 @@ class UncachedPackageManager extends PackageManager {
 		$this->saveToPackageCache();
 	}
 
-} 
+	protected function loadPackageStates() {
+		$this->packageStatesConfiguration = file_exists($this->packageStatesPathAndFilename) ? include($this->packageStatesPathAndFilename) : array();
+		if (!isset($this->packageStatesConfiguration['version']) || $this->packageStatesConfiguration['version'] < 4) {
+			$this->packageStatesConfiguration = array();
+		}
+		if ($this->packageStatesConfiguration === array()) {
+			$this->scanAvailablePackages();
+		} else {
+			$this->registerPackagesFromConfiguration();
+		}
+	}
+
+	protected function sortAndSavePackageStates() {
+		// no save!
+	}
+
+	/**
+	 * To enable writing of the package states file the package states
+	 * migration needs to override eventual failsafe blocks.
+	 */
+	public function forceSortAndSavePackageStates() {
+		parent::sortAndSavePackageStates();
+	}
+
+}

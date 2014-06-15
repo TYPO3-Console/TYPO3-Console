@@ -25,6 +25,7 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use Helhum\Typo3Console\Core\Booting\Scripts;
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
@@ -106,7 +107,7 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface {
 
 		$this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
 		$this->dispatcher = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Dispatcher');
-
+		Scripts::overrideImplementation('TYPO3\CMS\Extbase\Command\HelpCommandController', 'Helhum\Typo3Console\Command\HelpCommandController');
 	}
 
 	/**

@@ -63,7 +63,7 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager {
 	/**
 	 * Make sure the objet manager is set
 	 *
-	 * @return array
+	 * @return \TYPO3\CMS\Extbase\Mvc\Cli\Command[]
 	 */
 	public function getAvailableCommands() {
 		$this->initialize();
@@ -74,8 +74,9 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager {
 			} else {
 				$commandControllerRegistry = $this->commandControllers;
 			}
+			$this->availableCommands = parent::getAvailableCommands();
 		}
-		return parent::getAvailableCommands();
+		return $this->availableCommands;
 	}
 
 

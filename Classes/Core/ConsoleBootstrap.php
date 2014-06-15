@@ -73,6 +73,7 @@ class ConsoleBootstrap extends Bootstrap {
 
 		$this->requestId = uniqid();
 		$this->runLevel = new RunLevel();
+		$this->setEarlyInstance('Helhum\Typo3Console\Core\Booting\RunLevel', $this->runLevel);
 		new ExceptionHandler();
 	}
 
@@ -300,10 +301,15 @@ class ConsoleBootstrap extends Bootstrap {
 	}
 
 	protected function initializeUncachedClassLoader() {
-		$this->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader')
-			->injectClassesCache(new StringFrontend('cache_classes', new TransientMemoryBackend($this->getApplicationContext())));
-		$this->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader')
-			->setPackages($this->getEarlyInstance('TYPO3\\Flow\\Package\\PackageManager')->getActivePackages());
+		$classLoader = $this->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader');
+		$classLoader->injectClassesCache(new StringFrontend('cache_classes', new TransientMemoryBackend($this->getApplicationContext())));
+
+		$reflectionObject = new \ReflectionObject($classLoader);
+		$property = $reflectionObject->getProperty('isLoadingLocker');
+		$property->setAccessible(TRUE);
+		$property->setValue($classLoader, TRUE);
+
+		$classLoader->setPackages($this->getEarlyInstance('TYPO3\\Flow\\Package\\PackageManager')->getActivePackages());
 	}
 
 	public function disableCachesForObjectManagement() {

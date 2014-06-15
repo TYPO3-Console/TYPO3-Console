@@ -299,9 +299,38 @@ class RunLevel {
 	 * @return string
 	 * @internal
 	 */
-	protected function getRunlevelForCommand($commandIdentifier) {
+	public function getRunlevelForCommand($commandIdentifier) {
+		if ($commandIdentifier === '' || $commandIdentifier === 'help') {
+			return $this->getMaximumAvailableRunLevel();
+		}
 		$options = $this->getOptionsForCommand($commandIdentifier);
 		return isset($options['runLevel']) ? $options['runLevel'] : self::LEVEL_LEGACY;
+	}
+
+	/**
+	 * Check if we have all mandatory files to assume we have a fully configured / installed TYPO3
+	 *
+	 * @return bool
+	 */
+	public function getMaximumAvailableRunLevel() {
+		if (!file_exists(PATH_site . 'typo3conf/PackageStates.php') || !file_exists(PATH_site . 'typo3conf/LocalConfiguration.php')) {
+			return self::LEVEL_COMPILE;
+		}
+
+		return self::LEVEL_FULL;
+	}
+
+	public function isCommandAvailable($commandIdentifier) {
+		$expectedRunLevel = $this->getRunlevelForCommand($commandIdentifier);
+		$availableRunlevel = $this->getMaximumAvailableRunLevel();
+		$isAvailable = TRUE;
+		if ($availableRunlevel === self::LEVEL_COMPILE) {
+			if (in_array($expectedRunLevel, array(self::LEVEL_FULL, self::LEVEL_MINIMAL, self::LEVEL_LEGACY))) {
+				$isAvailable = FALSE;
+			}
+		}
+
+		return $isAvailable;
 	}
 
 	/**
