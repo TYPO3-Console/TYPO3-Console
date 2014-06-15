@@ -27,8 +27,13 @@ namespace Helhum\Typo3Console\Command;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use TYPO3\CMS\Core\Database\ReferenceIndex;
+use Helhum\Typo3Console\Context\NotificationContext;
+use Helhum\Typo3Console\Context\PersistenceContext;
+use Helhum\Typo3Console\Log\Writer\ConsoleWriter;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use TYPO3\CMS\Core\Log\Logger;
+use TYPO3\CMS\Core\Log\LogLevel;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class CleanupCommandController
@@ -36,46 +41,82 @@ use Helhum\Typo3Console\Mvc\Controller\CommandController;
 class CleanupCommandController extends CommandController {
 
 	/**
-	 * @var ReferenceIndex
+	 * @var \Helhum\Typo3Console\Service\PersistenceIntegrityService
+	 * @inject
 	 */
-	protected $referenceIndex;
+	protected $persistenceIntegrityService;
 
 	/**
+	 * Updates reference index to ensure data integrity
 	 *
+	 * @param bool $dryRun If set, index is only checked without performing any action
+	 * @param bool $verbose Whether to output results or not
+	 * @param bool $showProgress Whether to output a progress bar
 	 */
-	public function initializeObject() {
-		$this->referenceIndex = $this->objectManager->get('TYPO3\\CMS\\Core\\Database\\ReferenceIndex');
+	public function updateReferenceIndexCommand($dryRun = FALSE, $verbose = FALSE, $showProgress = FALSE) {
+		$this->outputLine('<info>' . ($dryRun ? 'Checking' : 'Updating') . ' reference index. This may take a while …</info>');
+
+		list($errorCount, $recordCount, $processedTables) = $this->persistenceIntegrityService->checkOrUpdateReferenceIndex(
+			$this->createPersistenceContext($dryRun),
+			$this->createNotificationContext($dryRun, $verbose, $showProgress)
+		);
+
+		if ($errorCount > 0) {
+			$this->outputLine('<info>%d errors were ' . ($dryRun ? 'found' : 'fixed') . ', while ' . ($dryRun ? 'checking' : 'updating') . ' reference index for %d records from %d tables.</info>', array($errorCount, $recordCount, count($processedTables)));
+		} else {
+			$this->outputLine('<info>Index integrity was perfect!</info>');
+		}
 	}
 
-	/**
-	 * Checks if integrity of reference index
-	 *
-	 * @param bool $verbose Whether to output results or not
-	 */
-	public function checkReferenceIndexCommand($verbose = TRUE) {
-		$this->outputLine('Checking reference index …');
-		list($header, $main, $errorCount) = $this->referenceIndex->updateIndex(TRUE, FALSE);
-		if ($verbose) {
-			$this->output($main . LF);
+	protected function createNotificationContext($dryRun, $verbose, $showProgress) {
+		$notificationContext = new NotificationContext($this->createLogger($verbose, $showProgress));
+
+		if ($showProgress) {
+			$progressHelper = $this->getProgressHelper();
+			$output = $this->output;
+			$notificationContext->subscribeEvent(
+				'startOperation',
+				function($max) use ($progressHelper, $output) {
+					$progressHelper->start($output, $max);
+				}
+			);
+			$notificationContext->subscribeEvent(
+				'proceedOperation',
+				function() use ($progressHelper) {
+					$progressHelper->advance();
+				}
+			);
+			$notificationContext->subscribeEvent(
+				'endOperation',
+				function() use ($progressHelper, $dryRun) {
+					$progressHelper->finish();
+					if (!$dryRun) {
+						GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Registry')->set('core', 'sys_refindex_lastUpdate', $GLOBALS['EXEC_TIME']);
+					}
+				}
+			);
 		}
-		if ($errorCount > 0) {
-			$this->outputLine('The reference index check found %s errors.', array($errorCount));
-		}
+
+		return $notificationContext;
 	}
 
-	/**
-	 * Updates reference index to ensure integrity
-	 *
-	 * @param bool $verbose Whether to output results or not
-	 */
-	public function updateReferenceIndexCommand($verbose = TRUE) {
-		$this->outputLine('Updating reference index …');
-		list($header, $main, $errorCount) = $this->referenceIndex->updateIndex(FALSE, FALSE);
-		if ($verbose) {
-			$this->output($main . LF);
+	protected function createPersistenceContext($dryRun) {
+		$options = array();
+		if ($dryRun) {
+			$options['dry-run'] = TRUE;
 		}
-		if ($errorCount > 0) {
-			$this->outputLine('The reference index update process found %s errors.', array($errorCount));
+		return new PersistenceContext($GLOBALS['TYPO3_DB'], $GLOBALS['TCA'], $options);
+	}
+
+	protected function createLogger($verbose, $addNewLines) {
+		$options = array(
+			'output' => $this->output
+		);
+		if ($addNewLines) {
+			$options['messageWrap'] = LF . LF . '|' . LF;
 		}
+		$logger = new Logger(__CLASS__);
+		$logger->addWriter($verbose ? LogLevel::DEBUG : LogLevel::WARNING, new ConsoleWriter($options));
+		return $logger;
 	}
 }
