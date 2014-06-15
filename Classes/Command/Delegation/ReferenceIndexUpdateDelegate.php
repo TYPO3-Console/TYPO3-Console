@@ -1,5 +1,5 @@
 <?php
-namespace Helhum\Typo3Console\Context;
+namespace Helhum\Typo3Console\Command\Delegation;
 
 /***************************************************************
  *  Copyright notice
@@ -27,35 +27,94 @@ namespace Helhum\Typo3Console\Context;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use Helhum\Typo3Console\Event\EventEmitterTrait;
+use Helhum\Typo3Console\Service\Delegation\ReferenceIndexIntegrityDelegateInterface;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Log\Logger;
 use TYPO3\CMS\Core\Log\LogLevel;
 use TYPO3\CMS\Core\Log\Writer\NullWriter;
 
 /**
- * Class NotificationContext
+ * Class ReferenceIndexUpdateDelegate
  */
-class NotificationContext {
+class ReferenceIndexUpdateDelegate implements ReferenceIndexIntegrityDelegateInterface {
 
-	use EventEmitterTrait;
+	/**
+	 * @var array
+	 */
+	protected $subscribers = array();
+
+	/**
+	 * @param string $name
+	 * @param array $arguments
+	 */
+	public function emitEvent($name, $arguments = array()) {
+		if (empty($this->subscribers[$name])) {
+			return;
+		}
+
+		foreach ($this->subscribers[$name] as $subscriber) {
+			call_user_func_array($subscriber, $arguments);
+		}
+	}
+
+	/**
+	 * @param string $name
+	 * @param Callback $subscriber
+	 */
+	public function subscribeEvent($name, $subscriber) {
+		if (!isset($this->subscribers[$name])) {
+			$this->subscribers[$name] = array();
+		}
+
+		$this->subscribers[$name][] = $subscriber;
+	}
 
 	/**
 	 * @var LoggerInterface
 	 */
 	protected $logger;
 
+	/**
+	 * @param LoggerInterface $logger
+	 */
 	function __construct(LoggerInterface $logger = NULL) {
-		$this->logger = $logger ?:  $this->createNullLogger();
+		$this->logger = $logger ?: $this->createNullLogger();
 	}
 
 	/**
-	 * @return \Psr\Log\LoggerInterface
+	 * @param int $unitsOfWorkCount
+	 * @return void
+	 */
+	public function willStartOperation($unitsOfWorkCount) {
+		$this->emitEvent('willStartOperation', array($unitsOfWorkCount));
+	}
+
+	/**
+	 * @param string $tableName
+	 * @param array $record
+	 * @return void
+	 */
+	public function willUpdateRecord($tableName, array $record) {
+		$this->emitEvent('willUpdateRecord', array($tableName, $record));
+	}
+
+	/**
+	 * @return void
+	 */
+	public function operationHasEnded() {
+		$this->emitEvent('operationHasEnded');
+	}
+
+	/**
+	 * @return LoggerInterface
 	 */
 	public function getLogger() {
 		return $this->logger;
 	}
 
+	/**
+	 * @return LoggerInterface
+	 */
 	protected function createNullLogger() {
 		$logger = new Logger(__CLASS__);
 		$logger->addWriter(LogLevel::EMERGENCY, new NullWriter());

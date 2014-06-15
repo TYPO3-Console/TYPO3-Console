@@ -27,8 +27,8 @@ namespace Helhum\Typo3Console\Command;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use Helhum\Typo3Console\Context\NotificationContext;
-use Helhum\Typo3Console\Context\PersistenceContext;
+use Helhum\Typo3Console\Command\Delegation\ReferenceIndexUpdateDelegate;
+use Helhum\Typo3Console\Service\Persistence\PersistenceContext;
 use Helhum\Typo3Console\Log\Writer\ConsoleWriter;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Log\Logger;
@@ -41,7 +41,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class CleanupCommandController extends CommandController {
 
 	/**
-	 * @var \Helhum\Typo3Console\Service\PersistenceIntegrityService
+	 * @var \Helhum\Typo3Console\Service\Persistence\PersistenceIntegrityService
 	 * @inject
 	 */
 	protected $persistenceIntegrityService;
@@ -56,9 +56,11 @@ class CleanupCommandController extends CommandController {
 	public function updateReferenceIndexCommand($dryRun = FALSE, $verbose = FALSE, $showProgress = FALSE) {
 		$this->outputLine('<info>' . ($dryRun ? 'Checking' : 'Updating') . ' reference index. This may take a while …</info>');
 
-		list($errorCount, $recordCount, $processedTables) = $this->persistenceIntegrityService->checkOrUpdateReferenceIndex(
-			$this->createPersistenceContext($dryRun),
-			$this->createNotificationContext($dryRun, $verbose, $showProgress)
+		$operation = $dryRun ? 'checkReferenceIndex' : 'updateReferenceIndex';
+
+		list($errorCount, $recordCount, $processedTables) = $this->persistenceIntegrityService->{$operation}(
+			new PersistenceContext($GLOBALS['TYPO3_DB'], $GLOBALS['TCA']),
+			$this->createReferenceIndexDelegateWithOptions($dryRun, $verbose, $showProgress)
 		);
 
 		if ($errorCount > 0) {
@@ -68,47 +70,55 @@ class CleanupCommandController extends CommandController {
 		}
 	}
 
-	protected function createNotificationContext($dryRun, $verbose, $showProgress) {
-		$notificationContext = new NotificationContext($this->createLogger($verbose, $showProgress));
-
+	/**
+	 * @param bool $dryRun
+	 * @param bool $verbose
+	 * @param bool $showProgress
+	 * @return ReferenceIndexUpdateDelegate
+	 */
+	protected function createReferenceIndexDelegateWithOptions($dryRun, $verbose, $showProgress) {
+		$delegate = new ReferenceIndexUpdateDelegate($this->createLogger($verbose, $showProgress));
 		if ($showProgress) {
 			$progressHelper = $this->getProgressHelper();
 			$output = $this->output;
-			$notificationContext->subscribeEvent(
-				'startOperation',
+			$delegate->subscribeEvent(
+				'willStartOperation',
 				function($max) use ($progressHelper, $output) {
 					$progressHelper->start($output, $max);
 				}
 			);
-			$notificationContext->subscribeEvent(
-				'proceedOperation',
+			$delegate->subscribeEvent(
+				'willUpdateRecord',
 				function() use ($progressHelper) {
 					$progressHelper->advance();
 				}
 			);
-			$notificationContext->subscribeEvent(
-				'endOperation',
+			$delegate->subscribeEvent(
+				'operationHasEnded',
 				function() use ($progressHelper, $dryRun) {
 					$progressHelper->finish();
-					if (!$dryRun) {
-						GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Registry')->set('core', 'sys_refindex_lastUpdate', $GLOBALS['EXEC_TIME']);
-					}
 				}
 			);
 		}
 
-		return $notificationContext;
-	}
-
-	protected function createPersistenceContext($dryRun) {
-		$options = array();
-		if ($dryRun) {
-			$options['dry-run'] = TRUE;
+		if (!$dryRun) {
+			$delegate->subscribeEvent(
+				'operationHasEnded',
+				function() {
+					GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Registry')->set('core', 'sys_refindex_lastUpdate', $GLOBALS['EXEC_TIME']);
+				}
+			);
 		}
-		return new PersistenceContext($GLOBALS['TYPO3_DB'], $GLOBALS['TCA'], $options);
+
+		return $delegate;
 	}
 
-	protected function createLogger($verbose, $addNewLines) {
+	/**
+	 * @param bool $verbose
+	 * @param bool $addNewLines
+	 * @return Logger
+	 */
+	protected function createLogger($verbose, $addNewLines = FALSE) {
 		$options = array(
 			'output' => $this->output
 		);

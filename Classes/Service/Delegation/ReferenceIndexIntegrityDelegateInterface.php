@@ -1,6 +1,4 @@
 <?php
-namespace Helhum\Typo3Console\Context;
-
 /***************************************************************
  *  Copyright notice
  *
@@ -27,53 +25,32 @@ namespace Helhum\Typo3Console\Context;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use TYPO3\CMS\Core\Database\DatabaseConnection;
 
-/**
- * Class PersistenceContext
- */
-class PersistenceContext {
+namespace Helhum\Typo3Console\Service\Delegation;
 
-	/**
-	 * @var DatabaseConnection
-	 */
-	protected $databaseConnection;
+
+interface ReferenceIndexIntegrityDelegateInterface {
 
 	/**
-	 * @var array
+	 * @param int $unitsOfWorkCount
+	 * @return void
 	 */
-	protected $persistenceConfiguration = array();
+	public function willStartOperation($unitsOfWorkCount);
 
 	/**
-	 * @var array
+	 * @param string $tableName
+	 * @param array $record
+	 * @return void
 	 */
-	protected $options = array();
-
-	public function __construct(DatabaseConnection $databaseConnection, array $persistenceConfiguration, array $options = array()) {
-		$this->databaseConnection = $databaseConnection;
-		$this->persistenceConfiguration = $persistenceConfiguration;
-		$this->options = $options;
-	}
+	public function willUpdateRecord($tableName, array $record);
 
 	/**
-	 * @return \TYPO3\CMS\Core\Database\DatabaseConnection
+	 * @return void
 	 */
-	public function getDatabaseConnection() {
-		return $this->databaseConnection;
-	}
+	public function operationHasEnded();
 
 	/**
-	 * @return array
+	 * @return \Psr\Log\LoggerInterface
 	 */
-	public function getPersistenceConfiguration() {
-		return $this->persistenceConfiguration;
-	}
-
-	public function hasOption($name) {
-		return isset($this->options[$name]);
-	}
-
-	public function getOption($name) {
-		return isset($this->options[$name]) ? $this->options[$name] : NULL;
-	}
+	public function getLogger();
 }
