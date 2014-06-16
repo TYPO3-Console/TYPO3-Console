@@ -44,6 +44,11 @@ class RunLevel {
 	protected $commandOptions = array();
 
 	/**
+	 * @var array
+	 */
+	protected $executedSequences = array();
+
+	/**
 	 * @param string $commandIdentifier
 	 * @param string $runlevel
 	 * @api
@@ -135,11 +140,12 @@ class RunLevel {
 	protected function buildEssentialSequence($identifier, $parentSequence = NULL) {
 		$sequence = $parentSequence ?: new Sequence($identifier);
 
-		$this->addStep($sequence, 'helhum.typo3console:coreconfiguration', $parentSequence ? TRUE : FALSE);
-		$this->addStep($sequence, 'helhum.typo3console:caching', $parentSequence ? TRUE : FALSE);
-		$this->addStep($sequence, 'helhum.typo3console:errorhandling', $parentSequence ? TRUE : FALSE);
-		$this->addStep($sequence, 'helhum.typo3console:classloadercache', $parentSequence ? TRUE : FALSE);
+		$this->addStep($sequence, 'helhum.typo3console:coreconfiguration', !empty($this->executedSequences[self::LEVEL_ESSENTIAL]));
+		$this->addStep($sequence, 'helhum.typo3console:caching', !empty($this->executedSequences[self::LEVEL_ESSENTIAL]));
+		$this->addStep($sequence, 'helhum.typo3console:errorhandling', !empty($this->executedSequences[self::LEVEL_ESSENTIAL]));
+		$this->addStep($sequence, 'helhum.typo3console:classloadercache', !empty($this->executedSequences[self::LEVEL_ESSENTIAL]));
 
+		$this->executedSequences[self::LEVEL_ESSENTIAL] = TRUE;
 		return $sequence;
 	}
 
@@ -164,6 +170,7 @@ class RunLevel {
 		}));
 		$sequence->addStep(new Step('helhum.typo3console:providecleanclassimplementations', array('Helhum\Typo3Console\Core\Booting\Scripts', 'provideCleanClassImplementations')));
 
+		$this->executedSequences[self::LEVEL_COMPILE] = TRUE;
 		return $sequence;
 	}
 
@@ -177,8 +184,8 @@ class RunLevel {
 	protected function buildBasicRuntimeSequence($identifier = self::LEVEL_MINIMAL, $parentSequence = NULL) {
 		$sequence = $parentSequence ?: $this->buildEssentialSequence($identifier);
 
-		$this->addStep($sequence, 'helhum.typo3console:extensionconfiguration', $parentSequence ? TRUE : FALSE);
-		if ($parentSequence === NULL) {
+		$this->addStep($sequence, 'helhum.typo3console:extensionconfiguration', !empty($this->executedSequences[self::LEVEL_MINIMAL]));
+		if (empty($this->executedSequences[self::LEVEL_COMPILE])) {
 			// Only execute if not already executed in compile time
 			$sequence->addStep(new Step('helhum.typo3console:providecleanclassimplementations', array('Helhum\Typo3Console\Core\Booting\Scripts', 'provideCleanClassImplementations')), 'helhum.typo3console:extensionconfiguration');
 		} else {
@@ -186,6 +193,7 @@ class RunLevel {
 			$this->addStep($sequence, 'helhum.typo3console:enablecorecaches');
 		}
 
+		$this->executedSequences[self::LEVEL_MINIMAL] = TRUE;
 		return $sequence;
 	}
 
@@ -199,10 +207,11 @@ class RunLevel {
 	protected function buildExtendedRuntimeSequence($identifier = self::LEVEL_FULL, $parentSequence = NULL) {
 		$sequence = $parentSequence ?: $this->buildBasicRuntimeSequence($identifier);
 
-		$this->addStep($sequence, 'helhum.typo3console:database', $parentSequence ? TRUE : FALSE);
-		$this->addStep($sequence, 'helhum.typo3console:persistence', $parentSequence ? TRUE : FALSE);
-		$this->addStep($sequence, 'helhum.typo3console:authentication', $parentSequence ? TRUE : FALSE);
+		$this->addStep($sequence, 'helhum.typo3console:database', !empty($this->executedSequences[self::LEVEL_FULL]));
+		$this->addStep($sequence, 'helhum.typo3console:persistence', !empty($this->executedSequences[self::LEVEL_FULL]));
+		$this->addStep($sequence, 'helhum.typo3console:authentication', !empty($this->executedSequences[self::LEVEL_FULL]));
 
+		$this->executedSequences[self::LEVEL_FULL] = TRUE;
 		return $sequence;
 	}
 
