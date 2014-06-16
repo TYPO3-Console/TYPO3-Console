@@ -39,7 +39,7 @@ just type:
 **Installation**
 
 For the extension to work, it *must* be installed in the typo3conf/ext/ directory *not* in any other possible extension location.
-To get the typo3cms command, just copy or link typo3_console/Scripts/typo3cms to your TYPO3 root directory. Windows users must copy
+To get the typo3cms command, just _copy_ typo3_console/Scripts/typo3cms to your TYPO3 root directory. Windows users must copy
 typo3_console/Scripts/typo3cms.bat to the TYPO3 root directory and set the location to the php.exe in that file (untested but should work).
 
 **TODO**
