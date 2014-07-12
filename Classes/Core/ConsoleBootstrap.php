@@ -246,7 +246,9 @@ class ConsoleBootstrap extends Bootstrap {
 		class_alias(get_class($this), 'TYPO3\\Flow\\Core\\Bootstrap');
 		parent::baseSetup($pathPart);
 		// I want to see deprecation messages
-		error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
+//		error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
+		// I would love to see deprecation messages, but unfortunately TYPO3 core itself triggers such messages :(
+		error_reporting(E_ALL & ~(E_STRICT | E_NOTICE | E_DEPRECATED));
 
 	}
 
