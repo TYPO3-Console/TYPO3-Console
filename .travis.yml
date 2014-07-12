@@ -23,6 +23,7 @@ before_script:
   - mkdir -p uploads typo3temp typo3conf/ext
   - cp typo3_console/Scripts/typo3cms .
   - mv typo3_console typo3conf/ext/
+  - ./typo3cms install:setup --database-user-name="root" --database-user-password="__EMPTY" --database-host-name="localhost" --database-port="3306" --database-name="travis_test" --admin-user-name="admin" --admin-password="password" --site-name="Travis Install"
 
 script:
   - >
@@ -38,3 +39,10 @@ script:
             exit 99;
         fi
     "
+# Basic functional tests - all commands should exit with 0
+  - ./typo3cms help
+  - ./typo3cms cache:flush
+  - ./typo3cms cache:warmup
+  - ./typo3cms backend:lock
+  - ./typo3cms backend:unlock
+  - ./typo3cms cleanup:updatereferenceindex

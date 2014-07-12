@@ -191,6 +191,13 @@ class InstallCommandController extends CommandController {
 	 * @return ActionInterface
 	 */
 	protected function createActionWithNameAndArguments($actionName, array $arguments = array()) {
+		// TODO: boy this is ugly, but it seems surprisingly hard to allow empty arguments from the command line ^^
+		foreach ($arguments as &$argumentValue) {
+			if ($argumentValue === '__EMPTY') {
+				$argumentValue = '';
+			}
+		}
+
 		$classPrefix = 'TYPO3\\CMS\\Install\\Controller\\Action\\Step\\';
 		$className = $classPrefix . ucfirst($actionName);
 
