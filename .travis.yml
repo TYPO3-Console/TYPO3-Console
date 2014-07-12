@@ -8,6 +8,7 @@ php:
 
 env:
   - TYPO3_BRANCH=master COVERAGE=0
+  - TYPO3_BRANCH=TYPO3_6-2 COVERAGE=0
 
 notifications:
   email:
