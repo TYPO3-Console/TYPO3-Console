@@ -79,16 +79,19 @@ class Package extends \TYPO3\CMS\Core\Package\Package {
 		$bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\SchedulerCommandController');
 		$bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\CleanupCommandController');
 		$bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\DocumentationCommandController');
-
 		$bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\InstallCommandController');
-		$bootstrap->setRunLevelForCommand('typo3_console:install:*', RunLevel::LEVEL_COMPILE);
+
+		$bootstrap->setRunLevelForCommand('typo3_console:install:databasedata', RunLevel::LEVEL_MINIMAL);
+		$bootstrap->addBootingStepForCommand('typo3_console:install:databasedata', 'helhum.typo3console:database');
 		$bootstrap->setRunLevelForCommand('typo3_console:install:defaultconfiguration', RunLevel::LEVEL_FULL);
+		$bootstrap->setRunLevelForCommand('typo3_console:install:*', RunLevel::LEVEL_COMPILE);
 
 		$bootstrap->setRunLevelForCommand('typo3_console:cache:flush', RunLevel::LEVEL_COMPILE);
 		$bootstrap->addBootingStepForCommand('typo3_console:cache:flush', 'helhum.typo3console:database');
+		$bootstrap->setRunLevelForCommand('typo3_console:cache:*', RunLevel::LEVEL_FULL);
+
 		$bootstrap->setRunLevelForCommand('typo3_console:backend:*', RunLevel::LEVEL_MINIMAL);
 		$bootstrap->setRunLevelForCommand('typo3_console:documentation:*', RunLevel::LEVEL_FULL);
-		$bootstrap->setRunLevelForCommand('typo3_console:cache:*', RunLevel::LEVEL_FULL);
 		$bootstrap->setRunLevelForCommand('typo3_console:scheduler:*', RunLevel::LEVEL_FULL);
 		$bootstrap->setRunLevelForCommand('typo3_console:cleanup:*', RunLevel::LEVEL_FULL);
 	}

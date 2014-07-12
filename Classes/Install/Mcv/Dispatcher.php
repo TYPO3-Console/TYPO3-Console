@@ -58,33 +58,43 @@ class Dispatcher extends StepController {
 	 * @return mixed
 	 */
 	public function dispatchAction($actionName, $arguments = array()) {
-
-		$classPrefix = 'TYPO3\\CMS\\Install\\Controller\\Action\\Step\\';
-		$className = $classPrefix . ucfirst($actionName);
-
-		/** @var ActionInterface $action */
-		$action = $this->objectManager->get($className);
-		$action->setController('step');
-		$action->setAction($actionName);
-		$action->setPostValues(array('values' => $arguments));
-		try {
-			$needsExecution = $action->needsExecution();
-		} catch(\TYPO3\CMS\Install\Controller\Exception\RedirectException $e) {
-			// todo: we may need to really reload everything from scratch here but for now we just proceed
-			$needsExecution = TRUE;
-		}
-
 		if (file_exists(PATH_site . 'typo3conf/LocalConfiguration.php')) {
 			$this->executeSilentConfigurationUpgradesIfNeeded();
 		}
 
-		if ($needsExecution) {
-			$messages = $action->execute();
-			$this->reloadConfiguration();
-			return $messages;
-		} else {
-			return FALSE;
+		do {
+			$messages = json_decode($this->executeCommand($actionName, $arguments));
+		} while($messages === 'REDIRECT');
+
+		return $messages;
+	}
+
+	/**
+	 * @param string $actionName
+	 * @param array $arguments
+	 * @return string Json encoded output of the executed command
+	 * @throws \Exception
+	 */
+	protected function executeCommand($actionName, $arguments = array()) {
+		$phpBinary = defined('PHP_BINARY') ? PHP_BINARY : (!empty($_SERVER['_']) ? $_SERVER['_'] : '');
+		$commandLine = isset($_SERVER['argv']) ? $_SERVER['argv'] : array();
+		$callingScript = array_shift($commandLine);
+		$commandLineArguments = array();
+		$commandLineArguments[] = 'install:' . strtolower($actionName);
+
+		foreach ($arguments as $argumentName => $argumentValue) {
+			$dashedName = ucfirst($argumentName);
+			$dashedName = preg_replace('/([A-Z][a-z0-9]+)/', '$1-', $dashedName);
+			$dashedName = '--' . strtolower(substr($dashedName, 0, -1));
+			$commandLineArguments[] = $dashedName . '="' . addcslashes($argumentValue, '"') . '"';
 		}
+
+		$scriptToExecute = (!empty($phpBinary) ? (escapeshellcmd($phpBinary) . ' ') : '') . escapeshellcmd($callingScript) . ' ' . implode(' ', $commandLineArguments);
+		$returnString = exec($scriptToExecute, $output, $returnValue);
+		if ($returnValue > 0) {
+			throw new \ErrorException(sprintf('Executing %s failed with message: ', $actionName) . LF . implode(LF, $output));
+		}
+		return $returnString;
 	}
 
 	/**
