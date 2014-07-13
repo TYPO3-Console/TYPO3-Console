@@ -21,10 +21,9 @@ before_script:
   - git clone --single-branch --branch $TYPO3_BRANCH --depth 1 https://github.com/TYPO3/TYPO3.CMS.git typo3_core
   - mv typo3_core/* .
   - composer install
-  - mkdir -p uploads typo3temp typo3conf/ext
+  - mkdir -p typo3conf/ext
   - cp typo3_console/Scripts/typo3cms .
   - mv typo3_console typo3conf/ext/
-  - ./typo3cms install:setup --non-interactive --database-user-name="root" --database-host-name="localhost" --database-port="3306" --database-name="travis_test" --admin-user-name="admin" --admin-password="password" --site-name="Travis Install"
 
 script:
   - >
@@ -41,6 +40,7 @@ script:
         fi
     "
 # Basic functional tests - all commands should exit with 0
+  - ./typo3cms install:setup --non-interactive --database-user-name="root" --database-host-name="localhost" --database-port="3306" --database-name="travis_test" --admin-user-name="admin" --admin-password="password" --site-name="Travis Install"
   - ./typo3cms help
   - ./typo3cms cache:flush
   - ./typo3cms cache:warmup
