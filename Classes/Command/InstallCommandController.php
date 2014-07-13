@@ -30,7 +30,7 @@ namespace Helhum\Typo3Console\Command;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 
 /**
- * Pre-alpha version of a setup command controller
+ * Alpha version of a setup command controller
  * Use with care and at your own risk!
  */
 class InstallCommandController extends CommandController {
@@ -42,8 +42,9 @@ class InstallCommandController extends CommandController {
 	protected $cliSetupRequestHandler;
 
 	/**
-	 * Pre-alpha version of a setup command. Use with care and at your own risk!
+	 * Alpha version of a setup command. Use with care and at your own risk!
 	 *
+	 * @param bool $nonInteractive
 	 * @param string $databaseUserName
 	 * @param string $databaseUserPassword
 	 * @param string $databaseHostName
@@ -54,11 +55,11 @@ class InstallCommandController extends CommandController {
 	 * @param string $adminPassword
 	 * @param string $siteName
 	 */
-	public function setupCommand($databaseUserName = '', $databaseUserPassword = '', $databaseHostName = '', $databasePort = '', $databaseSocket = '', $databaseName = '', $adminUserName = '', $adminPassword = '', $siteName = 'New TYPO3 Console site') {
+	public function setupCommand($nonInteractive = FALSE, $databaseUserName = '', $databaseUserPassword = '', $databaseHostName = '', $databasePort = '', $databaseSocket = '', $databaseName = '', $adminUserName = '', $adminPassword = '', $siteName = 'New TYPO3 Console site') {
 		$this->outputLine();
 		$this->outputLine('<options=bold>Welcome to the console installer of TYPO3 CMS!</options=bold>');
 
-		$this->cliSetupRequestHandler->setup($this->request->getArguments());
+		$this->cliSetupRequestHandler->setup(!$nonInteractive, $this->request->getArguments());
 
 		$this->outputLine();
 		$this->outputLine('Successfully installed TYPO3 CMS!');

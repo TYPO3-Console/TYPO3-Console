@@ -96,6 +96,11 @@ class CliSetupRequestHandler {
 	protected $givenRequestArguments = array();
 
 	/**
+	 * @var bool
+	 */
+	protected $interactiveSetup = TRUE;
+
+	/**
 	 *
 	 */
 	public function __construct() {
@@ -104,9 +109,11 @@ class CliSetupRequestHandler {
 	}
 
 	/**
+	 * @param bool $interactiveSetup
 	 * @param array $givenRequestArguments
 	 */
-	public function setup(array $givenRequestArguments = array()) {
+	public function setup($interactiveSetup, array $givenRequestArguments) {
+		$this->interactiveSetup = $interactiveSetup;
 		$this->givenRequestArguments = $givenRequestArguments;
 
 		touch(PATH_site . 'FIRST_INSTALL');
@@ -139,13 +146,6 @@ class CliSetupRequestHandler {
 	 * @return ActionInterface
 	 */
 	protected function createActionWithNameAndArguments($actionName, array $arguments = array()) {
-		// TODO: boy this is ugly, but it seems surprisingly hard to allow empty arguments from the command line ^^
-		foreach ($arguments as &$argumentValue) {
-			if ($argumentValue === '__EMPTY') {
-				$argumentValue = '';
-			}
-		}
-
 		$classPrefix = 'TYPO3\\CMS\\Install\\Controller\\Action\\Step\\';
 		$className = $classPrefix . ucfirst($actionName);
 
@@ -201,6 +201,13 @@ class CliSetupRequestHandler {
 				if (isset($this->givenRequestArguments[$argumentDefinition->getName()])) {
 					$actionArguments[$argumentDefinition->getName()] = $this->givenRequestArguments[$argumentDefinition->getName()];
 				} else {
+					if (!$this->interactiveSetup) {
+						if ($argument->isRequired()) {
+							throw new \RuntimeException(sprintf('Argument "%s" is not set, but is required and user interaction has been disabled!', $argument->getName()), 1405273316);
+						} else {
+							continue;
+						}
+					}
 					$argumentValue = NULL;
 					do {
 						$argumentValue = $this->ask(

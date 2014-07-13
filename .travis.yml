@@ -24,7 +24,7 @@ before_script:
   - mkdir -p uploads typo3temp typo3conf/ext
   - cp typo3_console/Scripts/typo3cms .
   - mv typo3_console typo3conf/ext/
-  - ./typo3cms install:setup --database-user-name="root" --database-user-password="__EMPTY" --database-host-name="localhost" --database-port="3306" --database-name="travis_test" --admin-user-name="admin" --admin-password="password" --site-name="Travis Install"
+  - ./typo3cms install:setup --non-interactive --database-user-name="root" --database-host-name="localhost" --database-port="3306" --database-name="travis_test" --admin-user-name="admin" --admin-password="password" --site-name="Travis Install"
 
 script:
   - >
