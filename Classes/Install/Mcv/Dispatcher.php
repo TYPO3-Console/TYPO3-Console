@@ -63,10 +63,10 @@ class Dispatcher extends StepController {
 		}
 
 		do {
-			$messages = json_decode($this->executeCommand($actionName, $arguments));
+			$messages = @unserialize($this->executeCommand($actionName, $arguments));
 		} while($messages === 'REDIRECT');
 
-		return $messages;
+		return $messages ?: array();
 	}
 
 	/**

@@ -30,12 +30,19 @@ namespace Helhum\Typo3Console\Command;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Install\Controller\Action\ActionInterface;
+use TYPO3\CMS\Install\Status\StatusInterface;
 
 /**
  * Pre-alpha version of a setup command controller
  * Use with care and at your own risk!
  */
 class InstallCommandController extends CommandController {
+
+	/**
+	 * @var \Helhum\Typo3Console\Mvc\Cli\CommandManager
+	 * @inject
+	 */
+	protected $commandManager;
 
 	/**
 	 * @var \Helhum\Typo3Console\Install\Mcv\Dispatcher
@@ -59,77 +66,61 @@ class InstallCommandController extends CommandController {
 	public function setupCommand($databaseUserName = '', $databaseUserPassword = '', $databaseHostName = '', $databasePort = '', $databaseSocket = '', $databaseName = '', $adminUserName = '', $adminPassword = '', $siteName = 'New TYPO3 Console site') {
 		$this->outputLine();
 		$this->outputLine('<options=bold>Welcome to the console installer of TYPO3 CMS!</options=bold>');
+		$this->outputLine();
 
-		touch(PATH_site . 'FIRST_INSTALL');
-		$this->dispatcher->dispatchAction('environmentAndFolders', $this->request->getArguments());
-
-		$requiredArguments = array('adminUserName', 'adminPassword', 'databaseName', 'databaseUserName', 'databaseUserPassword', 'databaseHostName', 'databasePort');
-		if (!$this->hasRequiredArguments($requiredArguments)) {
-			$this->outputLine();
-			$this->outputLine('Please specify some required settings for this installation:');
-		}
-
-		$requiredArguments = array('databaseUserName', 'databaseUserPassword', 'databaseHostName', 'databasePort');
-		if (!$this->hasRequiredArguments($requiredArguments)) {
-			$this->outputLine();
-			$this->outputLine('<options=bold>Database settings:</options=bold>');
-			$this->requestRequiredArguments($requiredArguments);
-		}
-		$this->dispatcher->dispatchAction('databaseConnect', $this->request->getArguments());
-
-		$requiredArguments = array('databaseName');
-		if (!$this->hasRequiredArguments($requiredArguments)) {
-			$this->requestRequiredArguments($requiredArguments);
-		}
-		$this->dispatcher->dispatchAction('databaseSelect', $this->request->getArguments());
-
-		$requiredArguments = array('adminUserName', 'adminPassword');
-		if (!$this->hasRequiredArguments($requiredArguments)) {
-			$this->outputLine();
-			$this->outputLine('<options=bold>Backend user credentials:</options=bold>');
-			$this->requestRequiredArguments($requiredArguments);
-		}
-		$this->dispatcher->dispatchAction('databaseData', $this->request->getArguments());
-		$this->dispatcher->dispatchAction('defaultConfiguration', $this->request->getArguments());
+		$this->dispatchAction('environmentAndFolders');
+		$this->dispatchAction('databaseConnect');
+		$this->dispatchAction('databaseSelect');
+		$this->dispatchAction('databaseData');
+		$this->dispatchAction('defaultConfiguration');
 
 		$this->outputLine();
 		$this->outputLine('Successfully installed TYPO3 CMS!');
-	}
+}
 
 	/**
+	 * Check environment and create folder structure
+	 *
 	 * @internal
 	 */
 	public function environmentAndFoldersCommand() {
+		touch(PATH_site . 'FIRST_INSTALL');
 		$messages = $this->executeAction($this->createActionWithNameAndArguments('environmentAndFolders'));
-		$this->outputLine(json_encode($messages));
+		$this->outputLine(serialize($messages));
 	}
 
 	/**
-	 * @param string $databaseUserName
-	 * @param string $databaseUserPassword
-	 * @param string $databaseHostName
-	 * @param string $databasePort
-	 * @param string $databaseSocket
+	 * Database connection details
+	 *
+	 * @param string $databaseUserName User name for database server
+	 * @param string $databaseUserPassword User password for database server
+	 * @param string $databaseHostName Host name of database server
+	 * @param string $databasePort TCP Port of database server
+	 * @param string $databaseSocket Unix Socket to connect to
 	 * @internal
 	 */
-	public function databaseConnectCommand($databaseUserName, $databaseUserPassword, $databaseHostName, $databasePort, $databaseSocket = '') {
+	public function databaseConnectCommand($databaseUserName = '', $databaseUserPassword = '', $databaseHostName = 'localhost', $databasePort = '3306', $databaseSocket = '') {
 		$messages = $this->executeAction($this->createActionWithNameAndArguments('databaseConnect', array('host' => $databaseHostName, 'port' => $databasePort, 'username' => $databaseUserName, 'password' => $databaseUserPassword, 'socket' => $databaseSocket)));
-		$this->outputLine(json_encode($messages));
+		$this->outputLine(serialize($messages));
 	}
 
 	/**
-	 * @param string $databaseName
+	 * Select a database name
+	 *
+	 * @param string $databaseName Name of the database (will be created)
 	 * @internal
 	 */
 	public function databaseSelectCommand($databaseName) {
 		$messages = $this->executeAction($this->createActionWithNameAndArguments('databaseSelect', array('type' => 'new', 'new' => $databaseName)));
-		$this->outputLine(json_encode($messages));
+		$this->outputLine(serialize($messages));
 	}
 
 	/**
-	 * @param string $adminUserName
-	 * @param string $adminPassword
-	 * @param string $siteName
+	 * Admin user and site name
+	 *
+	 * @param string $adminUserName Username of your first admin user
+	 * @param string $adminPassword Password of first admin user
+	 * @param string $siteName Site name
 	 * @internal
 	 */
 	public function databaseDataCommand($adminUserName, $adminPassword, $siteName = 'New TYPO3 Console site') {
@@ -140,50 +131,95 @@ class InstallCommandController extends CommandController {
 		$db = $GLOBALS['TYPO3_DB'];
 		$db->exec_INSERTquery('be_users', array('username' => '_cli_lowlevel'));
 
-		$this->outputLine(json_encode($messages));
+		$this->outputLine(serialize($messages));
 	}
 
 	/**
+	 * Write default configuration
+	 *
 	 * @internal
 	 */
 	public function defaultConfigurationCommand() {
 		$messages = $this->executeAction($this->createActionWithNameAndArguments('defaultConfiguration'));
-		$this->outputLine(json_encode($messages));
+		$this->outputLine(serialize($messages));
 	}
 
-	// TODO: Refactor the code below to dispatcher class
+
+
+	// TODO: Refactor to different class
 
 	/**
-	 * @param array $requiredArguments
-	 * @return bool
+	 * @param string $actionName
+	 * @throws \TYPO3\CMS\Extbase\Mvc\Exception\AmbiguousCommandIdentifierException
+	 * @throws \TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentTypeException
+	 * @throws \TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException
+	 * @throws \TYPO3\CMS\Extbase\Mvc\Exception\NoSuchCommandException
 	 */
-	protected function hasRequiredArguments(array $requiredArguments) {
-		foreach ($requiredArguments as $argumentName) {
-			if (!$this->request->hasArgument($argumentName)) {
-				return FALSE;
-			}
-		}
-		return TRUE;
-	}
+	protected function dispatchAction($actionName) {
+		$this->commandMethodName = $actionName . 'Command';
+		$this->initializeCommandMethodArguments();
+		$command = $this->commandManager->getCommandByIdentifier('install:' . strtolower($actionName));
 
-	/**
-	 * @param array $requiredArguments
-	 */
-	protected function requestRequiredArguments(array $requiredArguments) {
-		$requestArguments = $this->request->getArguments();
-		foreach ($requiredArguments as $argumentName) {
-			if (!$this->request->hasArgument($argumentName)) {
-				$argumentValue = NULL;
-				while ($argumentValue === NULL) {
-					$argumentValue = $this->ask(sprintf('<comment>%s:</comment> ', strtolower(substr(preg_replace('/([A-Z][a-z0-9]+)/', '$1 ', ucfirst($argumentName)), 0, -1))));
+		do {
+			$this->outputLine(sprintf('%s:', $command->getShortDescription()));
+
+			$actionArguments = array();
+			foreach ($command->getArgumentDefinitions() as $argumentDefinition) {
+				$argument = $this->arguments->getArgument($argumentDefinition->getName());
+				if ($this->request->hasArgument($argumentDefinition->getName())) {
+					$actionArguments[$argumentDefinition->getName()] = $this->request->getArgument($argumentDefinition->getName());
+				} else {
+					$argumentValue = NULL;
+					do {
+						$argumentValue = $this->ask(
+							sprintf(
+								'<comment>%s (%s):</comment> ',
+								$argumentDefinition->getDescription(),
+								$argument->isRequired() ? 'required' : sprintf('default: "%s"', $argument->getDefaultValue())
+							)
+						);
+					} while ($argumentDefinition->isRequired() && $argumentValue === NULL);
+					$actionArguments[$argumentDefinition->getName()] = $argumentValue ?: $argument->getDefaultValue();
 				}
-				$requestArguments[$argumentName] = $argumentValue;
 			}
-		}
-		$this->request->setArguments($requestArguments);
+
+			$messages = $this->dispatcher->dispatchAction($actionName, $actionArguments);
+			$this->outputMessages($messages);
+
+		} while(!empty($messages));
+
+
 	}
 
-	// TODO: Refactor the code below to own class
+	/**
+	 * @param StatusInterface[] $messages
+	 */
+	protected function outputMessages(array $messages = array()) {
+		if (empty($messages)) {
+			$this->outputLine('OK');
+			return;
+		}
+		$this->outputLine();
+		foreach ($messages as $statusMessage) {
+			$this->outputStatusMessage($statusMessage);
+		}
+		$this->outputLine();
+	}
+
+	/**
+	 * @param StatusInterface $statusMessage
+	 */
+	protected function outputStatusMessage(StatusInterface $statusMessage) {
+		$subject = strtoupper($statusMessage->getSeverity()) . ': ' . $statusMessage->getTitle();
+		switch ($statusMessage->getSeverity()) {
+			case 'error':
+				$subject = '<error>' . $subject . '</error>';
+			break;
+			default:
+		}
+		$this->outputLine($subject);
+		$this->outputLine(wordwrap($statusMessage->getMessage()));
+	}
 
 	/**
 	 * @param string $actionName
@@ -215,7 +251,6 @@ class InstallCommandController extends CommandController {
 	 * @return bool|string
 	 */
 	protected function executeAction(ActionInterface $action) {
-		$needsExecution = FALSE;
 		try {
 			$needsExecution = $action->needsExecution();
 		} catch(\TYPO3\CMS\Install\Controller\Exception\RedirectException $e) {
@@ -225,7 +260,7 @@ class InstallCommandController extends CommandController {
 		if ($needsExecution) {
 			return $action->execute();
 		} else {
-			return FALSE;
+			return array();
 		}
 
 	}
