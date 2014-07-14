@@ -11,6 +11,11 @@
     "replace": {
         "typo3_console": "*"
     },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    },
     "autoload": {
         "psr-4": {
             "Helhum\\Typo3Console": "Classes"
