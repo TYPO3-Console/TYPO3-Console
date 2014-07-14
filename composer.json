@@ -1,0 +1,19 @@
+{
+    "name": "helhum/typo3-console",
+    "type": "typo3-cms-extension",
+    "description": "A reliable and powerful console for TYPO3 CMS",
+    "homepage": "http://typo3.org",
+    "license": ["GPL-2.0+"],
+
+    "require": {
+        "typo3/cms-core": "*"
+    },
+    "replace": {
+        "typo3_console": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Helhum\\Typo3Console": "Classes"
+        }
+    }
+}
