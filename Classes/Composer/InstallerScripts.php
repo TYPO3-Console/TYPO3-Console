@@ -41,7 +41,7 @@ class InstallerScripts {
 	 * @return void
 	 */
 	static public function postUpdateAndInstall(CommandEvent $event) {
-		copy('typo3conf/ext/typo3_console/Scripts/typo3cms', '.');
+		copy('typo3conf/ext/typo3_console/Scripts/typo3cms', './typo3cms');
 		chmod('typo3cms', 0755);
 	}
 }
