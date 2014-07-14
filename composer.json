@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Helhum\\Typo3Console": "Classes"
+            "Helhum\\Typo3Console\\": "Classes"
         }
     }
 }
