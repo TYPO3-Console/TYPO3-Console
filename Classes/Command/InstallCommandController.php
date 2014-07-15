@@ -28,12 +28,20 @@ namespace Helhum\Typo3Console\Command;
  ***************************************************************/
 
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use TYPO3\CMS\Core\Package\Package;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Alpha version of a setup command controller
  * Use with care and at your own risk!
  */
 class InstallCommandController extends CommandController {
+
+	/**
+	 * @var \TYPO3\CMS\Core\Package\PackageManager
+	 * @inject
+	 */
+	protected $packageManager;
 
 	/**
 	 * @var \Helhum\Typo3Console\Install\CliSetupRequestHandler
@@ -63,7 +71,58 @@ class InstallCommandController extends CommandController {
 
 		$this->outputLine();
 		$this->outputLine('Successfully installed TYPO3 CMS!');
-}
+	}
+
+	/**
+	 * Activates all packages that are configured in root composer.json or are required
+	 *
+	 * @param bool $removeInactivePackages
+	 */
+	public function generatePackageStatesCommand($removeInactivePackages = FALSE) {
+		$installationPackages = $this->getPackagesFromRootComposerFile();
+		foreach ($this->packageManager->getAvailablePackages() as $package) {
+			if (
+				in_array($package->getPackageKey(), $installationPackages)
+				|| $package->isProtected()
+				|| ($package instanceof Package && $package->isPartOfMinimalUsableSystem())
+			) {
+				$this->packageManager->activatePackage($package->getPackageKey());
+			} else {
+				$this->packageManager->deactivatePackage($package->getPackageKey());
+				if ($removeInactivePackages) {
+					GeneralUtility::flushDirectory($package->getPackagePath());
+					$this->outputLine('Removed Package: ' . $package->getPackageKey());
+				}
+			}
+		}
+
+		$this->packageManager->forceSortAndSavePackageStates();
+	}
+
+	/**
+	 * @return array Array of packages keys in root composer.json
+	 */
+	protected function getPackagesFromRootComposerFile() {
+		if (!file_exists(PATH_site . 'composer.json')) {
+			$this->outputLine('No composer.json found in project root');
+			$this->sendAndExit(1);
+		}
+
+		$composerData = json_decode(file_get_contents(PATH_site . 'composer.json'));
+
+		if (!is_object($composerData)) {
+			$this->outputLine('composer.json seems to be invalid');
+			$this->sendAndExit(1);
+		}
+
+		$activePackageKey = 'active-packages';
+		if (!isset($composerData->extra->{$activePackageKey}) || !is_array($composerData->extra->{$activePackageKey})) {
+			$this->outputLine('No packages found to activate!');
+			$this->sendAndExit();
+		}
+
+		return $composerData->extra->{$activePackageKey};
+	}
 
 	/**
 	 * Check environment and create folder structure
