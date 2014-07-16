@@ -32,9 +32,11 @@ use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
 use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentTypeException;
 use TYPO3\CMS\Install\Controller\Action\ActionInterface;
+use TYPO3\CMS\Install\Controller\Exception\RedirectException;
 use TYPO3\CMS\Install\Status\StatusInterface;
 
 /**
@@ -58,7 +60,7 @@ class CliSetupRequestHandler {
 	protected $commandManager;
 
 	/**
-	 * @var \Helhum\Typo3Console\Install\Mcv\Dispatcher
+	 * @var \Helhum\Typo3Console\Mvc\Cli\CommandDispatcher
 	 * @inject
 	 */
 	protected $dispatcher;
@@ -185,6 +187,8 @@ class CliSetupRequestHandler {
 	 * @throws \RuntimeException
 	 */
 	protected function dispatchAction($actionName) {
+		$this->executeSilentConfigurationUpgradesIfNeeded();
+
 		$arguments = $this->getCommandMethodArguments($actionName . 'Command');
 		$command = $this->commandManager->getCommandByIdentifier('install:' . strtolower($actionName));
 
@@ -222,7 +226,11 @@ class CliSetupRequestHandler {
 				}
 			}
 
-			$messages = $this->dispatcher->dispatchAction($actionName, $actionArguments);
+			do {
+				$messages = @unserialize($this->dispatcher->executeCommand('install:' . strtolower($actionName), $actionArguments));
+			} while($messages === 'REDIRECT');
+			$messages = $messages ?: array();
+
 			$this->outputMessages($messages);
 
 			if ($loopCounter > 10) {
@@ -258,6 +266,47 @@ class CliSetupRequestHandler {
 		}
 
 		return $arguments;
+	}
+
+	/**
+	 * Call silent upgrade class, redirect to self if configuration was changed.
+	 *
+	 * @return void
+	 * @throws RedirectException
+	 */
+	protected function executeSilentConfigurationUpgradesIfNeeded() {
+		if (!file_exists(PATH_site . 'typo3conf/LocalConfiguration.php')) {
+			return;
+		}
+
+		/** @var \TYPO3\CMS\Install\Service\SilentConfigurationUpgradeService $upgradeService */
+		$upgradeService = $this->objectManager->get(
+			'TYPO3\\CMS\\Install\\Service\\SilentConfigurationUpgradeService'
+		);
+
+		$count = 0;
+		do {
+			try {
+				$count++;
+				$upgradeService->execute();
+				$redirect = FALSE;
+			} catch (RedirectException $e) {
+				$redirect = TRUE;
+				$this->reloadConfiguration();
+				if ($count > 20) {
+					throw $e;
+				}
+			}
+		} while ($redirect === TRUE);
+	}
+
+	/**
+	 * Fetch the new configuration and expose it to the global array
+	 */
+	protected function reloadConfiguration() {
+		/** @var \TYPO3\CMS\Core\Configuration\ConfigurationManager $configurationManger */
+		$configurationManger = GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager')->get('\TYPO3\CMS\Core\Configuration\ConfigurationManager');
+		$configurationManger->exportConfiguration();
 	}
 
 	// Logging and output related stuff
