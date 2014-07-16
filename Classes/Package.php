@@ -42,15 +42,6 @@ class Package extends \TYPO3\CMS\Core\Package\Package {
 	protected $namespace = 'Helhum\\Typo3Console';
 
 	/**
-	 * If this package is part of minimal usable system, it will be
-	 * activated if PackageStates is created from scratch.
-	 * This is exactly what we want for the console
-	 *
-	 * @var bool
-	 */
-	protected $partOfMinimalUsableSystem = TRUE;
-
-	/**
 	 * Register the cli request handler only when in cli mode
 	 *
 	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap

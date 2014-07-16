@@ -15,6 +15,11 @@
     "extra": {
         "branch-alias": {
             "dev-master": "1.0.x-dev"
+        },
+        "typo3/cms": {
+            "Package": {
+                "partOfMinimalUsableSystem": true
+            }
         }
     },
     "autoload": {
