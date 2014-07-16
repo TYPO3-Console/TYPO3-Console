@@ -96,6 +96,7 @@ class InstallCommandController extends CommandController {
 			}
 		}
 
+		$this->packageManager->scanAvailablePackages();
 		$this->packageManager->forceSortAndSavePackageStates();
 	}
 
