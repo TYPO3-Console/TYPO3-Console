@@ -42,20 +42,13 @@ class Package extends \TYPO3\CMS\Core\Package\Package {
 	protected $namespace = 'Helhum\\Typo3Console';
 
 	/**
-	 * @param \TYPO3\Flow\Package\PackageManager $packageManager
-	 * @param string $packageKey
-	 * @param string $packagePath
-	 * @param string|null $classesPath
-	 * @param string $manifestPath
+	 * If this package is part of minimal usable system, it will be
+	 * activated if PackageStates is created from scratch.
+	 * This is exactly what we want for the console
+	 *
+	 * @var bool
 	 */
-	public function __construct(\TYPO3\Flow\Package\PackageManager $packageManager, $packageKey, $packagePath, $classesPath = NULL, $manifestPath = '') {
-		\TYPO3\CMS\Core\Package\Package::__construct($packageManager, $packageKey, $packagePath, $classesPath, $manifestPath);
-		if (!file_exists(PATH_site . 'typo3conf/PackageStates.php')) {
-			// Force loading of the console in case we do not have a package states file yet (pre-install)
-			$this->protected = TRUE;
-		}
-	}
-
+	protected $partOfMinimalUsableSystem = TRUE;
 
 	/**
 	 * Register the cli request handler only when in cli mode
