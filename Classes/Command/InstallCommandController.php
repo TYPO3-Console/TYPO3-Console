@@ -90,13 +90,13 @@ class InstallCommandController extends CommandController {
 			} else {
 				$this->packageManager->deactivatePackage($package->getPackageKey());
 				if ($removeInactivePackages) {
+					$this->packageManager->unregisterPackage($package);
 					GeneralUtility::flushDirectory($package->getPackagePath());
 					$this->outputLine('Removed Package: ' . $package->getPackageKey());
 				}
 			}
 		}
 
-		$this->packageManager->scanAvailablePackages();
 		$this->packageManager->forceSortAndSavePackageStates();
 	}
 
