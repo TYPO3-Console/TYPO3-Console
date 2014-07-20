@@ -7,7 +7,7 @@
          bootstrap="vendor/autoload.php"
 >
     <testsuites>
-        <testsuite name="Symfony Console Component Test Suite">
+        <testsuite name="Symfony Process Component Test Suite">
             <directory>./Tests/</directory>
         </testsuite>
     </testsuites>
@@ -16,9 +16,7 @@
         <whitelist>
             <directory>./</directory>
             <exclude>
-                <directory>./Resources</directory>
                 <directory>./Tests</directory>
-                <directory>./vendor</directory>
             </exclude>
         </whitelist>
     </filter>
