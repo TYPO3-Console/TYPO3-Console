@@ -72,13 +72,20 @@ class UncachedPackageManager extends PackageManager {
 		}
 	}
 
+	/**
+	 * Only save a new PackageSates file if there is only one,
+	 * to prevent saving one before TYPO3 is properly installed
+	 */
 	protected function sortAndSavePackageStates() {
-		// no save!
+		if (@file_exists($this->packageStatesPathAndFilename)) {
+			parent::sortAndSavePackageStates();
+		}
 	}
 
 	/**
 	 * To enable writing of the package states file the package states
 	 * migration needs to override eventual failsafe blocks.
+	 * This will be used during installation process.
 	 */
 	public function forceSortAndSavePackageStates() {
 		parent::sortAndSavePackageStates();
