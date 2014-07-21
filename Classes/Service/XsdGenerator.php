@@ -184,7 +184,7 @@ class XsdGenerator extends AbstractGenerator {
 	 */
 	protected function getClassNameFromNamespaceAndPath($namespace, $filePath) {
 		$delimiter = $this->getDelimiterFromNamespace($namespace);
-		list($packagePath, $classesPath) = explode('Classes/', $filePath);
+		list($packagePath, $classesPath) = explode('Classes/ViewHelpers/', $filePath);
 		// TODO: This is psr-4 style like in TYPO3 CMS, but what about others?
 		$classSuffix = str_replace('/', $delimiter, str_replace('.php', '', $classesPath));
 		return $namespace . $classSuffix;
