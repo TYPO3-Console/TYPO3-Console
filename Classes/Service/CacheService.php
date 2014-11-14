@@ -216,7 +216,6 @@ class CacheService implements SingletonInterface {
 				$this->databaseConnection->exec_TRUNCATEquery($tableName);
 			}
 		}
-
 	}
 
 	/**
