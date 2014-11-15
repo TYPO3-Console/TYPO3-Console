@@ -314,25 +314,6 @@ class ConsoleBootstrap extends Bootstrap {
 		$classLoader->setPackages($this->getEarlyInstance('TYPO3\\Flow\\Package\\PackageManager')->getActivePackages());
 	}
 
-	public function disableCachesForObjectManagement() {
-		$cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
-
-		$cacheConfigurations['extbase_typo3dbbackend_tablecolumns'] = array(
-			'groups' => array('system'),
-			'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend'
-		);
-		$cacheConfigurations['extbase_typo3dbbackend_queries'] = array(
-			'groups' => array('system'),
-			'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend'
-		);
-		$cacheConfigurations['extbase_datamapfactory_datamap'] = array(
-			'groups' => array('system'),
-			'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend'
-		);
-		$cacheConfigurations['extbase_object']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
-		$cacheConfigurations['extbase_reflection']['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
-	}
-
 	public function initializeConfigurationManagement() {
 		$this->populateLocalConfiguration();
 		$this->setDefaultTimezone();

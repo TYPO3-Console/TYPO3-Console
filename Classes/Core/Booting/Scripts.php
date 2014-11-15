@@ -47,11 +47,33 @@ class Scripts {
 	 */
 	static public function initializeConfigurationManagement(ConsoleBootstrap $bootstrap) {
 		$bootstrap->initializeConfigurationManagement();
-
-		// TODO: check if it is smart to load configuration from required extensions (e.g. Extbase) here
-
 		self::$earlyCachesConfiguration = $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
-		$bootstrap->disableCachesForObjectManagement();
+		self::disableCachesForObjectManagement();
+	}
+
+	static public function disableCachesForObjectManagement() {
+		$cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
+		foreach (
+			array(
+				'extbase_object',
+				'extbase_reflection',
+				'extbase_typo3dbbackend_tablecolumns',
+				'extbase_typo3dbbackend_queries',
+				'extbase_datamapfactory_datamap',
+			) as $id) {
+			if (!isset($cacheConfigurations[$id])) {
+				self::$earlyCachesConfiguration[$id] = array(
+					'groups' => array('system')
+				);
+
+				$cacheConfigurations[$id] = array(
+					'groups' => array('system'),
+					'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend'
+				);
+			} else {
+				$cacheConfigurations[$id]['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
+			}
+		}
 	}
 
 	/**
@@ -82,7 +104,7 @@ class Scripts {
 	 * @param ConsoleBootstrap $bootstrap
 	 */
 	static public function reEnableOriginalCoreCaches(ConsoleBootstrap $bootstrap) {
-		ArrayUtility::mergeRecursiveWithOverrule($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'], self::$earlyCachesConfiguration);
+		$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'] = self::$earlyCachesConfiguration;
 
 		/** @var CacheManager $cacheManager */
 		$cacheManager = $bootstrap->getEarlyInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager');
