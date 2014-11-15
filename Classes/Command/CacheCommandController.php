@@ -110,4 +110,25 @@ class CacheCommandController extends CommandController {
 		$this->cacheService->warmupEssentialCaches();
 		$this->outputLine('Warmed up the following caches: classes, package manager, tca, ext_tables, ext_localconf');
 	}
+
+	/**
+	 * Lists all registered cache groups.
+	 *
+	 */
+	public function listGroupsCommand() {
+		$groups = $this->cacheService->getValidCacheGroups();
+		sort($groups);
+
+		switch (count($groups)) {
+			case 0:
+				$this->outputLine('No cache group is registered.');
+				break;
+			case 1:
+				$this->outputLine('The following cache group is registered: "' . implode('", "', $groups) . '".');
+				break;
+			default:
+				$this->outputLine('The following cache groups are registered: "' . implode('", "', $groups) . '".');
+				break;
+		}
+	}
 }
