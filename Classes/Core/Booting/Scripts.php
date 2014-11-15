@@ -140,8 +140,10 @@ class Scripts {
 	 */
 	static public function initializeClassLoaderCaches(ConsoleBootstrap $bootstrap) {
 		$bootstrap->initializeClassLoaderCaches();
+		$packageStatesPathAndFilename = PATH_typo3conf . 'PackageStates.php';
+		$mTime = @filemtime($packageStatesPathAndFilename);
 		$bootstrap->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader')
-			->setCacheIdentifier(md5_file(PATH_typo3conf . 'PackageStates.php'))
+			->setCacheIdentifier(md5($packageStatesPathAndFilename . $mTime))
 			->setPackages($bootstrap->getEarlyInstance('TYPO3\\Flow\\Package\\PackageManager')->getActivePackages());
 	}
 
