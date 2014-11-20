@@ -11,7 +11,7 @@ call_user_func(function($scriptLocation) {
 		$webRoot = getenv('TYPO3_PATH_WEB');
 	} elseif (isset($scriptLocation) && file_exists($scriptLocation . '/typo3/sysext')) {
 		$webRoot = $scriptLocation;
-	} elseif(file_exists(getcwd() . '/typo3/sysext')) {
+	} elseif (file_exists(getcwd() . '/typo3/sysext')) {
 		$webRoot = getcwd();
 	} else {
 		// Assume we are located in typo3conf/ext and neither folder is a link
