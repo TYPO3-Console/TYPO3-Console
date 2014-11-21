@@ -15,6 +15,7 @@ use Helhum\Typo3Console\Log\Writer\ConsoleWriter;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Log\Logger;
 use TYPO3\CMS\Core\Log\LogLevel;
+use TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition;
 use TYPO3\CMS\Extbase\Mvc\Cli\Request;
 use TYPO3\CMS\Extbase\Mvc\Cli\Response;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandControllerInterface;
@@ -196,22 +197,17 @@ class CommandController implements CommandControllerInterface {
 		/** @var Argument $argument */
 		foreach ($this->arguments as $argument) {
 			$argumentName = $argument->getName();
-
 			if ($this->request->hasArgument($argumentName)) {
 				$argument->setValue($this->request->getArgument($argumentName));
 				continue;
 			}
 			if (!$argument->isRequired()) {
 				continue;
-		}
-			$argumentValue = NULL;
-			while ($argumentValue === NULL) {
-				$argumentValue = $this->ask(sprintf('<comment>Please specify the required argument "%s":</comment> ', $argumentName));
 			}
-
-			if ($argumentValue === NULL) {
-				$exception = new CommandException(sprintf('Required argument "%s" is not set.', $argumentName), 1306755520);
-				$this->forward('error', 'TYPO3\CMS\Extbase\Command\HelpCommandController', array('exception' => $exception));
+			$argumentValue = NULL;
+			$commandArgumentDefinition = $this->objectManager->get(CommandArgumentDefinition::class, $argumentName, TRUE, NULL);
+			while ($argumentValue === NULL) {
+				$argumentValue = $this->ask(sprintf('<comment>Please specify the required argument "%s":</comment> ', $commandArgumentDefinition->getDashedName()));
 			}
 			$argument->setValue($argumentValue);
 		}
