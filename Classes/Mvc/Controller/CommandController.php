@@ -15,7 +15,6 @@ use Helhum\Typo3Console\Log\Writer\ConsoleWriter;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Log\Logger;
 use TYPO3\CMS\Core\Log\LogLevel;
-use TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition;
 use TYPO3\CMS\Extbase\Mvc\Cli\Request;
 use TYPO3\CMS\Extbase\Mvc\Cli\Response;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandControllerInterface;
@@ -205,7 +204,7 @@ class CommandController implements CommandControllerInterface {
 				continue;
 			}
 			$argumentValue = NULL;
-			$commandArgumentDefinition = $this->objectManager->get(CommandArgumentDefinition::class, $argumentName, TRUE, NULL);
+			$commandArgumentDefinition = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Cli\\CommandArgumentDefinition', $argumentName, TRUE, NULL);
 			while ($argumentValue === NULL) {
 				$argumentValue = $this->ask(sprintf('<comment>Please specify the required argument "%s":</comment> ', $commandArgumentDefinition->getDashedName()));
 			}
