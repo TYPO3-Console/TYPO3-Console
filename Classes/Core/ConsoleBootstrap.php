@@ -183,6 +183,10 @@ class ConsoleBootstrap extends Bootstrap {
 	 * @throws \TYPO3\CMS\Core\Error\Exception
 	 */
 	protected function resolveRequestHandler() {
+		if (empty($this->requestHandlers)) {
+			throw new \InvalidArgumentException('No request handlers found. Make sure the extension typo3_console is active and try again.', 1417863425);
+		}
+		$suitableRequestHandlers = array();
 		foreach ($this->requestHandlers as $requestHandler) {
 			if ($requestHandler->canHandleRequest() > 0) {
 				$priority = $requestHandler->getPriority();
@@ -191,6 +195,9 @@ class ConsoleBootstrap extends Bootstrap {
 				}
 				$suitableRequestHandlers[$priority] = $requestHandler;
 			}
+		}
+		if (empty($suitableRequestHandlers)) {
+			throw new \InvalidArgumentException('No request handler found that can handle that request.', 1417863426);
 		}
 		ksort($suitableRequestHandlers);
 		return array_pop($suitableRequestHandlers);
