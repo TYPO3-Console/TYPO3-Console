@@ -1,0 +1,73 @@
+﻿.. ==================================================
+.. FOR YOUR INFORMATION
+.. --------------------------------------------------
+.. -*- coding: utf-8 -*- with BOM.
+
+.. include:: ../Includes.txt
+
+
+What does it do?
+================
+
+The goal of this extension to improve the command line usage with TYPO3 CMS inspired by the command line interface of TYPO3 Flow.
+It aims to provide a consistent and easy to use interface for users and an easy API for developers.
+Every command that is shipped provides helpful information about usage and is easy to understand and use.
+
+TYPO3 CMS already has a command line interface but executing commands can look like this:
+
+.. code-block:: bash
+
+	# Run reference index check
+	./typo3/cli_dispatch.phpsh lowlevel_refindex -c
+
+	# Update translated labels
+	./typo3/cli_dispatch.phpsh extbase language:update
+
+	# Lock editing in the backend
+	./cli_dispatch.phpsh lowlevel_admin setBElock
+
+This extension comes with a command line tool called ``typo3cms`` and you can execute the commands from above like this:
+
+.. code-block:: bash
+
+	# Run reference index check
+	./typo3cms cleanup:updatereferenceindex --dry-run
+
+	# Update translated labels
+	./typo3cms language:update
+
+	# Lock editing in the backend
+	./typo3cms backend:lock
+
+Additionally it provides some commands, that wouldn't be possible at all with the current core command line interface:
+
+.. code-block:: bash
+
+	# Force flush all caches in a reliable and robust way
+	./typo3cms cache:flush --force
+
+	# Interactively set up a new TYPO3 instance from command line (instead of using the install tool)
+	./typo3cms install:setup
+
+	# Non interactive automatic setup of a new TYPO3 instance
+	./typo3cms install:setup --non-interactive \
+		--database-user-name="root" \
+		--database-host-name="localhost" \
+		--database-port="3306" \
+		--database-name="travis_test" \
+		--admin-user-name="admin" \
+		--admin-password="password" \
+		--site-name="Travis Install"
+
+	# Populate essential core caches
+	./typo3cms cache:warmup
+
+A help system is integrated, so that you can easily list all available commands or get help for individual commands:
+
+.. code-block:: bash
+
+	# List all commands with a short description
+	./typo3cms help
+
+	# Show detailed help for an individual command
+	./typo3cms help cache:flush

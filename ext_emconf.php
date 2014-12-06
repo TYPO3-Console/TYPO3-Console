@@ -1,16 +1,7 @@
 <?php
-/***************************************************************
- * Extension Manager/Repository config file for ext "about".
- *
- * Auto generated 24-02-2012 17:14
- *
- * Manual updates:
- * Only the data in the array - everything else is removed by next
- * writing. "version" and "dependencies" must not be touched!
- ***************************************************************/
 $EM_CONF[$_EXTKEY] = array(
 	'title' => 'TYPO3 Console',
-	'description' => 'Console for TYPO3 CMS',
+	'description' => 'A reliable and powerful command line interface for TYPO3 CMS',
 	'category' => 'cli',
 	'shy' => 1,
 	'dependencies' => '',
