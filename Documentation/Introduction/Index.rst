@@ -71,3 +71,27 @@ A help system is integrated, so that you can easily list all available commands 
 
 	# Show detailed help for an individual command
 	./typo3cms help cache:flush
+
+
+FAQ
+^^^
+
+:Question: How does ``typo3_console`` compare to ``coreapi``?
+:Answer: There is a `blog post`_ that explains the differences and points out the benefits of ``typo3_console``
+
+..
+
+:Question: Why isn't this functionality part of the TYPO3 core? Wouldn't it make sense?
+:Answer: Absolutely! Only, nobody did this until now. I also think that it is good to develop and stabilize this as third party product.
+ It is possible to get feedback, iterate and improve much faster than with a TYPO3 CMS core release.
+ Once the extension has matured, I'm fine to integrate it as core functionality.
+
+..
+
+:Question: When will this be part of the TYPO3 CMS core?
+:Answer: It might find its way into TYPO3 CMS 7, who knows. Until then you can already use it as extension in TYPO3 6.2 **and** 7.x
+
+
+
+.. _`blog post`: http://insight.helhum.io
+

@@ -30,10 +30,14 @@ There are three ways to properly install the extension.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For the extension to work, it **must** be installed in the ``typo3conf/ext/`` directory **not** in any other possible extension location.
-This is the default location when downloading it from TER with the Extension Manager. Don't forget to activate the extension in the extension manager.
+This is the default location when downloading it from TER with the Extension Manager.
 
-To get the ``typo3cms`` command, just **copy** ``typo3conf/ext/typo3_console/Scripts/typo3cms`` to your TYPO3 root directory and make sure it is marked as executable. Windows users must copy
-``typo3conf/ext/typo3_console/Scripts/typo3cms.bat`` to the TYPO3 root directory and set the location to the php.exe in that file (untested but should work).
+Don't forget to **activate the extension** in the extension manager.
+
+To get the ``typo3cms`` command, just **copy** ``typo3conf/ext/typo3_console/Scripts/typo3cms``
+to your TYPO3 root directory and make sure it is marked as executable. Windows users must copy
+``typo3conf/ext/typo3_console/Scripts/typo3cms.bat`` to the TYPO3 root directory
+and set the location to the php.exe in that file (untested but should work).
 
 
 2. Clone the repository
@@ -41,13 +45,14 @@ To get the ``typo3cms`` command, just **copy** ``typo3conf/ext/typo3_console/Scr
 
 .. code-block:: bash
 
-	git clone https://github.com/helhum/typo3_console.git typo3conf/ext/
+	git clone https://github.com/helhum/typo3_console.git typo3conf/ext/typo3_console
 
+Don't forget to **activate the extension** in the extension manager.
 
-Don't forget to activate the extension in the extension manager.
-
-To get the ``typo3cms`` command, just **copy** ``typo3conf/ext/typo3_console/Scripts/typo3cms`` to your TYPO3 root directory and make sure it is marked as executable. Windows users must copy
-``typo3conf/ext/typo3_console/Scripts/typo3cms.bat`` to the TYPO3 root directory and set the location to the php.exe in that file (untested but should work).
+To get the ``typo3cms`` command, just **copy** ``typo3conf/ext/typo3_console/Scripts/typo3cms``
+to your TYPO3 root directory and make sure it is marked as executable. Windows users must copy
+``typo3conf/ext/typo3_console/Scripts/typo3cms.bat`` to the TYPO3 root directory
+and set the location to the php.exe in that file (untested but should work).
 
 3. Via composer
 ^^^^^^^^^^^^^^^
@@ -72,11 +77,11 @@ Create a root ``composer.json`` file like this add the missing lines to your exi
 		},
 		"require": {
 			"typo3/cms": "~6.2.6",
-			"helhum/typo3-console": "1.0.x-dev"
+			"helhum/typo3-console": "~1.0.0"
 		}
 	}
 
-Don't forget to activate the extension in the extension manager.
+Don't forget to **activate the extension** in the extension manager.
 
 The ``typo3cms`` command will automatically be copied to your root directory.
 
