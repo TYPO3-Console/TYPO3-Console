@@ -49,8 +49,11 @@ class FrontendCommandController extends CommandController {
 			'documentRoot' => PATH_site,
 			'requestUrl' => $requestUrl,
 		);
-		$code = str_replace(array('{originalRoot}', '{arguments}'), array(PATH_site, var_export($arguments, true)), $template);
-
+		// No other solution atm than to fake a CLI request type
+		$code = '<?php
+		define(\'TYPO3_REQUESTTYPE\', 6);
+		?>';
+		$code .= str_replace(array('{originalRoot}', '{arguments}'), array(PATH_site, var_export($arguments, true)), $template);
 		$process = new PhpProcess($code);
 		$process->mustRun();
 		$rawResponse = json_decode($process->getOutput());
