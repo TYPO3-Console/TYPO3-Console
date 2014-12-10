@@ -42,12 +42,8 @@ The extension will automatically be activated and the ``typo3cms`` script will a
 
 	git clone https://github.com/helhum/typo3_console.git typo3conf/ext/typo3_console
 
-Don't forget to **activate the extension** in the extension manager.
-
-To get the ``typo3cms`` script, just **copy** ``typo3conf/ext/typo3_console/Scripts/typo3cms``
-to your TYPO3 root directory and make sure it is marked as executable. Windows users must copy
-``typo3conf/ext/typo3_console/Scripts/typo3cms.bat`` to the TYPO3 root directory
-and set the location to the php.exe in that file (untested but should work).
+Don't forget to **activate the extension** in the extension manager. Once you active the extension
+the ``typo3cms`` script is automatically copied to your TYPO3 root directory.
 
 3. Via composer
 ^^^^^^^^^^^^^^^
