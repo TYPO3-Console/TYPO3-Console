@@ -32,12 +32,7 @@ There are three ways to properly install the extension.
 For the extension to work, it **must** be installed in the ``typo3conf/ext/`` directory **not** in any other possible extension location.
 This is the default location when downloading it from TER with the Extension Manager.
 
-Don't forget to **activate the extension** in the extension manager.
-
-To get the ``typo3cms`` command, just **copy** ``typo3conf/ext/typo3_console/Scripts/typo3cms``
-to your TYPO3 root directory and make sure it is marked as executable. Windows users must copy
-``typo3conf/ext/typo3_console/Scripts/typo3cms.bat`` to the TYPO3 root directory
-and set the location to the php.exe in that file (untested but should work).
+The extension will automatically be activated and the ``typo3cms`` script will also copied to your TYPO3 root directory.
 
 
 2. Clone the repository
@@ -49,7 +44,7 @@ and set the location to the php.exe in that file (untested but should work).
 
 Don't forget to **activate the extension** in the extension manager.
 
-To get the ``typo3cms`` command, just **copy** ``typo3conf/ext/typo3_console/Scripts/typo3cms``
+To get the ``typo3cms`` script, just **copy** ``typo3conf/ext/typo3_console/Scripts/typo3cms``
 to your TYPO3 root directory and make sure it is marked as executable. Windows users must copy
 ``typo3conf/ext/typo3_console/Scripts/typo3cms.bat`` to the TYPO3 root directory
 and set the location to the php.exe in that file (untested but should work).
@@ -83,5 +78,5 @@ Create a root ``composer.json`` file like this add the missing lines to your exi
 
 Don't forget to **activate the extension** in the extension manager.
 
-The ``typo3cms`` command will automatically be copied to your root directory.
+The ``typo3cms`` script will automatically be copied to your TYPO3 root directory.
 

@@ -28,7 +28,6 @@ namespace typo3_console;
  ***************************************************************/
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
-use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 
 /**
