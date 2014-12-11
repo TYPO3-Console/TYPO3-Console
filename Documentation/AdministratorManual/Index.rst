@@ -53,7 +53,6 @@ Create a root ``composer.json`` file like this add the missing lines to your exi
 	{
 		"repositories": [
 			{ "type": "composer", "url": "http://composer.typo3.org/" },
-			{ "type": "vcs", "url": "https://github.com/helhum/typo3_console.git" }
 		],
 		"name": "typo3/cms-console-distribution",
 		"description" : "TYPO3 CMS Console Distribution",
@@ -68,7 +67,7 @@ Create a root ``composer.json`` file like this add the missing lines to your exi
 		},
 		"require": {
 			"typo3/cms": "~6.2.6",
-			"helhum/typo3-console": "~1.0.0"
+			"typo3-ter/typo3-console": "~1.0.2"
 		}
 	}
 
