@@ -42,6 +42,30 @@ class ConfigurationCommandController extends CommandController implements Single
 	protected $configurationManager;
 
 	/**
+	 * Get system configuration by path
+	 *
+	 * Example: ./typo3cms configuration:getbypath SYS/sitename
+	 *
+	 * @param string $path Path to system configuration
+	 * @return mixed
+	 */
+	public function getByPathCommand($path) {
+		return $this->configurationManager->getLocalConfigurationValueByPath($path);
+	}
+
+	/**
+	 * Set system configuration by path
+	 *
+	 * Example: ./typo3cms configuration:setbypath SYS/sitename Foo
+	 *
+	 * @param string $path Path to system configuration
+	 * @param mixed $value New configuration value
+	 */
+	public function setByPathCommand($path, $value) {
+		return $this->configurationManager->setLocalConfigurationValueByPath($path, $value);
+	}
+
+	/**
 	 * Removing system configuration by path
 	 *
 	 * Example: ./typo3cms configuration:removebypath DB,EXT/EXTCONF/realurl
