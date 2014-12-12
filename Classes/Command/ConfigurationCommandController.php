@@ -42,14 +42,14 @@ class ConfigurationCommandController extends CommandController implements Single
 	protected $configurationManager;
 
 	/**
-	 * Removing system configuration by path
+	 * Remove local configuration by path
 	 *
-	 * Example: ./typo3cms configuration:removebypath DB,EXT/EXTCONF/realurl
+	 * Example: ./typo3cms configuration:removelocal DB,EXT/EXTCONF/realurl
 	 *
-	 * @param array $paths Path to system configuration that should be removed. Multiple paths can be specified separated by comma
+	 * @param array $paths Path to local configuration that should be removed. Multiple paths can be specified separated by comma
 	 * @param bool $force If set, do not ask for confirmation
 	 */
-	public function removeByPathCommand(array $paths, $force = FALSE) {
+	public function removeLocalCommand(array $paths, $force = FALSE) {
 		if (!$force) {
 			do {
 				$answer = strtolower($this->ask('Remove ' . implode(',', $paths) . ' from system configuration (TYPO3_CONF_VARS)? (y/N): '));
