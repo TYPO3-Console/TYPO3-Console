@@ -145,7 +145,7 @@ class ConsoleBootstrap extends Bootstrap {
 	 */
 	protected function ensureRequiredEnvironment() {
 		if (PHP_SAPI !== 'cli') {
-			echo 'The comannd line must be executed with a cli PHP binary! The current PHP sapi type is "' . PHP_SAPI . '".' . PHP_EOL;
+			echo 'The command line must be executed with a cli PHP binary! The current PHP sapi type is "' . PHP_SAPI . '".' . PHP_EOL;
 			exit(1);
 		}
 		ini_set('memory_limit', -1);
