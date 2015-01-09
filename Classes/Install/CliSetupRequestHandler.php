@@ -305,7 +305,7 @@ class CliSetupRequestHandler {
 	 */
 	protected function reloadConfiguration() {
 		/** @var \TYPO3\CMS\Core\Configuration\ConfigurationManager $configurationManger */
-		$configurationManger = GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager')->get('\TYPO3\CMS\Core\Configuration\ConfigurationManager');
+		$configurationManger = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager')->get('TYPO3\\CMS\\Core\\Configuration\\ConfigurationManager');
 		$configurationManger->exportConfiguration();
 	}
 
