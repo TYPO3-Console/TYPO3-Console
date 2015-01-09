@@ -227,7 +227,9 @@ class ConsoleBootstrap extends Bootstrap {
 		$this->loadExtensionTables();
 		$this->initializeBackendUser();
 		$this->initializeBackendAuthentication();
-		$this->initializeBackendUserMounts();
+		if (method_exists($this, 'initializeBackendUserMounts')) {
+			$this->initializeBackendUserMounts();
+		}
 		$this->initializeLanguageObject();
 		$this->flushOutputBuffers();
 	}

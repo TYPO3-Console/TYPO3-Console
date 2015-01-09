@@ -37,8 +37,10 @@ unset($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['GLOBAL']['cliKeys']['extbase'])
 	->loadExtensionTables(TRUE)
 	->initializeBackendUser()
 	->initializeBackendAuthentication()
-	->initializeBackendUserMounts()
 	->initializeLanguageObject();
+	if (method_exists(\TYPO3\CMS\Core\Core\Bootstrap::getInstance(), 'initializeBackendUserMounts')) {
+		\TYPO3\CMS\Core\Core\Bootstrap::getInstance()->initializeBackendUserMounts();
+	}
 
 // Make sure output is not buffered, so command-line output and interaction can take place
 \TYPO3\CMS\Core\Utility\GeneralUtility::flushOutputBuffers();

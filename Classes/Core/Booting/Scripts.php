@@ -176,8 +176,9 @@ class Scripts {
 	static public function initializeAuthenticatedOperations(ConsoleBootstrap $bootstrap) {
 		$bootstrap->initializeBackendUser();
 		$bootstrap->initializeBackendAuthentication();
-		$bootstrap->initializeBackendUserMounts();
-
+		if (method_exists($bootstrap, 'initializeBackendUserMounts')) {
+			$bootstrap->initializeBackendUserMounts();
+		}
 		// Global language object on CLI? rly? but seems to be needed by some scheduler tasks :(
 		$bootstrap->initializeLanguageObject();
 	}
