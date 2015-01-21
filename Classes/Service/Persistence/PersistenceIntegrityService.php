@@ -40,48 +40,48 @@ class PersistenceIntegrityService {
 	/**
 	 * Updating Reference Index
 	 *
-	 * @param PersistenceContext $persitenceContext
+	 * @param PersistenceContext $persistenceContext
 	 * @param ReferenceIndexIntegrityDelegateInterface|NULL $delegate
 	 * @return array Tuple ($errorCount, $recordCount, $processedTables)
 	 */
-	public function updateReferenceIndex(PersistenceContext $persitenceContext, ReferenceIndexIntegrityDelegateInterface $delegate = NULL) {
-		return $this->checkOrUpdateReferenceIndex(FALSE, $persitenceContext, $delegate);
+	public function updateReferenceIndex(PersistenceContext $persistenceContext, ReferenceIndexIntegrityDelegateInterface $delegate = NULL) {
+		return $this->checkOrUpdateReferenceIndex(FALSE, $persistenceContext, $delegate);
 	}
 
 	/**
 	 * Checking Reference Index
 	 *
-	 * @param PersistenceContext $persitenceContext
+	 * @param PersistenceContext $persistenceContext
 	 * @param ReferenceIndexIntegrityDelegateInterface|NULL $delegate
 	 * @return array Tuple ($errorCount, $recordCount, $processedTables)
 	 */
-	public function checkReferenceIndex(PersistenceContext $persitenceContext, ReferenceIndexIntegrityDelegateInterface $delegate = NULL) {
-		return $this->checkOrUpdateReferenceIndex(TRUE, $persitenceContext, $delegate);
+	public function checkReferenceIndex(PersistenceContext $persistenceContext, ReferenceIndexIntegrityDelegateInterface $delegate = NULL) {
+		return $this->checkOrUpdateReferenceIndex(TRUE, $persistenceContext, $delegate);
 	}
 
 	/**
 	 * Updating or checking Reference Index
 	 *
 	 * @param bool $dryRun
-	 * @param PersistenceContext $persitenceContext
+	 * @param PersistenceContext $persistenceContext
 	 * @param ReferenceIndexIntegrityDelegateInterface|NULL $delegate
 	 * @return array Tuple ($errorCount, $recordCount, $processedTables)
 	 */
-	protected function checkOrUpdateReferenceIndex($dryRun, PersistenceContext $persitenceContext, ReferenceIndexIntegrityDelegateInterface $delegate = NULL) {
+	protected function checkOrUpdateReferenceIndex($dryRun, PersistenceContext $persistenceContext, ReferenceIndexIntegrityDelegateInterface $delegate = NULL) {
 		$processedTables = array();
 		$errorCount = 0;
 		$recordCount = 0;
 
-		$existingTableNames = $persitenceContext->getDatabaseConnection()->admin_get_tables();
+		$existingTableNames = $persistenceContext->getDatabaseConnection()->admin_get_tables();
 
-		$this->callDelegateForEvent($delegate, 'willStartOperation', array($this->countRowsOfAllRegisteredTables($persitenceContext, $existingTableNames)));
+		$this->callDelegateForEvent($delegate, 'willStartOperation', array($this->countRowsOfAllRegisteredTables($persistenceContext, $existingTableNames)));
 
 		// Traverse all tables:
-		foreach (array_keys($persitenceContext->getPersistenceConfiguration()) as $tableName) {
+		foreach (array_keys($persistenceContext->getPersistenceConfiguration()) as $tableName) {
 			// Traverse all records in tables, including deleted records:
 			$selectFields = (BackendUtility::isTableWorkspaceEnabled($tableName) ? 'uid,t3ver_wsid' : 'uid');
 			if (!empty($existingTableNames[$tableName])) {
-				$records = $persitenceContext->getDatabaseConnection()->exec_SELECTgetRows($selectFields, $tableName, '1=1');
+				$records = $persistenceContext->getDatabaseConnection()->exec_SELECTgetRows($selectFields, $tableName, '1=1');
 			} else {
 				$this->delegateLog($delegate, 'warning', 'Table "%s" exists in $TCA but does not exist in the database. You should run the Database Analyzer in the Install Tool to fix this.', array($tableName));
 				continue;
@@ -115,8 +115,8 @@ class PersistenceIntegrityService {
 				}
 			}
 			// Searching lost indexes for this table:
-			$where = 'tablename=' . $persitenceContext->getDatabaseConnection()->fullQuoteStr($tableName, 'sys_refindex') . ' AND recuid NOT IN (' . implode(',', $uidList) . ')';
-			$lostIndexes = $persitenceContext->getDatabaseConnection()->exec_SELECTgetRows('hash', 'sys_refindex', $where);
+			$where = 'tablename=' . $persistenceContext->getDatabaseConnection()->fullQuoteStr($tableName, 'sys_refindex') . ' AND recuid NOT IN (' . implode(',', $uidList) . ')';
+			$lostIndexes = $persistenceContext->getDatabaseConnection()->exec_SELECTgetRows('hash', 'sys_refindex', $where);
 			if (count($lostIndexes)) {
 				$errorMessage = 'Table ' . $tableName . ' has ' . count($lostIndexes);
 				if ($dryRun) {
@@ -127,19 +127,19 @@ class PersistenceIntegrityService {
 				$errorCount++;
 				$this->delegateLog($delegate, 'notice', $errorMessage);
 				if (!$dryRun) {
-					$persitenceContext->getDatabaseConnection()->exec_DELETEquery('sys_refindex', $where);
+					$persistenceContext->getDatabaseConnection()->exec_DELETEquery('sys_refindex', $where);
 				}
 			}
 		}
 
 		// Searching lost indexes for non-existing tables:
-		$where = 'tablename NOT IN (' . implode(',', $persitenceContext->getDatabaseConnection()->fullQuoteArray($processedTables, 'sys_refindex')) . ')';
-		$lostTablesCount = $persitenceContext->getDatabaseConnection()->exec_SELECTcountRows('hash', 'sys_refindex', $where);
+		$where = 'tablename NOT IN (' . implode(',', $persistenceContext->getDatabaseConnection()->fullQuoteArray($processedTables, 'sys_refindex')) . ')';
+		$lostTablesCount = $persistenceContext->getDatabaseConnection()->exec_SELECTcountRows('hash', 'sys_refindex', $where);
 		if ($lostTablesCount) {
 			$errorCount++;
 			$this->delegateLog($delegate, 'notice', 'Found ' . $lostTablesCount . ' indexes for not existing tables.');
 			if (!$dryRun) {
-				$persitenceContext->getDatabaseConnection()->exec_DELETEquery('sys_refindex', $where);
+				$persistenceContext->getDatabaseConnection()->exec_DELETEquery('sys_refindex', $where);
 				$this->delegateLog($delegate, 'info', 'Removed indexes for not existing tables.');
 			}
 		}
@@ -175,17 +175,17 @@ class PersistenceIntegrityService {
 	}
 
 	/**
-	 * @param PersistenceContext $persitenceContext
+	 * @param PersistenceContext $persistenceContext
 	 * @param array $existingTableNames
 	 * @return int
 	 */
-	protected function countRowsOfAllRegisteredTables(PersistenceContext $persitenceContext, $existingTableNames) {
+	protected function countRowsOfAllRegisteredTables(PersistenceContext $persistenceContext, $existingTableNames) {
 		$rowsCount = 0;
-		foreach (array_keys($persitenceContext->getPersistenceConfiguration()) as $tableName) {
+		foreach (array_keys($persistenceContext->getPersistenceConfiguration()) as $tableName) {
 			if (empty($existingTableNames[$tableName])) {
 				continue;
 			}
-			$rowsCount += $persitenceContext->getDatabaseConnection()->exec_SELECTcountRows('uid', $tableName, '1=1');
+			$rowsCount += $persistenceContext->getDatabaseConnection()->exec_SELECTcountRows('uid', $tableName, '1=1');
 		}
 
 		return $rowsCount;
