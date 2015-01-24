@@ -26,7 +26,7 @@ just type:
 ./typo3cms extension:install realurl
 ```
 
-**Features**
+## Features
 * Command line tool
 * Flexible bootstrap for commands (not every command needs a fully bootstrapped framework)
 * Cache flush and core cache warmup commands
@@ -36,7 +36,7 @@ just type:
 * Support for all other Extbase command controllers
 
 
-**Installation**
+## Installation
 
 For the extension to work, it *must* be installed in the typo3conf/ext/ directory *not* in any other possible extension location.
 To get the typo3cms command, just _copy_ typo3_console/Scripts/typo3cms to your TYPO3 root directory. Windows users must copy
@@ -44,14 +44,21 @@ typo3_console/Scripts/typo3cms.bat to the TYPO3 root directory and set the locat
 
 Don't forget to activate the extension in the extension manager before you start using the command line tool.
 
-**TODO**
+#### linux shell installation
+make sure **"_cli_lowlevel"** user is a valid backenduser with any password**
+
+```
+cd typo3conf/ext/
+git clone https://github.com/helhum/typo3_console.git
+cp typo3_console/Scripts/typo3cms ../../
+cd ../../
+php ./typo3/cli_dispatch.phpsh extbase extension:install typo3_console
+php typo3cms help
+```
+
+## TODO & Ideas
 
 Currently only a few commands are delivered with the extension, but those delivered are quite useful already. And if any other extension
 adds Extbase command controllers, they will also be useable with the typo3cms command.
 
-* convert lowlevel_cleaner to command controller
-* add basic package/extension kickstarting commands
-* add commands to upload extensions to TER (with user interaction for password)
-* add possibility to install and configure TYPO3 (database migrations, changing configuration etc.)
-* add possibility to update and upgrade TYPO3
-* … contact me if you have further ideas
+* … Add ideas to the issues section of this repository where title is prepended with "idea:"
