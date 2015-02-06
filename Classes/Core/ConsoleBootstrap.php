@@ -249,6 +249,10 @@ class ConsoleBootstrap extends Bootstrap {
 	 * @return void
 	 */
 	public function baseSetup($pathPart = '') {
+		// Compat 6.2 check
+		if (is_callable(array(__CLASS__, 'initializeComposerClassLoader'))) {
+			$this->setEarlyInstance('Composer\\Autoload\\ClassLoader', self::initializeComposerClassLoader());
+		}
 		define('TYPO3_MODE', 'BE');
 		define('TYPO3_cliMode', TRUE);
 		$GLOBALS['MCONF']['name'] = '_CLI_lowlevel';
