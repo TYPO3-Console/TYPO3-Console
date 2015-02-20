@@ -48,10 +48,8 @@ Don't forget to activate the extension in the extension manager before you start
 make sure **"_cli_lowlevel"** user is a valid backenduser with any password**
 
 ```
-cd typo3conf/ext/
-git clone https://github.com/helhum/typo3_console.git
-cp typo3_console/Scripts/typo3cms ../../
-cd ../../
+git clone https://github.com/helhum/typo3_console.git typo3conf/ext/typo3_console
+cp typo3conf/ext/typo3_console/Scripts/typo3cms .
 php ./typo3/cli_dispatch.phpsh extbase extension:install typo3_console
 php typo3cms help
 ```
