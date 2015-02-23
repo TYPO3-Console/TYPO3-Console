@@ -59,11 +59,12 @@ class InstallCommandController extends CommandController {
 	 * @param string $databasePort
 	 * @param string $databaseSocket
 	 * @param string $databaseName
+	 * @param string $databaseCreate
 	 * @param string $adminUserName
 	 * @param string $adminPassword
 	 * @param string $siteName
 	 */
-	public function setupCommand($nonInteractive = FALSE, $databaseUserName = '', $databaseUserPassword = '', $databaseHostName = '', $databasePort = '', $databaseSocket = '', $databaseName = '', $adminUserName = '', $adminPassword = '', $siteName = 'New TYPO3 Console site') {
+	public function setupCommand($nonInteractive = FALSE, $databaseUserName = '', $databaseUserPassword = '', $databaseHostName = '', $databasePort = '', $databaseSocket = '', $databaseName = '', $databaseCreate = '', $adminUserName = '', $adminPassword = '', $siteName = 'New TYPO3 Console site') {
 		$this->outputLine();
 		$this->outputLine('<options=bold>Welcome to the console installer of TYPO3 CMS!</options=bold>');
 
