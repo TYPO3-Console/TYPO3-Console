@@ -4,7 +4,7 @@
     "description": "A reliable and powerful command line interface for TYPO3 CMS",
     "homepage": "http://typo3.org",
     "license": ["GPL-2.0+"],
-    "version": "1.0.5",
+    "version": "1.0.6",
 
     "require": {
         "typo3/cms-core": ">=6.2.6,<8.0"
