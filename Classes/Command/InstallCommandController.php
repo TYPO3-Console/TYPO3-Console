@@ -151,11 +151,13 @@ class InstallCommandController extends CommandController {
 	/**
 	 * Select a database name
 	 *
-	 * @param string $databaseName Name of the database (will be created)
+	 * @param string $databaseName Name of the database
+	 * @param bool $createNew Create database (1) or use existing database (0)
 	 * @internal
 	 */
-	public function databaseSelectCommand($databaseName) {
-		$this->cliSetupRequestHandler->executeActionWithArguments('databaseSelect', array('type' => 'new', 'new' => $databaseName));
+	public function databaseSelectCommand($databaseName, $createNew = TRUE) {
+		$selectType = $createNew ? 'new' : 'existing';
+		$this->cliSetupRequestHandler->executeActionWithArguments('databaseSelect', array('type' => $selectType, $selectType => $databaseName));
 	}
 
 	/**
