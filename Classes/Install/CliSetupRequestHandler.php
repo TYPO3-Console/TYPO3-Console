@@ -222,7 +222,7 @@ class CliSetupRequestHandler {
 							)
 						);
 					} while ($argumentDefinition->isRequired() && $argumentValue === NULL);
-					$actionArguments[$argumentDefinition->getName()] = $argumentValue ?: $argument->getDefaultValue();
+					$actionArguments[$argumentDefinition->getName()] = $argumentValue !== NULL ? $argumentValue : $argument->getDefaultValue();
 				}
 			}
 
