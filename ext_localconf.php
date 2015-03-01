@@ -9,12 +9,8 @@ call_user_func(function($extensionKey) {
 		$signalSlotDispatcher->connect(
 			'TYPO3\\CMS\\Extensionmanager\\Service\\ExtensionManagementService',
 			'hasInstalledExtensions',
-			function($keyOfInstalledExtension) use ($extensionKey) {
-				if ($extensionKey !== $keyOfInstalledExtension) {
-					return;
-				}
-				\Helhum\Typo3Console\Composer\InstallerScripts::postInstallExtension();
-			}
+			'Helhum\\Typo3Console\\Hook\\ExtensionInstallation',
+			'afterInstallation'
 		);
 	}
 }, $_EXTKEY);
