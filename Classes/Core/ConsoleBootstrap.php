@@ -89,14 +89,17 @@ class ConsoleBootstrap extends Bootstrap {
 	/**
 	 * Bootstraps the minimal infrastructure, resolves a fitting request handler and
 	 * then passes control over to that request handler.
+	 * @param string $relativePathPart Relative path of entry script back to document root
+	 * @return ConsoleBootstrap
 	 */
-	public function run() {
+	public function run($relativePathPart = '') {
 		$this->initializeClassLoader();
 		$this->initializeCommandManager();
 		$this->initializePackageManagement();
 
 		$requestHandler = $this->resolveRequestHandler();
 		$requestHandler->handleRequest();
+		return $this;
 	}
 
 	/**
@@ -182,7 +185,7 @@ class ConsoleBootstrap extends Bootstrap {
 	 * @return RequestHandlerInterface A request handler
 	 * @throws \TYPO3\CMS\Core\Error\Exception
 	 */
-	protected function resolveRequestHandler() {
+	public function resolveRequestHandler() {
 		if (empty($this->requestHandlers)) {
 			throw new \InvalidArgumentException('No request handlers found. Make sure the extension typo3_console is active and try again.', 1417863425);
 		}
