@@ -35,7 +35,12 @@ call_user_func(function($scriptLocation) {
 		require __DIR__ . '/../Scripts/CliDispatch.php';
 		exit(0);
 	} else {
-		define('PATH_thisScript', realpath(PATH_site . 'typo3cms'));
+		if ($scriptLocation) {
+			$scriptPath = $scriptLocation . '/typo3cms';
+		} else {
+			$scriptPath = PATH_site . 'typo3cms';
+		}
+		define('PATH_thisScript', $scriptPath);
 	}
 
 	require PATH_site . 'typo3/sysext/core/Classes/Core/Bootstrap.php';
