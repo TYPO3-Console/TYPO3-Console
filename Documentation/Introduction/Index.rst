@@ -62,6 +62,9 @@ Additionally it provides some commands, that wouldn't be possible at all with th
 	# Populate essential core caches
 	./typo3cms cache:warmup
 
+	# Perform safe database schema updates
+	./typo3cms database:updateschema "*.add,*.change"
+
 A help system is integrated, so that you can easily list all available commands or get help for individual commands:
 
 .. code-block:: bash

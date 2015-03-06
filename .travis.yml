@@ -58,3 +58,4 @@ script:
   - ./typo3cms backend:lock
   - ./typo3cms backend:unlock
   - ./typo3cms cleanup:updatereferenceindex
+  - ./typo3cms database:updateschema "*"
