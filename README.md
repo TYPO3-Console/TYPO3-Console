@@ -44,7 +44,7 @@ typo3_console/Scripts/typo3cms.bat to the TYPO3 root directory and set the locat
 
 Don't forget to activate the extension in the extension manager before you start using the command line tool.
 
-#### linux shell installation
+#### linux Shell Installation
 make sure **"_cli_lowlevel"** user is a valid backenduser with any password**
 
 ```
@@ -54,7 +54,7 @@ php ./typo3/cli_dispatch.phpsh extbase extension:install typo3_console
 php typo3cms help
 ```
 
-## TODO & Ideas
+## ToDo & Ideas
 
 Currently only a few commands are delivered with the extension, but those delivered are quite useful already. And if any other extension
 adds Extbase command controllers, they will also be useable with the typo3cms command.
