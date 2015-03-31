@@ -1,5 +1,5 @@
 {
-    "name": "helhum/typo3-console",
+    "name": "helhum/typo3_console",
     "type": "typo3-cms-extension",
     "description": "A reliable and powerful command line interface for TYPO3 CMS",
     "homepage": "http://typo3.org",
