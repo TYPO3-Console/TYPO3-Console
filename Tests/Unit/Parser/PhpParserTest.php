@@ -1,5 +1,5 @@
 <?php
-namespace Tests\Unit\Parser;
+namespace Helhum\Typo3Console\Tests\Unit\Parser;
 
 /***************************************************************
  *  Copyright notice
@@ -59,7 +59,7 @@ class PhpParserTest extends UnitTestCase {
 	public function parsedResultCorrectlySetsNamespaceOfParsedClass() {
 		$subject = new Parser\PhpParser();
 		$result = $subject->parseClassFile(__DIR__ . '/Fixtures/NamespacedClassFixture.php');
-		$this->assertSame('Tests\\Unit\\Parser\\Fixtures', $result->getNamespace());
+		$this->assertSame('Helhum\\Typo3Console\\Tests\\Unit\\Parser\\Fixtures', $result->getNamespace());
 	}
 
 	/**
@@ -96,7 +96,7 @@ class PhpParserTest extends UnitTestCase {
 	public function parsedResultCorrectlySetsFullyQualifiedClassNameOfParsedClass() {
 		$subject = new Parser\PhpParser();
 		$result = $subject->parseClassFile(__DIR__ . '/Fixtures/NamespacedClassFixture.php');
-		$this->assertSame('Tests\\Unit\\Parser\\Fixtures\\NamespacedClassFixture', $result->getFullyQualifiedClassName());
+		$this->assertSame('Helhum\\Typo3Console\\Tests\\Unit\\Parser\\Fixtures\\NamespacedClassFixture', $result->getFullyQualifiedClassName());
 	}
 
 	/**

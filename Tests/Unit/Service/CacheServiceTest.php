@@ -1,5 +1,5 @@
 <?php
-namespace Tests\Unit\Service;
+namespace Helhum\Typo3Console\Tests\Unit\Service;
 
 /***************************************************************
  *  Copyright notice
