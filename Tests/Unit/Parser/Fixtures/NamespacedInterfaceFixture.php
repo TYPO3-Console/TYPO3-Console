@@ -1,5 +1,5 @@
 <?php
- 	namespace Tests\Unit\Parser\Fixtures	;
+namespace Helhum\Typo3Console\Tests\Unit\Parser\Fixtures;
 
 /***************************************************************
  *  Copyright notice
@@ -30,6 +30,6 @@
 /**
  * Class NamespacedClassFixture
  */
- 	interface NamespacedInterfaceFixture 	{
+interface NamespacedInterfaceFixture {
 
-} 
+}
