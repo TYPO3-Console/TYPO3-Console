@@ -244,10 +244,10 @@ class CommandController implements CommandControllerInterface {
 		foreach ($this->arguments as $argument) {
 			$preparedArguments[] = $argument->getValue();
 		}
-
+		$originalRole = $this->ensureAdminRoleIfRequested();
 		$commandResult = call_user_func_array(array($this, $this->commandMethodName), $preparedArguments);
-
-		if (is_string($commandResult) && strlen($commandResult) > 0) {
+		$this->restoreUserRole($originalRole);
+		if (is_string($commandResult) && $commandResult !== '') {
 			$this->response->appendContent($commandResult);
 		} elseif (is_object($commandResult) && method_exists($commandResult, '__toString')) {
 			$this->response->appendContent((string) $commandResult);
@@ -267,6 +267,17 @@ class CommandController implements CommandControllerInterface {
 		$originalRole = $this->userAuthentication->user['admin'];
 		$this->userAuthentication->user['admin'] = 1;
 		return $originalRole;
+	}
+
+	/**
+	 * Restores the original user role
+	 *
+	 * @param NULL|int $originalRole
+	 */
+	protected function restoreUserRole($originalRole) {
+		if ($originalRole !== NULL) {
+			$this->userAuthentication->user['admin'] = $originalRole;
+		}
 	}
 
 	/**
