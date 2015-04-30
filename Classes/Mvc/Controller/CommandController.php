@@ -19,6 +19,7 @@ use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use TYPO3\CMS\Extbase\Mvc\Cli\Request;
 use TYPO3\CMS\Extbase\Mvc\Cli\Response;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandControllerInterface;
+use Symfony\Component\Console\Output\ConsoleOutput as SymfonyConsoleOutput;
 use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -317,7 +318,7 @@ class CommandController implements CommandControllerInterface {
 	 * @return LoggerInterface
 	 */
 	protected function createDefaultLogger($minimumLevel = LogLevel::DEBUG, $options = array()) {
-		$options['output'] = $this->output;
+		$options['output'] = new SymfonyConsoleOutput();
 		$logger = new Logger(get_class($this));
 		$logger->addWriter($minimumLevel, new ConsoleWriter($options));
 
