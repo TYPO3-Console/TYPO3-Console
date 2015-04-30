@@ -309,7 +309,7 @@ class CommandController implements CommandControllerInterface {
 	}
 
 	/**
-	 * Formats the given text to fit into MAXIMUM_LINE_LENGTH and outputs it to the
+	 * Formats the given text to fit into $this->output->getMaximumLineLength() and outputs it to the
 	 * console window
 	 *
 	 * @param string $text Text to output
