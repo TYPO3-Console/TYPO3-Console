@@ -32,6 +32,7 @@ use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
 use TYPO3\CMS\Extbase\Mvc\Exception\UnsupportedRequestTypeException;
 use TYPO3\CMS\Extbase\Mvc\RequestInterface;
 use TYPO3\CMS\Extbase\Mvc\ResponseInterface;
+use TYPO3\CMS\Core\Authentication\AbstractUserAuthentication;
 
 /**
  * A controller which processes requests from the command line
@@ -68,6 +69,19 @@ class CommandController implements CommandControllerInterface {
 	protected $commandMethodName = '';
 
 	/**
+	 * Whether the command needs admin access to perform its job
+	 *
+	 * @var bool
+	 * @api
+	 */
+	protected $requestAdminPermissions = FALSE;
+
+	/**
+	 * @var AbstractUserAuthentication
+	 */
+	protected $userAuthentication;
+
+	/**
 	 * @var \TYPO3\CMS\Extbase\Reflection\ReflectionService
 	 * @inject
 	 */
@@ -85,6 +99,7 @@ class CommandController implements CommandControllerInterface {
 	public function injectObjectManager(\TYPO3\CMS\Extbase\Object\ObjectManagerInterface $objectManager) {
 		$this->objectManager = $objectManager;
 		$this->arguments = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Controller\\Arguments');
+		$this->userAuthentication = isset($GLOBALS['BE_USER']) ? $GLOBALS['BE_USER'] : NULL;
 		$this->output = $this->objectManager->get('Helhum\\Typo3Console\\Mvc\\Cli\\ConsoleOutput');
 	}
 
@@ -237,6 +252,21 @@ class CommandController implements CommandControllerInterface {
 		} elseif (is_object($commandResult) && method_exists($commandResult, '__toString')) {
 			$this->response->appendContent((string) $commandResult);
 		}
+	}
+
+	/**
+	 * Set admin permissions for currently authenticated user if requested
+	 * and returns the original state or NULL
+	 *
+	 * @return NULL|int
+	 */
+	protected function ensureAdminRoleIfRequested() {
+		if (!$this->requestAdminPermissions || !$this->userAuthentication || !isset($this->userAuthentication->user['admin'])) {
+			return NULL;
+		}
+		$originalRole = $this->userAuthentication->user['admin'];
+		$this->userAuthentication->user['admin'] = 1;
+		return $originalRole;
 	}
 
 	/**
