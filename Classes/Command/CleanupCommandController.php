@@ -78,24 +78,23 @@ class CleanupCommandController extends CommandController {
 	protected function createReferenceIndexDelegateWithOptions($dryRun, $verbose, $showProgress) {
 		$delegate = new ReferenceIndexUpdateDelegate($this->createLogger($verbose, $showProgress));
 		if ($showProgress) {
-			$progressHelper = $this->getProgressHelper();
 			$output = $this->output;
 			$delegate->subscribeEvent(
 				'willStartOperation',
-				function($max) use ($progressHelper, $output) {
-					$progressHelper->start($output, $max);
+				function($max) use ($output) {
+					$output->progressStart($max);
 				}
 			);
 			$delegate->subscribeEvent(
 				'willUpdateRecord',
-				function() use ($progressHelper) {
-					$progressHelper->advance();
+				function() use ($output) {
+					$output->progressAdvance();
 				}
 			);
 			$delegate->subscribeEvent(
 				'operationHasEnded',
-				function() use ($progressHelper, $dryRun) {
-					$progressHelper->finish();
+				function() use ($output, $dryRun) {
+					$output->progressFinish();
 				}
 			);
 		}
@@ -124,4 +123,5 @@ class CleanupCommandController extends CommandController {
 		}
 		return parent::createDefaultLogger($verbose ? LogLevel::DEBUG : LogLevel::WARNING, $options);
 	}
+
 }

@@ -52,7 +52,7 @@ class ConfigurationCommandController extends CommandController implements Single
 	public function removeByPathCommand(array $paths, $force = FALSE) {
 		if (!$force) {
 			do {
-				$answer = strtolower($this->ask('Remove ' . implode(',', $paths) . ' from system configuration (TYPO3_CONF_VARS)? (y/N): '));
+				$answer = strtolower($this->output->ask('Remove ' . implode(',', $paths) . ' from system configuration (TYPO3_CONF_VARS)? (y/N): '));
 			} while ($answer !== 'y' && $answer !== 'yes');
 			}
 		$removed = $this->configurationManager->removeLocalConfigurationKeysByPath($paths);

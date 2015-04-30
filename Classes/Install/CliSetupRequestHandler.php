@@ -27,10 +27,10 @@ namespace Helhum\Typo3Console\Install;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
@@ -88,11 +88,6 @@ class CliSetupRequestHandler {
 	protected $output;
 
 	/**
-	 * @var DialogHelper
-	 */
-	protected $dialogHelper;
-
-	/**
 	 * @var array
 	 */
 	protected $givenRequestArguments = array();
@@ -103,11 +98,12 @@ class CliSetupRequestHandler {
 	protected $interactiveSetup = TRUE;
 
 	/**
-	 *
+	 * Creates a new output object during object creation
 	 */
-	public function __construct() {
-		$this->output = new ConsoleOutput();
-
+	public function initializeObject() {
+		if ($this->output === NULL) {
+			$this->output = $this->objectManager->get('Helhum\\Typo3Console\\Mvc\\Cli\\ConsoleOutput');
+		}
 	}
 
 	/**
@@ -139,7 +135,7 @@ class CliSetupRequestHandler {
 			$db = $GLOBALS['TYPO3_DB'];
 			$db->exec_INSERTquery('be_users', array('username' => '_cli_lowlevel'));
 		}
-		$this->outputLine(serialize($messages));
+		$this->output->outputLine(serialize($messages));
 	}
 
 	/**
@@ -196,8 +192,8 @@ class CliSetupRequestHandler {
 
 		do {
 			$loopCounter++;
-			$this->outputLine();
-			$this->outputLine(sprintf('%s:', $command->getShortDescription()));
+			$this->output->outputLine();
+			$this->output->outputLine(sprintf('%s:', $command->getShortDescription()));
 
 			$actionArguments = array();
 			foreach ($command->getArgumentDefinitions() as $argumentDefinition) {
@@ -214,7 +210,7 @@ class CliSetupRequestHandler {
 					}
 					$argumentValue = NULL;
 					do {
-						$argumentValue = $this->ask(
+						$argumentValue = $this->output->ask(
 							sprintf(
 								'<comment>%s (%s):</comment> ',
 								$argumentDefinition->getDescription(),
@@ -317,14 +313,14 @@ class CliSetupRequestHandler {
 	 */
 	protected function outputMessages(array $messages = array()) {
 		if (empty($messages)) {
-			$this->outputLine('OK');
+			$this->output->outputLine('OK');
 			return;
 		}
-		$this->outputLine();
+		$this->output->outputLine();
 		foreach ($messages as $statusMessage) {
 			$this->outputStatusMessage($statusMessage);
 		}
-		$this->outputLine();
+		$this->output->outputLine();
 	}
 
 	/**
@@ -338,65 +334,8 @@ class CliSetupRequestHandler {
 			break;
 			default:
 		}
-		$this->outputLine($subject);
-		$this->outputLine(wordwrap($statusMessage->getMessage()));
+		$this->output->outputLine($subject);
+		$this->output->outputLine(wordwrap($statusMessage->getMessage()));
 	}
-
-	/**
-	 * Outputs specified text to the console window and appends a line break
-	 *
-	 * @param string $text Text to output
-	 * @param array $arguments Optional arguments to use for sprintf
-	 * @return void
-	 * @see output()
-	 * @see outputLines()
-	 */
-	protected function outputLine($text = '', array $arguments = array()) {
-		$this->output($text . PHP_EOL, $arguments);
-	}
-
-	/**
-	 * Outputs specified text to the console window
-	 * You can specify arguments that will be passed to the text via sprintf
-	 * @see http://www.php.net/sprintf
-	 *
-	 * @param string $text Text to output
-	 * @param array $arguments Optional arguments to use for sprintf
-	 * @return void
-	 */
-	protected function output($text, array $arguments = array()) {
-		if ($arguments !== array()) {
-			$text = vsprintf($text, $arguments);
-		}
-		$this->output->write($text);
-	}
-
-	/**
-	 * Asks a question to the user
-	 *
-	 * @param string|array $question The question to ask. If an array each array item is turned into one line of a multi-line question
-	 * @param string $default The default answer if none is given by the user
-	 * @param array $autocomplete List of values to autocomplete. This only works if "stty" is installed
-	 * @return string The user answer
-	 * @throws \RuntimeException If there is no data to read in the input stream
-	 */
-	protected function ask($question, $default = NULL, array $autocomplete = NULL) {
-		return $this->getDialogHelper()->ask($this->output, $question, $default, $autocomplete);
-	}
-
-	/**
-	 * Returns or initializes the symfony/console DialogHelper
-	 *
-	 * @return DialogHelper
-	 */
-	protected function getDialogHelper() {
-		if ($this->dialogHelper === NULL) {
-			$this->dialogHelper = new DialogHelper();
-			$helperSet = new HelperSet(array(new FormatterHelper()));
-			$this->dialogHelper->setHelperSet($helperSet);
-		}
-		return $this->dialogHelper;
-	}
-
 
 }

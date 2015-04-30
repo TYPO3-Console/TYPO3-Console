@@ -26,6 +26,7 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
