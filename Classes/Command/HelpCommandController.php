@@ -30,13 +30,14 @@ namespace Helhum\Typo3Console\Command;
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
+use Helhum\Typo3Console\Mvc\Controller\CommandController;
 
 /**
  * A Command Controller which provides help for available commands
  *
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class HelpCommandController extends \TYPO3\CMS\Extbase\Mvc\Controller\CommandController {
+class HelpCommandController extends CommandController {
 
 	/**
 	 * @var \Helhum\Typo3Console\Mvc\Cli\CommandManager
