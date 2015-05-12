@@ -344,4 +344,21 @@ class ConsoleBootstrap extends Bootstrap {
 	protected function flushOutputBuffers() {
 		\TYPO3\CMS\Core\Utility\GeneralUtility::flushOutputBuffers();
 	}
+
+
+	/**
+	 * Sets up additional configuration applied in all scopes
+	 *
+	 * @return Bootstrap
+	 * @internal This is not a public API method, do not use in own extensions
+	 * @todo: This is only for master "compatibility". Once 6.2 compatibility is removed, we can call these methods directly.
+	 */
+	public function applyAdditionalConfigurationSettings() {
+		$this->initializeExceptionHandling()
+			->setFinalCachingFrameworkCacheConfiguration()
+			->defineLoggingAndExceptionConstants()
+			->unsetReservedGlobalVariables();
+		return $this;
+	}
+
 }

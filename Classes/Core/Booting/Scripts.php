@@ -159,13 +159,6 @@ class Scripts {
 	/**
 	 * @param ConsoleBootstrap $bootstrap
 	 */
-	static public function applyAdditionalConfigurationSettings(ConsoleBootstrap $bootstrap) {
-		$bootstrap->applyAdditionalConfigurationSettings();
-	}
-
-	/**
-	 * @param ConsoleBootstrap $bootstrap
-	 */
 	static public function initializePersistence(ConsoleBootstrap $bootstrap) {
 		$bootstrap->loadExtensionTables();
 	}
