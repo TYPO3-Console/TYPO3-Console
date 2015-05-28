@@ -27,14 +27,23 @@ namespace Helhum\Typo3Console\Package;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use Helhum\Typo3Console\Core\Booting\RunLevel;
+use Helhum\Typo3Console\Core\ConsoleBootstrap;
+use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 use TYPO3\CMS\Core\Package\Exception;
 use TYPO3\CMS\Core\Package\Package;
+use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 
 /**
  * Class UncachedPackageManager
  */
 class UncachedPackageManager extends PackageManager {
+
+	/**
+	 * @var ConsoleBootstrap
+	 */
+	protected $bootstrap;
 
 	/**
 	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
@@ -46,10 +55,60 @@ class UncachedPackageManager extends PackageManager {
 		$this->initializePackageObjects();
 		$this->initializeCompatibilityLoadedExtArray();
 
-		foreach ($this->activePackages as $package) {
+		foreach ($this->activePackages as $packageKey => $package) {
 			/** @var $package Package */
 			$package->boot($bootstrap);
 		}
+
+		if ($this->consolePackageBootRequired($this->getPackage('typo3_console'))) {
+			// Force loading of the console in any case
+			$this->activatePackage('typo3_console');
+			$this->bootConsole();
+		}
+	}
+
+	/**
+	 * @param PackageInterface $consolePackage
+	 * @return bool
+	 */
+	protected function consolePackageBootRequired($consolePackage) {
+		return !$consolePackage instanceof \typo3_console\Package;
+	}
+
+	/**
+	 * Boot up console (previously done in own package class)
+	 */
+	protected function bootConsole() {
+		$this->bootstrap->registerRequestHandler(new RequestHandler($this->bootstrap));
+		$this->registerCommands($this->bootstrap);
+	}
+
+	/**
+	 * Register console commands, now only possible for typo3_console commands, not third party extensions :-/
+	 */
+	protected function registerCommands() {
+		$this->bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\CacheCommandController');
+		$this->bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\BackendCommandController');
+		$this->bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\SchedulerCommandController');
+		$this->bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\CleanupCommandController');
+		$this->bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\DocumentationCommandController');
+		$this->bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\InstallCommandController');
+		$this->bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\ConfigurationCommandController');
+		$this->bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\FrontendCommandController');
+
+		$this->bootstrap->setRunLevelForCommand('typo3_console:install:databasedata', RunLevel::LEVEL_MINIMAL);
+		$this->bootstrap->addBootingStepForCommand('typo3_console:install:databasedata', 'helhum.typo3console:database');
+		$this->bootstrap->setRunLevelForCommand('typo3_console:install:defaultconfiguration', RunLevel::LEVEL_FULL);
+		$this->bootstrap->setRunLevelForCommand('typo3_console:install:*', RunLevel::LEVEL_COMPILE);
+
+		$this->bootstrap->setRunLevelForCommand('typo3_console:cache:flush', RunLevel::LEVEL_COMPILE);
+		$this->bootstrap->addBootingStepForCommand('typo3_console:cache:flush', 'helhum.typo3console:database');
+		$this->bootstrap->setRunLevelForCommand('typo3_console:cache:*', RunLevel::LEVEL_FULL);
+
+		$this->bootstrap->setRunLevelForCommand('typo3_console:backend:*', RunLevel::LEVEL_MINIMAL);
+		$this->bootstrap->setRunLevelForCommand('typo3_console:documentation:*', RunLevel::LEVEL_FULL);
+		$this->bootstrap->setRunLevelForCommand('typo3_console:scheduler:*', RunLevel::LEVEL_FULL);
+		$this->bootstrap->setRunLevelForCommand('typo3_console:cleanup:*', RunLevel::LEVEL_FULL);
 	}
 
 	/**
