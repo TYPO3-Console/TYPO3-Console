@@ -1,8 +1,59 @@
 #!/usr/bin/env php
 <?php
+namespace Helhum\Typo3Console;
+
+/**
+ * @param string $path
+ * @return bool
+ */
+function entryScriptExists($path) {
+	return file_exists($path . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php');
+}
+
+/**
+ * Returns parent directory.
+ *
+ * @param string $path Path to start from.
+ * @return string Parent path.
+ */
+function getParentDirectoryPath($path) {
+	if (empty($path)) {
+		return FALSE;
+	}
+	$path = explode('/', $path);
+	array_pop($path);
+	return implode('/', $path);
+}
+
+/**
+ * Returns the TYPO3 root path.
+ *
+ * @return string TYPO3 root path.
+ */
+function getInstallationRootPath() {
+	static $installationRootPath = FALSE;
+
+	if (!$installationRootPath) {
+		$path = getcwd();
+		if (entryScriptExists($path)) {
+			$installationRootPath = $path;
+		} else {
+			while ($path = getParentDirectoryPath($path)) {
+				if (entryScriptExists($path)) {
+					$installationRootPath = $path;
+					break;
+				}
+			}
+		}
+	}
+	return $installationRootPath;
+}
 
 /**
  * Bootstrap for the command line
  */
-$__self_dir = __DIR__;
-require __DIR__ . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php';
+if (getInstallationRootPath()) {
+	require getInstallationRootPath() . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php';
+} else {
+	echo "Could not find typo3cms.php, make sure your path is within a TYPO3 installation and/or EXT:typo3_console is installed.\n";
+}

@@ -44,7 +44,7 @@ typo3_console/Scripts/typo3cms.bat to the TYPO3 root directory and set the locat
 
 Don't forget to activate the extension in the extension manager before you start using the command line tool.
 
-### Linux Shell Installation
+### Linux and OS X Shell Installation
 
 ```
 git clone https://github.com/helhum/typo3_console.git typo3conf/ext/typo3_console
@@ -52,6 +52,9 @@ cp typo3conf/ext/typo3_console/Scripts/typo3cms .
 php ./typo3/cli_dispatch.phpsh extbase extension:install typo3_console
 php typo3cms help
 ```
+
+You may also copy ```typo3conf/ext/typo3_console/Scripts/typo3cms``` to a directory within your ```$PATH``` environment variable and use it 
+for all your TYPO3 installations containing EXT:typo3_console by just running ```typo3cms help```.
 
 ## ToDo & Ideas
 
