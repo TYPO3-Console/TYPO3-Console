@@ -139,8 +139,8 @@ class Scripts {
 	 * @param ConsoleBootstrap $bootstrap
 	 */
 	static public function initializeClassLoaderCaches(ConsoleBootstrap $bootstrap) {
-		if (is_callable(array($bootstrap, 'initializeClassLoader'))) {
-			$bootstrap->initializeClassLoader();
+		if (is_callable(array($bootstrap, 'initializeClassLoaderCaches'))) {
+			$bootstrap->initializeClassLoaderCaches();
 			$packageStatesPathAndFilename = PATH_typo3conf . 'PackageStates.php';
 			$mTime = @filemtime($packageStatesPathAndFilename);
 			$bootstrap->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader')

@@ -265,11 +265,14 @@ class ConsoleBootstrap extends Bootstrap {
 		if (is_callable(array(__CLASS__, 'initializeComposerClassLoader'))) {
 			$this->setEarlyInstance('Composer\\Autoload\\ClassLoader', self::initializeComposerClassLoader());
 		}
+		// @deprecated in 6.2 will be removed in 7
 		if (!class_exists('TYPO3\\Flow\\Package\\PackageManager')) {
 			$this->packageManagerInstanceName = 'TYPO3\\CMS\\Core\\Package\\PackageManager';
 			class_alias('TYPO3\\CMS\\Core\\Package\\PackageManager', 'TYPO3\\Flow\\Package\\PackageManager');
-			class_alias('TYPO3\\CMS\\Core\\Core\\Bootstrap', 'TYPO3\\Flow\\Core\\Bootstrap');
 		}
+		// @deprecated in 6.2 will be removed in 7
+		class_alias('TYPO3\\CMS\\Core\\Core\\Bootstrap', 'TYPO3\\Flow\\Core\\Bootstrap');
+
 		define('TYPO3_MODE', 'BE');
 		define('TYPO3_cliMode', TRUE);
 		$GLOBALS['MCONF']['name'] = '_CLI_lowlevel';
