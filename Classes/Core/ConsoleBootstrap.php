@@ -61,6 +61,12 @@ class ConsoleBootstrap extends Bootstrap {
 	protected $runLevel;
 
 	/**
+	 * @deprecated with 6.2 will be removed with 7
+	 * @var string
+	 */
+	protected $packageManagerInstanceName = 'TYPO3\\Flow\\Package\\PackageManager';
+
+	/**
 	 * @var string $context Application context
 	 */
 	public function __construct($context) {
@@ -93,7 +99,10 @@ class ConsoleBootstrap extends Bootstrap {
 	 * @return ConsoleBootstrap
 	 */
 	public function run($relativePathPart = '') {
-		$this->initializeClassLoader();
+		// @deprecated in 6.2, will be removed in 7.0
+		if (is_callable(array(__CLASS__, 'initializeClassLoader'))) {
+			$this->initializeClassLoader();
+		}
 		$this->initializeCommandManager();
 		$this->initializePackageManagement();
 
@@ -252,14 +261,18 @@ class ConsoleBootstrap extends Bootstrap {
 	 * @return void
 	 */
 	public function baseSetup($pathPart = '') {
-		// Compat 6.2 check
+		// @deprecated in 6.2 will be removed in 7
 		if (is_callable(array(__CLASS__, 'initializeComposerClassLoader'))) {
 			$this->setEarlyInstance('Composer\\Autoload\\ClassLoader', self::initializeComposerClassLoader());
+		}
+		if (!class_exists('TYPO3\\Flow\\Package\\PackageManager')) {
+			$this->packageManagerInstanceName = 'TYPO3\\CMS\\Core\\Package\\PackageManager';
+			class_alias('TYPO3\\CMS\\Core\\Package\\PackageManager', 'TYPO3\\Flow\\Package\\PackageManager');
+			class_alias('TYPO3\\CMS\\Core\\Core\\Bootstrap', 'TYPO3\\Flow\\Core\\Bootstrap');
 		}
 		define('TYPO3_MODE', 'BE');
 		define('TYPO3_cliMode', TRUE);
 		$GLOBALS['MCONF']['name'] = '_CLI_lowlevel';
-		class_alias(get_class($this), 'TYPO3\\Flow\\Core\\Bootstrap');
 		parent::baseSetup($pathPart);
 		// I want to see deprecation messages
 //		error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
@@ -296,20 +309,29 @@ class ConsoleBootstrap extends Bootstrap {
 	 */
 	public function initializePackageManagement($packageManagerClassName = 'Helhum\\Typo3Console\\Package\\UncachedPackageManager') {
 		require __DIR__ . '/../Package/UncachedPackageManager.php';
+
 		$packageManager = new \Helhum\Typo3Console\Package\UncachedPackageManager();
-		$this->setEarlyInstance('TYPO3\\Flow\\Package\\PackageManager', $packageManager);
+		$this->setEarlyInstance($this->packageManagerInstanceName, $packageManager);
 		Utility\ExtensionManagementUtility::setPackageManager($packageManager);
-		$packageManager->injectClassLoader($this->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader'));
+		// @deprecated in 6.2, will be removed in 7.0
+		if (is_callable(array($packageManager, 'injectClassLoader'))) {
+			$packageManager->injectClassLoader($this->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader'));
+		}
 		$packageManager->injectDependencyResolver(Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Package\\DependencyResolver'));
 		$packageManager->initialize($this);
 		Utility\GeneralUtility::setSingletonInstance('TYPO3\\CMS\\Core\\Package\\PackageManager', $packageManager);
 	}
 
 	public function disableCoreCaches() {
-		$this->disableCoreAndClassesCache();
-		$this->initializeUncachedClassLoader();
+		// @deprecated in 6.2, will be removed in 7.0
+		if (is_callable(array(__CLASS__, 'disableCoreAndClassesCache'))) {
+			$this->disableCoreAndClassesCache();
+			$this->initializeUncachedClassLoader();
+		} else {
+			$this->disableCoreCache();
+		}
 		/** @var PackageManager $packageManager */
-		$packageManager = $this->getEarlyInstance('TYPO3\\Flow\\Package\\PackageManager');
+		$packageManager = $this->getEarlyInstance($this->packageManagerInstanceName);
 		if ($packageManager->isPackageActive('dbal')) {
 			$cacheConfigurations['dbal'] = array(
 				'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\TransientMemoryBackend',
@@ -327,7 +349,7 @@ class ConsoleBootstrap extends Bootstrap {
 		$property->setAccessible(TRUE);
 		$property->setValue($classLoader, TRUE);
 
-		$classLoader->setPackages($this->getEarlyInstance('TYPO3\\Flow\\Package\\PackageManager')->getActivePackages());
+		$classLoader->setPackages($this->getEarlyInstance($this->packageManagerInstanceName)->getActivePackages());
 	}
 
 	public function initializeConfigurationManagement() {

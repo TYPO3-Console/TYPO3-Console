@@ -29,6 +29,7 @@ namespace Helhum\Typo3Console\Package;
 
 use TYPO3\CMS\Core\Package\Exception;
 use TYPO3\CMS\Core\Package\Package;
+use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 
 /**
@@ -70,6 +71,18 @@ class UncachedPackageManager extends PackageManager {
 		} else {
 			$this->registerPackagesFromConfiguration();
 		}
+
+		if ($this->consolePackageBootRequired($this->getPackage('typo3_console'))) {
+			$this->packages['typo3_console'] = new \typo3_console\Package($this, 'typo3_console', $this->getPackage('typo3_console')->getPackagePath());
+		}
+	}
+
+	/**
+	 * @param PackageInterface $consolePackage
+	 * @return bool
+	 */
+	protected function consolePackageBootRequired($consolePackage) {
+		return !$consolePackage instanceof \typo3_console\Package;
 	}
 
 	/**
