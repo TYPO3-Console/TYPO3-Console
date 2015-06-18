@@ -30,6 +30,7 @@ namespace Helhum\Typo3Console\Service;
 use Helhum\Typo3Console\Parser\ParsingException;
 use Helhum\Typo3Console\Parser\PhpParser;
 use Psr\Log\LoggerInterface;
+use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -156,8 +157,15 @@ class CacheService implements SingletonInterface {
 	 * Warmup essential caches such as class and core caches
 	 *
 	 * @param bool $triggerRequire
+	 * @return bool
 	 */
 	public function warmupEssentialCaches($triggerRequire = FALSE) {
+		try {
+			$this->cacheManager->getCache('cache_classes');
+		} catch (NoSuchCacheException $e) {
+			$this->logger->warning('Warmup skipped due to lack of classes cache');
+			return FALSE;
+		}
 		// TODO: This currently only builds the classes cache! Find a way to build other system caches as well (like reflection caches, datamap caches …)
 		// package namespace and aliases caches are implicitely built in extended bootstrap before we reach this point
 		$phpParser = new PhpParser();
@@ -174,6 +182,8 @@ class CacheService implements SingletonInterface {
 		}
 		$this->packageManager->injectCoreCache($this->cacheManager->getCache('cache_core'));
 		$this->packageManager->populatePackageCache();
+
+		return TRUE;
 	}
 
 	/**
