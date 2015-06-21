@@ -19,6 +19,13 @@
 	"require": {
 		"typo3/cms-core": ">=6.2.6,<8.0"
 	},
+
+	"autoload": {
+		"psr-4": {
+			"Helhum\\Typo3Console\\": "Classes"
+		}
+	},
+
 	"replace": {
 		"typo3_console": "self.version",
 		"typo3-ter/typo3-console": "self.version"
@@ -31,11 +38,6 @@
 			"Package": {
 				"partOfMinimalUsableSystem": true
 			}
-		}
-	},
-	"autoload": {
-		"psr-4": {
-			"Helhum\\Typo3Console\\": "Classes"
 		}
 	}
 }
