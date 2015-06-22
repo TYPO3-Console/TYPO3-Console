@@ -21,6 +21,9 @@
 	},
 
 	"autoload": {
+		"classmap": [
+			"Classes/Package.php"
+		],
 		"psr-4": {
 			"Helhum\\Typo3Console\\": "Classes"
 		}
