@@ -2,7 +2,57 @@
 <?php
 
 /**
+ * @param string $path
+ * @return bool
+ */
+function typo3cmsExists($path) {
+	return file_exists($path . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php');
+}
+
+/**
+ * Returns parent directory.
+ *
+ * @param string $path Path to start from.
+ * @return string Parent path.
+ */
+function getParentDirectoryPath($path) {
+	if (empty($path)) {
+		return FALSE;
+	}
+	$path = explode('/', $path);
+	array_pop($path);
+	return implode('/', $path);
+}
+
+/**
+ * Returns the TYPO3 root path.
+ *
+ * @return string TYPO3 root path.
+ */
+function getTYPO3RootPath() {
+	$TYPO3RootPath = FALSE;
+	$path = getcwd();
+	if (typo3cmsExists($path)) {
+		$TYPO3RootPath = $path;
+	}
+	else {
+		while ($path = getParentDirectoryPath($path)) {
+			if (typo3cmsExists($path)) {
+				$TYPO3RootPath = $path;
+				break;
+			}
+		}
+	}
+	return $TYPO3RootPath;
+}
+
+/**
  * Bootstrap for the command line
  */
-$__self_dir = __DIR__;
-require __DIR__ . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php';
+$__self_dir = getTYPO3RootPath();
+if ($__self_dir) {
+	require $__self_dir . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php';
+}
+else {
+	echo "Could not find typo3cms.php, make sure your path is within a TYPO3 installation and/or EXT:typo3_console is installed.\n";
+}
