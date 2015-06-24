@@ -40,12 +40,7 @@ script:
   - >
     echo;
     echo "Running php lint";
-    /bin/bash -c "
-        if ! find typo3conf/ext/typo3_console -name \*.php | parallel --gnu 'php -l {}' > /tmp/errors 2>&1; then
-            grep -v \"No syntax errors detected in\" /tmp/errors;
-            exit 99;
-        fi
-    "
+    find typo3conf/ext/typo3_console/ -name \*.php | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;
 # Basic functional tests - all commands should exit with 0
   - ./typo3cms help && [ ! -f "typo3conf/PackageStates.php" ]
   - ./typo3cms install:setup --non-interactive --database-user-name="root" --database-host-name="localhost" --database-port="3306" --database-name="travis_test" --admin-user-name="admin" --admin-password="password" --site-name="Travis Install"
