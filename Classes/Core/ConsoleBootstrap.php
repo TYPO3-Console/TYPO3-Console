@@ -73,14 +73,6 @@ class ConsoleBootstrap extends Bootstrap {
 		self::$instance = $this;
 		$this->ensureRequiredEnvironment();
 		$this->applicationContext = new ApplicationContext($context);
-		$this->baseSetup();
-		$this->requireBaseClasses();
-		$this->defineTypo3RequestTypes();
-
-		$this->requestId = uniqid();
-		$this->runLevel = new RunLevel();
-		$this->setEarlyInstance('Helhum\Typo3Console\Core\Booting\RunLevel', $this->runLevel);
-		new ExceptionHandler();
 	}
 
 	/**
@@ -95,13 +87,31 @@ class ConsoleBootstrap extends Bootstrap {
 	/**
 	 * Bootstraps the minimal infrastructure, resolves a fitting request handler and
 	 * then passes control over to that request handler.
-	 * @param string $relativePathPart Relative path of entry script back to document root
 	 * @return ConsoleBootstrap
 	 */
-	public function run($relativePathPart = '') {
+
+	/**
+	 * @param \Composer\Autoload\ClassLoader|NULL $classLoader
+	 * @return $this
+	 * @throws \TYPO3\CMS\Core\Error\Exception
+	 */
+	public function run($classLoader = NULL) {
+		// @deprecated in 6.2, will be removed in 7.0 (condition will be removed)
+		if ($classLoader) {
+			$this->initializeClassLoader($classLoader);
+		}
+		$this->baseSetup();
+		$this->requireBaseClasses();
+		$this->defineTypo3RequestTypes();
+
+		$this->requestId = uniqid();
+		$this->runLevel = new RunLevel();
+		$this->setEarlyInstance('Helhum\Typo3Console\Core\Booting\RunLevel', $this->runLevel);
+		new ExceptionHandler();
+
 		// @deprecated in 6.2, will be removed in 7.0
-		if (is_callable(array(__CLASS__, 'initializeClassLoader'))) {
-			$this->initializeClassLoader();
+		if (!$classLoader) {
+			$this->initializeClassLoader(NULL);
 		}
 		$this->initializeCommandManager();
 		$this->initializePackageManagement();
