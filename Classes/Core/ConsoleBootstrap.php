@@ -330,7 +330,14 @@ class ConsoleBootstrap extends Bootstrap {
 		if (is_callable(array($packageManager, 'injectClassLoader'))) {
 			$packageManager->injectClassLoader($this->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader'));
 		}
-		$packageManager->injectDependencyResolver(Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Package\\DependencyResolver'));
+		$dependencyResolver = Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Package\\DependencyResolver');
+		// required since 7.4
+		if (is_callable(array($dependencyResolver, 'injectDependencyOrderingService'))) {
+			$dependencyResolver->injectDependencyOrderingService(
+				Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Service\\DependencyOrderingService')
+			);
+		}
+		$packageManager->injectDependencyResolver($dependencyResolver);
 		$packageManager->initialize($this);
 		Utility\GeneralUtility::setSingletonInstance('TYPO3\\CMS\\Core\\Package\\PackageManager', $packageManager);
 	}
