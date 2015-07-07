@@ -14,8 +14,11 @@ matrix:
       env: TYPO3_BRANCH=master
 
 env:
-  - TYPO3_BRANCH=master
-  - TYPO3_BRANCH=TYPO3_6-2
+  global:
+    - secure: "2jkWz3b8tfN5yCHKbdn02Fd0doKcDXWAQW+h0DJcGzIqBT2OBn5xWHMCRketdo7J9BYcmIVipfCNVxN7QOmJCQeXUWhO4LQPLX0zDkXKP9Tht/cOA2HNNCcIcw5WMucEmeIXWP3ahNdGoUF72TSuKr58Y8VRTfjoTdIq9LL5RIY="
+  matrix:
+    - TYPO3_BRANCH=master
+    - TYPO3_BRANCH=TYPO3_6-2
 
 sudo: false
 
@@ -33,6 +36,7 @@ notifications:
     - helmut@typo3.org
 
 before_script:
+  - if [ "$GITHUB_COMPOSER_AUTH" ]; then composer config -g github-oauth.github.com $GITHUB_COMPOSER_AUTH; fi
   - cd ..
   - git clone --single-branch --branch $TYPO3_BRANCH --depth 1 https://github.com/TYPO3/TYPO3.CMS.git typo3_core
   - mv typo3_core/* .
