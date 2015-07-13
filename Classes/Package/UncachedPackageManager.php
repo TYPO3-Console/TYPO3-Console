@@ -47,10 +47,15 @@ class UncachedPackageManager extends PackageManager {
 		$this->initializePackageObjects();
 		$this->initializeCompatibilityLoadedExtArray();
 
+		// @deprecated since 7.4 will be removed
 		foreach ($this->activePackages as $package) {
 			/** @var $package Package */
+			if (!is_callable(array($package, 'boot'))) {
+				break;
+			}
 			$package->boot($bootstrap);
 		}
+		$this->getPackage('typo3_console')->bootPackage($bootstrap);
 	}
 
 	/**

@@ -61,9 +61,8 @@ class Package extends \TYPO3\CMS\Core\Package\Package {
 	 *
 	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
 	 */
-	public function boot(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
+	public function bootPackage(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
 		if (defined('TYPO3_cliMode') && TYPO3_cliMode && is_callable(array($bootstrap, 'registerRequestHandler'))) {
-			parent::boot($bootstrap);
 			$bootstrap->registerRequestHandler(new RequestHandler($bootstrap));
 			$this->registerCommands($bootstrap);
 		}
