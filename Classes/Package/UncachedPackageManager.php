@@ -49,7 +49,9 @@ class UncachedPackageManager extends PackageManager {
 
 		foreach ($this->activePackages as $package) {
 			/** @var $package Package */
-			$package->boot($bootstrap);
+			if (is_callable(array($package, 'boot'))) {
+				$package->boot($bootstrap);
+			}
 		}
 	}
 
