@@ -63,7 +63,10 @@ class Package extends \TYPO3\CMS\Core\Package\Package {
 	 */
 	public function boot(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
 		if (defined('TYPO3_cliMode') && TYPO3_cliMode && is_callable(array($bootstrap, 'registerRequestHandler'))) {
-			parent::boot($bootstrap);
+			// boot method has been deleted in 7.4
+			if (is_callable('parent::boot')) {
+				parent::boot($bootstrap);
+			}
 			$bootstrap->registerRequestHandler(new RequestHandler($bootstrap));
 			$this->registerCommands($bootstrap);
 		}
