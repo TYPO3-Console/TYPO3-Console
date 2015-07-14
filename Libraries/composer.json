@@ -6,8 +6,7 @@
         "symfony/console": "2.4.*",
         "symfony/process": "~2.1"
     },
-    "bin": ["index.php"],
-	"config": {
+    "config": {
         "vendor-dir": ".",
         "bin-dir": "bin"
     }
