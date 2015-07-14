@@ -1,24 +1,24 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d6a353a4a6ddad3b8d4cf4b5335a4ba5",
+    "hash": "5e2d2acfc66e63f6718a0435b4859db9",
     "packages": [
         {
             "name": "symfony/console",
-            "version": "v2.4.8",
+            "version": "v2.4.10",
             "target-dir": "Symfony/Component/Console",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Console.git",
-                "reference": "29ef7af8aa6e3c015445f34291ccab9b8019085b"
+                "reference": "39dd1c85ffdfc3c5fb008019dd027af05f64ec36"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Console/zipball/29ef7af8aa6e3c015445f34291ccab9b8019085b",
-                "reference": "29ef7af8aa6e3c015445f34291ccab9b8019085b",
+                "url": "https://api.github.com/repos/symfony/Console/zipball/39dd1c85ffdfc3c5fb008019dd027af05f64ec36",
+                "reference": "39dd1c85ffdfc3c5fb008019dd027af05f64ec36",
                 "shasum": ""
             },
             "require": {
@@ -47,46 +47,46 @@
             ],
             "authors": [
                 {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com",
-                    "homepage": "http://fabien.potencier.org",
-                    "role": "Lead Developer"
-                },
-                {
                     "name": "Symfony Community",
                     "homepage": "http://symfony.com/contributors"
+                },
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
                 }
             ],
             "description": "Symfony Console Component",
             "homepage": "http://symfony.com",
-            "time": "2014-07-09 12:44:38"
+            "time": "2014-09-22 08:51:05"
         },
         {
             "name": "symfony/process",
-            "version": "v2.5.2",
-            "target-dir": "Symfony/Component/Process",
+            "version": "v2.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Process.git",
-                "reference": "5e53efbf61a7fbf73c79e3e08feea50f64c20bfa"
+                "reference": "48aeb0e48600321c272955132d7606ab0a49adb3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Process/zipball/5e53efbf61a7fbf73c79e3e08feea50f64c20bfa",
-                "reference": "5e53efbf61a7fbf73c79e3e08feea50f64c20bfa",
+                "url": "https://api.github.com/repos/symfony/Process/zipball/48aeb0e48600321c272955132d7606ab0a49adb3",
+                "reference": "48aeb0e48600321c272955132d7606ab0a49adb3",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": ">=5.3.9"
+            },
+            "require-dev": {
+                "symfony/phpunit-bridge": "~2.7"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.5-dev"
+                    "dev-master": "2.7-dev"
                 }
             },
             "autoload": {
-                "psr-0": {
+                "psr-4": {
                     "Symfony\\Component\\Process\\": ""
                 }
             },
@@ -97,34 +97,24 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com",
-                    "homepage": "http://fabien.potencier.org",
-                    "role": "Lead Developer"
+                    "email": "fabien@symfony.com"
                 },
                 {
                     "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
             "description": "Symfony Process Component",
-            "homepage": "http://symfony.com",
-            "time": "2014-07-09 09:05:48"
+            "homepage": "https://symfony.com",
+            "time": "2015-07-01 11:25:50"
         }
     ],
-    "packages-dev": [
-
-    ],
-    "aliases": [
-
-    ],
+    "packages-dev": [],
+    "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [
-
-    ],
-    "platform": [
-
-    ],
-    "platform-dev": [
-
-    ]
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
 }
