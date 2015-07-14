@@ -396,8 +396,12 @@ class ConsoleBootstrap extends Bootstrap {
 	 * @todo: This is only for master "compatibility". Once 6.2 compatibility is removed, we can call these methods directly.
 	 */
 	public function applyAdditionalConfigurationSettings() {
-		$this->initializeExceptionHandling()
-			->setFinalCachingFrameworkCacheConfiguration()
+		if (is_callable(array($this, 'initializeErrorHandling'))) {
+			$this->initializeErrorHandling();
+		} else {
+			$this->initializeExceptionHandling();
+		}
+		$this->setFinalCachingFrameworkCacheConfiguration()
 			->defineLoggingAndExceptionConstants()
 			->unsetReservedGlobalVariables();
 		return $this;
