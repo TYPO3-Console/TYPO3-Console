@@ -116,7 +116,7 @@ class ConsoleBootstrap extends Bootstrap {
 		$this->initializeCommandManager();
 		$this->initializePackageManagement();
 
-		$requestHandler = $this->resolveRequestHandler();
+		$requestHandler = $this->resolveCliRequestHandler();
 		$requestHandler->handleRequest();
 		return $this;
 	}
@@ -204,7 +204,7 @@ class ConsoleBootstrap extends Bootstrap {
 	 * @return RequestHandlerInterface A request handler
 	 * @throws \TYPO3\CMS\Core\Error\Exception
 	 */
-	public function resolveRequestHandler() {
+	public function resolveCliRequestHandler() {
 		if (empty($this->requestHandlers)) {
 			throw new \InvalidArgumentException('No request handlers found. Make sure the extension typo3_console is active and try again.', 1417863425);
 		}

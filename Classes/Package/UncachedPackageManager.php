@@ -47,7 +47,7 @@ class UncachedPackageManager extends PackageManager {
 		$this->initializePackageObjects();
 		$this->initializeCompatibilityLoadedExtArray();
 
-		// @deprecated since 7.4 will be removed
+		// @deprecated since 7.4 will be removed once 6.2 compatibility is removed
 		foreach ($this->activePackages as $package) {
 			/** @var $package Package */
 			if (!is_callable(array($package, 'boot'))) {
