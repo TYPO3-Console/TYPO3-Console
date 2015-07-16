@@ -1,24 +1,14 @@
 language: php
 
 php:
-  - 5.3
-  - 5.4
   - 5.5
   - 5.6
-
-matrix:
-  exclude:
-    - php: 5.3
-      env: TYPO3_VERSION=dev-master
-    - php: 5.4
-      env: TYPO3_VERSION=dev-master
 
 env:
   global:
     - secure: "2jkWz3b8tfN5yCHKbdn02Fd0doKcDXWAQW+h0DJcGzIqBT2OBn5xWHMCRketdo7J9BYcmIVipfCNVxN7QOmJCQeXUWhO4LQPLX0zDkXKP9Tht/cOA2HNNCcIcw5WMucEmeIXWP3ahNdGoUF72TSuKr58Y8VRTfjoTdIq9LL5RIY="
   matrix:
     - TYPO3_VERSION=dev-master
-    - TYPO3_VERSION=6.2.*
 
 sudo: false
 
