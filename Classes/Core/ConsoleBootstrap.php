@@ -240,7 +240,9 @@ class ConsoleBootstrap extends Bootstrap {
 		$this->setCacheHashOptions();
 		$this->initializeL10nLocales();
 		$this->convertPageNotFoundHandlingToBoolean();
-		$this->registerGlobalDebugFunctions();
+		if (method_exists($this, 'registerGlobalDebugFunctions')) {
+			$this->registerGlobalDebugFunctions();
+		}
 		$this->setMemoryLimit();
 		$this->loadTypo3LoadedExtAndExtLocalconf();
 		Scripts::initializeErrorHandling($this);
