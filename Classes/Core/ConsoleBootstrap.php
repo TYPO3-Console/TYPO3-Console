@@ -236,7 +236,6 @@ class ConsoleBootstrap extends Bootstrap {
 		$this->initializeCachingFramework();
 		Scripts::initializeClassLoaderCaches($this);
 		$this->registerExtDirectComponents();
-		$this->transferDeprecatedCurlSettings();
 		$this->setCacheHashOptions();
 		$this->initializeL10nLocales();
 		$this->convertPageNotFoundHandlingToBoolean();
