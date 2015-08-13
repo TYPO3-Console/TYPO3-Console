@@ -22,7 +22,7 @@ call_user_func(function($scriptLocation) {
 	define('PATH_thisScript', realpath(PATH_site . 'typo3cms'));
 
 	if (@file_exists(PATH_site . 'typo3/sysext/core/Classes/Core/ApplicationInterface.php')) {
-		$classLoader = require_once PATH_site . 'typo3/vendor/autoload.php';
+		$classLoader = require_once PATH_site . 'typo3/../vendor/autoload.php';
 	} else {
 		require_once PATH_site . 'typo3/sysext/core/Classes/Core/Bootstrap.php';
 		require_once PATH_site . 'typo3/sysext/core/Classes/Core/ApplicationContext.php';
