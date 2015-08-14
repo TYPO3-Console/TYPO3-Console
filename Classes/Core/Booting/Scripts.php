@@ -131,12 +131,12 @@ class Scripts {
 		} else {
 			$cacheManager = new \TYPO3\CMS\Core\Cache\CacheManager();
 			$cacheManager->setCacheConfigurations($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']);
-			\TYPO3\CMS\Core\Utility\GeneralUtility::setSingletonInstance(\TYPO3\CMS\Core\Cache\CacheManager::class, $cacheManager);
+			\TYPO3\CMS\Core\Utility\GeneralUtility::setSingletonInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager', $cacheManager);
 
 			$cacheFactory = new \TYPO3\CMS\Core\Cache\CacheFactory('production', $cacheManager);
-			\TYPO3\CMS\Core\Utility\GeneralUtility::setSingletonInstance(\TYPO3\CMS\Core\Cache\CacheFactory::class, $cacheFactory);
+			\TYPO3\CMS\Core\Utility\GeneralUtility::setSingletonInstance('TYPO3\\CMS\\Core\\Cache\\CacheFactory', $cacheFactory);
 
-			$bootstrap->setEarlyInstance(\TYPO3\CMS\Core\Cache\CacheManager::class, $cacheManager);
+			$bootstrap->setEarlyInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager', $cacheManager);
 		}
 	}
 
