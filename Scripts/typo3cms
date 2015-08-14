@@ -56,4 +56,5 @@ if (getInstallationRootPath()) {
 	require getInstallationRootPath() . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php';
 } else {
 	echo "Could not find typo3cms.php, make sure your path is within a TYPO3 installation and/or EXT:typo3_console is installed.\n";
+	exit(1);
 }
