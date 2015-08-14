@@ -236,6 +236,9 @@ class ConsoleBootstrap extends Bootstrap {
 		$this->initializeCachingFramework();
 		Scripts::initializeClassLoaderCaches($this);
 		$this->registerExtDirectComponents();
+		if (is_callable(array($this, 'transferDeprecatedCurlSettings'))) {
+			$this->transferDeprecatedCurlSettings();
+		}
 		$this->setCacheHashOptions();
 		$this->initializeL10nLocales();
 		$this->convertPageNotFoundHandlingToBoolean();
@@ -251,7 +254,7 @@ class ConsoleBootstrap extends Bootstrap {
 		$this->initializeBackendUser();
 		// TODO: avoid throwing a deprecation message with this call
 		$GLOBALS['BE_USER']->checkCLIuser();
-		$this->initializeBackendAuthentication();
+		$GLOBALS['BE_USER']->backendCheckLogin();
 		if (method_exists($this, 'initializeBackendUserMounts')) {
 			$this->initializeBackendUserMounts();
 		}

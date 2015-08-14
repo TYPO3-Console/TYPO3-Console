@@ -187,7 +187,7 @@ class Scripts {
 		$bootstrap->initializeBackendUser();
 		// TODO: avoid throwing a deprecation message with this call
 		$GLOBALS['BE_USER']->checkCLIuser();
-		$bootstrap->initializeBackendAuthentication();
+		$GLOBALS['BE_USER']->backendCheckLogin();
 		if (method_exists($bootstrap, 'initializeBackendUserMounts')) {
 			$bootstrap->initializeBackendUserMounts();
 		}
