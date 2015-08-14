@@ -17,6 +17,11 @@
 	"require": {
 		"typo3/cms-core": ">=7.4.0,<8.0"
 	},
+	"require-dev": {
+		"namelesscoder/typo3-repository-client": "~1.0.2",
+		"mikey179/vfsStream": "1.4.*@dev",
+		"phpunit/phpunit": "~4.7.0"
+	},
 	"autoload": {
 		"classmap": [
 			"Classes/Package.php"
@@ -24,6 +29,19 @@
 		"psr-4": {
 			"Helhum\\Typo3Console\\": "Classes"
 		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Helhum\\Typo3Console\\Tests\\": "Tests",
+			"TYPO3\\CMS\\Core\\Tests\\": "vendor/typo3/cms/typo3/sysext/core/Tests/"
+		}
+	},
+	"scripts": {
+		"post-autoload-dump": [
+			"[ -f vendor/web/typo3cms ] || cp Scripts/typo3cms vendor/web/",
+			"mkdir -p vendor/web/typo3conf/ext/",
+			"[ -L vendor/web/typo3conf/ext/typo3_console ] || ln -snvf ../../../../. vendor/web/typo3conf/ext/typo3_console"
+		]
 	},
 	"replace": {
 		"typo3_console": "self.version",
@@ -34,6 +52,8 @@
 			"dev-master": "2.0.x-dev"
 		},
 		"typo3/cms": {
+			"cms-package-dir": "{$vendor-dir}/typo3/cms",
+			"web-dir": "{$vendor-dir}/web",
 			"Package": {
 				"partOfMinimalUsableSystem": true
 			}

@@ -25,28 +25,27 @@ notifications:
   email:
     - helmut@typo3.org
 
-before_script:
+before_install:
+  - composer self-update
   - if [ "$GITHUB_COMPOSER_AUTH" ]; then composer config -g github-oauth.github.com $GITHUB_COMPOSER_AUTH; fi
-  - if [ -f .git/shallow ]; then git fetch --unshallow; fi
-  - git branch travis-build
-  - export REPO_URL=`pwd`
-  - cd ..
-  - composer create-project typo3/cms=$TYPO3_VERSION travis-build
-  - cd travis-build
-  - composer config repositories.console vcs "$REPO_URL"
-  - composer require helhum/typo3-console="dev-travis-build"
-  - cp typo3conf/ext/typo3_console/Scripts/typo3cms .
+
+before_script:
+  - composer require typo3/cms=$TYPO3_VERSION
+# We currently need to get rid of the typo3/cms requirement in composer.json
+  - git reset --hard HEAD
+  - export TYPO3_PATH_WEB=$PWD/vendor/web
 
 script:
   - >
     echo;
     echo "Running unit tests";
-    ./bin/phpunit --colors -c typo3/sysext/core/Build/UnitTests.xml typo3conf/ext/typo3_console/Tests/Unit/
+    vendor/bin/phpunit -c vendor/typo3/cms/typo3/sysext/core/Build/UnitTests.xml Tests/Unit/
   - >
     echo;
     echo "Running php lint";
-    find typo3conf/ext/typo3_console/ -name \*.php | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;
+    find . -name \*.php ! -path "./vendor/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;
 # Basic functional tests - all commands should exit with 0
+  - cd $TYPO3_PATH_WEB
   - ./typo3cms help && [ ! -f "typo3conf/PackageStates.php" ]
   - ./typo3cms install:setup --non-interactive --database-user-name="root" --database-host-name="localhost" --database-port="3306" --database-name="travis_test" --admin-user-name="admin" --admin-password="password" --site-name="Travis Install"
   - ./typo3cms help
