@@ -249,6 +249,8 @@ class ConsoleBootstrap extends Bootstrap {
 		$this->initializeTypo3DbGlobal();
 		$this->loadExtensionTables();
 		$this->initializeBackendUser();
+		// TODO: avoid throwing a deprecation message with this call
+		$GLOBALS['BE_USER']->checkCLIuser();
 		$this->initializeBackendAuthentication();
 		if (method_exists($this, 'initializeBackendUserMounts')) {
 			$this->initializeBackendUserMounts();
