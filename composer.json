@@ -13,13 +13,10 @@
 		}
 	],
 	"license": "GPL-2.0+",
-
 	"version": "1.1.2",
-
 	"require": {
 		"typo3/cms-core": ">=7.4.0,<8.0"
 	},
-
 	"autoload": {
 		"classmap": [
 			"Classes/Package.php"
@@ -28,7 +25,6 @@
 			"Helhum\\Typo3Console\\": "Classes"
 		}
 	},
-
 	"replace": {
 		"typo3_console": "self.version",
 		"typo3-ter/typo3-console": "self.version"
