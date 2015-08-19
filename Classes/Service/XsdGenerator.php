@@ -12,6 +12,7 @@ namespace Helhum\Typo3Console\Service;
  *                                                                        */
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
 use TYPO3\CMS\Fluid\Service\AbstractGenerator;
 use TYPO3\CMS\Extbase\Reflection\ClassReflection;
 use TYPO3\CMS\Fluid\Core\ViewHelper\ArgumentDefinition;
@@ -101,6 +102,7 @@ class XsdGenerator extends AbstractGenerator {
 	 * @return void
 	 */
 	protected function addAttributes($className, \SimpleXMLElement $xsdElement) {
+		/** @var AbstractViewHelper $viewHelper */
 		$viewHelper = $this->objectManager->get($className);
 		$argumentDefinitions = $viewHelper->prepareArguments();
 
