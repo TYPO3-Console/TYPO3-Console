@@ -62,7 +62,7 @@ class DocumentationCommandController extends CommandController implements Single
 			$this->sendAndExit(1);
 		}
 		if ($targetFile === NULL) {
-			$this->output($xsdSchema);
+			echo $xsdSchema;
 		} else {
 			file_put_contents($targetFile, $xsdSchema);
 		}
