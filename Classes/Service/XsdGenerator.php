@@ -143,7 +143,7 @@ class XsdGenerator extends AbstractGenerator {
 		$packageKey = $this->getPackageKeyFromNamespace($namespace);
 		$viewHelperClassFiles = GeneralUtility::getAllFilesAndFoldersInPath(
 			array(),
-			$this->packageManager->getPackage($packageKey)->getClassesPath() . 'ViewHelpers/',
+			$this->packageManager->getPackage($packageKey)->getPackagePath() . 'Classes/ViewHelpers/',
 			'php'
 		);
 		$affectedViewHelperClassNames = array();

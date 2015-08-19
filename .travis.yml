@@ -49,10 +49,11 @@ script:
   - ./typo3cms help && [ ! -f "typo3conf/PackageStates.php" ]
   - ./typo3cms install:setup --non-interactive --database-user-name="root" --database-host-name="localhost" --database-port="3306" --database-name="travis_test" --admin-user-name="admin" --admin-password="password" --site-name="Travis Install"
   - ./typo3cms help
+  - ./typo3cms backend:lock
+  - ./typo3cms backend:unlock
   - ./typo3cms cache:flush
   - ./typo3cms cache:listgroups
   - ./typo3cms cache:warmup
-  - ./typo3cms backend:lock
-  - ./typo3cms backend:unlock
   - ./typo3cms cleanup:updatereferenceindex
   - ./typo3cms database:updateschema "*"
+  - ./typo3cms documentation:generatexsd TYPO3\\CMS\\Fluid\\ViewHelpers
