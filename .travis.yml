@@ -31,19 +31,19 @@ before_install:
 
 before_script:
   - composer require typo3/cms=$TYPO3_VERSION
-# We currently need to get rid of the typo3/cms requirement in composer.json
-  - git reset --hard HEAD
-  - export TYPO3_PATH_WEB=$PWD/vendor/web
+  # We currently need to get rid of the typo3/cms requirement in composer.json
+  - composer remove typo3/cms
+  - export TYPO3_PATH_WEB=$PWD/Build/Web
 
 script:
   - >
     echo;
     echo "Running unit tests";
-    vendor/bin/phpunit -c vendor/typo3/cms/typo3/sysext/core/Build/UnitTests.xml Tests/Unit/
+    Build/bin/phpunit -c Build/vendor/typo3/cms/typo3/sysext/core/Build/UnitTests.xml Tests/Unit/
   - >
     echo;
     echo "Running php lint";
-    find . -name \*.php ! -path "./vendor/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;
+    find . -name \*.php ! -path "./Build/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;
 # Basic functional tests - all commands should exit with 0
   - cd $TYPO3_PATH_WEB
   - ./typo3cms help && [ ! -f "typo3conf/PackageStates.php" ]
