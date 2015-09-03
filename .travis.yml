@@ -8,6 +8,7 @@ env:
   global:
     - secure: "2jkWz3b8tfN5yCHKbdn02Fd0doKcDXWAQW+h0DJcGzIqBT2OBn5xWHMCRketdo7J9BYcmIVipfCNVxN7QOmJCQeXUWhO4LQPLX0zDkXKP9Tht/cOA2HNNCcIcw5WMucEmeIXWP3ahNdGoUF72TSuKr58Y8VRTfjoTdIq9LL5RIY="
   matrix:
+    - TYPO3_VERSION=7.4.0
     - TYPO3_VERSION=dev-master
 
 sudo: false
@@ -31,8 +32,9 @@ before_install:
   - if [ "$GITHUB_COMPOSER_AUTH" ]; then composer config -g github-oauth.github.com $GITHUB_COMPOSER_AUTH; fi
 
 before_script:
+  - composer require typo3/cms=$TYPO3_VERSION
   # We currently need to get rid of the typo3/cms requirement in composer.json
-  - composer require typo3/cms=$TYPO3_VERSION && composer remove typo3/cms
+  - git reset --hard HEAD
   - export TYPO3_PATH_WEB=$PWD/Build/Web
 
 script:
