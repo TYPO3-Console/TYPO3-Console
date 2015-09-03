@@ -27,12 +27,12 @@ notifications:
 
 before_install:
   - composer self-update
+  - composer --version
   - if [ "$GITHUB_COMPOSER_AUTH" ]; then composer config -g github-oauth.github.com $GITHUB_COMPOSER_AUTH; fi
 
 before_script:
-  - composer require typo3/cms=$TYPO3_VERSION
   # We currently need to get rid of the typo3/cms requirement in composer.json
-  - composer remove typo3/cms
+  - composer require typo3/cms=$TYPO3_VERSION && composer remove typo3/cms
   - export TYPO3_PATH_WEB=$PWD/Build/Web
 
 script:
