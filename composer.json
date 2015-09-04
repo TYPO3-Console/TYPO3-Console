@@ -32,14 +32,14 @@
 	"autoload-dev": {
 		"psr-4": {
 			"Helhum\\Typo3Console\\Tests\\": "Tests",
-			"TYPO3\\CMS\\Core\\Tests\\": "Build/vendor/typo3/cms/typo3/sysext/core/Tests/"
+			"TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/core/Tests/"
 		}
 	},
 	"scripts": {
 		"post-autoload-dump": [
-			"[ -f Build/Web/typo3cms ] || cp Scripts/typo3cms Build/Web/",
-			"mkdir -p Build/Web/typo3conf/ext/",
-			"[ -L Build/Web/typo3conf/ext/typo3_console ] || ln -snvf ../../../../. Build/Web/typo3conf/ext/typo3_console"
+			"[ -f .Build/Web/typo3cms ] || cp Scripts/typo3cms .Build/Web/",
+			"mkdir -p .Build/Web/typo3conf/ext/",
+			"[ -L .Build/Web/typo3conf/ext/typo3_console ] || ln -snvf ../../../../. .Build/Web/typo3conf/ext/typo3_console"
 		]
 	},
 	"replace": {
@@ -47,8 +47,8 @@
 		"typo3-ter/typo3-console": "self.version"
 	},
 	"config": {
-		"vendor-dir": "Build/vendor",
-		"bin-dir": "Build/bin"
+		"vendor-dir": ".Build/vendor",
+		"bin-dir": ".Build/bin"
 	},
 	"extra": {
 		"branch-alias": {
@@ -56,7 +56,7 @@
 		},
 		"typo3/cms": {
 			"cms-package-dir": "{$vendor-dir}/typo3/cms",
-			"web-dir": "Build/Web",
+			"web-dir": ".Build/Web",
 			"Package": {
 				"partOfMinimalUsableSystem": true
 			}
