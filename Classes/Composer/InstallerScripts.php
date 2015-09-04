@@ -28,6 +28,8 @@ namespace Helhum\Typo3Console\Composer;
  ***************************************************************/
 
 use Composer\Script\CommandEvent;
+use TYPO3\CMS\Composer\Plugin\Config;
+use TYPO3\CMS\Composer\Plugin\Util\Filesystem;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -48,13 +50,36 @@ class InstallerScripts {
 	 * @param CommandEvent $event
 	 * @return void
 	 */
-	static public function postUpdateAndInstall(CommandEvent $event) {
+	static public function setupConsole(CommandEvent $event) {
+		$config = self::getConfig($event);
+		$installDir = self::getInstallDir($config);
+		$filesystem = new Filesystem();
+		if ($event->getComposer()->getPackage()->getName() === 'helhum/typo3-console') {
+			$extDir = $installDir . 'typo3conf/ext/';
+			$consoleDir = $extDir . 'typo3_console';
+			if (!file_exists($consoleDir)) {
+				$filesystem->ensureDirectoryExists($extDir);
+				$filesystem->symlink($config->getBaseDir(), $consoleDir);
+			}
+		}
 		$scriptName = self::isWindowsOs() ? 'typo3cms.bat' : 'typo3cms';
-		$success = self::safeCopy($scriptName, './');
+		$success = self::safeCopy($scriptName, $installDir);
 		if (!$success) {
 			$event->getIO()->write(sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName));
 			$event->getIO()->write(sprintf(self::COPY_FAILED_MESSAGE, $scriptName));
 		}
+	}
+
+	/**
+	 * Called from composer
+	 *
+	 * @param CommandEvent $event
+	 * @return void
+	 */
+	static public function postUpdateAndInstall(CommandEvent $event) {
+		$event->getIO()->write('<info>Helhum\\Typo3Console\\Composer\\InstallerScripts::setupConsole has been deprecated.</info>');
+		$event->getIO()->write('<info>Please use Helhum\\Typo3Console\\Composer\\InstallerScripts::setupConsole instead!</info>');
+		self::setupConsole($event);
 	}
 
 	/**
@@ -134,5 +159,21 @@ class InstallerScripts {
 		$flashMessage = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Messaging\\FlashMessage', $messageBody, $messageTitle, $severity, $storeInSession);
 		$queue = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Messaging\\FlashMessageQueue', self::EM_FLASH_MESSAGE_QUEUE_ID);
 		$queue->enqueue($flashMessage);
+	}
+
+	/**
+	 * @param Config $event
+	 * @return string
+	 */
+	static protected function getInstallDir(Config $config) {
+		return rtrim($config->get('web-dir'), '\\/') . '/';
+	}
+
+	/**
+	 * @param CommandEvent $event
+	 * @return Config
+	 */
+	static protected function getConfig(CommandEvent $event) {
+		return Config::load($event->getComposer());
 	}
 }
