@@ -23,7 +23,7 @@
         "typo3/cms-core": ">=7.4.0,<8.0"
     },
     "require-dev": {
-        "namelesscoder/typo3-repository-client": "dev-master",
+        "namelesscoder/typo3-repository-client": "1.1.x-dev",
         "mikey179/vfsStream": "1.4.*@dev",
         "phpunit/phpunit": "~4.7.0"
     },
