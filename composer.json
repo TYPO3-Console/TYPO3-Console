@@ -42,11 +42,7 @@
         }
     },
     "scripts": {
-        "post-autoload-dump": [
-            "[ -f .Build/Web/typo3cms ] || cp Scripts/typo3cms .Build/Web/",
-            "mkdir -p .Build/Web/typo3conf/ext/",
-            "[ -L .Build/Web/typo3conf/ext/typo3_console ] || ln -snvf ../../../../. .Build/Web/typo3conf/ext/typo3_console"
-        ]
+        "post-autoload-dump": "Helhum\\Typo3Console\\Composer\\InstallerScripts::setupConsole"
     },
     "replace": {
         "typo3_console": "self.version",
