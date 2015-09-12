@@ -120,11 +120,23 @@ class Scripts {
 	 * @param ConsoleBootstrap $bootstrap
 	 */
 	static public function initializeCachingFramework(ConsoleBootstrap $bootstrap) {
-		$bootstrap->setEarlyInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager', \TYPO3\CMS\Core\Cache\Cache::initializeCachingFramework());
-		// @deprecated since 6.2 will be removed in two versions
-		if (class_exists('TYPO3\\CMS\\Core\\Compatibility\\GlobalObjectDeprecationDecorator')) {
-			$GLOBALS['typo3CacheManager'] = new \TYPO3\CMS\Core\Compatibility\GlobalObjectDeprecationDecorator('TYPO3\\CMS\\Core\\Cache\\CacheManager');
-			$GLOBALS['typo3CacheFactory'] = new \TYPO3\CMS\Core\Compatibility\GlobalObjectDeprecationDecorator('TYPO3\\CMS\\Core\\Cache\\CacheFactory');
+		// Cache framework initialisation for TYPO3 CMS <= 7.3
+		if (class_exists('TYPO3\\CMS\\Core\\Cache\\Cache')) {
+			$bootstrap->setEarlyInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager', \TYPO3\CMS\Core\Cache\Cache::initializeCachingFramework());
+			// @deprecated since 6.2 will be removed in two versions
+			if (class_exists('TYPO3\\CMS\\Core\\Compatibility\\GlobalObjectDeprecationDecorator')) {
+				$GLOBALS['typo3CacheManager'] = new \TYPO3\CMS\Core\Compatibility\GlobalObjectDeprecationDecorator('TYPO3\\CMS\\Core\\Cache\\CacheManager');
+				$GLOBALS['typo3CacheFactory'] = new \TYPO3\CMS\Core\Compatibility\GlobalObjectDeprecationDecorator('TYPO3\\CMS\\Core\\Cache\\CacheFactory');
+			}
+		} else {
+			$cacheManager = new \TYPO3\CMS\Core\Cache\CacheManager();
+			$cacheManager->setCacheConfigurations($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']);
+			\TYPO3\CMS\Core\Utility\GeneralUtility::setSingletonInstance(\TYPO3\CMS\Core\Cache\CacheManager::class, $cacheManager);
+
+			$cacheFactory = new \TYPO3\CMS\Core\Cache\CacheFactory('production', $cacheManager);
+			\TYPO3\CMS\Core\Utility\GeneralUtility::setSingletonInstance(\TYPO3\CMS\Core\Cache\CacheFactory::class, $cacheFactory);
+
+			$bootstrap->setEarlyInstance(\TYPO3\CMS\Core\Cache\CacheManager::class, $cacheManager);
 		}
 	}
 
@@ -153,7 +165,10 @@ class Scripts {
 	 * @param ConsoleBootstrap $bootstrap
 	 */
 	static public function initializeExtensionConfiguration(ConsoleBootstrap $bootstrap) {
-		require_once PATH_site . 'typo3/sysext/core/Classes/Core/GlobalDebugFunctions.php';
+		// Manual load GlobalDebugFunctions.php for TYPO3 CMS <= 7.3
+		if (file_exists(PATH_site . 'typo3/sysext/core/Classes/Core/GlobalDebugFunctions.php')) {
+			require_once PATH_site . 'typo3/sysext/core/Classes/Core/GlobalDebugFunctions.php';
+		}
 		ExtensionManagementUtility::loadExtLocalconf();
 		$bootstrap->applyAdditionalConfigurationSettings();
 	}

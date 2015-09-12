@@ -236,11 +236,12 @@ class ConsoleBootstrap extends Bootstrap {
 		$this->initializeCachingFramework();
 		Scripts::initializeClassLoaderCaches($this);
 		$this->registerExtDirectComponents();
-		$this->transferDeprecatedCurlSettings();
 		$this->setCacheHashOptions();
 		$this->initializeL10nLocales();
 		$this->convertPageNotFoundHandlingToBoolean();
-		$this->registerGlobalDebugFunctions();
+		if (method_exists($this, 'registerGlobalDebugFunctions')) {
+			$this->registerGlobalDebugFunctions();
+		}
 		$this->setMemoryLimit();
 		$this->loadTypo3LoadedExtAndExtLocalconf();
 		Scripts::initializeErrorHandling($this);
