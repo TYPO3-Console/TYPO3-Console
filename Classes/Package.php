@@ -1,5 +1,5 @@
 <?php
-namespace typo3_console;
+namespace Helhum\Typo3Console;
 
 /***************************************************************
  *  Copyright notice
