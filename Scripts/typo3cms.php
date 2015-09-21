@@ -19,7 +19,7 @@ call_user_func(function($scriptLocation) {
 	}
 
 	define('PATH_site', strtr($webRoot, '\\', '/') . '/');
-	define('PATH_thisScript', realpath(PATH_site . 'typo3cms'));
+	define('PATH_thisScript', realpath(PATH_site . 'typo3/cli_dispatch.phpsh'));
 
 	if (@file_exists(PATH_site . 'typo3/sysext/core/Classes/Core/ApplicationInterface.php')) {
 		foreach (array(PATH_site . 'typo3/../vendor/autoload.php', PATH_site . 'typo3/vendor/autoload.php') as $possibleAutoloadLocation) {
