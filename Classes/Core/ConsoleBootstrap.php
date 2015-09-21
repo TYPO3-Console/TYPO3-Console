@@ -72,7 +72,7 @@ class ConsoleBootstrap extends Bootstrap {
 	public function __construct($context) {
 		self::$instance = $this;
 		$this->ensureRequiredEnvironment();
-		$this->applicationContext = new ApplicationContext($context);
+		parent::__construct($context);
 	}
 
 	/**
