@@ -78,6 +78,7 @@ class Package extends \TYPO3\CMS\Core\Package\Package {
 		$bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\CleanupCommandController');
 		$bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\DocumentationCommandController');
 		$bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\InstallCommandController');
+		$bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\DatabaseCommandController');
 		$bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\ConfigurationCommandController');
 		$bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\FrontendCommandController');
 
