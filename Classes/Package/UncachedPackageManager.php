@@ -78,7 +78,7 @@ class UncachedPackageManager extends PackageManager {
 		}
 
 		if ($this->consolePackageBootRequired($this->getPackage('typo3_console'))) {
-			$this->packages['typo3_console'] = new \typo3_console\Package($this, 'typo3_console', $this->getPackage('typo3_console')->getPackagePath());
+			$this->packages['typo3_console'] = new \Helhum\Typo3Console\Package($this, 'typo3_console', $this->getPackage('typo3_console')->getPackagePath());
 		}
 	}
 
@@ -87,7 +87,7 @@ class UncachedPackageManager extends PackageManager {
 	 * @return bool
 	 */
 	protected function consolePackageBootRequired($consolePackage) {
-		return !$consolePackage instanceof \typo3_console\Package;
+		return !$consolePackage instanceof \Helhum\Typo3Console\Package;
 	}
 
 	/**
