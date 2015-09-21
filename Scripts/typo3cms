@@ -31,13 +31,23 @@ function getParentDirectoryPath($path) {
  * @return string TYPO3 root path.
  */
 function getInstallationRootPath() {
-	static $installationRootPath = FALSE;
+	static $installationRootPath = '';
 
 	if (!$installationRootPath) {
+		$paths = array(
+			__DIR__,
+			getcwd(),
+			__DIR__ . '/Web',
+			__DIR__ . '/web',
+		);
 		$path = getcwd();
-		if (entryScriptExists($path)) {
-			$installationRootPath = $path;
-		} else {
+		foreach ($paths as $path) {
+			if (entryScriptExists($path)) {
+				$installationRootPath = $path;
+				break;
+			}
+		}
+		if (!$installationRootPath) {
 			while ($path = getParentDirectoryPath($path)) {
 				if (entryScriptExists($path)) {
 					$installationRootPath = $path;
