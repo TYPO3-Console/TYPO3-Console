@@ -154,7 +154,7 @@ class CacheService implements SingletonInterface {
 	}
 
 	/**
-	 * Warmup essential caches such as class and core caches
+	 * Warm up essential caches such as class and core caches
 	 *
 	 * @param bool $triggerRequire
 	 * @return bool
@@ -167,7 +167,7 @@ class CacheService implements SingletonInterface {
 			return FALSE;
 		}
 		// TODO: This currently only builds the classes cache! Find a way to build other system caches as well (like reflection caches, datamap caches …)
-		// package namespace and aliases caches are implicitely built in extended bootstrap before we reach this point
+		// package namespace and aliases caches are implicitly built in extended bootstrap before we reach this point
 		$phpParser = new PhpParser();
 		foreach ($this->packageManager->getActivePackages() as $package) {
 			$classFiles = GeneralUtility::getAllFilesAndFoldersInPath(array(), $package->getClassesPath(), 'php');
@@ -176,7 +176,7 @@ class CacheService implements SingletonInterface {
 					$parsedResult = $phpParser->parseClassFile($classFile);
 					$this->writeCacheEntryForClass($parsedResult->getFullyQualifiedClassName(), $classFile);
 				} catch(ParsingException $e) {
-					$this->logger->warning('Class file "' . PathUtility::stripPathSitePrefix($classFile) . '" does not contain a class defininition. Skipping …');
+					$this->logger->warning('Class file "' . PathUtility::stripPathSitePrefix($classFile) . '" does not contain a class definition. Skipping …');
 				}
 			}
 		}

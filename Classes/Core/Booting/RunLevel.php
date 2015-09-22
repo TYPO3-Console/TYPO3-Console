@@ -117,7 +117,7 @@ class RunLevel {
 	 * @param string $requestedRunLevel
 	 * @return Sequence
 	 */
-	public function buildDifferentialSquenceUpToLevel($requestedRunLevel) {
+	public function buildDifferentialSequenceUpToLevel($requestedRunLevel) {
 		$executionOrder = array(self::LEVEL_ESSENTIAL, self::LEVEL_MINIMAL, self::LEVEL_FULL);
 		$sequence = new Sequence($requestedRunLevel);
 		foreach ($executionOrder as $runLevel) {

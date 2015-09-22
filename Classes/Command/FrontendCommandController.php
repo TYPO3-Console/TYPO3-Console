@@ -58,7 +58,7 @@ class FrontendCommandController extends CommandController {
 		$process->mustRun();
 		$rawResponse = json_decode($process->getOutput());
 		if ($rawResponse === NULL || $rawResponse->status === Response::STATUS_Failure) {
-			$this->outputLine('<error>An error occured while trying to request the specified URL.</error>');
+			$this->outputLine('<error>An error occurred while trying to request the specified URL.</error>');
 			$this->outputLine(sprintf('<error>Error: %s</error>', !empty($rawResponse->error) ? $rawResponse->error : 'Could not decode response. Please check your error log!'));
 			$this->outputLine(sprintf('<error>Content: %s</error>', $process->getOutput()));
 			$this->sendAndExit(1);

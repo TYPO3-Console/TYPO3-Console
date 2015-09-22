@@ -62,7 +62,7 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager {
 	}
 
 	/**
-	 * Make sure the objet manager is set
+	 * Make sure the object manager is set
 	 *
 	 * @return \TYPO3\CMS\Extbase\Mvc\Cli\Command[]
 	 */
