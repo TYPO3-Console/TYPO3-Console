@@ -26,7 +26,6 @@ namespace Helhum\Typo3Console\Error;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use TYPO3\CMS\Core\Error\AbstractExceptionHandler;
 
 /**
  * Class ExceptionHandler

@@ -111,7 +111,7 @@ class PhpParserTest extends UnitTestCase {
 	/**
 	 * @test
 	 */
-	public function parserDetectsAbtractClassDefinition() {
+	public function parserDetectsAbstractClassDefinition() {
 		$subject = new Parser\PhpParser();
 		$result = $subject->parseClass('	 abstract 	 class Foo 	 {');
 		$this->assertTrue($result->isAbstract());
