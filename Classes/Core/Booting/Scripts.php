@@ -72,6 +72,7 @@ class Scripts {
 				);
 			} else {
 				$cacheConfigurations[$id]['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
+				$cacheConfigurations[$id]['options'] = array();
 			}
 		}
 	}
