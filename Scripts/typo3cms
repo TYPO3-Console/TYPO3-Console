@@ -25,17 +25,27 @@ call_user_func(function() {
 		return implode('/', $path);
 	};
 
-	$paths = array(
-		__DIR__,
-		getcwd(),
-		__DIR__ . '/Web',
-		__DIR__ . '/web',
-	);
+	if (file_exists(__DIR__ . '/composer.json')) {
+		$composerData = json_decode(file_get_contents(__DIR__ . '/composer.json'), true);
+		if (isset($composerData['extra']['typo3/cms']['web-dir'])) {
+			$path = __DIR__ . '/' . $composerData['extra']['typo3/cms']['web-dir'];
+			if ($entryScriptExists($path)) {
+				$installationRootPath = $path;
+			};
+		}
+	}
 
-	foreach ($paths as $path) {
-		if ($entryScriptExists($path)) {
-			$installationRootPath = $path;
-			break;
+	if (!isset($installationRootPath)) {
+		$paths = array(
+			__DIR__,
+			getcwd()
+		);
+
+		foreach ($paths as $path) {
+			if ($entryScriptExists($path)) {
+				$installationRootPath = $path;
+				break;
+			}
 		}
 	}
 	if (!isset($installationRootPath)) {
