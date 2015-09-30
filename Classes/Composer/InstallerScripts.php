@@ -77,7 +77,7 @@ class InstallerScripts {
 	 * @return void
 	 */
 	static public function postUpdateAndInstall(CommandEvent $event) {
-		$event->getIO()->write('<info>Helhum\\Typo3Console\\Composer\\InstallerScripts::setupConsole has been deprecated.</info>');
+		$event->getIO()->write('<info>Helhum\\Typo3Console\\Composer\\InstallerScripts::postUpdateAndInstall has been deprecated.</info>');
 		$event->getIO()->write('<info>Please use Helhum\\Typo3Console\\Composer\\InstallerScripts::setupConsole instead!</info>');
 		self::setupConsole($event);
 	}
