@@ -39,4 +39,18 @@ $EM_CONF[$_EXTKEY] = array (
   'suggests' => 
   array (
   ),
+  'autoload' =>
+  array (
+    'psr-4' =>
+    array (
+      'Helhum\\Typo3Console\\' => 'Classes',
+    ),
+  ),
+  'autoload-dev' =>
+  array (
+    'psr-4' =>
+    array (
+      'Helhum\\Typo3Console\\Tests\\' => 'Tests',
+    ),
+  ),
 );
