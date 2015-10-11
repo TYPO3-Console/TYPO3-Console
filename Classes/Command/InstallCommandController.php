@@ -80,7 +80,13 @@ class InstallCommandController extends CommandController {
 	 * @param bool $removeInactivePackages
 	 */
 	public function generatePackageStatesCommand($removeInactivePackages = FALSE) {
-		$installationPackages = $this->getPackagesFromRootComposerFile();
+		try {
+			$installationPackages = $this->getPackagesFromRootComposerFile();
+		} catch (\Exception $e) {
+			$this->outputLine($e->getMessage());
+			$this->quit(1);
+			return;
+		}
 		foreach ($this->packageManager->getAvailablePackages() as $package) {
 			if (
 				in_array($package->getPackageKey(), $installationPackages)
@@ -106,24 +112,68 @@ class InstallCommandController extends CommandController {
 	 */
 	protected function getPackagesFromRootComposerFile() {
 		if (!file_exists(PATH_site . 'composer.json')) {
-			$this->outputLine('No composer.json found in project root');
-			$this->sendAndExit(1);
+			throw new \RuntimeException('No composer.json found in project root', 1444596470);
 		}
-
 		$composerData = json_decode(file_get_contents(PATH_site . 'composer.json'));
-
 		if (!is_object($composerData)) {
-			$this->outputLine('composer.json seems to be invalid');
-			$this->sendAndExit(1);
+			throw new \RuntimeException('composer.json seems to be invalid', 1444596471);
 		}
-
 		$activePackageKey = 'active-packages';
 		if (!isset($composerData->extra->{$activePackageKey}) || !is_array($composerData->extra->{$activePackageKey})) {
-			$this->outputLine('No packages found to activate!');
-			$this->sendAndExit();
+			throw new \RuntimeException('No packages found to activate!', 1444596472);
 		}
+		$configuredPackages = $composerData->extra->{$activePackageKey};
+		// Determine non typo3-cms-extension packages installed by composer
+		$composerInstalledPackages = array();
+		$composerLockFile = PATH_site . 'composer.lock';
+		if (file_exists($composerLockFile)) {
+			$composerLock = json_decode(file_get_contents($composerLockFile));
+			if ($composerLock) {
+				foreach ($composerLock->packages as $package) {
+					if (!in_array($package->type, array('typo3-cms-core', 'typo3-cms-framework'), TRUE) && (!empty($package->source) || !empty($package->dist))) {
+						$composerInstalledPackages[] = $this->getPackageKeyFromManifest($package);
+					}
+				}
+			}
+		}
+		$allPackages = array_flip(array_flip(array_merge($configuredPackages, $composerInstalledPackages)));
+		return $allPackages;
+	}
 
-		return $composerData->extra->{$activePackageKey};
+	/**
+	 * Resolves package key from Composer manifest
+	 *
+	 * If it is a TYPO3 package the name of the replaces section will be used.
+	 *
+	 * Else if the composer name of the package matches the first part of the lowercased namespace of the package, the mixed
+	 * case version of the composer name / namespace will be used, with backslashes replaced by dots.
+	 *
+	 * Else the composer name will be used with the slash replaced by a dot
+	 *
+	 * @param object $manifest
+	 * @return string
+	 */
+	protected function getPackageKeyFromManifest($manifest) {
+		if (isset($manifest->type) && substr($manifest->type, 0, 10) === 'typo3-cms-') {
+			if (empty($manifest->replace)) {
+				throw new \RuntimeException(sprintf('TYPO3 extension package with name "%s" does not have a replace section. Unable to determine package key!', $manifest->name), 1444596603);
+			}
+			$replaces = array_flip(json_decode(json_encode($manifest->replace), TRUE));
+			foreach ($replaces as $replacedName) {
+				if (strpos($replacedName, '/') === FALSE) {
+					$extensionKey = $replacedName;
+					break;
+				}
+			}
+			if (empty($extensionKey)) {
+				list(, $extensionKey) = explode('/', $manifest->name, 2);
+				$extensionKey = str_replace('-', '_', $extensionKey);
+			}
+			return $extensionKey;
+		} else {
+			$packageKey = str_replace('/', '.', $manifest->name);
+			return preg_replace('/[^A-Za-z0-9.]/', '', $packageKey);
+		}
 	}
 
 	/**
