@@ -25,6 +25,7 @@ call_user_func(function($scriptLocation) {
 		foreach (array(PATH_site . 'typo3/../vendor/autoload.php', PATH_site . 'typo3/vendor/autoload.php') as $possibleAutoloadLocation) {
 			if (file_exists($possibleAutoloadLocation)) {
 				$classLoader = require_once $possibleAutoloadLocation;
+				break;
 			}
 		}
 	} else {
