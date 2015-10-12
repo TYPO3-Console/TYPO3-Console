@@ -83,7 +83,7 @@ class InstallCommandController extends CommandController {
 		try {
 			$installationPackages = $this->getPackagesFromRootComposerFile();
 		} catch (\Exception $e) {
-			$this->outputLine($e->getMessage());
+			$this->outputLine('<error>' . $e->getMessage() . '</error>');
 			$this->quit(1);
 			return;
 		}
@@ -111,18 +111,21 @@ class InstallCommandController extends CommandController {
 	 * @return array Array of packages keys in root composer.json
 	 */
 	protected function getPackagesFromRootComposerFile() {
-		if (!file_exists(PATH_site . 'composer.json')) {
-			throw new \RuntimeException('No composer.json found in project root', 1444596470);
+		// Look up configured active packages
+		$configuredPackages = array();
+		if (file_exists(PATH_site . 'composer.json')) {
+			$composerData = json_decode(file_get_contents(PATH_site . 'composer.json'));
+			if (!is_object($composerData)) {
+				throw new \RuntimeException('composer.json seems to be invalid', 1444596471);
+			}
+			if (isset($composerData->extra->{'active-packages'})) {
+				if (!is_array($composerData->extra->{'active-packages'})) {
+					throw new \RuntimeException('Active packages is not an array!', 1444656020);
+				}
+				$configuredPackages = $composerData->extra->{'active-packages'};
+			}
 		}
-		$composerData = json_decode(file_get_contents(PATH_site . 'composer.json'));
-		if (!is_object($composerData)) {
-			throw new \RuntimeException('composer.json seems to be invalid', 1444596471);
-		}
-		$activePackageKey = 'active-packages';
-		if (!isset($composerData->extra->{$activePackageKey}) || !is_array($composerData->extra->{$activePackageKey})) {
-			throw new \RuntimeException('No packages found to activate!', 1444596472);
-		}
-		$configuredPackages = $composerData->extra->{$activePackageKey};
+
 		// Determine non typo3-cms-extension packages installed by composer
 		$composerInstalledPackages = array();
 		$composerLockFile = PATH_site . 'composer.lock';
@@ -136,7 +139,11 @@ class InstallCommandController extends CommandController {
 				}
 			}
 		}
+
 		$allPackages = array_flip(array_merge($configuredPackages, $composerInstalledPackages));
+		if (empty($allPackages)) {
+			$this->outputLine('<warning>No packages found to activate! Only marking required and important TYPO3 packages as active!</warning>');
+		}
 		return $allPackages;
 	}
 
