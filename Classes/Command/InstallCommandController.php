@@ -89,7 +89,7 @@ class InstallCommandController extends CommandController {
 		}
 		foreach ($this->packageManager->getAvailablePackages() as $package) {
 			if (
-				in_array($package->getPackageKey(), $installationPackages)
+				isset($installationPackages[$package->getPackageKey()])
 				|| $package->isProtected()
 				|| ($package instanceof Package && $package->isPartOfMinimalUsableSystem())
 			) {
@@ -136,7 +136,7 @@ class InstallCommandController extends CommandController {
 				}
 			}
 		}
-		$allPackages = array_flip(array_flip(array_merge($configuredPackages, $composerInstalledPackages)));
+		$allPackages = array_flip(array_merge($configuredPackages, $composerInstalledPackages));
 		return $allPackages;
 	}
 
@@ -155,14 +155,13 @@ class InstallCommandController extends CommandController {
 	 */
 	protected function getPackageKeyFromManifest($manifest) {
 		if (isset($manifest->type) && substr($manifest->type, 0, 10) === 'typo3-cms-') {
-			if (empty($manifest->replace)) {
-				throw new \RuntimeException(sprintf('TYPO3 extension package with name "%s" does not have a replace section. Unable to determine package key!', $manifest->name), 1444596603);
-			}
-			$replaces = array_flip(json_decode(json_encode($manifest->replace), TRUE));
-			foreach ($replaces as $replacedName) {
-				if (strpos($replacedName, '/') === FALSE) {
-					$extensionKey = $replacedName;
-					break;
+			if (!empty($manifest->replace)) {
+				$replaces = array_flip(json_decode(json_encode($manifest->replace), TRUE));
+				foreach ($replaces as $replacedName) {
+					if (strpos($replacedName, '/') === FALSE) {
+						$extensionKey = $replacedName;
+						break;
+					}
 				}
 			}
 			if (empty($extensionKey)) {
