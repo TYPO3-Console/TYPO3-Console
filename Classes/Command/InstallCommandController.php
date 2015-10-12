@@ -118,11 +118,14 @@ class InstallCommandController extends CommandController {
 			if (!is_object($composerData)) {
 				throw new \RuntimeException('composer.json seems to be invalid', 1444596471);
 			}
-			if (isset($composerData->extra->{'active-packages'})) {
-				if (!is_array($composerData->extra->{'active-packages'})) {
-					throw new \RuntimeException('Active packages is not an array!', 1444656020);
-				}
+			if (isset($composerData->extra->{'helhum/typo3-console'}->{'active-packages'})) {
+				$configuredPackages = $composerData->extra->{'helhum/typo3-console'}->{'active-packages'};
+			} elseif (isset($composerData->extra->{'active-packages'})) {
 				$configuredPackages = $composerData->extra->{'active-packages'};
+				$this->outputLine('<warning>Active packages configuration key changed. Please use extra["helhum/typo3-console"]["active-packages"]</warning>');
+			}
+			if (!is_array($configuredPackages)) {
+				throw new \RuntimeException('Active packages is not an array!', 1444656020);
 			}
 		}
 
