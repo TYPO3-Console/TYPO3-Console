@@ -59,4 +59,4 @@ script:
   - ./typo3cms cache:warmup
   - ./typo3cms cleanup:updatereferenceindex
   - ./typo3cms database:updateschema "*"
-  - ./typo3cms documentation:generatexsd TYPO3\\CMS\\Fluid\\ViewHelpers
+  - ./typo3cms documentation:generatexsd TYPO3\\CMS\\Fluid\\ViewHelpers > /dev/null
