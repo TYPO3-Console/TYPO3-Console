@@ -70,8 +70,8 @@ class ConsoleOutput {
 		$this->output->getFormatter()->setStyle('u', new OutputFormatterStyle(NULL, NULL, array('underscore')));
 		$this->output->getFormatter()->setStyle('em', new OutputFormatterStyle(NULL, NULL, array('reverse')));
 		$this->output->getFormatter()->setStyle('strike', new OutputFormatterStyle(NULL, NULL, array('conceal')));
-		$this->output->getFormatter()->setStyle('error', new OutputFormatterStyle('red'));
 		$this->output->getFormatter()->setStyle('success', new OutputFormatterStyle('green'));
+		$this->output->getFormatter()->setStyle('warning', new OutputFormatterStyle('black', 'yellow'));
 	}
 
 	/**
