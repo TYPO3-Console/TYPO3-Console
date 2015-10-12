@@ -60,3 +60,4 @@ script:
   - ./typo3cms cleanup:updatereferenceindex
   - ./typo3cms database:updateschema "*"
   - ./typo3cms documentation:generatexsd TYPO3\\CMS\\Fluid\\ViewHelpers > /dev/null
+  - rm -f typo3conf/PackageStates.php && ./typo3cms install:generatepackagestates && [ -f "typo3conf/PackageStates.php" ]
