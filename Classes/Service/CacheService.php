@@ -97,7 +97,6 @@ class CacheService implements SingletonInterface {
 	 * Flushes all caches
 	 *
 	 * @param bool $force
-	 * @throws NoSuchCacheGroupException
 	 */
 	public function flush($force = FALSE) {
 		if ($force) {
@@ -248,4 +247,5 @@ class CacheService implements SingletonInterface {
 			);
 		}
 	}
+
 }
