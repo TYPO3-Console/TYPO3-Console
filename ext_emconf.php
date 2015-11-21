@@ -21,7 +21,7 @@ $EM_CONF[$_EXTKEY] = array (
   'author_company' => '',
   'CGLcompliance' => '',
   'CGLcompliance_note' => '',
-  'version' => '1.2.3',
+  'version' => '1.2.4',
   '_md5_values_when_last_written' => '',
   'constraints' => 
   array (
@@ -39,16 +39,16 @@ $EM_CONF[$_EXTKEY] = array (
   'suggests' => 
   array (
   ),
-  'autoload' =>
+  'autoload' => 
   array (
-    'psr-4' =>
+    'psr-4' => 
     array (
       'Helhum\\Typo3Console\\' => 'Classes',
     ),
   ),
-  'autoload-dev' =>
+  'autoload-dev' => 
   array (
-    'psr-4' =>
+    'psr-4' => 
     array (
       'Helhum\\Typo3Console\\Tests\\' => 'Tests',
     ),
