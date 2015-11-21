@@ -221,7 +221,7 @@ class CacheService implements SingletonInterface {
 		$tables = $this->databaseConnection->admin_get_tables();
 		foreach ($tables as $table) {
 			$tableName = $table['Name'];
-			if (substr($tableName, 0, 3) === 'cf_') {
+			if (substr($tableName, 0, 3) === 'cf_' || ($tableName !== 'tx_realurl_redirects' && substr($tableName, 0, 11) === 'tx_realurl_')) {
 				$this->databaseConnection->exec_TRUNCATEquery($tableName);
 			}
 		}
