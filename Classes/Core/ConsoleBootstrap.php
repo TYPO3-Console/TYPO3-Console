@@ -315,7 +315,12 @@ class ConsoleBootstrap extends Bootstrap {
 		require_once __DIR__ . '/Booting/Scripts.php';
 		require_once __DIR__ . '/Booting/RunLevel.php';
 		require_once __DIR__ . '/../Mvc/Cli/CommandManager.php';
-		require_once __DIR__ . '/../../Libraries/autoload.php';
+		if (!interface_exists('Symfony\\Component\\Console\\Output\\OutputInterface')) {
+			require_once __DIR__ . '/../../Libraries/symfony-console.phar';
+		}
+		if (!class_exists('Symfony\\Component\\Process\\Process')) {
+			require_once __DIR__ . '/../../Libraries/symfony-process.phar';
+		}
 	}
 
 	/**

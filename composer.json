@@ -20,7 +20,10 @@
     ],
     "license": "GPL-2.0+",
     "require": {
-        "typo3/cms-core": ">=7.4.0,<8.0"
+        "ext-Phar": "*",
+        "typo3/cms-core": "^7.6",
+        "symfony/console": "^2.7",
+        "symfony/process": "^2.7"
     },
     "require-dev": {
         "namelesscoder/typo3-repository-client": "1.1.x-dev",
