@@ -8,7 +8,7 @@ env:
   global:
     - secure: "2jkWz3b8tfN5yCHKbdn02Fd0doKcDXWAQW+h0DJcGzIqBT2OBn5xWHMCRketdo7J9BYcmIVipfCNVxN7QOmJCQeXUWhO4LQPLX0zDkXKP9Tht/cOA2HNNCcIcw5WMucEmeIXWP3ahNdGoUF72TSuKr58Y8VRTfjoTdIq9LL5RIY="
   matrix:
-    - TYPO3_VERSION=7.5.0
+    - TYPO3_VERSION=^7.6
     - TYPO3_VERSION=dev-master
 
 sudo: false
