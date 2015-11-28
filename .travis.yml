@@ -32,6 +32,7 @@ before_install:
   - if [ "$GITHUB_COMPOSER_AUTH" ]; then composer config -g github-oauth.github.com $GITHUB_COMPOSER_AUTH; fi
 
 before_script:
+  - phpenv config-rm xdebug.ini
   - composer require typo3/cms=$TYPO3_VERSION
   # We currently need to get rid of the typo3/cms requirement in composer.json
   - git reset --hard HEAD
