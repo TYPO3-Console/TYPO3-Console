@@ -29,6 +29,7 @@ namespace Helhum\Typo3Console\Command;
 
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 
 /**
  * Class ConfigurationCommandController
@@ -62,4 +63,32 @@ class ConfigurationCommandController extends CommandController implements Single
 		}
 		$this->outputLine('Removed from system configuration');
 	}
-} 
+
+	/**
+	 * Show system configuration by path
+	 * If the given path holds a subtree instead of a value, the full subtree is shown
+	 *
+	 * Example: ./typo3cms configuration:showbypath SYS/caching/cacheConfigurations/cache_core
+	 *
+	 * @param string $path Path to system configuration that should be shown.
+	 */
+	public function showByPathCommand($path) {
+		$configurationValue = NULL;
+		try {
+			$configurationValue = ArrayUtility::getValueByPath($GLOBALS['TYPO3_CONF_VARS'], $path);
+		} catch(\RuntimeException $e) {
+			$this->outputLine($e->getMessage());
+			$this->sendAndExit(1);
+		}
+
+		if (is_array($configurationValue)) {
+			$configurationValue = ArrayUtility::arrayExport($configurationValue);
+		}
+
+		if ($configurationValue === '') {
+			$configurationValue = '\'\'';
+		}
+
+		$this->outputLine($configurationValue);
+	}
+}
