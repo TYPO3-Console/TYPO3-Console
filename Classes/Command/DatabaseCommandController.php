@@ -44,12 +44,6 @@ class DatabaseCommandController extends CommandController {
 	 */
 	protected $schemaService;
 
-    /**
-     * @var \TYPO3\CMS\Core\Configuration\ConfigurationManager
-     * @inject
-     */
-    protected $configurationManager;
-
 	/**
 	 * Mapping of schema update types to human-readable labels
 	 *
@@ -66,24 +60,10 @@ class DatabaseCommandController extends CommandController {
 	);
 
     /**
-     * @var string
+     * @var \Helhum\Typo3Console\Service\Database\BackupService
+     * @inject
      */
-    private $dumpDirectory;
-
-    /**
-     * @var string
-     */
-    private $dumpFilename;
-
-    /**
-     * @var array
-     */
-    private $databaseConnection;
-
-    /**
-     * @var string
-     */
-    private $mysqldumpCommandLine;
+    protected $backupService;
 
     /**
 	 * Update database schema
@@ -189,129 +169,19 @@ class DatabaseCommandController extends CommandController {
      * Command makes use of mysqldump. Therefore mysqldump is a dependency.
      * Make sure that mysqldump is within your $PATH.
      *
-     * @param string $dumpDirectory Directory to put the dump into. E.g. /tmp
+     * @param string $backupDirectory Directory to put the dump into. E.g. /tmp
      * @throws \UnexpectedValueException
      */
-    public function backupCommand($dumpDirectory) {
+    public function backupCommand($backupDirectory) {
         try {
-            $this->setDumpDirectory($dumpDirectory);
+            $this->backupService->setBackupDirectory($backupDirectory);
         } catch (\UnexpectedValueException $e) {
             $this->outputLine(sprintf('<error>%s</error>', $e->getMessage()));
             $this->sendAndExit(1);
         }
-        $this->setDumpFilename();
-        $this->setMysqldumpCommandLine();
-        $this->output->outputLine($this->mysqldumpCommandLine);
-
-        $this->process($this->mysqldumpCommandLine);
-    }
-
-    /**
-     * Calls 'system()' function, passing through all arguments unchanged.
-     *
-     * @param string $exec The shell command to execute.  Parameters should already be escaped.
-     * @return int The result code from system():  0 == success.
-     */
-    private function process($exec) {
-        $this->output->outputLine("Calling system($exec);");
-        system($exec, $result_code);
-
-        return $result_code;
-    }
-
-    /**
-     * Builds and sets the mysqldump command line.
-     *
-     * @todo Check whether if it is a socket mysql connection.
-     */
-    private function setMysqldumpCommandLine() {
-        if (!isset($this->databaseConnection)) {
-            $this->setDatabaseConnection();
-        }
-
-        $exec = 'mysqldump';
-        $exec .=
-            sprintf(
-                ' --user=%s --password=%s --host=%s %s',
-                $this->databaseConnection['username'],
-                $this->databaseConnection['password'],
-                $this->databaseConnection['host'],
-                $this->databaseConnection['database']
-            );
-
-        $exec .= ' --no-autocommit --single-transaction --opt -Q';
-        $exec .= ' --skip-extended-insert --order-by-primary';
-        $exec .= ' > ' . $this->dumpDirectory . '/' . $this->dumpFilename;
-
-        $this->mysqldumpCommandLine = $exec;
-    }
-
-    /**
-     * Sets the database connection of the current Typo3 instance.
-     */
-    private function setDatabaseConnection() {
-        $this->databaseConnection = $this->configurationManager->getConfigurationValueByPath('DB');
-    }
-
-    /**
-     * Sets the filename for the database dump.
-     */
-    private function setDumpFilename() {
-        if (!isset($this->databaseConnection)) {
-            $this->setDatabaseConnection();
-        }
-
-        $this->dumpFilename = sprintf(
-            'dump-%s.sql',
-            $this->databaseConnection['database']
-        );
-    }
-
-    /**
-     * Sets the directory to put the dump into.
-     *
-     * @param string $dumpDirectory
-     */
-    private function setDumpDirectory($dumpDirectory) {
-        $dumpDirectory = rtrim($dumpDirectory, '/');
-        if ($this->checkIfDirectoryExists($dumpDirectory) && $this->checkIfDirectoryIsWritable($dumpDirectory)) {
-            $this->dumpDirectory = $dumpDirectory;
-        }
-    }
-
-    /**
-     * Checks if a file exists and if it is a directory.
-     *
-     * @param string $filename
-     * @return bool
-     * @throws \UnexpectedValueException
-     */
-    private function checkIfDirectoryExists($filename) {
-        if (file_exists($filename) && is_dir($filename)) {
-            return true;
-        } else {
-            throw new \UnexpectedValueException(sprintf(
-                'Directory "%s" does not exist.',
-                $filename
-            ));
-        }
-    }
-
-    /**
-     * Checks if a directory is writable.
-     *
-     * @param $filename
-     * @return bool
-     * @throws \UnexpectedValueException
-     */
-    private function checkIfDirectoryIsWritable($filename) {
-        if (is_writable($filename)) {
-            return true;
-        } else {
-            throw new \UnexpectedValueException(sprintf(
-                'Directory "%s" not writable.',
-                $filename
-            ));
-        }
+        $this->backupService->setBackupFilename();
+        $this->backupService->setMysqldumpCommandLine();
+        $this->backupService->process();
+        $this->output->outputLine('Backup created.');
     }
 }
