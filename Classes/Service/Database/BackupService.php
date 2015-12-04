@@ -36,12 +36,6 @@ use TYPO3\CMS\Core\SingletonInterface;
 class BackupService implements SingletonInterface {
 
 	/**
-	 * @var \TYPO3\CMS\Core\Configuration\ConfigurationManager
-	 * @inject
-	 */
-	protected $configurationManager;
-
-	/**
 	 * @var string
 	 */
 	private $backupDirectory;
@@ -140,9 +134,7 @@ class BackupService implements SingletonInterface {
 	 * Sets the database connection of the current Typo3 instance.
 	 */
 	private function setDatabaseConnection() {
-		print_r($GLOBALS['TYPO3_DB']);
-		print_r($GLOBALS['TYPO3_DB']->databaseHost);
-		$this->databaseConnection = $this->configurationManager->getConfigurationValueByPath('DB');
+		$this->databaseConnection = $GLOBALS['TYPO3_CONF_VARS']['DB'];
 	}
 
 	/**
@@ -189,5 +181,4 @@ class BackupService implements SingletonInterface {
 	private function osIsWindows() {
 		return (strtoupper(substr(PHP_OS, 0, 3)) == "WIN");
 	}
-
 }
