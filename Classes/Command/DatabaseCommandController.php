@@ -59,13 +59,13 @@ class DatabaseCommandController extends CommandController {
 		SchemaUpdateType::TABLE_DROP => 'Drop tables',
 	);
 
-    /**
-     * @var \Helhum\Typo3Console\Service\Database\BackupService
-     * @inject
-     */
-    protected $backupService;
+	/**
+	 * @var \Helhum\Typo3Console\Service\Database\BackupService
+	 * @inject
+	 */
+	protected $backupService;
 
-    /**
+	/**
 	 * Update database schema
 	 *
 	 * See Helhum\Typo3Console\Service\Database\Schema\SchemaUpdateType for a list of valid schema update types.
@@ -162,26 +162,26 @@ class DatabaseCommandController extends CommandController {
 		}
 	}
 
-    /**
-     * Backup the Typo3 database.
-     *
-     * Dumps the Typo3 database to a local directory.
-     * Command makes use of mysqldump. Therefore mysqldump is a dependency.
-     * Make sure that mysqldump is within your $PATH.
-     *
-     * @param string $backupDirectory Directory to put the dump into. E.g. /tmp
-     * @throws \UnexpectedValueException
-     */
-    public function backupCommand($backupDirectory) {
-        try {
-            $this->backupService->setBackupDirectory($backupDirectory);
-        } catch (\UnexpectedValueException $e) {
-            $this->outputLine(sprintf('<error>%s</error>', $e->getMessage()));
-            $this->sendAndExit(1);
-        }
-        $this->backupService->setBackupFilename();
-        $this->backupService->setMysqldumpCommandLine();
-        $this->backupService->process();
-        $this->output->outputLine('Backup created.');
-    }
+	/**
+	 * Backup the Typo3 database.
+	 *
+	 * Dumps the Typo3 database to a local directory.
+	 * Command makes use of mysqldump. Therefore mysqldump is a dependency.
+	 * Make sure that mysqldump is within your $PATH.
+	 *
+	 * @param string $backupDirectory Directory to put the dump into. E.g. /tmp
+	 * @throws \UnexpectedValueException
+	 */
+	public function backupCommand($backupDirectory) {
+		try {
+			$this->backupService->setBackupDirectory($backupDirectory);
+		} catch (\UnexpectedValueException $e) {
+			$this->outputLine(sprintf('<error>%s</error>', $e->getMessage()));
+			$this->sendAndExit(1);
+		}
+		$this->backupService->setBackupFilename();
+		$this->backupService->setMysqldumpCommandLine();
+		$this->backupService->process();
+		$this->output->outputLine('Backup created.');
+	}
 }
