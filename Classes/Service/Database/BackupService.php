@@ -27,6 +27,7 @@ namespace Helhum\Typo3Console\Service\Database;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use Helhum\Typo3Console\Exception;
 use TYPO3\CMS\Core\SingletonInterface;
 
 /**
@@ -59,6 +60,17 @@ class BackupService implements SingletonInterface {
 	 * @var string
 	 */
 	private $mysqldumpCommandLine;
+
+	/**
+	 * Check if basic requirements are met.
+	 *
+	 * @throws Exception
+	 */
+	public function checkRequirements() {
+		if ($this->osIsWindows()) {
+			throw new Exception('Command database:backup is currently not available on Windows systems.');
+		}
+	}
 
 	/**
 	 * Calls 'system()' function, passing through all arguments unchanged.
@@ -168,4 +180,14 @@ class BackupService implements SingletonInterface {
 			));
 		}
 	}
+
+	/**
+	 * Do you use a Windows operating system or not?
+	 *
+	 * @return bool
+	 */
+	private function osIsWindows() {
+		return (strtoupper(substr(PHP_OS, 0, 3)) == "WIN");
+	}
+
 }

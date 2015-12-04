@@ -27,6 +27,7 @@ namespace Helhum\Typo3Console\Command;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use Helhum\Typo3Console\Exception;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Helhum\Typo3Console\Service\Database\Schema\SchemaUpdateException;
 use Helhum\Typo3Console\Service\Database\Schema\SchemaUpdateResult;
@@ -174,11 +175,19 @@ class DatabaseCommandController extends CommandController {
 	 */
 	public function backupCommand($backupDirectory) {
 		try {
+			$this->backupService->checkRequirements();
+		} catch (Exception $e) {
+			$this->outputLine(sprintf('<error>%s</error>', $e->getMessage()));
+			$this->sendAndExit(1);
+		}
+
+		try {
 			$this->backupService->setBackupDirectory($backupDirectory);
 		} catch (\UnexpectedValueException $e) {
 			$this->outputLine(sprintf('<error>%s</error>', $e->getMessage()));
 			$this->sendAndExit(1);
 		}
+
 		$this->backupService->setBackupFilename();
 		$this->backupService->setMysqldumpCommandLine();
 		$this->backupService->process();
