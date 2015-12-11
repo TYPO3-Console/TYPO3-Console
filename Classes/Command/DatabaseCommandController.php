@@ -70,7 +70,7 @@ class DatabaseCommandController extends CommandController {
 	 * "field.*" (all field updates)
 	 * "*.add,*.change" (all add/change updates)
 	 *
-	 * To avoid shell matching all types with wildcards should be quoted.
+	 * Quotes should be used to avoid wildards matching all types in shell.
 	 *
 	 * @param array $schemaUpdateTypes List of schema update types
 	 */
