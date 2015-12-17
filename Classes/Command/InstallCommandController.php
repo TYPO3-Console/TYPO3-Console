@@ -78,10 +78,11 @@ class InstallCommandController extends CommandController {
 	 * Activates all packages that are configured in root composer.json or are required
 	 *
 	 * @param bool $removeInactivePackages
+	 * @param int $composerFileOffset
 	 */
-	public function generatePackageStatesCommand($removeInactivePackages = FALSE) {
+	public function generatePackageStatesCommand($removeInactivePackages = FALSE, $composerFileOffset = 0) {
 		try {
-			$installationPackages = $this->getPackagesFromRootComposerFile();
+			$installationPackages = $this->getPackagesFromRootComposerFile($composerFileOffset);
 		} catch (\Exception $e) {
 			$this->outputLine('<error>' . $e->getMessage() . '</error>');
 			$this->quit(1);
@@ -108,13 +109,18 @@ class InstallCommandController extends CommandController {
 	}
 
 	/**
+	 * @param int $composerFileOffset
 	 * @return array Array of packages keys in root composer.json
 	 */
-	protected function getPackagesFromRootComposerFile() {
+	protected function getPackagesFromRootComposerFile($composerFileOffset = 0) {
 		// Look up configured active packages
 		$configuredPackages = array();
-		if (file_exists(PATH_site . 'composer.json')) {
-			$composerData = json_decode(file_get_contents(PATH_site . 'composer.json'));
+		$composerPath = PATH_site;
+		for ($count=0; $count<$composerFileOffset; $count++) {
+			$composerPath .= '../';
+		}
+		if (file_exists($composerPath . 'composer.json')) {
+			$composerData = json_decode(file_get_contents($composerPath . 'composer.json'));
 			if (!is_object($composerData)) {
 				throw new \RuntimeException('composer.json seems to be invalid', 1444596471);
 			}
@@ -131,7 +137,7 @@ class InstallCommandController extends CommandController {
 
 		// Determine non typo3-cms-extension packages installed by composer
 		$composerInstalledPackages = array();
-		$composerLockFile = PATH_site . 'composer.lock';
+		$composerLockFile = $composerPath . 'composer.lock';
 		if (file_exists($composerLockFile)) {
 			$composerLock = json_decode(file_get_contents($composerLockFile));
 			if ($composerLock) {
