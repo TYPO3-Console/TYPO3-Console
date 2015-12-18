@@ -95,7 +95,14 @@ class InstallCommandController extends CommandController {
 			) {
 				$this->packageManager->activatePackage($package->getPackageKey());
 			} else {
-				$this->packageManager->deactivatePackage($package->getPackageKey());
+				try {
+					$this->packageManager->deactivatePackage($package->getPackageKey());
+				} catch (\UnexpectedValueException $exception) {
+					$this->outputLine(
+						'<info>Error while deactivating package %s. Exception: %s</info>',
+						array($package->getPackageKey(), $exception->getMessage())
+					);
+				}
 				if ($removeInactivePackages) {
 					$this->packageManager->unregisterPackage($package);
 					GeneralUtility::flushDirectory($package->getPackagePath());
