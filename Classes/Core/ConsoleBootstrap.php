@@ -99,6 +99,7 @@ class ConsoleBootstrap extends Bootstrap {
 		if ($classLoader) {
 			$this->initializeClassLoader($classLoader);
 		}
+		$this->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
 		$this->baseSetup();
 		$this->requireBaseClasses();
 		$this->defineTypo3RequestTypes();

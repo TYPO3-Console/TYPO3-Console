@@ -34,8 +34,7 @@ call_user_func(function($scriptLocation) {
 	}
 
 	require __DIR__ . '/../Classes/Core/ConsoleBootstrap.php';
-	$context = getenv('TYPO3_CONTEXT') ?: (getenv('REDIRECT_TYPO3_CONTEXT') ?: 'Production');
-	$bootstrap = new \Helhum\Typo3Console\Core\ConsoleBootstrap($context);
+	$bootstrap = \Helhum\Typo3Console\Core\ConsoleBootstrap::getInstance();
 	$bootstrap->run(isset($classLoader) ? $classLoader : NULL);
 
 }, (isset($__self_dir) ? $__self_dir : NULL));
