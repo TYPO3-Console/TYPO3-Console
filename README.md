@@ -32,6 +32,7 @@ just type:
 * Cache flush and core cache warmup commands
 * Scheduler command
 * Backend lock/unlock commands
+* Install tool lock/unlock commands
 * Reference Index commands
 * Support for all other Extbase command controllers
 
