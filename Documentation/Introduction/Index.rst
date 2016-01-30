@@ -59,6 +59,12 @@ Additionally it provides some commands, that wouldn't be possible at all with th
 		--admin-password="password" \
 		--site-name="Travis Install"
 
+	# Unlock install tool
+	./typo3cms install:unlock
+
+	# Lock install tool
+	./typo3cms install:lock
+
 	# Populate essential core caches
 	./typo3cms cache:warmup
 

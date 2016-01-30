@@ -247,4 +247,35 @@ class InstallCommandController extends CommandController {
 	public function defaultConfigurationCommand() {
 		$this->cliSetupRequestHandler->executeActionWithArguments('defaultConfiguration');
 	}
+
+    /**
+     * Unlock install tool
+     *
+     * @return void
+     */
+    public function unlockCommand()
+    {
+        $enableFileService = $this->objectManager->get(\TYPO3\CMS\Install\Service\EnableFileService::class);
+        if (@$enableFileService->createInstallToolEnableFile()) {
+            $this->output->output('Install tool unlocked');
+        } else {
+            $this->output->output('Could not unlock install tool');
+        }
+    }
+
+    /**
+     * Lock install tool
+     *
+     * @return void
+     */
+    public function lockCommand()
+    {
+        $enableFileService = $this->objectManager->get(\TYPO3\CMS\Install\Service\EnableFileService::class);
+        if (@$enableFileService->removeInstallToolEnableFile()) {
+            $this->output->output('Install tool locked');
+        } else {
+            $this->output->output('Could not unlock install tool');
+        }
+    }
+
 }
