@@ -30,6 +30,7 @@ call_user_func(function() {
 		getcwd(),
 		__DIR__ . '/Web',
 		__DIR__ . '/web',
+		__DIR__ . '/../web'
 	);
 
 	$path = getcwd();
