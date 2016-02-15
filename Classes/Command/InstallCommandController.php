@@ -120,8 +120,9 @@ class InstallCommandController extends CommandController {
 	protected function getPackagesFromRootComposerFile() {
 		// Look up configured active packages
 		$configuredPackages = array();
-		if (file_exists(PATH_site . 'composer.json')) {
-			$composerData = json_decode(file_get_contents(PATH_site . 'composer.json'));
+		$composerManifestFile = getcwd() . '/composer.json';
+		if (file_exists($composerManifestFile)) {
+			$composerData = json_decode(file_get_contents($composerManifestFile));
 			if (!is_object($composerData)) {
 				throw new \RuntimeException('composer.json seems to be invalid', 1444596471);
 			}
@@ -138,7 +139,7 @@ class InstallCommandController extends CommandController {
 
 		// Determine non typo3-cms-extension packages installed by composer
 		$composerInstalledPackages = array();
-		$composerLockFile = PATH_site . 'composer.lock';
+		$composerLockFile = getcwd() . '/composer.lock';
 		if (file_exists($composerLockFile)) {
 			$composerLock = json_decode(file_get_contents($composerLockFile));
 			if ($composerLock) {
