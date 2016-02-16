@@ -226,13 +226,6 @@ class Scripts {
 	}
 
 	/**
-	 * @param ConsoleBootstrap $bootstrap
-	 */
-	static public function runLegacyBootstrap(ConsoleBootstrap $bootstrap) {
-		$bootstrap->runLegacyBootstrap();
-	}
-
-	/**
 	 * Provide cleaned imlementation of TYPO3 CMS core classes.
 	 * Can only be called *after* extension configuration is loaded (needs extbase configuration)!
 	 *
