@@ -12,6 +12,10 @@ env:
     - TYPO3_VERSION=^7.6
     - TYPO3_VERSION=dev-master
 
+matrix:
+  allow_failures:
+    - env: TYPO3_VERSION=dev-master
+
 sudo: false
 cache:
   directories:
