@@ -307,7 +307,7 @@ class RunLevel {
 		$availableRunlevel = $this->getMaximumAvailableRunLevel();
 		$isAvailable = TRUE;
 		if ($availableRunlevel === self::LEVEL_COMPILE) {
-			if (in_array($expectedRunLevel, array(self::LEVEL_FULL, self::LEVEL_MINIMAL, self::LEVEL_LEGACY))) {
+			if (in_array($expectedRunLevel, array(self::LEVEL_FULL, self::LEVEL_MINIMAL))) {
 				$isAvailable = FALSE;
 			}
 		}
