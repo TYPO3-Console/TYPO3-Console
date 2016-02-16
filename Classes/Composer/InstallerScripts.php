@@ -162,7 +162,7 @@ class InstallerScripts {
 	}
 
 	/**
-	 * @param Config $event
+	 * @param Config $config
 	 * @return string
 	 */
 	static protected function getInstallDir(Config $config) {
