@@ -99,10 +99,15 @@ class ConsoleBootstrap extends Bootstrap {
 		if ($classLoader) {
 			$this->initializeClassLoader($classLoader);
 		}
+		if (is_callable(array($this, 'setRequestType'))) {
+			$this->defineTypo3RequestTypes();
+			$this->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
+		}
 		$this->baseSetup();
 		$this->requireBaseClasses();
-		$this->defineTypo3RequestTypes();
-
+		if (!is_callable(array($this, 'setRequestType'))) {
+			$this->defineTypo3RequestTypes();
+		}
 		$this->requestId = uniqid();
 		$this->runLevel = new RunLevel();
 		$this->setEarlyInstance('Helhum\Typo3Console\Core\Booting\RunLevel', $this->runLevel);
@@ -348,7 +353,7 @@ class ConsoleBootstrap extends Bootstrap {
 			);
 		}
 		$packageManager->injectDependencyResolver($dependencyResolver);
-		$packageManager->initialize($this);
+		$packageManager->init($this);
 		Utility\GeneralUtility::setSingletonInstance('TYPO3\\CMS\\Core\\Package\\PackageManager', $packageManager);
 	}
 

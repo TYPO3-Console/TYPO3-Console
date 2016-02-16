@@ -27,6 +27,7 @@ namespace Helhum\Typo3Console\Package;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use TYPO3\CMS\Core\Package\Exception;
 use TYPO3\CMS\Core\Package\Package;
 use TYPO3\CMS\Core\Package\PackageInterface;
@@ -40,7 +41,7 @@ class UncachedPackageManager extends PackageManager {
 	/**
 	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
 	 */
-	public function initialize(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
+	public function init(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
 		$this->bootstrap = $bootstrap;
 
 		$this->loadPackageStates();
