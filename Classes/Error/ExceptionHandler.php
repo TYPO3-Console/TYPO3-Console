@@ -30,73 +30,75 @@ namespace Helhum\Typo3Console\Error;
 /**
  * Class ExceptionHandler
  */
-class ExceptionHandler {
+class ExceptionHandler
+{
+    /**
+     * Register Exception Handler
+     */
+    public function __construct()
+    {
+        set_exception_handler(array($this, 'handleException'));
+    }
 
-	/**
-	 * Register Exception Handler
-	 */
-	function __construct() {
-		set_exception_handler(array($this, 'handleException'));
-	}
+    /**
+     * Formats and echoes the exception for the command line
+     *
+     * @param \Exception $exception The exception object
+     * @return void
+     */
+    public function handleException($exception)
+    {
+        $pathPosition = strpos($exception->getFile(), 'ext/');
+        $filePathAndName = ($pathPosition !== false) ? substr($exception->getFile(), $pathPosition) : $exception->getFile();
 
-	/**
-	 * Formats and echoes the exception for the command line
-	 *
-	 * @param \Exception $exception The exception object
-	 * @return void
-	 */
-	public function handleException($exception) {
-		$pathPosition = strpos($exception->getFile(), 'ext/');
-		$filePathAndName = ($pathPosition !== FALSE) ? substr($exception->getFile(), $pathPosition) : $exception->getFile();
+        $exceptionCodeNumber = ($exception->getCode() > 0) ? '#' . $exception->getCode() . ': ' : '';
 
-		$exceptionCodeNumber = ($exception->getCode() > 0) ? '#' . $exception->getCode() . ': ' : '';
+        echo PHP_EOL . 'Uncaught Exception in TYPO3 CMS ' . $exceptionCodeNumber . $exception->getMessage() . PHP_EOL;
+        echo 'thrown in file ' . $filePathAndName . PHP_EOL;
+        echo 'in line ' . $exception->getLine() . PHP_EOL;
+        if ($exception instanceof \TYPO3\Flow\Exception) {
+            echo 'Reference code: ' . $exception->getReferenceCode() . PHP_EOL;
+        }
 
-		echo PHP_EOL . 'Uncaught Exception in TYPO3 CMS ' . $exceptionCodeNumber . $exception->getMessage() . PHP_EOL;
-		echo 'thrown in file ' . $filePathAndName . PHP_EOL;
-		echo 'in line ' . $exception->getLine() . PHP_EOL;
-		if ($exception instanceof \TYPO3\Flow\Exception) {
-			echo 'Reference code: ' . $exception->getReferenceCode() . PHP_EOL;
-		}
+        $indent = '  ';
+        while (($exception = $exception->getPrevious()) !== null) {
+            echo PHP_EOL . $indent . 'Nested exception:' . PHP_EOL;
+            $pathPosition = strpos($exception->getFile(), 'Packages/');
+            $filePathAndName = ($pathPosition !== false) ? substr($exception->getFile(), $pathPosition) : $exception->getFile();
 
-		$indent = '  ';
-		while (($exception = $exception->getPrevious()) !== NULL) {
-			echo PHP_EOL . $indent . 'Nested exception:' . PHP_EOL;
-			$pathPosition = strpos($exception->getFile(), 'Packages/');
-			$filePathAndName = ($pathPosition !== FALSE) ? substr($exception->getFile(), $pathPosition) : $exception->getFile();
+            $exceptionCodeNumber = ($exception->getCode() > 0) ? '#' . $exception->getCode() . ': ' : '';
 
-			$exceptionCodeNumber = ($exception->getCode() > 0) ? '#' . $exception->getCode() . ': ' : '';
+            echo PHP_EOL . $indent . 'Uncaught Exception in Flow ' . $exceptionCodeNumber . $exception->getMessage() . PHP_EOL;
+            echo $indent . 'thrown in file ' . $filePathAndName . PHP_EOL;
+            echo $indent . 'in line ' . $exception->getLine() . PHP_EOL;
+            if ($exception instanceof \TYPO3\Flow\Exception) {
+                echo 'Reference code: ' . $exception->getReferenceCode() . PHP_EOL;
+            }
 
-			echo PHP_EOL . $indent . 'Uncaught Exception in Flow ' . $exceptionCodeNumber . $exception->getMessage() . PHP_EOL;
-			echo $indent . 'thrown in file ' . $filePathAndName . PHP_EOL;
-			echo $indent . 'in line ' . $exception->getLine() . PHP_EOL;
-			if ($exception instanceof \TYPO3\Flow\Exception) {
-				echo 'Reference code: ' . $exception->getReferenceCode() . PHP_EOL;
-			}
+            $indent .= '  ';
+        }
 
-			$indent .= '  ';
-		}
+        if (function_exists('xdebug_get_function_stack')) {
+            $backtraceSteps = xdebug_get_function_stack();
+        } else {
+            $backtraceSteps = debug_backtrace();
+        }
 
-		if (function_exists('xdebug_get_function_stack')) {
-			$backtraceSteps = xdebug_get_function_stack();
-		} else {
-			$backtraceSteps = debug_backtrace();
-		}
+        for ($index = 0; $index < count($backtraceSteps); $index ++) {
+            echo PHP_EOL . '#' . $index . ' ';
+            if (isset($backtraceSteps[$index]['class'])) {
+                echo $backtraceSteps[$index]['class'];
+            }
+            if (isset($backtraceSteps[$index]['function'])) {
+                echo '::' . $backtraceSteps[$index]['function'] . '()';
+            }
+            echo PHP_EOL;
+            if (isset($backtraceSteps[$index]['file'])) {
+                echo '   ' . $backtraceSteps[$index]['file'] . (isset($backtraceSteps[$index]['line']) ? ':' . $backtraceSteps[$index]['line'] : '') . PHP_EOL;
+            }
+        }
 
-		for ($index = 0; $index < count($backtraceSteps); $index ++) {
-			echo PHP_EOL . '#' . $index . ' ';
-			if (isset($backtraceSteps[$index]['class'])) {
-				echo $backtraceSteps[$index]['class'];
-			}
-			if (isset($backtraceSteps[$index]['function'])) {
-				echo '::' . $backtraceSteps[$index]['function'] . '()';
-			}
-			echo PHP_EOL;
-			if (isset($backtraceSteps[$index]['file'])) {
-				echo '   ' . $backtraceSteps[$index]['file'] . (isset($backtraceSteps[$index]['line']) ? ':' . $backtraceSteps[$index]['line'] : '') . PHP_EOL;
-			}
-		}
-
-		echo PHP_EOL;
-		exit(1);
-	}
+        echo PHP_EOL;
+        exit(1);
+    }
 }

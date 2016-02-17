@@ -32,65 +32,66 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Class CommandManager
  */
-class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager {
+class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
+{
+    /**
+     * @var array
+     */
+    protected $commandControllers = array();
 
-	/**
-	 * @var array
-	 */
-	protected $commandControllers = array();
+    /**
+     * @var bool
+     */
+    protected $initialized = false;
 
-	/**
-	 * @var bool
-	 */
-	protected $initialized = FALSE;
+    /**
+     * This lifecycle method is called by the object manager after instantiation
+     * We can be sure dependencies have been injected.
+     */
+    public function initializeObject()
+    {
+        $this->initialized = true;
+    }
 
-	/**
-	 * This lifecycle method is called by the object manager after instantiation
-	 * We can be sure dependencies have been injected.
-	 */
-	public function initializeObject() {
-		$this->initialized = TRUE;
-	}
+    /**
+     * Set the dependency
+     */
+    protected function initialize()
+    {
+        if (!$this->initialized) {
+            $this->objectManager = GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
+        }
+    }
 
-	/**
-	 * Set the dependency
-	 */
-	protected function initialize() {
-		if (!$this->initialized) {
-			$this->objectManager = GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
-		}
-	}
+    /**
+     * Make sure the object manager is set
+     *
+     * @return \TYPO3\CMS\Extbase\Mvc\Cli\Command[]
+     */
+    public function getAvailableCommands()
+    {
+        $this->initialize();
+        if ($this->availableCommands === null) {
+            $commandControllerRegistry = & $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'];
+            if (!empty($commandControllerRegistry) && is_array($commandControllerRegistry)) {
+                $commandControllerRegistry = array_merge($commandControllerRegistry, $this->commandControllers);
+            } else {
+                $commandControllerRegistry = $this->commandControllers;
+            }
+            $this->availableCommands = parent::getAvailableCommands();
+        }
+        return $this->availableCommands;
+    }
 
-	/**
-	 * Make sure the object manager is set
-	 *
-	 * @return \TYPO3\CMS\Extbase\Mvc\Cli\Command[]
-	 */
-	public function getAvailableCommands() {
-		$this->initialize();
-		if ($this->availableCommands === NULL) {
-			$commandControllerRegistry = & $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'];
-			if (!empty($commandControllerRegistry) && is_array($commandControllerRegistry)) {
-				$commandControllerRegistry = array_merge($commandControllerRegistry, $this->commandControllers);
-			} else {
-				$commandControllerRegistry = $this->commandControllers;
-			}
-			$this->availableCommands = parent::getAvailableCommands();
-		}
-		return $this->availableCommands;
-	}
-
-
-	/**
-	 * @param string $commandControllerClassName
-	 */
-	public function registerCommandController($commandControllerClassName) {
-		if (!isset($this->commandControllers[$commandControllerClassName])) {
-			$this->commandControllers[$commandControllerClassName] = $commandControllerClassName;
-		} else {
-			echo 'WARNING: command controller already registered!' . PHP_EOL;
-		}
-	}
-
-
+    /**
+     * @param string $commandControllerClassName
+     */
+    public function registerCommandController($commandControllerClassName)
+    {
+        if (!isset($this->commandControllers[$commandControllerClassName])) {
+            $this->commandControllers[$commandControllerClassName] = $commandControllerClassName;
+        } else {
+            echo 'WARNING: command controller already registered!' . PHP_EOL;
+        }
+    }
 }

@@ -37,80 +37,83 @@ use TYPO3\CMS\Saltedpasswords\Utility\SaltedPasswordsUtility;
 /**
  * Hook
  */
-class ExtensionInstallation {
+class ExtensionInstallation
+{
+    const EXTKEY = 'typo3_console';
 
-	const EXTKEY = 'typo3_console';
+    /**
+     * Actions to take after extension has been installed
+     *
+     * @param string $keyOfInstalledExtension
+     */
+    public function afterInstallation($keyOfInstalledExtension)
+    {
+        if (self::EXTKEY !== $keyOfInstalledExtension) {
+            return;
+        }
+        InstallerScripts::postInstallExtension();
 
-	/**
-	 * Actions to take after extension has been installed
-	 *
-	 * @param string $keyOfInstalledExtension
-	 */
-	public function afterInstallation($keyOfInstalledExtension) {
-		if (self::EXTKEY !== $keyOfInstalledExtension) {
-			return;
-		}
-		InstallerScripts::postInstallExtension();
+        $this->createCliBeUser();
+    }
 
-		$this->createCliBeUser();
-	}
+    protected function createCliBeUser()
+    {
+        $db = $this->getDatabaseConnection();
 
-	protected function createCliBeUser() {
-		$db = $this->getDatabaseConnection();
+        $where = 'username = ' . $db->fullQuoteStr('_cli_lowlevel', 'be_users') . ' AND admin = 0';
 
-		$where = 'username = ' . $db->fullQuoteStr('_cli_lowlevel', 'be_users') . ' AND admin = 0';
+        $user = $db->exec_SELECTgetSingleRow('*', 'be_users', $where);
+        if ($user) {
+            if ($user['deleted'] || $user['disable']) {
+                $data = array(
+                    'be_users' => array(
+                        $user['uid'] => array(
+                            'deleted' => 0,
+                            'disable' => 0
+                        )
+                    )
+                );
+                /** @var \TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
+                $dataHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
+                $dataHandler->stripslashes_values = false;
+                $dataHandler->start($data, array());
+                $dataHandler->process_datamap();
+            }
+        } else {
+            // Prepare necessary data for _cli_lowlevel user creation
+            $password = uniqid('scheduler', true);
+            if (SaltedPasswordsUtility::isUsageEnabled()) {
+                $objInstanceSaltedPW = SaltFactory::getSaltingInstance();
+                $password = $objInstanceSaltedPW->getHashedPassword($password);
+            }
+            $data = array(
+                'be_users' => array(
+                    'NEW' => array(
+                        'username' => '_cli_lowlevel',
+                        'password' => $password,
+                        'pid' => 0
+                    )
+                )
+            );
+            /** @var \TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
+            $dataHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
+            $dataHandler->stripslashes_values = false;
+            $dataHandler->start($data, array());
+            $dataHandler->process_datamap();
+            // Check if a new uid was indeed generated (i.e. a new record was created)
+            // (counting DataHandler errors doesn't work as some failures don't report errors)
+            $numberOfNewIDs = count($dataHandler->substNEWwithIDs);
+            if ((int)$numberOfNewIDs !== 1) {
+                InstallerScripts::addFlashMessage('Failed to create _cli_lowlevel BE user.', 'BE user creation failed', AbstractMessage::WARNING);
+            }
+        }
+    }
 
-		$user = $db->exec_SELECTgetSingleRow('*', 'be_users', $where);
-		if ($user) {
-			if ($user['deleted'] || $user['disable']) {
-				$data = array(
-					'be_users' => array(
-						$user['uid'] => array(
-							'deleted' => 0,
-							'disable' => 0
-						)
-					)
-				);
-				/** @var \TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
-				$dataHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
-				$dataHandler->stripslashes_values = FALSE;
-				$dataHandler->start($data, array());
-				$dataHandler->process_datamap();
-			}
-		} else {
-			// Prepare necessary data for _cli_lowlevel user creation
-			$password = uniqid('scheduler', TRUE);
-			if (SaltedPasswordsUtility::isUsageEnabled()) {
-				$objInstanceSaltedPW = SaltFactory::getSaltingInstance();
-				$password = $objInstanceSaltedPW->getHashedPassword($password);
-			}
-			$data = array(
-				'be_users' => array(
-					'NEW' => array(
-						'username' => '_cli_lowlevel',
-						'password' => $password,
-						'pid' => 0
-					)
-				)
-			);
-			/** @var \TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
-			$dataHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
-			$dataHandler->stripslashes_values = FALSE;
-			$dataHandler->start($data, array());
-			$dataHandler->process_datamap();
-			// Check if a new uid was indeed generated (i.e. a new record was created)
-			// (counting DataHandler errors doesn't work as some failures don't report errors)
-			$numberOfNewIDs = count($dataHandler->substNEWwithIDs);
-			if ((int)$numberOfNewIDs !== 1) {
-				InstallerScripts::addFlashMessage('Failed to create _cli_lowlevel BE user.', 'BE user creation failed', AbstractMessage::WARNING);
-			}
-		}
-	}
-
-	/**
-	 * @return DatabaseConnection
-	 */
-	protected function getDatabaseConnection() {
-		return $GLOBALS['TYPO3_DB'];
-	}
+    /**
+     * @return DatabaseConnection
+     */
+    protected function getDatabaseConnection()
+    {
+        return $GLOBALS['TYPO3_DB'];
+    }
 }

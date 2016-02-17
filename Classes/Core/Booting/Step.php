@@ -16,42 +16,44 @@ namespace Helhum\Typo3Console\Core\Booting;
  *
  * @api
  */
-class Step {
+class Step
+{
+    /**
+     * @var string
+     */
+    protected $identifier;
 
-	/**
-	 * @var string
-	 */
-	protected $identifier;
+    /**
+     * @var Callable
+     */
+    protected $callback;
 
-	/**
-	 * @var Callable
-	 */
-	protected $callback;
+    /**
+     * @param string $identifier
+     * @param mixed $callback
+     */
+    public function __construct($identifier, $callback)
+    {
+        $this->identifier = $identifier;
+        $this->callback = $callback;
+    }
 
-	/**
-	 * @param string $identifier
-	 * @param mixed $callback
-	 */
-	public function __construct($identifier, $callback) {
-		$this->identifier = $identifier;
-		$this->callback = $callback;
-	}
+    /**
+     * Invokes / executes this step
+     *
+     * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
+     * @return void
+     */
+    public function __invoke(\TYPO3\Flow\Core\Bootstrap $bootstrap)
+    {
+        call_user_func($this->callback, $bootstrap);
+    }
 
-	/**
-	 * Invokes / executes this step
-	 *
-	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
-	 * @return void
-	 */
-	public function __invoke(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
-		call_user_func($this->callback, $bootstrap);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getIdentifier() {
-		return $this->identifier;
-	}
-
+    /**
+     * @return string
+     */
+    public function getIdentifier()
+    {
+        return $this->identifier;
+    }
 }

@@ -30,9 +30,9 @@ namespace Helhum\Typo3Console\Service\Database\Schema;
 /**
  * Represents a database schema update result
  */
-class SchemaUpdateResult {
-
-  /**
+class SchemaUpdateResult
+{
+    /**
    * @var array $performedUpdates
    */
   protected $performedUpdates = array();
@@ -42,17 +42,19 @@ class SchemaUpdateResult {
    *
    * @return array
    */
-  public function getPerformedUpdates() {
-    return $this->performedUpdates;
+  public function getPerformedUpdates()
+  {
+      return $this->performedUpdates;
   }
 
   /**
    * Returns TRUE if updates where performed, FALSE otherwise
    *
-   * @return boolean
+   * @return bool
    */
-  public function hasPerformedUpdates() {
-    return count($this->performedUpdates);
+  public function hasPerformedUpdates()
+  {
+      return count($this->performedUpdates);
   }
 
   /**
@@ -61,8 +63,9 @@ class SchemaUpdateResult {
    * @param SchemaUpdateType $schemaUpdateType Schema update type
    * @param int $numberOfUpdates Number of updates performed
    */
-  public function addPerformedUpdates(SchemaUpdateType $schemaUpdateType, $numberOfUpdates) {
-    $this->performedUpdates[(string)$schemaUpdateType] += $numberOfUpdates;
+  public function addPerformedUpdates(SchemaUpdateType $schemaUpdateType, $numberOfUpdates)
+  {
+      $this->performedUpdates[(string)$schemaUpdateType] += $numberOfUpdates;
   }
 
   /**
@@ -73,8 +76,9 @@ class SchemaUpdateResult {
   /**
    * @return array
    */
-  public function getErrors() {
-    return $this->errors;
+  public function getErrors()
+  {
+      return $this->errors;
   }
 
   /**
@@ -83,16 +87,18 @@ class SchemaUpdateResult {
    * @param SchemaUpdateType $schemaUpdateType Schema update type
    * @param array $errors List of error messages
    */
-  public function addErrors(SchemaUpdateType $schemaUpdateType, array $errors) {
-    $this->errors[(string)$schemaUpdateType] = array_merge((array)$this->errors[(string)$schemaUpdateType], $errors);
+  public function addErrors(SchemaUpdateType $schemaUpdateType, array $errors)
+  {
+      $this->errors[(string)$schemaUpdateType] = array_merge((array)$this->errors[(string)$schemaUpdateType], $errors);
   }
 
   /**
    * Returns TRUE if errors did occur during schema update, FALSE otherwise
    *
-   * @return boolean
+   * @return bool
    */
-  public function hasErrors() {
-    return count($this->errors);
+  public function hasErrors()
+  {
+      return count($this->errors);
   }
 }

@@ -30,6 +30,6 @@ namespace Helhum\Typo3Console\Parser;
 /**
  * Class ParsingException
  */
-class ParsingException extends \TYPO3\CMS\Core\Error\Exception {
-
-} 
+class ParsingException extends \TYPO3\CMS\Core\Error\Exception
+{
+}

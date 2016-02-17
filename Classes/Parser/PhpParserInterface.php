@@ -30,19 +30,18 @@ namespace Helhum\Typo3Console\Parser;
 /**
  * Interface PhpParserInterface
  */
-interface PhpParserInterface {
+interface PhpParserInterface
+{
+    /**
+     * @param string $classFile Path to PHP class file
+     * @return ParsedClass
+     * @throws ParsingException
+     */
+    public function parseClassFile($classFile);
 
-	/**
-	 * @param string $classFile Path to PHP class file
-	 * @return ParsedClass
-	 * @throws ParsingException
-	 */
-	public function parseClassFile($classFile);
-
-	/**
-	 * @param string $classContent
-	 * @return ParsedClass
-	 */
-	public function parseClass($classContent);
-
+    /**
+     * @param string $classContent
+     * @return ParsedClass
+     */
+    public function parseClass($classContent);
 }

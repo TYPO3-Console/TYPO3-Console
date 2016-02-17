@@ -1,5 +1,5 @@
 <?php
-$EM_CONF[$_EXTKEY] = array (
+$EM_CONF[$_EXTKEY] = array(
   'title' => 'TYPO3 Console',
   'description' => 'A reliable and powerful command line interface for TYPO3 CMS',
   'category' => 'cli',
@@ -23,33 +23,33 @@ $EM_CONF[$_EXTKEY] = array (
   'CGLcompliance_note' => '',
   'version' => '1.2.5',
   '_md5_values_when_last_written' => '',
-  'constraints' => 
-  array (
-    'depends' => 
-    array (
+  'constraints' =>
+  array(
+    'depends' =>
+    array(
       'typo3' => '7.4.0-7.99.99',
     ),
-    'conflicts' => 
-    array (
+    'conflicts' =>
+    array(
     ),
-    'suggests' => 
-    array (
+    'suggests' =>
+    array(
     ),
   ),
-  'suggests' => 
-  array (
+  'suggests' =>
+  array(
   ),
-  'autoload' => 
-  array (
-    'psr-4' => 
-    array (
+  'autoload' =>
+  array(
+    'psr-4' =>
+    array(
       'Helhum\\Typo3Console\\' => 'Classes',
     ),
   ),
-  'autoload-dev' => 
-  array (
-    'psr-4' => 
-    array (
+  'autoload-dev' =>
+  array(
+    'psr-4' =>
+    array(
       'Helhum\\Typo3Console\\Tests\\' => 'Tests',
     ),
   ),

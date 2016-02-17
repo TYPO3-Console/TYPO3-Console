@@ -27,8 +27,6 @@ namespace Helhum\Typo3Console\Package;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use Helhum\Typo3Console\Core\ConsoleBootstrap;
-use TYPO3\CMS\Core\Package\Exception;
 use TYPO3\CMS\Core\Package\Package;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
@@ -36,78 +34,83 @@ use TYPO3\CMS\Core\Package\PackageManager;
 /**
  * Class UncachedPackageManager
  */
-class UncachedPackageManager extends PackageManager {
+class UncachedPackageManager extends PackageManager
+{
+    /**
+     * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
+     */
+    public function init(\TYPO3\Flow\Core\Bootstrap $bootstrap)
+    {
+        $this->bootstrap = $bootstrap;
 
-	/**
-	 * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
-	 */
-	public function init(\TYPO3\Flow\Core\Bootstrap $bootstrap) {
-		$this->bootstrap = $bootstrap;
+        $this->loadPackageStates();
+        $this->initializePackageObjects();
+        $this->initializeCompatibilityLoadedExtArray();
 
-		$this->loadPackageStates();
-		$this->initializePackageObjects();
-		$this->initializeCompatibilityLoadedExtArray();
+        // @deprecated since 7.4 will be removed once 6.2 compatibility is removed
+        foreach ($this->activePackages as $package) {
+            /** @var $package Package */
+            if (!is_callable(array($package, 'boot'))) {
+                break;
+            }
+            $package->boot($bootstrap);
+        }
+        $this->getPackage('typo3_console')->bootPackage($bootstrap);
+    }
 
-		// @deprecated since 7.4 will be removed once 6.2 compatibility is removed
-		foreach ($this->activePackages as $package) {
-			/** @var $package Package */
-			if (!is_callable(array($package, 'boot'))) {
-				break;
-			}
-			$package->boot($bootstrap);
-		}
-		$this->getPackage('typo3_console')->bootPackage($bootstrap);
-	}
+    /**
+     * Intended to be called by the cache warmup only
+     * @internal
+     */
+    public function populatePackageCache()
+    {
+        $this->saveToPackageCache();
+    }
 
-	/**
-	 * Intended to be called by the cache warmup only
-	 * @internal
-	 */
-	public function populatePackageCache() {
-		$this->saveToPackageCache();
-	}
+    protected function loadPackageStates()
+    {
+        $this->packageStatesConfiguration = file_exists($this->packageStatesPathAndFilename) ? include($this->packageStatesPathAndFilename) : array();
+        if (!isset($this->packageStatesConfiguration['version']) || $this->packageStatesConfiguration['version'] < 4) {
+            $this->packageStatesConfiguration = array();
+        }
+        if ($this->packageStatesConfiguration === array()) {
+            $this->scanAvailablePackages();
+        } else {
+            $this->registerPackagesFromConfiguration();
+        }
 
-	protected function loadPackageStates() {
-		$this->packageStatesConfiguration = file_exists($this->packageStatesPathAndFilename) ? include($this->packageStatesPathAndFilename) : array();
-		if (!isset($this->packageStatesConfiguration['version']) || $this->packageStatesConfiguration['version'] < 4) {
-			$this->packageStatesConfiguration = array();
-		}
-		if ($this->packageStatesConfiguration === array()) {
-			$this->scanAvailablePackages();
-		} else {
-			$this->registerPackagesFromConfiguration();
-		}
+        if ($this->consolePackageBootRequired($this->getPackage('typo3_console'))) {
+            $this->packages['typo3_console'] = new \Helhum\Typo3Console\Package($this, 'typo3_console', $this->getPackage('typo3_console')->getPackagePath());
+        }
+    }
 
-		if ($this->consolePackageBootRequired($this->getPackage('typo3_console'))) {
-			$this->packages['typo3_console'] = new \Helhum\Typo3Console\Package($this, 'typo3_console', $this->getPackage('typo3_console')->getPackagePath());
-		}
-	}
+    /**
+     * @param PackageInterface $consolePackage
+     * @return bool
+     */
+    protected function consolePackageBootRequired($consolePackage)
+    {
+        return !$consolePackage instanceof \Helhum\Typo3Console\Package;
+    }
 
-	/**
-	 * @param PackageInterface $consolePackage
-	 * @return bool
-	 */
-	protected function consolePackageBootRequired($consolePackage) {
-		return !$consolePackage instanceof \Helhum\Typo3Console\Package;
-	}
+    /**
+     * Only save a new PackageSates file if there is only one,
+     * to prevent saving one before TYPO3 is properly installed
+     */
+    protected function sortAndSavePackageStates()
+    {
+        if (@file_exists($this->packageStatesPathAndFilename)) {
+            parent::sortAndSavePackageStates();
+        }
+    }
 
-	/**
-	 * Only save a new PackageSates file if there is only one,
-	 * to prevent saving one before TYPO3 is properly installed
-	 */
-	protected function sortAndSavePackageStates() {
-		if (@file_exists($this->packageStatesPathAndFilename)) {
-			parent::sortAndSavePackageStates();
-		}
-	}
-
-	/**
-	 * To enable writing of the package states file the package states
-	 * migration needs to override eventual failsafe blocks.
-	 * This will be used during installation process.
-	 */
-	public function forceSortAndSavePackageStates() {
-		parent::sortAndSavePackageStates();
-	}
-
+    /**
+     * To enable writing of the package states file the package states
+     * migration needs to override eventual failsafe blocks.
+     * This will be used during installation process.
+     */
+    public function forceSortAndSavePackageStates()
+    {
+        parent::sortAndSavePackageStates();
+    }
 }

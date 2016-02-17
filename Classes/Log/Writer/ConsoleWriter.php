@@ -34,59 +34,63 @@ use TYPO3\CMS\Core\Log\Writer\AbstractWriter;
 /**
  * Class ConsoleWriter
  */
-class ConsoleWriter extends AbstractWriter {
+class ConsoleWriter extends AbstractWriter
+{
+    /**
+     * @var OutputInterface
+     */
+    protected $output;
 
-	/**
-	 * @var OutputInterface
-	 */
-	protected $output;
+    /**
+     * @var string
+     */
+    protected $messageWrap = '|';
 
-	/**
-	 * @var string
-	 */
-	protected $messageWrap = '|';
+    protected $severityTagMapping = array(
+        LogLevel::EMERGENCY => '<error>|</error>',
+        LogLevel::ALERT => '<error>|</error>',
+        LogLevel::CRITICAL => '<error>|</error>',
+        LogLevel::ERROR => '<fg=red>|</fg=red>',
+        LogLevel::WARNING => '<fg=yellow;options=bold>|</fg=yellow;options=bold>',
+        LogLevel::NOTICE => '<fg=yellow>|</fg=yellow>',
+        LogLevel::INFO => '<info>|</info>',
+        LogLevel::DEBUG => '|'
+    );
+    /**
+     * @param OutputInterface $output
+     */
+    public function setOutput(OutputInterface $output)
+    {
+        $this->output = $output;
+    }
 
-	protected $severityTagMapping = array(
-		LogLevel::EMERGENCY => '<error>|</error>',
-		LogLevel::ALERT => '<error>|</error>',
-		LogLevel::CRITICAL => '<error>|</error>',
-		LogLevel::ERROR => '<fg=red>|</fg=red>',
-		LogLevel::WARNING => '<fg=yellow;options=bold>|</fg=yellow;options=bold>',
-		LogLevel::NOTICE => '<fg=yellow>|</fg=yellow>',
-		LogLevel::INFO => '<info>|</info>',
-		LogLevel::DEBUG => '|'
-	);
-	/**
-	 * @param OutputInterface $output
-	 */
-	public function setOutput(OutputInterface $output) {
-		$this->output = $output;
-	}
+    /**
+     * @param string $messageWrap
+     */
+    public function setMessageWrap($messageWrap)
+    {
+        $this->messageWrap = $messageWrap;
+    }
 
-	/**
-	 * @param string $messageWrap
-	 */
-	public function setMessageWrap($messageWrap) {
-		$this->messageWrap = $messageWrap;
-	}
+    /**
+     * Writes the log record
+     *
+     * @param \TYPO3\CMS\Core\Log\LogRecord $record Log record
+     * @return \TYPO3\CMS\Core\Log\Writer\WriterInterface $this
+     * @throws \Exception
+     */
+    public function writeLog(\TYPO3\CMS\Core\Log\LogRecord $record)
+    {
+        $this->output->write(
+            $this->wrapMessage(vsprintf($record->getMessage(), $record->getData()), $record->getLevel()),
+            true
+        );
+    }
 
-	/**
-	 * Writes the log record
-	 *
-	 * @param \TYPO3\CMS\Core\Log\LogRecord $record Log record
-	 * @return \TYPO3\CMS\Core\Log\Writer\WriterInterface $this
-	 * @throws \Exception
-	 */
-	public function writeLog(\TYPO3\CMS\Core\Log\LogRecord $record) {
-		$this->output->write(
-			$this->wrapMessage(vsprintf($record->getMessage(), $record->getData()), $record->getLevel()),
-			TRUE
-		);
-	}
-
-	protected function wrapMessage($message, $level) {
-		list($tagStart, $tagEnd) = explode('|', $this->severityTagMapping[$level]);
-		list($wrapStart, $wrapEnd) = explode('|', $this->messageWrap);
-		return $tagStart . $wrapStart . $message . $wrapEnd . $tagEnd;
-	}
+    protected function wrapMessage($message, $level)
+    {
+        list($tagStart, $tagEnd) = explode('|', $this->severityTagMapping[$level]);
+        list($wrapStart, $wrapEnd) = explode('|', $this->messageWrap);
+        return $tagStart . $wrapStart . $message . $wrapEnd . $tagEnd;
+    }
 }

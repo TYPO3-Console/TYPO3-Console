@@ -30,6 +30,6 @@ namespace Helhum\Typo3Console\Tests\Unit\Parser\Fixtures;
 /**
  * Class NamespacedClassFixture
  */
-interface NamespacedInterfaceFixture {
-
+interface NamespacedInterfaceFixture
+{
 }

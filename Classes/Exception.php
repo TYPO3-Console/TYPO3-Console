@@ -30,6 +30,6 @@ namespace Helhum\Typo3Console;
 /**
  * A generic exception
  */
-class Exception extends \Exception {
-
+class Exception extends \Exception
+{
 }

@@ -32,34 +32,37 @@ use TYPO3\CMS\Core\Database\DatabaseConnection;
 /**
  * Class PersistenceContext
  */
-class PersistenceContext {
+class PersistenceContext
+{
+    /**
+     * @var DatabaseConnection
+     */
+    protected $databaseConnection;
 
-	/**
-	 * @var DatabaseConnection
-	 */
-	protected $databaseConnection;
+    /**
+     * @var array
+     */
+    protected $persistenceConfiguration = array();
 
-	/**
-	 * @var array
-	 */
-	protected $persistenceConfiguration = array();
+    public function __construct(DatabaseConnection $databaseConnection, array $persistenceConfiguration)
+    {
+        $this->databaseConnection = $databaseConnection;
+        $this->persistenceConfiguration = $persistenceConfiguration;
+    }
 
-	public function __construct(DatabaseConnection $databaseConnection, array $persistenceConfiguration) {
-		$this->databaseConnection = $databaseConnection;
-		$this->persistenceConfiguration = $persistenceConfiguration;
-	}
+    /**
+     * @return \TYPO3\CMS\Core\Database\DatabaseConnection
+     */
+    public function getDatabaseConnection()
+    {
+        return $this->databaseConnection;
+    }
 
-	/**
-	 * @return \TYPO3\CMS\Core\Database\DatabaseConnection
-	 */
-	public function getDatabaseConnection() {
-		return $this->databaseConnection;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getPersistenceConfiguration() {
-		return $this->persistenceConfiguration;
-	}
+    /**
+     * @return array
+     */
+    public function getPersistenceConfiguration()
+    {
+        return $this->persistenceConfiguration;
+    }
 }
