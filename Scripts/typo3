@@ -1,7 +1,0 @@
-#!/usr/bin/env php
-<?php
-
-/**
- * Bootstrap for the command line
- */
-require __DIR__ . '/typo3cms.php';
