@@ -1,62 +1,61 @@
 #!/usr/bin/env php
 <?php
-call_user_func(function() {
+call_user_func(function () {
 
-	/**
-	 * @param string $path
-	 * @return bool
-	 */
-	$entryScriptExists = function($path) {
-		return file_exists($path . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php');
-	};
+    /**
+     * @param string $path
+     * @return bool
+     */
+    $entryScriptExists = function ($path) {
+        return file_exists($path . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php');
+    };
 
-	/**
-	 * Returns parent directory.
-	 *
-	 * @param string $path Path to start from.
-	 * @return string Parent path.
-	 */
-	$getParentDirectoryPath = function($path) {
-		if (empty($path)) {
-			return FALSE;
-		}
-		$path = explode('/', $path);
-		array_pop($path);
-		return implode('/', $path);
-	};
+    /**
+     * Returns parent directory.
+     *
+     * @param string $path Path to start from.
+     * @return string Parent path.
+     */
+    $getParentDirectoryPath = function ($path) {
+        if (empty($path)) {
+            return false;
+        }
+        $path = explode('/', $path);
+        array_pop($path);
+        return implode('/', $path);
+    };
 
-	$paths = array(
-		__DIR__,
-		getcwd(),
-		__DIR__ . '/Web',
-		__DIR__ . '/web',
-	);
+    $paths = array(
+        __DIR__,
+        getcwd(),
+        __DIR__ . '/Web',
+        __DIR__ . '/web',
+    );
 
-	$path = getcwd();
-	foreach ($paths as $path) {
-		if ($entryScriptExists($path)) {
-			$installationRootPath = $path;
-			break;
-		}
-	}
-	if (!isset($installationRootPath)) {
-		while ($path = $getParentDirectoryPath($path)) {
-			if ($entryScriptExists($path)) {
-				$installationRootPath = $path;
-				break;
-			}
-		}
-	}
+    $path = getcwd();
+    foreach ($paths as $path) {
+        if ($entryScriptExists($path)) {
+            $installationRootPath = $path;
+            break;
+        }
+    }
+    if (!isset($installationRootPath)) {
+        while ($path = $getParentDirectoryPath($path)) {
+            if ($entryScriptExists($path)) {
+                $installationRootPath = $path;
+                break;
+            }
+        }
+    }
 
-	/**
-	 * Bootstrap for the command line
-	 */
-	if (isset($installationRootPath)) {
-		require $installationRootPath . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php';
-	} else {
-		echo "Could not find typo3cms.php, make sure your path is within a TYPO3 installation and/or EXT:typo3_console is installed.\n";
-		exit(1);
-	}
+    /**
+     * Bootstrap for the command line
+     */
+    if (isset($installationRootPath)) {
+        require $installationRootPath . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php';
+    } else {
+        echo "Could not find typo3cms.php, make sure your path is within a TYPO3 installation and/or EXT:typo3_console is installed.\n";
+        exit(1);
+    }
 
 });
-
