@@ -270,6 +270,7 @@ class ConsoleBootstrap extends Bootstrap
         class_alias('TYPO3\\CMS\\Core\\Core\\Bootstrap', 'TYPO3\\Flow\\Core\\Bootstrap');
 
         define('TYPO3_MODE', 'BE');
+        // @deprecated to define this constant. Can be removed when TYPO3 7 support is removed
         define('TYPO3_cliMode', true);
         $GLOBALS['MCONF']['name'] = '_CLI_lowlevel';
         parent::baseSetup($pathPart);
