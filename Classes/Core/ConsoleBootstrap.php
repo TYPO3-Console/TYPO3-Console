@@ -101,7 +101,11 @@ class ConsoleBootstrap extends Bootstrap {
 		}
 		if (is_callable(array($this, 'setRequestType'))) {
 			$this->defineTypo3RequestTypes();
-			$this->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
+			try {
+				$this->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
+			} catch (\RuntimeException $exception) {
+				// No worries
+			}
 		}
 		$this->baseSetup();
 		$this->requireBaseClasses();
