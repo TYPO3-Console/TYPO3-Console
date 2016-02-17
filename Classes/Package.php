@@ -92,6 +92,7 @@ class Package extends \TYPO3\CMS\Core\Package\Package {
 		$bootstrap->setRunLevelForCommand('typo3_console:cache:*', RunLevel::LEVEL_FULL);
 
 		$bootstrap->setRunLevelForCommand('typo3_console:backend:*', RunLevel::LEVEL_MINIMAL);
+		$bootstrap->setRunLevelForCommand('typo3_console:database:backup', RunLevel::LEVEL_COMPILE);
 		$bootstrap->setRunLevelForCommand('typo3_console:documentation:*', RunLevel::LEVEL_FULL);
 		$bootstrap->setRunLevelForCommand('typo3_console:scheduler:*', RunLevel::LEVEL_FULL);
 		$bootstrap->setRunLevelForCommand('typo3_console:cleanup:*', RunLevel::LEVEL_FULL);

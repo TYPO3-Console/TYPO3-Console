@@ -27,6 +27,7 @@ namespace Helhum\Typo3Console\Command;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use Helhum\Typo3Console\Exception;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Helhum\Typo3Console\Service\Database\Schema\SchemaUpdateException;
 use Helhum\Typo3Console\Service\Database\Schema\SchemaUpdateResult;
@@ -58,6 +59,12 @@ class DatabaseCommandController extends CommandController {
 		SchemaUpdateType::TABLE_CLEAR => 'Clear tables',
 		SchemaUpdateType::TABLE_DROP => 'Drop tables',
 	);
+
+	/**
+	 * @var \Helhum\Typo3Console\Service\Database\BackupService
+	 * @inject
+	 */
+	protected $backupService;
 
 	/**
 	 * Update database schema
@@ -154,5 +161,36 @@ class DatabaseCommandController extends CommandController {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Backup the Typo3 database.
+	 *
+	 * Dumps the Typo3 database to a local directory.
+	 * Command makes use of mysqldump. Therefore mysqldump is a dependency.
+	 * Make sure that mysqldump is within your $PATH.
+	 *
+	 * @param string $backupDirectory Directory to put the dump into. E.g. /tmp
+	 * @throws \UnexpectedValueException
+	 */
+	public function backupCommand($backupDirectory) {
+		try {
+			$this->backupService->checkRequirements();
+		} catch (Exception $e) {
+			$this->outputLine(sprintf('<error>%s</error>', $e->getMessage()));
+			$this->sendAndExit(1);
+		}
+
+		try {
+			$this->backupService->setBackupDirectory($backupDirectory);
+		} catch (\UnexpectedValueException $e) {
+			$this->outputLine(sprintf('<error>%s</error>', $e->getMessage()));
+			$this->sendAndExit(1);
+		}
+
+		$this->backupService->setBackupFilename();
+		$this->backupService->setMysqldumpCommandLine();
+		$this->backupService->process();
+		$this->output->outputLine('Backup created.');
 	}
 }
