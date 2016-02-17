@@ -99,10 +99,15 @@ class ConsoleBootstrap extends Bootstrap {
 		if ($classLoader) {
 			$this->initializeClassLoader($classLoader);
 		}
+		if (is_callable(array($this, 'setRequestType'))) {
+			$this->defineTypo3RequestTypes();
+			$this->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
+		}
 		$this->baseSetup();
 		$this->requireBaseClasses();
-		$this->defineTypo3RequestTypes();
-
+		if (!is_callable(array($this, 'setRequestType'))) {
+			$this->defineTypo3RequestTypes();
+		}
 		$this->requestId = uniqid();
 		$this->runLevel = new RunLevel();
 		$this->setEarlyInstance('Helhum\Typo3Console\Core\Booting\RunLevel', $this->runLevel);
@@ -224,43 +229,6 @@ class ConsoleBootstrap extends Bootstrap {
 		return array_pop($suitableRequestHandlers);
 	}
 
-
-
-	/**
-	 * Complete bootstrap in traditional order and with no possibility to inject steps
-	 */
-	public function runLegacyBootstrap() {
-		$this->initializeConfigurationManagement();
-		$this->defineDatabaseConstants();
-		$this->initializeCachingFramework();
-		Scripts::initializeClassLoaderCaches($this);
-		$this->registerExtDirectComponents();
-		if (is_callable(array($this, 'transferDeprecatedCurlSettings'))) {
-			$this->transferDeprecatedCurlSettings();
-		}
-		$this->setCacheHashOptions();
-		$this->initializeL10nLocales();
-		$this->convertPageNotFoundHandlingToBoolean();
-		if (method_exists($this, 'registerGlobalDebugFunctions')) {
-			$this->registerGlobalDebugFunctions();
-		}
-		$this->setMemoryLimit();
-		$this->loadTypo3LoadedExtAndExtLocalconf();
-		Scripts::initializeErrorHandling($this);
-		$this->applyAdditionalConfigurationSettings();
-		$this->initializeTypo3DbGlobal();
-		$this->loadExtensionTables();
-		$this->initializeBackendUser();
-		// TODO: avoid throwing a deprecation message with this call
-		$GLOBALS['BE_USER']->checkCLIuser();
-		$GLOBALS['BE_USER']->backendCheckLogin();
-		if (method_exists($this, 'initializeBackendUserMounts')) {
-			$this->initializeBackendUserMounts();
-		}
-		$this->initializeLanguageObject();
-		$this->flushOutputBuffers();
-	}
-
 	/*
 	 *  Additional Methods needed for the bootstrap sequences
 	 */
@@ -348,7 +316,7 @@ class ConsoleBootstrap extends Bootstrap {
 			);
 		}
 		$packageManager->injectDependencyResolver($dependencyResolver);
-		$packageManager->initialize($this);
+		$packageManager->init($this);
 		Utility\GeneralUtility::setSingletonInstance('TYPO3\\CMS\\Core\\Package\\PackageManager', $packageManager);
 	}
 

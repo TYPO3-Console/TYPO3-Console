@@ -21,9 +21,8 @@
     "license": "GPL-2.0+",
     "require": {
         "ext-Phar": "*",
-        "typo3/cms-core": "^7.6",
-        "symfony/console": "^2.7",
-        "symfony/process": "^2.7"
+        "symfony/console": ">=2.7|<3.1",
+        "symfony/process": ">=2.7|<3.1"
     },
     "require-dev": {
         "namelesscoder/typo3-repository-client": "1.1.x-dev",

@@ -36,7 +36,6 @@ class RunLevel {
 	const LEVEL_COMPILE = 'buildCompiletimeSequence';
 	const LEVEL_MINIMAL = 'buildBasicRuntimeSequence';
 	const LEVEL_FULL = 'buildExtendedRuntimeSequence';
-	const LEVEL_LEGACY = 'buildLegacySequence';
 
 	/**
 	 * @var array
@@ -216,18 +215,6 @@ class RunLevel {
 	}
 
 	/**
-	 * Complete bootstrap in traditional order and with no possibility to inject steps
-	 *
-	 * @return Sequence
-	 */
-	protected function buildLegacySequence() {
-		$sequence = new Sequence(self::LEVEL_LEGACY);
-		$this->addStep($sequence, 'helhum.typo3console:runLegacyBootstrap');
-
-		return $sequence;
-	}
-
-	/**
 	 * @param Sequence $sequence
 	 * @param string $stepIdentifier
 	 * @param bool $isDummyStep
@@ -282,11 +269,6 @@ class RunLevel {
 				$sequence->addStep(new Step('helhum.typo3console:authentication', $action), 'helhum.typo3console:extensionconfiguration');
 				break;
 
-			// Legacy booting
-			case 'helhum.typo3console:runLegacyBootstrap':
-				$sequence->addStep(new Step('helhum.typo3console:runLegacyBootstrap', array('Helhum\Typo3Console\Core\Booting\Scripts', 'runLegacyBootstrap')));
-				break;
-
 			default:
 				throw new \InvalidArgumentException('ERROR: cannot find step for identifier "' . $stepIdentifier . '"', 1402075819);
 		}
@@ -304,7 +286,7 @@ class RunLevel {
 			return $this->getMaximumAvailableRunLevel();
 		}
 		$options = $this->getOptionsForCommand($commandIdentifier);
-		return isset($options['runLevel']) ? $options['runLevel'] : self::LEVEL_LEGACY;
+		return isset($options['runLevel']) ? $options['runLevel'] : self::LEVEL_FULL;
 	}
 
 	/**
@@ -325,7 +307,7 @@ class RunLevel {
 		$availableRunlevel = $this->getMaximumAvailableRunLevel();
 		$isAvailable = TRUE;
 		if ($availableRunlevel === self::LEVEL_COMPILE) {
-			if (in_array($expectedRunLevel, array(self::LEVEL_FULL, self::LEVEL_MINIMAL, self::LEVEL_LEGACY))) {
+			if (in_array($expectedRunLevel, array(self::LEVEL_FULL, self::LEVEL_MINIMAL))) {
 				$isAvailable = FALSE;
 			}
 		}

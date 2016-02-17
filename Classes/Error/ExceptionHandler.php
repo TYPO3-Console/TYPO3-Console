@@ -45,7 +45,7 @@ class ExceptionHandler {
 	 * @param \Exception $exception The exception object
 	 * @return void
 	 */
-	public function handleException(\Exception $exception) {
+	public function handleException($exception) {
 		$pathPosition = strpos($exception->getFile(), 'ext/');
 		$filePathAndName = ($pathPosition !== FALSE) ? substr($exception->getFile(), $pathPosition) : $exception->getFile();
 

@@ -187,8 +187,14 @@ class Scripts {
 	static public function initializeAuthenticatedOperations(ConsoleBootstrap $bootstrap) {
 		$bootstrap->initializeBackendUser();
 		// TODO: avoid throwing a deprecation message with this call
-		$GLOBALS['BE_USER']->checkCLIuser();
-		$GLOBALS['BE_USER']->backendCheckLogin();
+		/** @var $backendUser \TYPO3\CMS\Core\Authentication\BackendUserAuthentication */
+		$backendUser = $GLOBALS['BE_USER'];
+		if (is_callable(array($backendUser, 'checkCLIuser'))) {
+			$backendUser->checkCLIuser();
+		} else {
+			self::loadCommandLineBackendUser('_CLI_lowlevel');
+		}
+		$backendUser->backendCheckLogin();
 		if (method_exists($bootstrap, 'initializeBackendUserMounts')) {
 			$bootstrap->initializeBackendUserMounts();
 		}
@@ -197,10 +203,26 @@ class Scripts {
 	}
 
 	/**
-	 * @param ConsoleBootstrap $bootstrap
+	 * If the backend script is in CLI mode, it will try to load a backend user named by the CLI module name (in lowercase)
+	 *
+	 * @param string $commandLineName the name of the module registered inside $TYPO3_CONF_VARS[SC_OPTIONS][GLOBAL][cliKeys] as second parameter
+	 * @throws \RuntimeException if a non-admin Backend user could not be loaded
 	 */
-	static public function runLegacyBootstrap(ConsoleBootstrap $bootstrap) {
-		$bootstrap->runLegacyBootstrap();
+	static protected function loadCommandLineBackendUser($commandLineName) {
+		if ($GLOBALS['BE_USER']->user['uid']) {
+			throw new \RuntimeException('Another user was already loaded which is impossible in CLI mode!', 3);
+		}
+		if (!\TYPO3\CMS\Core\Utility\StringUtility::beginsWith($commandLineName, '_CLI_')) {
+			throw new \RuntimeException('Module name, "' . $commandLineName . '", was not prefixed with "_CLI_"', 3);
+		}
+		$userName = strtolower($commandLineName);
+		$GLOBALS['BE_USER']->setBeUserByName($userName);
+		if (!$GLOBALS['BE_USER']->user['uid']) {
+			throw new \RuntimeException('No backend user named "' . $userName . '" was found!', 3);
+		}
+		if ($GLOBALS['BE_USER']->isAdmin()) {
+			throw new \RuntimeException('CLI backend user "' . $userName . '" was ADMIN which is not allowed!', 3);
+		}
 	}
 
 	/**

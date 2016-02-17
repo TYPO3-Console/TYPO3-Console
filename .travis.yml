@@ -3,6 +3,7 @@ language: php
 php:
   - 5.5
   - 5.6
+  - 7
 
 env:
   global:
@@ -11,28 +12,31 @@ env:
     - TYPO3_VERSION=^7.6
     - TYPO3_VERSION=dev-master
 
+matrix:
+  allow_failures:
+    - env: TYPO3_VERSION=dev-master
+
 sudo: false
+cache:
+  directories:
+    - $HOME/.composer/cache
 
 addons:
   apt:
     packages:
       - parallel
 
-cache:
-  directories:
-    - $HOME/.composer/cache
-
 notifications:
   email:
     - helmut@typo3.org
 
 before_install:
+  - phpenv config-rm xdebug.ini
   - composer self-update
   - composer --version
   - if [ "$GITHUB_COMPOSER_AUTH" ]; then composer config -g github-oauth.github.com $GITHUB_COMPOSER_AUTH; fi
 
 before_script:
-  - phpenv config-rm xdebug.ini
   - composer require typo3/cms=$TYPO3_VERSION
   # We currently need to get rid of the typo3/cms requirement in composer.json
   - git reset --hard HEAD
