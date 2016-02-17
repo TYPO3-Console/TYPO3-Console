@@ -54,7 +54,7 @@ class SchemaService implements SingletonInterface
      */
     protected $schemaUpdateTypesStatementTypesMapping = array(
         SchemaUpdateType::FIELD_ADD => array('add'),
-        SchemaUpdateType::FIELD_CHANGE => array('change', 'change_currentValue'),
+        SchemaUpdateType::FIELD_CHANGE => array('change'),
         SchemaUpdateType::FIELD_DROP => array('drop'),
         SchemaUpdateType::TABLE_ADD => array('create_table'),
         SchemaUpdateType::TABLE_CHANGE => array('change_table'),
