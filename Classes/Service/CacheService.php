@@ -36,6 +36,7 @@ use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
+use TYPO3\CMS\Core\Service\OpcodeCacheService;
 
 /**
  * Class CacheService
@@ -107,6 +108,7 @@ class CacheService implements SingletonInterface
             $this->forceFlushCoreFileAndDatabaseCaches();
         }
         $this->cacheManager->flushCaches();
+        $this->flushOpcodeCache();
     }
 
     /**
@@ -156,6 +158,14 @@ class CacheService implements SingletonInterface
                 $this->flushByTags($tags, $group);
             }
         }
+    }
+
+    /**
+     * Flushes PHP opcode cache
+     */
+    public function flushOpcodeCache()
+    {
+        GeneralUtility::makeInstance(OpcodeCacheService::class)->clearAllActive();
     }
 
     /**

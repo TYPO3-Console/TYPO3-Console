@@ -108,6 +108,20 @@ class CacheCommandController extends CommandController
     }
 
     /**
+     * Flushes PHP opcode cache
+     */
+    public function flushOpcodeCacheCommand()
+    {
+        try {
+            $this->cacheService->flushOpcodeCache();
+            $this->outputLine('Flushed all available opcode caches');
+        } catch (\Exception $e) {
+            $this->outputLine($e->getMessage());
+            $this->sendAndExit(1);
+        }
+    }
+
+    /**
      * Warmup essential caches such as class and core caches
      */
     public function warmupCommand()
