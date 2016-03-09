@@ -353,6 +353,7 @@ class ConsoleBootstrap extends Bootstrap {
 		/** @var PackageManager $packageManager */
 		$packageManager = $this->getEarlyInstance($this->packageManagerInstanceName);
 		if ($packageManager->isPackageActive('dbal')) {
+			$cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
 			$cacheConfigurations['dbal'] = array(
 				'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\TransientMemoryBackend',
 				'groups' => array()
