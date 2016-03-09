@@ -195,9 +195,6 @@ class RunLevel
         if (empty($this->executedSequences[self::LEVEL_COMPILE])) {
             // Only execute if not already executed in compile time
             $sequence->addStep(new Step('helhum.typo3console:providecleanclassimplementations', array('Helhum\Typo3Console\Core\Booting\Scripts', 'provideCleanClassImplementations')), 'helhum.typo3console:extensionconfiguration');
-        } else {
-            // Fix core caches that were disabled in compile time
-            $this->addStep($sequence, 'helhum.typo3console:enablecorecaches');
         }
 
         $this->executedSequences[self::LEVEL_MINIMAL] = true;
@@ -218,6 +215,8 @@ class RunLevel
         $this->addStep($sequence, 'helhum.typo3console:database', !empty($this->executedSequences[self::LEVEL_FULL]));
         $this->addStep($sequence, 'helhum.typo3console:persistence', !empty($this->executedSequences[self::LEVEL_FULL]));
         $this->addStep($sequence, 'helhum.typo3console:authentication', !empty($this->executedSequences[self::LEVEL_FULL]));
+        // Fix core caches that were disabled beforehand
+        $this->addStep($sequence, 'helhum.typo3console:enablecorecaches');
 
         $this->executedSequences[self::LEVEL_FULL] = true;
         return $sequence;
@@ -262,7 +261,7 @@ class RunLevel
                 break;
             case 'helhum.typo3console:enablecorecaches':
                 $action = $isDummyStep ? function () {} : array('Helhum\Typo3Console\Core\Booting\Scripts', 'reEnableOriginalCoreCaches');
-                $sequence->addStep(new Step('helhum.typo3console:enablecorecaches', $action), 'helhum.typo3console:coreconfiguration');
+                $sequence->addStep(new Step('helhum.typo3console:enablecorecaches', $action), 'helhum.typo3console:authentication');
                 break;
 
             // Part of full runtime

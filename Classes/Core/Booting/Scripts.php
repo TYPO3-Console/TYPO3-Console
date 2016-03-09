@@ -48,7 +48,6 @@ class Scripts
     public static function initializeConfigurationManagement(ConsoleBootstrap $bootstrap)
     {
         $bootstrap->initializeConfigurationManagement();
-        self::$earlyCachesConfiguration = $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
         self::disableCachesForObjectManagement();
     }
 
@@ -63,19 +62,9 @@ class Scripts
                 'extbase_typo3dbbackend_queries',
                 'extbase_datamapfactory_datamap',
             ) as $id) {
-            if (!isset($cacheConfigurations[$id])) {
-                self::$earlyCachesConfiguration[$id] = array(
-                    'groups' => array('system')
-                );
-
-                $cacheConfigurations[$id] = array(
-                    'groups' => array('system'),
-                    'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend'
-                );
-            } else {
-                $cacheConfigurations[$id]['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
-                $cacheConfigurations[$id]['options'] = array();
-            }
+            self::$earlyCachesConfiguration[$id] = $cacheConfigurations[$id];
+            $cacheConfigurations[$id]['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
+            $cacheConfigurations[$id]['options'] = array();
         }
     }
 
@@ -99,6 +88,17 @@ class Scripts
      */
     public static function disableCoreCaches(ConsoleBootstrap $bootstrap)
     {
+        $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
+        foreach (
+            array(
+                'cache_core',
+                'cache_classes',
+                'dbal',
+            ) as $id) {
+            if (isset($cacheConfigurations[$id])) {
+                self::$earlyCachesConfiguration[$id] = $cacheConfigurations[$id];
+            }
+        }
         $bootstrap->disableCoreCaches();
     }
 
@@ -110,7 +110,7 @@ class Scripts
      */
     public static function reEnableOriginalCoreCaches(ConsoleBootstrap $bootstrap)
     {
-        $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'] = self::$earlyCachesConfiguration;
+        $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'] = array_replace_recursive($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'], self::$earlyCachesConfiguration);
 
         /** @var CacheManager $cacheManager */
         $cacheManager = $bootstrap->getEarlyInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager');
