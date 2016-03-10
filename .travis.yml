@@ -66,3 +66,22 @@ script:
   - ./typo3cms database:updateschema "*"
   - ./typo3cms documentation:generatexsd TYPO3\\CMS\\Fluid\\ViewHelpers > /dev/null
   - rm -f typo3conf/PackageStates.php && ./typo3cms install:generatepackagestates && [ -f "typo3conf/PackageStates.php" ]
+
+after_script:
+  - >
+    if [ -n "$TRAVIS_TAG" ] && [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
+      echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n"
+
+      export PATH=$HOME/.composer/vendor/bin:$(npm bin):$PATH
+      cd ../../
+      npm install
+      travis-after-all;
+
+      if [ $? -eq 0 ]; then
+        TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
+
+        echo "Uploading release ${TRAVIS_TAG} to TER"
+        .Build/bin/upload . "$TYPO3_ORG_USERNAME" "$TYPO3_ORG_PASSWORD" "$TAG_MESSAGE"
+      fi;
+    fi;
+

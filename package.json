@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "travis-after-all": "^1.4.4"
+  }
+}
