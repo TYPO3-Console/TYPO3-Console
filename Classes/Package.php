@@ -86,6 +86,8 @@ class Package extends \TYPO3\CMS\Core\Package\Package
 
         $bootstrap->setRunLevelForCommand('typo3_console:install:databasedata', RunLevel::LEVEL_MINIMAL);
         $bootstrap->addBootingStepForCommand('typo3_console:install:databasedata', 'helhum.typo3console:database');
+        $bootstrap->setRunLevelForCommand('typo3_console:install:defaultconfiguration', RunLevel::LEVEL_MINIMAL);
+        $bootstrap->addBootingStepForCommand('typo3_console:install:defaultconfiguration', 'helhum.typo3console:database');
         $bootstrap->setRunLevelForCommand('typo3_console:install:*', RunLevel::LEVEL_COMPILE);
 
         $bootstrap->setRunLevelForCommand('typo3_console:cache:flush', RunLevel::LEVEL_COMPILE);
