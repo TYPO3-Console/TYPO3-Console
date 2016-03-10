@@ -22,12 +22,11 @@ $EM_CONF[$_EXTKEY] = array (
   'CGLcompliance' => '',
   'CGLcompliance_note' => '',
   'version' => '1.2.5',
-  '_md5_values_when_last_written' => '',
   'constraints' => 
   array (
     'depends' => 
     array (
-      'typo3' => '7.4.0-7.99.99',
+      'typo3' => '7.6.0-7.6.99',
     ),
     'conflicts' => 
     array (
