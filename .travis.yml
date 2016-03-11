@@ -72,12 +72,9 @@ after_script:
     if [ -n "$TRAVIS_TAG" ] && [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
       echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n"
 
-      export PATH=$HOME/.composer/vendor/bin:$(npm bin):$PATH
-      cd ../../
-      npm install
-      travis-after-all;
-
+      curl -sSL https://raw.githubusercontent.com/alrra/travis-after-all/1.4.4/lib/travis-after-all.js | node
       if [ $? -eq 0 ]; then
+        cd ../../
         TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
 
         echo "Uploading release ${TRAVIS_TAG} to TER"
