@@ -27,6 +27,7 @@ namespace Helhum\Typo3Console\Package;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\Package;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
@@ -37,24 +38,14 @@ use TYPO3\CMS\Core\Package\PackageManager;
 class UncachedPackageManager extends PackageManager
 {
     /**
-     * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
+     * @param Bootstrap $bootstrap
      */
-    public function init(\TYPO3\Flow\Core\Bootstrap $bootstrap)
+    public function init(Bootstrap $bootstrap)
     {
-        $this->bootstrap = $bootstrap;
-
         $this->loadPackageStates();
         $this->initializePackageObjects();
         $this->initializeCompatibilityLoadedExtArray();
 
-        // @deprecated since 7.4 will be removed once 6.2 compatibility is removed
-        foreach ($this->activePackages as $package) {
-            /** @var $package Package */
-            if (!is_callable(array($package, 'boot'))) {
-                break;
-            }
-            $package->boot($bootstrap);
-        }
         $this->getPackage('typo3_console')->bootPackage($bootstrap);
     }
 

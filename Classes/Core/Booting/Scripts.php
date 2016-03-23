@@ -127,24 +127,14 @@ class Scripts
      */
     public static function initializeCachingFramework(ConsoleBootstrap $bootstrap)
     {
-        // Cache framework initialisation for TYPO3 CMS <= 7.3
-        if (class_exists('TYPO3\\CMS\\Core\\Cache\\Cache')) {
-            $bootstrap->setEarlyInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager', \TYPO3\CMS\Core\Cache\Cache::initializeCachingFramework());
-            // @deprecated since 6.2 will be removed in two versions
-            if (class_exists('TYPO3\\CMS\\Core\\Compatibility\\GlobalObjectDeprecationDecorator')) {
-                $GLOBALS['typo3CacheManager'] = new \TYPO3\CMS\Core\Compatibility\GlobalObjectDeprecationDecorator('TYPO3\\CMS\\Core\\Cache\\CacheManager');
-                $GLOBALS['typo3CacheFactory'] = new \TYPO3\CMS\Core\Compatibility\GlobalObjectDeprecationDecorator('TYPO3\\CMS\\Core\\Cache\\CacheFactory');
-            }
-        } else {
-            $cacheManager = new \TYPO3\CMS\Core\Cache\CacheManager();
-            $cacheManager->setCacheConfigurations($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']);
-            \TYPO3\CMS\Core\Utility\GeneralUtility::setSingletonInstance(\TYPO3\CMS\Core\Cache\CacheManager::class, $cacheManager);
+        $cacheManager = new \TYPO3\CMS\Core\Cache\CacheManager();
+        $cacheManager->setCacheConfigurations($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']);
+        \TYPO3\CMS\Core\Utility\GeneralUtility::setSingletonInstance(\TYPO3\CMS\Core\Cache\CacheManager::class, $cacheManager);
 
-            $cacheFactory = new \TYPO3\CMS\Core\Cache\CacheFactory('production', $cacheManager);
-            \TYPO3\CMS\Core\Utility\GeneralUtility::setSingletonInstance(\TYPO3\CMS\Core\Cache\CacheFactory::class, $cacheFactory);
+        $cacheFactory = new \TYPO3\CMS\Core\Cache\CacheFactory('production', $cacheManager);
+        \TYPO3\CMS\Core\Utility\GeneralUtility::setSingletonInstance(\TYPO3\CMS\Core\Cache\CacheFactory::class, $cacheFactory);
 
-            $bootstrap->setEarlyInstance(\TYPO3\CMS\Core\Cache\CacheManager::class, $cacheManager);
-        }
+        $bootstrap->setEarlyInstance(\TYPO3\CMS\Core\Cache\CacheManager::class, $cacheManager);
     }
 
     /**
@@ -153,21 +143,6 @@ class Scripts
     public static function initializeDatabaseConnection(ConsoleBootstrap $bootstrap)
     {
         $bootstrap->initializeDatabaseConnection();
-    }
-
-    /**
-     * @param ConsoleBootstrap $bootstrap
-     */
-    public static function initializeClassLoaderCaches(ConsoleBootstrap $bootstrap)
-    {
-        if (is_callable(array($bootstrap, 'initializeClassLoaderCaches'))) {
-            $bootstrap->initializeClassLoaderCaches();
-            $packageStatesPathAndFilename = PATH_typo3conf . 'PackageStates.php';
-            $mTime = @filemtime($packageStatesPathAndFilename);
-            $bootstrap->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader')
-                ->setCacheIdentifier(md5($packageStatesPathAndFilename . $mTime))
-                ->setPackages($bootstrap->getEarlyInstance('TYPO3\\Flow\\Package\\PackageManager')->getActivePackages());
-        }
     }
 
     /**
@@ -197,18 +172,10 @@ class Scripts
     public static function initializeAuthenticatedOperations(ConsoleBootstrap $bootstrap)
     {
         $bootstrap->initializeBackendUser();
-        // TODO: avoid throwing a deprecation message with this call
+        self::loadCommandLineBackendUser('_CLI_lowlevel');
         /** @var $backendUser \TYPO3\CMS\Core\Authentication\BackendUserAuthentication */
         $backendUser = $GLOBALS['BE_USER'];
-        if (is_callable(array($backendUser, 'checkCLIuser'))) {
-            $backendUser->checkCLIuser();
-        } else {
-            self::loadCommandLineBackendUser('_CLI_lowlevel');
-        }
         $backendUser->backendCheckLogin();
-        if (method_exists($bootstrap, 'initializeBackendUserMounts')) {
-            $bootstrap->initializeBackendUserMounts();
-        }
         // Global language object on CLI? rly? but seems to be needed by some scheduler tasks :(
         $bootstrap->initializeLanguageObject();
     }

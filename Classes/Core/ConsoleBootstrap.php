@@ -60,12 +60,6 @@ class ConsoleBootstrap extends Bootstrap
     protected $runLevel;
 
     /**
-     * @deprecated with 6.2 will be removed with 7
-     * @var string
-     */
-    protected $packageManagerInstanceName = 'TYPO3\\Flow\\Package\\PackageManager';
-
-    /**
      * @var string $context Application context
      */
     public function __construct($context)
@@ -98,16 +92,15 @@ class ConsoleBootstrap extends Bootstrap
      */
     public function run($classLoader = null)
     {
-        // @deprecated in 6.2, will be removed in 7.0 (condition will be removed)
-        if ($classLoader) {
-            $this->initializeClassLoader($classLoader);
-        }
+        $this->initializeClassLoader($classLoader);
+        // @deprecated in TYPO3 8. Condition will be removed when TYPO3 7.6 support is removed
         if (is_callable(array($this, 'setRequestType'))) {
             $this->defineTypo3RequestTypes();
             $this->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
         }
         $this->baseSetup();
-        $this->requireBaseClasses();
+        $this->requireLibraries();
+        // @deprecated in TYPO3 8 will be removed when TYPO3 7.6 support is removed
         if (!is_callable(array($this, 'setRequestType'))) {
             $this->defineTypo3RequestTypes();
         }
@@ -116,10 +109,6 @@ class ConsoleBootstrap extends Bootstrap
         $this->setEarlyInstance('Helhum\Typo3Console\Core\Booting\RunLevel', $this->runLevel);
         new ExceptionHandler();
 
-        // @deprecated in 6.2, will be removed in 7.0
-        if (!$classLoader) {
-            $this->initializeClassLoader(null);
-        }
         $this->initializeCommandManager();
         $this->initializePackageManagement();
 
@@ -257,45 +246,20 @@ class ConsoleBootstrap extends Bootstrap
      */
     public function baseSetup($pathPart = '')
     {
-        // @deprecated in 6.2 will be removed in 7
-        if (is_callable(array(__CLASS__, 'initializeComposerClassLoader'))) {
-            $this->setEarlyInstance('Composer\\Autoload\\ClassLoader', self::initializeComposerClassLoader());
-        }
-        // @deprecated in 6.2 will be removed in 7
-        if (!class_exists('TYPO3\\Flow\\Package\\PackageManager')) {
-            $this->packageManagerInstanceName = 'TYPO3\\CMS\\Core\\Package\\PackageManager';
-            class_alias('TYPO3\\CMS\\Core\\Package\\PackageManager', 'TYPO3\\Flow\\Package\\PackageManager');
-        }
-        // @deprecated in 6.2 will be removed in 7
-        class_alias('TYPO3\\CMS\\Core\\Core\\Bootstrap', 'TYPO3\\Flow\\Core\\Bootstrap');
-
         define('TYPO3_MODE', 'BE');
         // @deprecated to define this constant. Can be removed when TYPO3 7 support is removed
         define('TYPO3_cliMode', true);
         $GLOBALS['MCONF']['name'] = '_CLI_lowlevel';
         parent::baseSetup($pathPart);
         // I want to see deprecation messages
-//        error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
-        // I would love to see deprecation messages, but unfortunately TYPO3 core itself triggers such messages :(
-        error_reporting(E_ALL & ~(E_STRICT | E_NOTICE | E_DEPRECATED));
+        error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
     }
 
     /**
-     * Classes required prior to class loader
+     * Require libraries, in case TYPO3 is in non composer mode
      */
-    protected function requireBaseClasses()
+    protected function requireLibraries()
     {
-        require_once __DIR__ . '/../Error/ErrorHandler.php';
-        require_once __DIR__ . '/../Error/ExceptionHandler.php';
-        require_once __DIR__ . '/../Mvc/Cli/RequestHandler.php';
-        require_once __DIR__ . '/Booting/Sequence.php';
-        require_once __DIR__ . '/Booting/Step.php';
-        require_once __DIR__ . '/Booting/Scripts.php';
-        require_once __DIR__ . '/Booting/RunLevel.php';
-        require_once __DIR__ . '/../Mvc/Cli/CommandManager.php';
-        if (!interface_exists('Symfony\\Component\\Console\\Output\\OutputInterface')) {
-            require_once __DIR__ . '/../../Libraries/symfony-console.phar';
-        }
         if (!class_exists('Symfony\\Component\\Process\\Process')) {
             require_once __DIR__ . '/../../Libraries/symfony-process.phar';
         }
@@ -313,19 +277,12 @@ class ConsoleBootstrap extends Bootstrap
         require __DIR__ . '/../Package/UncachedPackageManager.php';
 
         $packageManager = new \Helhum\Typo3Console\Package\UncachedPackageManager();
-        $this->setEarlyInstance($this->packageManagerInstanceName, $packageManager);
+        $this->setEarlyInstance('TYPO3\\CMS\\Core\\Package\\PackageManager', $packageManager);
         Utility\ExtensionManagementUtility::setPackageManager($packageManager);
-        // @deprecated in 6.2, will be removed in 7.0
-        if (is_callable(array($packageManager, 'injectClassLoader'))) {
-            $packageManager->injectClassLoader($this->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader'));
-        }
         $dependencyResolver = Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Package\\DependencyResolver');
-        // required since 7.4
-        if (is_callable(array($dependencyResolver, 'injectDependencyOrderingService'))) {
-            $dependencyResolver->injectDependencyOrderingService(
-                Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Service\\DependencyOrderingService')
-            );
-        }
+        $dependencyResolver->injectDependencyOrderingService(
+            Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Service\\DependencyOrderingService')
+        );
         $packageManager->injectDependencyResolver($dependencyResolver);
         $packageManager->init($this);
         Utility\GeneralUtility::setSingletonInstance('TYPO3\\CMS\\Core\\Package\\PackageManager', $packageManager);
@@ -333,15 +290,9 @@ class ConsoleBootstrap extends Bootstrap
 
     public function disableCoreCaches()
     {
-        // @deprecated in 6.2, will be removed in 7.0
-        if (is_callable(array(__CLASS__, 'disableCoreAndClassesCache'))) {
-            $this->disableCoreAndClassesCache();
-            $this->initializeUncachedClassLoader();
-        } else {
-            $this->disableCoreCache();
-        }
+        $this->disableCoreCache();
         /** @var PackageManager $packageManager */
-        $packageManager = $this->getEarlyInstance($this->packageManagerInstanceName);
+        $packageManager = $this->getEarlyInstance('TYPO3\\CMS\\Core\\Package\\PackageManager');
         if ($packageManager->isPackageActive('dbal')) {
             $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
             $cacheConfigurations['dbal'] = array(
@@ -349,19 +300,6 @@ class ConsoleBootstrap extends Bootstrap
                 'groups' => array()
             );
         }
-    }
-
-    protected function initializeUncachedClassLoader()
-    {
-        $classLoader = $this->getEarlyInstance('TYPO3\\CMS\\Core\\Core\\ClassLoader');
-        $classLoader->injectClassesCache(new StringFrontend('cache_classes', new TransientMemoryBackend($this->getApplicationContext())));
-
-        $reflectionObject = new \ReflectionObject($classLoader);
-        $property = $reflectionObject->getProperty('isLoadingLocker');
-        $property->setAccessible(true);
-        $property->setValue($classLoader, true);
-
-        $classLoader->setPackages($this->getEarlyInstance($this->packageManagerInstanceName)->getActivePackages());
     }
 
     public function initializeConfigurationManagement()

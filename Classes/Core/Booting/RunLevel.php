@@ -148,7 +148,6 @@ class RunLevel
         $this->addStep($sequence, 'helhum.typo3console:coreconfiguration', !empty($this->executedSequences[self::LEVEL_ESSENTIAL]));
         $this->addStep($sequence, 'helhum.typo3console:caching', !empty($this->executedSequences[self::LEVEL_ESSENTIAL]));
         $this->addStep($sequence, 'helhum.typo3console:errorhandling', !empty($this->executedSequences[self::LEVEL_ESSENTIAL]));
-        $this->addStep($sequence, 'helhum.typo3console:classloadercache', !empty($this->executedSequences[self::LEVEL_ESSENTIAL]));
 
         $this->executedSequences[self::LEVEL_ESSENTIAL] = true;
         return $sequence;
@@ -164,7 +163,6 @@ class RunLevel
         $sequence = $this->buildEssentialSequence(self::LEVEL_COMPILE);
 
         $this->addStep($sequence, 'helhum.typo3console:disablecorecaches');
-        $sequence->removeStep('helhum.typo3console:classloadercache');
 
         $sequence->addStep(new Step('helhum.typo3console:loadextbaseconfiguration', function () {
             // TODO: hack alarm :) We remove this in order to prevent double inclusion of the ext_localconf.php
@@ -244,10 +242,6 @@ class RunLevel
                 $action = $isDummyStep ? function () {} : array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeErrorHandling');
                 $sequence->addStep(new Step('helhum.typo3console:errorhandling', $action));
                 break;
-            case 'helhum.typo3console:classloadercache':
-                $action = $isDummyStep ? function () {} : array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeClassLoaderCaches');
-                $sequence->addStep(new Step('helhum.typo3console:classloadercache', $action));
-                break;
 
             // Part of compiletime sequence
             case 'helhum.typo3console:disablecorecaches':
@@ -257,7 +251,7 @@ class RunLevel
             // Part of basic runtime
             case 'helhum.typo3console:extensionconfiguration':
                 $action = $isDummyStep ? function () {} : array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeExtensionConfiguration');
-                $sequence->addStep(new Step('helhum.typo3console:extensionconfiguration', $action), 'helhum.typo3console:classloadercache');
+                $sequence->addStep(new Step('helhum.typo3console:extensionconfiguration', $action));
                 break;
             case 'helhum.typo3console:enablecorecaches':
                 $action = $isDummyStep ? function () {} : array('Helhum\Typo3Console\Core\Booting\Scripts', 'reEnableOriginalCoreCaches');

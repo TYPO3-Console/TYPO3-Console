@@ -27,9 +27,9 @@ namespace Helhum\Typo3Console\Mvc\Cli;
 
 use Helhum\Typo3Console\Core\Booting\Scripts;
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
+use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\Flow\Core\Bootstrap;
 
 /**
  * The generic command line interface request handler for the MVC framework.

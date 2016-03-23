@@ -29,6 +29,8 @@ namespace Helhum\Typo3Console;
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
+use Helhum\Typo3Console\Core\ConsoleBootstrap as Bootstrap;
+use TYPO3\CMS\Core\Package\PackageManager;
 
 /**
  * Class Package
@@ -41,13 +43,13 @@ class Package extends \TYPO3\CMS\Core\Package\Package
     protected $namespace = 'Helhum\\Typo3Console';
 
     /**
-     * @param \TYPO3\Flow\Package\PackageManager $packageManager
+     * @param PackageManager $packageManager
      * @param string $packageKey
      * @param string $packagePath
      * @param string|null $classesPath
      * @param string $manifestPath
      */
-    public function __construct(\TYPO3\Flow\Package\PackageManager $packageManager, $packageKey, $packagePath, $classesPath = null, $manifestPath = '')
+    public function __construct(PackageManager $packageManager, $packageKey, $packagePath, $classesPath = null, $manifestPath = '')
     {
         \TYPO3\CMS\Core\Package\Package::__construct($packageManager, $packageKey, $packagePath, $classesPath, $manifestPath);
         if (!file_exists(PATH_site . 'typo3conf/PackageStates.php')) {
@@ -59,20 +61,20 @@ class Package extends \TYPO3\CMS\Core\Package\Package
     /**
      * Register the cli request handler only when in cli mode
      *
-     * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
+     * @param Bootstrap $bootstrap
      */
-    public function bootPackage(\TYPO3\Flow\Core\Bootstrap $bootstrap)
+    public function bootPackage(Bootstrap $bootstrap)
     {
-        if ((TYPO3_REQUESTTYPE & TYPO3_REQUESTTYPE_CLI) && is_callable(array($bootstrap, 'registerRequestHandler'))) {
+        if (TYPO3_REQUESTTYPE & TYPO3_REQUESTTYPE_CLI) {
             $bootstrap->registerRequestHandler(new RequestHandler($bootstrap));
             $this->registerCommands($bootstrap);
         }
     }
 
     /**
-     * @param \TYPO3\Flow\Core\Bootstrap $bootstrap
+     * @param Bootstrap $bootstrap
      */
-    protected function registerCommands(\TYPO3\Flow\Core\Bootstrap $bootstrap)
+    protected function registerCommands(Bootstrap $bootstrap)
     {
         $bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\CacheCommandController');
         $bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\BackendCommandController');
