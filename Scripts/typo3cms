@@ -39,6 +39,7 @@ call_user_func(function () {
         }
     }
     if (!isset($installationRootPath)) {
+        $path = getcwd();
         while ($path = $getParentDirectoryPath($path)) {
             if ($entryScriptExists($path)) {
                 $installationRootPath = $path;
