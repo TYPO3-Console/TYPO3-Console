@@ -27,7 +27,7 @@ namespace Helhum\Typo3Console\Composer;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use Composer\Script\CommandEvent;
+use Composer\Script\Event as ScriptEvent;
 use TYPO3\CMS\Composer\Plugin\Config;
 use TYPO3\CMS\Composer\Plugin\Util\Filesystem;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
@@ -47,24 +47,26 @@ class InstallerScripts
     /**
      * Called from composer
      *
-     * @param CommandEvent $event
+     * @param ScriptEvent $event
      * @return void
      */
-    public static function setupConsole(CommandEvent $event)
+    public static function setupConsole(ScriptEvent $event)
     {
         $config = self::getConfig($event);
         $installDir = self::getInstallDir($config);
+        $webDir = self::getWebDir($config);
+        $relativeWebDir = substr($webDir, strlen($installDir) + 1);
         $filesystem = new Filesystem();
         if ($event->getComposer()->getPackage()->getName() === 'helhum/typo3-console') {
-            $extDir = $installDir . 'typo3conf/ext/';
-            $consoleDir = $extDir . 'typo3_console';
+            $extDir = $webDir . '/typo3conf/ext';
+            $consoleDir = $extDir . '/typo3_console';
             if (!file_exists($consoleDir)) {
                 $filesystem->ensureDirectoryExists($extDir);
-                $filesystem->symlink($config->getBaseDir(), $consoleDir);
+                $filesystem->symlink($installDir, $consoleDir);
             }
         }
         $scriptName = self::isWindowsOs() ? 'typo3cms.bat' : 'typo3cms';
-        $success = self::safeCopy($scriptName, $installDir);
+        $success = self::safeCopy($webDir . '/' . self::BINARY_PATH . $scriptName, $installDir . '/' . $scriptName, $relativeWebDir);
         if (!$success) {
             $event->getIO()->write(sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName));
             $event->getIO()->write(sprintf(self::COPY_FAILED_MESSAGE, $scriptName));
@@ -74,10 +76,10 @@ class InstallerScripts
     /**
      * Called from composer
      *
-     * @param CommandEvent $event
+     * @param ScriptEvent $event
      * @return void
      */
-    public static function postUpdateAndInstall(CommandEvent $event)
+    public static function postUpdateAndInstall(ScriptEvent $event)
     {
         $event->getIO()->write('<info>Helhum\\Typo3Console\\Composer\\InstallerScripts::postUpdateAndInstall has been deprecated.</info>');
         $event->getIO()->write('<info>Please use Helhum\\Typo3Console\\Composer\\InstallerScripts::setupConsole instead!</info>');
@@ -90,7 +92,7 @@ class InstallerScripts
     public static function postInstallExtension()
     {
         $scriptName = self::isWindowsOs() ? 'typo3cms.bat' : 'typo3cms';
-        $success = self::safeCopy($scriptName, PATH_site);
+        $success = self::safeCopy(PATH_site . self::BINARY_PATH . $scriptName, PATH_site . $scriptName);
         if (!$success) {
             self::addFlashMessage(sprintf(self::COPY_FAILED_MESSAGE, $scriptName), sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName), AbstractMessage::WARNING);
         } else {
@@ -101,15 +103,13 @@ class InstallerScripts
     /**
      * Copy typo3cms command to root directory taking several possible situations into account
      *
-     * @param string $scriptName The script that should be copied (depending on OS)
-     * @param string $pathPrefix directory prefix
+     * @param string $fullSourcePath Path to the script that should be copied (depending on OS)
+     * @param string $fullTargetPath Target path to which the script should be copied to
+     * @param string $relativeWebDir Relative path to the web directory (which equals the TYPO3 root directory currently)
      * @return bool
      */
-    protected static function safeCopy($scriptName, $pathPrefix)
+    protected static function safeCopy($fullSourcePath, $fullTargetPath, $relativeWebDir = '')
     {
-        $fullSourcePath = $pathPrefix . self::BINARY_PATH . $scriptName;
-        $fullTargetPath = $pathPrefix . $scriptName;
-
         if (file_exists($fullTargetPath)) {
             if (!is_file($fullTargetPath)) {
                 // Seems to be a directory: ignore
@@ -127,8 +127,21 @@ class InstallerScripts
 
         $success = @copy($fullSourcePath, $fullTargetPath);
 
-        if ($success && !self::isWindowsOs()) {
-            $success = @chmod($fullTargetPath, 0755);
+        if ($success) {
+            if (!self::isWindowsOs()) {
+                $success = @chmod($fullTargetPath, 0755);
+            }
+            if (!empty($relativeWebDir) && !in_array($relativeWebDir, array('web', 'Web'))) {
+                $success = @file_put_contents(
+                    $fullTargetPath,
+                    str_replace(
+                        '{$replacedDuringComposerInstall}',
+                        $relativeWebDir,
+                        file_get_contents($fullTargetPath)
+                    )
+                );
+            }
+
         }
 
         return $success;
@@ -141,7 +154,7 @@ class InstallerScripts
      */
     protected static function isWindowsOs()
     {
-        if (!stristr(PHP_OS, 'darwin') && stristr(PHP_OS, 'win')) {
+        if (DIRECTORY_SEPARATOR === '\\') {
             return true;
         }
         return false;
@@ -173,14 +186,23 @@ class InstallerScripts
      */
     protected static function getInstallDir(Config $config)
     {
-        return rtrim($config->get('web-dir'), '\\/') . '/';
+        return realpath($config->getBaseDir());
     }
 
     /**
-     * @param CommandEvent $event
+     * @param Config $config
+     * @return string
+     */
+    protected static function getWebDir(Config $config)
+    {
+        return realpath($config->get('web-dir'));
+    }
+
+    /**
+     * @param ScriptEvent $event
      * @return Config
      */
-    protected static function getConfig(CommandEvent $event)
+    protected static function getConfig(ScriptEvent $event)
     {
         return Config::load($event->getComposer());
     }

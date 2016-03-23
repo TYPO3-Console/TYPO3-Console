@@ -285,10 +285,6 @@ class ConsoleBootstrap extends Bootstrap
      */
     protected function requireBaseClasses()
     {
-        require_once PATH_site . 'typo3/sysext/core/Classes/Exception.php';
-        require_once PATH_site . 'typo3/sysext/extbase/Classes/Mvc/Cli/CommandManager.php';
-        require_once PATH_site . 'typo3/sysext/extbase/Classes/Mvc/RequestHandlerInterface.php';
-
         require_once __DIR__ . '/../Error/ErrorHandler.php';
         require_once __DIR__ . '/../Error/ExceptionHandler.php';
         require_once __DIR__ . '/../Mvc/Cli/RequestHandler.php';
