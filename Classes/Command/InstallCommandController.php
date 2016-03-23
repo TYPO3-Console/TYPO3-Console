@@ -250,10 +250,11 @@ class InstallCommandController extends CommandController
     /**
      * Write default configuration
      *
+     * @param string $siteSetupType Specify the setup type: Download the list of distributions (loaddistribution), Create empty root page (createsite), Do nothing (donothing)
      * @internal
      */
-    public function defaultConfigurationCommand()
+    public function defaultConfigurationCommand($siteSetupType = 'createsite')
     {
-        $this->cliSetupRequestHandler->executeActionWithArguments('defaultConfiguration');
+        $this->cliSetupRequestHandler->executeActionWithArguments('defaultConfiguration', array('sitesetup' => $siteSetupType));
     }
 }
