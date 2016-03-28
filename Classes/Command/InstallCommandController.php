@@ -28,7 +28,6 @@ namespace Helhum\Typo3Console\Command;
  ***************************************************************/
 
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
-use TYPO3\CMS\Core\Package\Package;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -50,7 +49,13 @@ class InstallCommandController extends CommandController
     protected $cliSetupRequestHandler;
 
     /**
-     * Alpha version of a setup command. Use with care and at your own risk!
+     * @var \Helhum\Typo3Console\Install\PackageStatesGenerator
+     * @inject
+     */
+    protected $packageStatesGenerator;
+
+    /**
+     * TYPO3 Setup. Use as cli replacement for the web installation process.
      *
      * @param bool $nonInteractive
      * @param string $databaseUserName
@@ -76,116 +81,32 @@ class InstallCommandController extends CommandController
     }
 
     /**
-     * Activates all packages that are configured in root composer.json or are required
+     * Writes the typo3conf/PackageStates.php file.
      *
-     * @param bool $removeInactivePackages
+     * Marks the following extensions as active in the process:
+     * * third party extensions
+     * * all core extensions that are required (or part of minimal usable system)
+     * * all core extensions which are provided in the TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS environment variable
+     * Extension keys in this variable must be separated by comma and without spaces.
+     *
+     * Example: TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS="info,info_pagetsconfig" ./typo3cms install:generatepackagestates
+     *
+     * @param bool $removeInactiveSystemExtensions Inactive extensions are removed from typo3/sysext (Handle with care!)
      */
-    public function generatePackageStatesCommand($removeInactivePackages = false)
+    public function generatePackageStatesCommand($removeInactiveSystemExtensions = false)
     {
-        try {
-            $installationPackages = $this->getPackagesFromRootComposerFile();
-        } catch (\Exception $e) {
-            $this->outputLine('<error>' . $e->getMessage() . '</error>');
-            $this->quit(1);
-            return;
-        }
-        foreach ($this->packageManager->getAvailablePackages() as $package) {
-            if (
-                isset($installationPackages[$package->getPackageKey()])
-                || $package->isProtected()
-                || ($package instanceof Package && $package->isPartOfMinimalUsableSystem())
-            ) {
-                $this->packageManager->activatePackage($package->getPackageKey());
-            } else {
-                $this->packageManager->deactivatePackage($package->getPackageKey());
-                if ($removeInactivePackages) {
+        $this->packageStatesGenerator->generate($this->packageManager);
+
+        if ($removeInactiveSystemExtensions) {
+            $activePackages = $this->packageManager->getActivePackages();
+            foreach ($this->packageManager->getAvailablePackages() as $package) {
+                if (empty($activePackages[$package->getPackageKey()])) {
                     $this->packageManager->unregisterPackage($package);
                     GeneralUtility::flushDirectory($package->getPackagePath());
                     $this->outputLine('Removed Package: ' . $package->getPackageKey());
                 }
             }
-        }
-
-        $this->packageManager->forceSortAndSavePackageStates();
-    }
-
-    /**
-     * @return array Array of packages keys in root composer.json
-     */
-    protected function getPackagesFromRootComposerFile()
-    {
-        // Look up configured active packages
-        $configuredPackages = array();
-        if (file_exists(PATH_site . 'composer.json')) {
-            $composerData = json_decode(file_get_contents(PATH_site . 'composer.json'));
-            if (!is_object($composerData)) {
-                throw new \RuntimeException('composer.json seems to be invalid', 1444596471);
-            }
-            if (isset($composerData->extra->{'helhum/typo3-console'}->{'active-packages'})) {
-                $configuredPackages = $composerData->extra->{'helhum/typo3-console'}->{'active-packages'};
-            } elseif (isset($composerData->extra->{'active-packages'})) {
-                $configuredPackages = $composerData->extra->{'active-packages'};
-                $this->outputLine('<warning>Active packages configuration key changed. Please use extra["helhum/typo3-console"]["active-packages"]</warning>');
-            }
-            if (!is_array($configuredPackages)) {
-                throw new \RuntimeException('Active packages is not an array!', 1444656020);
-            }
-        }
-
-        // Determine non typo3-cms-extension packages installed by composer
-        $composerInstalledPackages = array();
-        $composerLockFile = PATH_site . 'composer.lock';
-        if (file_exists($composerLockFile)) {
-            $composerLock = json_decode(file_get_contents($composerLockFile));
-            if ($composerLock) {
-                foreach ($composerLock->packages as $package) {
-                    if (!in_array($package->type, array('typo3-cms-core', 'typo3-cms-framework'), true) && (!empty($package->source) || !empty($package->dist))) {
-                        $composerInstalledPackages[] = $this->getPackageKeyFromManifest($package);
-                    }
-                }
-            }
-        }
-
-        $allPackages = array_flip(array_merge($configuredPackages, $composerInstalledPackages));
-        if (empty($allPackages)) {
-            $this->outputLine('<warning>No packages found to activate! Only marking required and important TYPO3 packages as active!</warning>');
-        }
-        return $allPackages;
-    }
-
-    /**
-     * Resolves package key from Composer manifest
-     *
-     * If it is a TYPO3 package the name of the replaces section will be used.
-     *
-     * Else if the composer name of the package matches the first part of the lowercased namespace of the package, the mixed
-     * case version of the composer name / namespace will be used, with backslashes replaced by dots.
-     *
-     * Else the composer name will be used with the slash replaced by a dot
-     *
-     * @param object $manifest
-     * @return string
-     */
-    protected function getPackageKeyFromManifest($manifest)
-    {
-        if (isset($manifest->type) && substr($manifest->type, 0, 10) === 'typo3-cms-') {
-            if (!empty($manifest->replace)) {
-                $replaces = array_flip(json_decode(json_encode($manifest->replace), true));
-                foreach ($replaces as $replacedName) {
-                    if (strpos($replacedName, '/') === false) {
-                        $extensionKey = $replacedName;
-                        break;
-                    }
-                }
-            }
-            if (empty($extensionKey)) {
-                list(, $extensionKey) = explode('/', $manifest->name, 2);
-                $extensionKey = str_replace('-', '_', $extensionKey);
-            }
-            return $extensionKey;
-        } else {
-            $packageKey = str_replace('/', '.', $manifest->name);
-            return preg_replace('/[^A-Za-z0-9.]/', '', $packageKey);
+            $this->packageManager->forceSortAndSavePackageStates();
         }
     }
 
