@@ -92,7 +92,7 @@ class InstallerScripts
     public static function postInstallExtension()
     {
         $scriptName = self::isWindowsOs() ? 'typo3cms.bat' : 'typo3cms';
-        $success = self::safeCopy(PATH_site . self::BINARY_PATH . $scriptName, PATH_site . $scriptName);
+        $success = self::safeCopy(PATH_site . self::BINARY_PATH . $scriptName, PATH_site . $scriptName, '', false);
         if (!$success) {
             self::addFlashMessage(sprintf(self::COPY_FAILED_MESSAGE, $scriptName), sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName), AbstractMessage::WARNING);
         } else {
@@ -106,9 +106,10 @@ class InstallerScripts
      * @param string $fullSourcePath Path to the script that should be copied (depending on OS)
      * @param string $fullTargetPath Target path to which the script should be copied to
      * @param string $relativeWebDir Relative path to the web directory (which equals the TYPO3 root directory currently)
+     * @param bool $composerInstall Whether this is a composer install or not
      * @return bool
      */
-    protected static function safeCopy($fullSourcePath, $fullTargetPath, $relativeWebDir = '')
+    protected static function safeCopy($fullSourcePath, $fullTargetPath, $relativeWebDir = '', $composerInstall = true)
     {
         if (file_exists($fullTargetPath)) {
             if (!is_file($fullTargetPath)) {
@@ -133,7 +134,7 @@ class InstallerScripts
                 $fullTargetPath,
                 str_replace(
                     array('$composerInstall', '{$relative-web-dir}'),
-                    array('true', $relativeWebDir),
+                    array($composerInstall ? 'true' : 'false', $relativeWebDir),
                     file_get_contents($fullTargetPath)
                 )
             );
