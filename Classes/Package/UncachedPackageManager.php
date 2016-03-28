@@ -38,6 +38,11 @@ use TYPO3\CMS\Core\Package\PackageManager;
 class UncachedPackageManager extends PackageManager
 {
     /**
+     * @var bool
+     */
+    protected $forceSavePackageStates = false;
+
+    /**
      * @param Bootstrap $bootstrap
      */
     public function init(Bootstrap $bootstrap)
@@ -96,12 +101,26 @@ class UncachedPackageManager extends PackageManager
     }
 
     /**
+     * Overload original method because the stupid TYPO3 core
+     * tries to sort packages by dependencies before *DEACTIVATING* a package
+     * In this case we do nothing now until this TYPO3 bug is fixed.
+     */
+    protected function sortAvailablePackagesByDependencies()
+    {
+        if ($this->forceSavePackageStates) {
+            parent::sortAvailablePackagesByDependencies();
+        }
+    }
+
+    /**
      * To enable writing of the package states file the package states
      * migration needs to override eventual failsafe blocks.
      * This will be used during installation process.
      */
     public function forceSortAndSavePackageStates()
     {
+        $this->forceSavePackageStates = true;
         parent::sortAndSavePackageStates();
+        $this->forceSavePackageStates = false;
     }
 }
