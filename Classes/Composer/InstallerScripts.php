@@ -124,26 +124,20 @@ class InstallerScripts
                 return false;
             }
         }
-
         $success = @copy($fullSourcePath, $fullTargetPath);
-
-        if ($success) {
-            if (!self::isWindowsOs()) {
-                $success = @chmod($fullTargetPath, 0755);
-            }
-            if (!empty($relativeWebDir) && !in_array($relativeWebDir, array('web', 'Web'))) {
-                $success = @file_put_contents(
-                    $fullTargetPath,
-                    str_replace(
-                        '{$replacedDuringComposerInstall}',
-                        $relativeWebDir,
-                        file_get_contents($fullTargetPath)
-                    )
-                );
-            }
-
+        if ($success && !self::isWindowsOs()) {
+            $success = @chmod($fullTargetPath, 0755);
         }
-
+        if ($success) {
+            $success = @file_put_contents(
+                $fullTargetPath,
+                str_replace(
+                    array('$composerInstall', '{$relative-web-dir}'),
+                    array('true', $relativeWebDir),
+                    file_get_contents($fullTargetPath)
+                )
+            );
+        }
         return $success;
     }
 

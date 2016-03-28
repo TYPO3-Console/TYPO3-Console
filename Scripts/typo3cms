@@ -24,15 +24,18 @@ call_user_func(function () {
         array_pop($path);
         return implode('/', $path);
     };
-
     $paths = array(
         __DIR__,
         getcwd(),
         __DIR__ . '/Web',
         __DIR__ . '/web',
-        __DIR__ . '/{$replacedDuringComposerInstall}',
     );
-    if (getenv('TYPO3_PATH_WEB')) {
+    if (!empty($composerInstall)) {
+        array_unshift($paths, __DIR__ . '/{$relative-web-dir}');
+        if (!defined('TYPO3_CONSOLE_ROOT')) {
+            define('TYPO3_CONSOLE_ROOT', __DIR__);
+        }
+    } elseif (getenv('TYPO3_PATH_WEB')) {
         array_unshift($paths, rtrim(getenv('TYPO3_PATH_WEB'), '\\/'));
     }
     foreach ($paths as $path) {
