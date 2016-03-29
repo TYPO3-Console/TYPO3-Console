@@ -54,15 +54,6 @@ class UncachedPackageManager extends PackageManager
         $this->getPackage('typo3_console')->bootPackage($bootstrap);
     }
 
-    /**
-     * Intended to be called by the cache warmup only
-     * @internal
-     */
-    public function populatePackageCache()
-    {
-        $this->saveToPackageCache();
-    }
-
     protected function loadPackageStates()
     {
         $this->packageStatesConfiguration = file_exists($this->packageStatesPathAndFilename) ? include($this->packageStatesPathAndFilename) : array();

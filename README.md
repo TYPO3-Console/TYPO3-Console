@@ -28,11 +28,14 @@ just type:
 
 ## Features
 * Command line tool
+* TYPO3 installation from command line
 * Flexible bootstrap for commands (not every command needs a fully bootstrapped framework)
-* Cache flush and core cache warmup commands
+* Reliable cache flush commands
 * Scheduler command
 * Backend lock/unlock commands
 * Reference Index commands
+* Many commands useful for deployment
+* …
 * Support for all other Extbase command controllers
 
 

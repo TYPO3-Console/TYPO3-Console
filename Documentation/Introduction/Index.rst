@@ -59,9 +59,6 @@ Additionally it provides some commands, that wouldn't be possible at all with th
 		--admin-password="password" \
 		--site-name="Travis Install"
 
-	# Populate essential core caches
-	./typo3cms cache:warmup
-
 	# Perform safe database schema updates
 	./typo3cms database:updateschema "*.add,*.change"
 

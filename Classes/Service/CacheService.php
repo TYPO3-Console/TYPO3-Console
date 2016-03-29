@@ -159,40 +159,6 @@ class CacheService implements SingletonInterface
     }
 
     /**
-     * Warm up essential caches such as class and core caches
-     *
-     * @param bool $triggerRequire
-     * @return bool
-     */
-    public function warmupEssentialCaches($triggerRequire = false)
-    {
-        try {
-            $this->cacheManager->getCache('cache_classes');
-        } catch (NoSuchCacheException $e) {
-            $this->logger->warning('Warmup skipped due to lack of classes cache');
-            return false;
-        }
-        // TODO: This currently only builds the classes cache! Find a way to build other system caches as well (like reflection caches, datamap caches …)
-        // package namespace and aliases caches are implicitly built in extended bootstrap before we reach this point
-        $phpParser = new PhpParser();
-        foreach ($this->packageManager->getActivePackages() as $package) {
-            $classFiles = GeneralUtility::getAllFilesAndFoldersInPath(array(), $package->getClassesPath(), 'php');
-            foreach ($classFiles as $classFile) {
-                try {
-                    $parsedResult = $phpParser->parseClassFile($classFile);
-                    $this->writeCacheEntryForClass($parsedResult->getFullyQualifiedClassName(), $classFile);
-                } catch (ParsingException $e) {
-                    $this->logger->warning('Class file "' . PathUtility::stripPathSitePrefix($classFile) . '" does not contain a class definition. Skipping …');
-                }
-            }
-        }
-        $this->packageManager->injectCoreCache($this->cacheManager->getCache('cache_core'));
-        $this->packageManager->populatePackageCache();
-
-        return true;
-    }
-
-    /**
      * @return array
      */
     public function getValidCacheGroups()

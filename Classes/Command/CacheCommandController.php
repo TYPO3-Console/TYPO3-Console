@@ -108,18 +108,6 @@ class CacheCommandController extends CommandController
     }
 
     /**
-     * Warmup essential caches such as class and core caches
-     */
-    public function warmupCommand()
-    {
-        if ($this->cacheService->warmupEssentialCaches()) {
-            $this->outputLine('Warmed up the following caches: classes, package manager, tca, ext_tables, ext_localconf');
-        } else {
-            $this->outputLine('<info>Warmup skipped due to lack of classes cache</info>');
-        }
-    }
-
-    /**
      * Lists all registered cache groups.
      */
     public function listGroupsCommand()

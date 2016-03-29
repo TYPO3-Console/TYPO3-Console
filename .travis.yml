@@ -57,7 +57,6 @@ script:
   - ./typo3cms backend:unlock
   - ./typo3cms cache:flush
   - ./typo3cms cache:listgroups
-  - ./typo3cms cache:warmup
   - ./typo3cms cleanup:updatereferenceindex
   - ./typo3cms database:updateschema "*"
   - ./typo3cms documentation:generatexsd TYPO3\\CMS\\Fluid\\ViewHelpers > /dev/null
