@@ -74,19 +74,6 @@ class InstallerScripts
     }
 
     /**
-     * Called from composer
-     *
-     * @param ScriptEvent $event
-     * @return void
-     */
-    public static function postUpdateAndInstall(ScriptEvent $event)
-    {
-        $event->getIO()->write('<info>Helhum\\Typo3Console\\Composer\\InstallerScripts::postUpdateAndInstall has been deprecated.</info>');
-        $event->getIO()->write('<info>Please use Helhum\\Typo3Console\\Composer\\InstallerScripts::setupConsole instead!</info>');
-        self::setupConsole($event);
-    }
-
-    /**
      * Called from TYPO3 CMS extension manager
      */
     public static function postInstallExtension()
