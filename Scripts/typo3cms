@@ -1,58 +1,10 @@
 #!/usr/bin/env php
 <?php
 call_user_func(function () {
-
-    /**
-     * @param string $path
-     * @return bool
-     */
-    $entryScriptExists = function ($path) {
-        return file_exists($path . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php');
-    };
-
-    /**
-     * Returns parent directory.
-     *
-     * @param string $path Path to start from.
-     * @return string Parent path.
-     */
-    $getParentDirectoryPath = function ($path) {
-        if (empty($path)) {
-            return false;
-        }
-        $path = explode('/', $path);
-        array_pop($path);
-        return implode('/', $path);
-    };
-    if (!empty($composerInstall)) {
-        if (!defined('TYPO3_CONSOLE_ROOT')) {
-            define('TYPO3_CONSOLE_ROOT', __DIR__);
-        }
-        $installationRootPath = __DIR__ . '/{$relative-web-dir}';
-    } elseif (getenv('TYPO3_PATH_WEB')) {
+    if (getenv('TYPO3_PATH_WEB')) {
         $installationRootPath = rtrim(getenv('TYPO3_PATH_WEB'), '\\/');
     } else {
-        $paths = array(
-            __DIR__,
-            getcwd(),
-            __DIR__ . '/Web',
-            __DIR__ . '/web',
-        );
-        foreach ($paths as $path) {
-            if ($entryScriptExists($path)) {
-                $installationRootPath = $path;
-                break;
-            }
-        }
-    }
-    if (!isset($installationRootPath)) {
-        $path = getcwd();
-        while ($path = $getParentDirectoryPath($path)) {
-            if ($entryScriptExists($path)) {
-                $installationRootPath = $path;
-                break;
-            }
-        }
+        $installationRootPath = __DIR__ . '/{$relative-web-dir}';
     }
 
     /**
