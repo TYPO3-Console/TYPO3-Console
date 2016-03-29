@@ -67,33 +67,13 @@ class CacheService implements SingletonInterface
     protected $databaseConnection;
 
     /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
      * Fetches and sets the logger instance
+     *
+     * @param DatabaseConnection $databaseConnection
      */
-    public function __construct()
+    public function __construct(DatabaseConnection $databaseConnection = null)
     {
-        $this->logger = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Log\LogManager::class)->getLogger(__CLASS__);
-        $this->databaseConnection = $GLOBALS['TYPO3_DB'];
-    }
-
-    /**
-     * @return LoggerInterface
-     */
-    protected function getLogger()
-    {
-        return $this->logger;
-    }
-
-    /**
-     * @param LoggerInterface $logger
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
+        $this->databaseConnection = $databaseConnection ?: $GLOBALS['TYPO3_DB'];
     }
 
     /**
@@ -200,28 +180,6 @@ class CacheService implements SingletonInterface
             if (substr($tableName, 0, 3) === 'cf_' || ($tableName !== 'tx_realurl_redirects' && substr($tableName, 0, 11) === 'tx_realurl_')) {
                 $this->databaseConnection->exec_TRUNCATEquery($tableName);
             }
-        }
-    }
-
-    /**
-     * @param string $classFile
-     * @param string $className
-     * @param bool $triggerRequire
-     */
-    protected function writeCacheEntryForClass($className, $classFile, $triggerRequire = false)
-    {
-        $classesCache = $this->cacheManager->getCache('cache_classes');
-        $cacheEntryIdentifier = strtolower(str_replace('\\', '_', $className));
-        $classLoadingInformation = array(
-            $classFile,
-            strtolower($className),
-            // TODO: consider aliases?
-        );
-        if (!$classesCache->has($cacheEntryIdentifier)) {
-            $classesCache->set(
-                $cacheEntryIdentifier,
-                implode("\xff", $classLoadingInformation)
-            );
         }
     }
 }

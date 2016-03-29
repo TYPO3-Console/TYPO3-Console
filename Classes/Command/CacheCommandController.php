@@ -58,20 +58,15 @@ class CacheCommandController extends CommandController
      */
     public function flushCommand($force = false)
     {
-        try {
-            $this->cacheService->flush($force);
+        $this->cacheService->flush($force);
 
-            // TODO: use nicer API once available
-            ConsoleBootstrap::getInstance()->requestRunLevel(RunLevel::LEVEL_FULL);
+        // TODO: use nicer API once available
+        ConsoleBootstrap::getInstance()->requestRunLevel(RunLevel::LEVEL_FULL);
 
-            // Flush a second time to have extension caches and previously disabled core caches cleared when clearing not forced
-            $this->cacheService->flush();
+        // Flush a second time to have extension caches and previously disabled core caches cleared when clearing not forced
+        $this->cacheService->flush();
 
-            $this->outputLine('Flushed all caches.');
-        } catch (\Exception $e) {
-            $this->outputLine($e->getMessage());
-            $this->sendAndExit(1);
-        }
+        $this->outputLine('Flushed all caches.');
     }
 
     /**
