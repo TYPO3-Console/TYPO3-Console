@@ -41,7 +41,7 @@ class CacheServiceTest extends UnitTestCase
 
     public function setup()
     {
-        $this->subject = $this->getAccessibleMock('Helhum\\Typo3Console\\Service\\CacheService', array('getLogger'));
+        $this->subject = $this->getAccessibleMock(\Helhum\Typo3Console\Service\CacheService::class, array('getLogger'));
     }
 
     /**
@@ -51,7 +51,7 @@ class CacheServiceTest extends UnitTestCase
      */
     protected function setCacheConfiguration($mockedConfiguration)
     {
-        $configurationManagerMock = $this->getMock('TYPO3\\CMS\\Core\\Configuration\\ConfigurationManager');
+        $configurationManagerMock = $this->getMock(\TYPO3\CMS\Core\Configuration\ConfigurationManager::class);
         $configurationManagerMock
             ->expects($this->atLeastOnce())
             ->method('getConfigurationValueByPath')

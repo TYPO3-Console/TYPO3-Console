@@ -106,7 +106,7 @@ class ConsoleBootstrap extends Bootstrap
         }
         $this->requestId = uniqid();
         $this->runLevel = new RunLevel();
-        $this->setEarlyInstance('Helhum\Typo3Console\Core\Booting\RunLevel', $this->runLevel);
+        $this->setEarlyInstance(\Helhum\Typo3Console\Core\Booting\RunLevel::class, $this->runLevel);
         new ExceptionHandler();
 
         $this->initializeCommandManager();
@@ -198,7 +198,7 @@ class ConsoleBootstrap extends Bootstrap
      */
     public function getCommandManager()
     {
-        return $this->getEarlyInstance('TYPO3\CMS\Extbase\Mvc\Cli\CommandManager');
+        return $this->getEarlyInstance(\TYPO3\CMS\Extbase\Mvc\Cli\CommandManager::class);
     }
 
     /**
@@ -235,9 +235,9 @@ class ConsoleBootstrap extends Bootstrap
 
     public function initializeCommandManager()
     {
-        $commandManager = Utility\GeneralUtility::makeInstance('Helhum\Typo3Console\Mvc\Cli\CommandManager');
-        $this->setEarlyInstance('TYPO3\CMS\Extbase\Mvc\Cli\CommandManager', $commandManager);
-        Utility\GeneralUtility::setSingletonInstance('TYPO3\CMS\Extbase\Mvc\Cli\CommandManager', $commandManager);
+        $commandManager = Utility\GeneralUtility::makeInstance(\Helhum\Typo3Console\Mvc\Cli\CommandManager::class);
+        $this->setEarlyInstance(\TYPO3\CMS\Extbase\Mvc\Cli\CommandManager::class, $commandManager);
+        Utility\GeneralUtility::setSingletonInstance(\TYPO3\CMS\Extbase\Mvc\Cli\CommandManager::class, $commandManager);
     }
 
     /**
@@ -272,31 +272,31 @@ class ConsoleBootstrap extends Bootstrap
      * @param string $packageManagerClassName Define an alternative package manager implementation (usually for the installer)
      * @return void
      */
-    public function initializePackageManagement($packageManagerClassName = 'Helhum\\Typo3Console\\Package\\UncachedPackageManager')
+    public function initializePackageManagement($packageManagerClassName = \Helhum\Typo3Console\Package\UncachedPackageManager::class)
     {
         require __DIR__ . '/../Package/UncachedPackageManager.php';
 
         $packageManager = new \Helhum\Typo3Console\Package\UncachedPackageManager();
-        $this->setEarlyInstance('TYPO3\\CMS\\Core\\Package\\PackageManager', $packageManager);
+        $this->setEarlyInstance(\TYPO3\CMS\Core\Package\PackageManager::class, $packageManager);
         Utility\ExtensionManagementUtility::setPackageManager($packageManager);
-        $dependencyResolver = Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Package\\DependencyResolver');
+        $dependencyResolver = Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Package\DependencyResolver::class);
         $dependencyResolver->injectDependencyOrderingService(
-            Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Service\\DependencyOrderingService')
+            Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Service\DependencyOrderingService::class)
         );
         $packageManager->injectDependencyResolver($dependencyResolver);
         $packageManager->init($this);
-        Utility\GeneralUtility::setSingletonInstance('TYPO3\\CMS\\Core\\Package\\PackageManager', $packageManager);
+        Utility\GeneralUtility::setSingletonInstance(\TYPO3\CMS\Core\Package\PackageManager::class, $packageManager);
     }
 
     public function disableCoreCaches()
     {
         $this->disableCoreCache();
         /** @var PackageManager $packageManager */
-        $packageManager = $this->getEarlyInstance('TYPO3\\CMS\\Core\\Package\\PackageManager');
+        $packageManager = $this->getEarlyInstance(\TYPO3\CMS\Core\Package\PackageManager::class);
         if ($packageManager->isPackageActive('dbal')) {
             $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
             $cacheConfigurations['dbal'] = array(
-                'backend' => 'TYPO3\\CMS\\Core\\Cache\\Backend\\TransientMemoryBackend',
+                'backend' => \TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend::class,
                 'groups' => array()
             );
         }

@@ -210,7 +210,7 @@ class HelpCommandController extends CommandController
     {
         $availableCommands = $this->commandManager->getAvailableCommands();
         /** @var RunLevel $runLevel */
-        $runLevel = ConsoleBootstrap::getInstance()->getEarlyInstance('Helhum\Typo3Console\Core\Booting\RunLevel');
+        $runLevel = ConsoleBootstrap::getInstance()->getEarlyInstance(\Helhum\Typo3Console\Core\Booting\RunLevel::class);
         foreach ($availableCommands as $command) {
             if ($command->isInternal()) {
                 continue;

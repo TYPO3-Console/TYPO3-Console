@@ -153,7 +153,7 @@ class XsdGenerator
         $affectedViewHelperClassNames = array();
         foreach ($viewHelperClassFiles as $filePathAndFilename) {
             $potentialViewHelperClassName = $this->getClassNameFromNamespaceAndPath($namespace, $filePathAndFilename);
-            if (is_subclass_of($potentialViewHelperClassName, 'TYPO3\\CMS\\Fluid\Core\\ViewHelper\\AbstractViewHelper')) {
+            if (is_subclass_of($potentialViewHelperClassName, \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper::class)) {
                 $classReflection = new \ReflectionClass($potentialViewHelperClassName);
                 if ($classReflection->isAbstract() === true) {
                     continue;

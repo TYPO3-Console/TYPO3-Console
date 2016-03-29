@@ -94,9 +94,9 @@ class CommandController implements CommandControllerInterface
     public function injectObjectManager(\TYPO3\CMS\Extbase\Object\ObjectManagerInterface $objectManager)
     {
         $this->objectManager = $objectManager;
-        $this->arguments = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Controller\\Arguments');
+        $this->arguments = $this->objectManager->get(\TYPO3\CMS\Extbase\Mvc\Controller\Arguments::class);
         $this->userAuthentication = isset($GLOBALS['BE_USER']) ? $GLOBALS['BE_USER'] : null;
-        $this->output = $this->objectManager->get('Helhum\\Typo3Console\\Mvc\\Cli\\ConsoleOutput');
+        $this->output = $this->objectManager->get(\Helhum\Typo3Console\Mvc\Cli\ConsoleOutput::class);
     }
 
     /**
@@ -198,7 +198,7 @@ class CommandController implements CommandControllerInterface
                 continue;
             }
             $argumentValue = null;
-            $commandArgumentDefinition = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Cli\\CommandArgumentDefinition', $argumentName, true, null);
+            $commandArgumentDefinition = $this->objectManager->get(\TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition::class, $argumentName, true, null);
             while ($argumentValue === null) {
                 $argumentValue = $this->output->ask(sprintf('<comment>Please specify the required argument "%s":</comment> ', $commandArgumentDefinition->getDashedName()));
             }

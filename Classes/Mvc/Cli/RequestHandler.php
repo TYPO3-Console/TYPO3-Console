@@ -88,7 +88,7 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
             $callingScript = $_SERVER['_'] . ' ' . $callingScript;
         }
 
-        $this->request = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Cli\\RequestBuilder')->build($commandLine, $callingScript);
+        $this->request = $this->objectManager->get(\TYPO3\CMS\Extbase\Mvc\Cli\RequestBuilder::class)->build($commandLine, $callingScript);
         $this->response = new \TYPO3\CMS\Extbase\Mvc\Cli\Response();
         $this->dispatcher->dispatch($this->request, $this->response);
 
@@ -108,8 +108,8 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
         $sequence = $this->bootstrap->buildBootingSequenceForCommand($commandIdentifier);
         $sequence->invoke($this->bootstrap);
 
-        $this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-        $this->dispatcher = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Dispatcher');
+        $this->objectManager = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);
+        $this->dispatcher = $this->objectManager->get(\TYPO3\CMS\Extbase\Mvc\Dispatcher::class);
     }
 
     /**

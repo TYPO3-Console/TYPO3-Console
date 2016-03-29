@@ -105,7 +105,7 @@ class CleanupCommandController extends CommandController
             $delegate->subscribeEvent(
                 'operationHasEnded',
                 function () {
-                    GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Registry')->set('core', 'sys_refindex_lastUpdate', $GLOBALS['EXEC_TIME']);
+                    GeneralUtility::makeInstance(\TYPO3\CMS\Core\Registry::class)->set('core', 'sys_refindex_lastUpdate', $GLOBALS['EXEC_TIME']);
                 }
             );
         }

@@ -63,7 +63,7 @@ class Scripts
                 'extbase_datamapfactory_datamap',
             ) as $id) {
             self::$earlyCachesConfiguration[$id] = $cacheConfigurations[$id];
-            $cacheConfigurations[$id]['backend'] = 'TYPO3\\CMS\\Core\\Cache\\Backend\\NullBackend';
+            $cacheConfigurations[$id]['backend'] = \TYPO3\CMS\Core\Cache\Backend\NullBackend::class;
             $cacheConfigurations[$id]['options'] = array();
         }
     }
@@ -113,7 +113,7 @@ class Scripts
         $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'] = array_replace_recursive($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'], self::$earlyCachesConfiguration);
 
         /** @var CacheManager $cacheManager */
-        $cacheManager = $bootstrap->getEarlyInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager');
+        $cacheManager = $bootstrap->getEarlyInstance(\TYPO3\CMS\Core\Cache\CacheManager::class);
         $cacheManager->setCacheConfigurations($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']);
 
         $reflectionObject = new \ReflectionObject($cacheManager);
@@ -212,8 +212,8 @@ class Scripts
      */
     public static function provideCleanClassImplementations(ConsoleBootstrap $bootstrap)
     {
-        self::overrideImplementation('TYPO3\CMS\Extbase\Mvc\Controller\Argument', 'Helhum\Typo3Console\Mvc\Controller\Argument');
-        self::overrideImplementation('TYPO3\CMS\Extbase\Command\HelpCommandController', 'Helhum\Typo3Console\Command\HelpCommandController');
+        self::overrideImplementation(\TYPO3\CMS\Extbase\Mvc\Controller\Argument::class, \Helhum\Typo3Console\Mvc\Controller\Argument::class);
+        self::overrideImplementation(\TYPO3\CMS\Extbase\Command\HelpCommandController::class, \Helhum\Typo3Console\Command\HelpCommandController::class);
     }
 
     /**
@@ -222,7 +222,7 @@ class Scripts
     public static function overrideImplementation($originalClassName, $overrideClassName)
     {
         /** @var $extbaseObjectContainer \TYPO3\CMS\Extbase\Object\Container\Container */
-        $extbaseObjectContainer = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\Container\\Container');
+        $extbaseObjectContainer = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\Container\Container::class);
         $extbaseObjectContainer->registerImplementation($originalClassName, $overrideClassName);
         $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][$originalClassName]['className'] = $overrideClassName;
         class_alias($overrideClassName, $originalClassName);

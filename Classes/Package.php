@@ -76,15 +76,15 @@ class Package extends \TYPO3\CMS\Core\Package\Package
      */
     protected function registerCommands(Bootstrap $bootstrap)
     {
-        $bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\CacheCommandController');
-        $bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\BackendCommandController');
-        $bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\SchedulerCommandController');
-        $bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\CleanupCommandController');
-        $bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\DocumentationCommandController');
-        $bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\InstallCommandController');
-        $bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\DatabaseCommandController');
-        $bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\ConfigurationCommandController');
-        $bootstrap->getCommandManager()->registerCommandController('Helhum\Typo3Console\Command\FrontendCommandController');
+        $bootstrap->getCommandManager()->registerCommandController(\Helhum\Typo3Console\Command\CacheCommandController::class);
+        $bootstrap->getCommandManager()->registerCommandController(\Helhum\Typo3Console\Command\BackendCommandController::class);
+        $bootstrap->getCommandManager()->registerCommandController(\Helhum\Typo3Console\Command\SchedulerCommandController::class);
+        $bootstrap->getCommandManager()->registerCommandController(\Helhum\Typo3Console\Command\CleanupCommandController::class);
+        $bootstrap->getCommandManager()->registerCommandController(\Helhum\Typo3Console\Command\DocumentationCommandController::class);
+        $bootstrap->getCommandManager()->registerCommandController(\Helhum\Typo3Console\Command\InstallCommandController::class);
+        $bootstrap->getCommandManager()->registerCommandController(\Helhum\Typo3Console\Command\DatabaseCommandController::class);
+        $bootstrap->getCommandManager()->registerCommandController(\Helhum\Typo3Console\Command\ConfigurationCommandController::class);
+        $bootstrap->getCommandManager()->registerCommandController(\Helhum\Typo3Console\Command\FrontendCommandController::class);
 
         $bootstrap->setRunLevelForCommand('typo3_console:install:databasedata', RunLevel::LEVEL_MINIMAL);
         $bootstrap->addBootingStepForCommand('typo3_console:install:databasedata', 'helhum.typo3console:database');

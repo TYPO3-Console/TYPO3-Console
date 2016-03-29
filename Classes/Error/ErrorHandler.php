@@ -73,7 +73,7 @@ class ErrorHandler
         );
 
         if (in_array($errorLevel, (array)$this->exceptionalErrors)) {
-            if (class_exists('TYPO3\\CMS\\Core\\Error\\Exception')) {
+            if (class_exists(\TYPO3\CMS\Core\Error\Exception::class)) {
                 throw new \TYPO3\CMS\Core\Error\Exception($errorLevels[$errorLevel] . ': ' . $errorMessage . ' in ' . $errorFile . ' line ' . $errorLine, 1);
             } else {
                 throw new \Exception($errorLevels[$errorLevel] . ': ' . $errorMessage . ' in ' . $errorFile . ' line ' . $errorLine, 1);

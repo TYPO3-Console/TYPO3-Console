@@ -86,7 +86,7 @@ class ArrayConverter extends \TYPO3\CMS\Extbase\Property\TypeConverter\AbstractT
         if ($configuration === null) {
             return self::DEFAULT_STRING_DELIMITER;
         }
-        $stringDelimiter = $configuration->getConfigurationValue('TYPO3\Flow\Property\TypeConverter\ArrayConverter', self::CONFIGURATION_STRING_DELIMITER);
+        $stringDelimiter = $configuration->getConfigurationValue(\Helhum\Typo3Console\Property\TypeConverter\ArrayConverter::class, self::CONFIGURATION_STRING_DELIMITER);
         if ($stringDelimiter === null) {
             return self::DEFAULT_STRING_DELIMITER;
         } elseif (!is_string($stringDelimiter)) {

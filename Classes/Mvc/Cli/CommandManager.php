@@ -59,7 +59,7 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
     protected function initialize()
     {
         if (!$this->initialized) {
-            $this->objectManager = GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
+            $this->objectManager = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);
         }
     }
 

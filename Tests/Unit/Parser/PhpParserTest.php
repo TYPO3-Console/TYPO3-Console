@@ -42,7 +42,7 @@ class PhpParserTest extends UnitTestCase
     {
         $subject = new Parser\PhpParser();
         $result = $subject->parseClassFile(__DIR__ . '/Fixtures/NamespacedClassFixture.php');
-        $this->assertInstanceOf('Helhum\\Typo3Console\\Parser\\ParsedClass', $result);
+        $this->assertInstanceOf(\Helhum\Typo3Console\Parser\ParsedClass::class, $result);
     }
 
     /**
@@ -103,7 +103,7 @@ class PhpParserTest extends UnitTestCase
     {
         $subject = new Parser\PhpParser();
         $result = $subject->parseClassFile(__DIR__ . '/Fixtures/NamespacedClassFixture.php');
-        $this->assertSame('Helhum\\Typo3Console\\Tests\\Unit\\Parser\\Fixtures\\NamespacedClassFixture', $result->getFullyQualifiedClassName());
+        $this->assertSame(\Helhum\Typo3Console\Tests\Unit\Parser\Fixtures\NamespacedClassFixture::class, $result->getFullyQualifiedClassName());
     }
 
     /**

@@ -99,7 +99,7 @@ class PersistenceIntegrityService
                 $this->callDelegateForEvent($delegate, 'willUpdateRecord', array($tableName, $record));
 
                 /** @var $refIndexObj ReferenceIndex */
-                $refIndexObj = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\ReferenceIndex');
+                $refIndexObj = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Database\ReferenceIndex::class);
                 if (isset($record['t3ver_wsid'])) {
                     $refIndexObj->setWorkspaceId($record['t3ver_wsid']);
                 }

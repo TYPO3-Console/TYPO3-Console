@@ -42,7 +42,7 @@ use TYPO3\CMS\Install\Status\StatusInterface;
  */
 class CliSetupRequestHandler
 {
-    const INSTALL_COMMAND_CONTROLLER_CLASS = 'Helhum\\Typo3Console\\Command\\InstallCommandController';
+    const INSTALL_COMMAND_CONTROLLER_CLASS = \Helhum\Typo3Console\Command\InstallCommandController::class;
 
     /**
      * @var \TYPO3\CMS\Extbase\Object\ObjectManager
@@ -100,7 +100,7 @@ class CliSetupRequestHandler
     public function initializeObject()
     {
         if ($this->output === null) {
-            $this->output = $this->objectManager->get('Helhum\\Typo3Console\\Mvc\\Cli\\ConsoleOutput');
+            $this->output = $this->objectManager->get(\Helhum\Typo3Console\Mvc\Cli\ConsoleOutput::class);
         }
     }
 
@@ -248,7 +248,7 @@ class CliSetupRequestHandler
      */
     protected function getCommandMethodArguments($commandMethodName)
     {
-        $arguments = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Controller\\Arguments');
+        $arguments = $this->objectManager->get(\TYPO3\CMS\Extbase\Mvc\Controller\Arguments::class);
         $methodParameters = $this->reflectionService->getMethodParameters(self::INSTALL_COMMAND_CONTROLLER_CLASS, $commandMethodName);
         foreach ($methodParameters as $parameterName => $parameterInfo) {
             $dataType = null;
@@ -279,9 +279,8 @@ class CliSetupRequestHandler
             return;
         }
 
-        /** @var \TYPO3\CMS\Install\Service\SilentConfigurationUpgradeService $upgradeService */
         $upgradeService = $this->objectManager->get(
-            'TYPO3\\CMS\\Install\\Service\\SilentConfigurationUpgradeService'
+            \TYPO3\CMS\Install\Service\SilentConfigurationUpgradeService::class
         );
 
         $count = 0;
@@ -305,8 +304,7 @@ class CliSetupRequestHandler
      */
     protected function reloadConfiguration()
     {
-        /** @var \TYPO3\CMS\Core\Configuration\ConfigurationManager $configurationManger */
-        $configurationManger = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager')->get('TYPO3\\CMS\\Core\\Configuration\\ConfigurationManager');
+        $configurationManger = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class)->get(\TYPO3\CMS\Core\Configuration\ConfigurationManager::class);
         $configurationManger->exportConfiguration();
     }
 

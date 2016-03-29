@@ -73,8 +73,7 @@ class ExtensionInstallation
                         )
                     )
                 );
-                /** @var \TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
-                $dataHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
+                $dataHandler = GeneralUtility::makeInstance(\TYPO3\CMS\Core\DataHandling\DataHandler::class);
                 $dataHandler->stripslashes_values = false;
                 $dataHandler->start($data, array());
                 $dataHandler->process_datamap();
@@ -95,8 +94,7 @@ class ExtensionInstallation
                     )
                 )
             );
-            /** @var \TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
-            $dataHandler = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
+            $dataHandler = GeneralUtility::makeInstance(\TYPO3\CMS\Core\DataHandling\DataHandler::class);
             $dataHandler->stripslashes_values = false;
             $dataHandler->start($data, array());
             $dataHandler->process_datamap();
