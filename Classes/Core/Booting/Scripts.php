@@ -213,6 +213,7 @@ class Scripts
     public static function provideCleanClassImplementations(ConsoleBootstrap $bootstrap)
     {
         self::overrideImplementation('TYPO3\CMS\Extbase\Mvc\Controller\Argument', 'Helhum\Typo3Console\Mvc\Controller\Argument');
+        self::overrideImplementation('TYPO3\CMS\Extbase\Command\HelpCommandController', 'Helhum\Typo3Console\Command\HelpCommandController');
     }
 
     /**

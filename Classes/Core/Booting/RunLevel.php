@@ -146,6 +146,7 @@ class RunLevel
         $sequence = $parentSequence ?: new Sequence($identifier);
 
         $this->addStep($sequence, 'helhum.typo3console:coreconfiguration', !empty($this->executedSequences[self::LEVEL_ESSENTIAL]));
+        $this->addStep($sequence, 'helhum.typo3console:providecleanclassimplementations', !empty($this->executedSequences[self::LEVEL_ESSENTIAL]));
         $this->addStep($sequence, 'helhum.typo3console:caching', !empty($this->executedSequences[self::LEVEL_ESSENTIAL]));
         $this->addStep($sequence, 'helhum.typo3console:errorhandling', !empty($this->executedSequences[self::LEVEL_ESSENTIAL]));
 
@@ -172,7 +173,6 @@ class RunLevel
             unset($GLOBALS['TYPO3_LOADED_EXT']['extbase']['ext_localconf.php']);
             require PATH_site . 'typo3/sysext/extbase/ext_localconf.php';
         }));
-        $sequence->addStep(new Step('helhum.typo3console:providecleanclassimplementations', array('Helhum\Typo3Console\Core\Booting\Scripts', 'provideCleanClassImplementations')));
 
         $this->executedSequences[self::LEVEL_COMPILE] = true;
         return $sequence;
@@ -190,10 +190,6 @@ class RunLevel
         $sequence = $parentSequence ?: $this->buildEssentialSequence($identifier);
 
         $this->addStep($sequence, 'helhum.typo3console:extensionconfiguration', !empty($this->executedSequences[self::LEVEL_MINIMAL]));
-        if (empty($this->executedSequences[self::LEVEL_COMPILE])) {
-            // Only execute if not already executed in compile time
-            $sequence->addStep(new Step('helhum.typo3console:providecleanclassimplementations', array('Helhum\Typo3Console\Core\Booting\Scripts', 'provideCleanClassImplementations')), 'helhum.typo3console:extensionconfiguration');
-        }
 
         $this->executedSequences[self::LEVEL_MINIMAL] = true;
         return $sequence;
@@ -233,6 +229,10 @@ class RunLevel
             case 'helhum.typo3console:coreconfiguration':
                 $action = $isDummyStep ? function () {} : array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeConfigurationManagement');
                 $sequence->addStep(new Step('helhum.typo3console:coreconfiguration', $action));
+                break;
+            case 'helhum.typo3console:providecleanclassimplementations':
+                $action = $isDummyStep ? function () {} : array('Helhum\Typo3Console\Core\Booting\Scripts', 'provideCleanClassImplementations');
+                $sequence->addStep(new Step('helhum.typo3console:providecleanclassimplementations', $action, 'helhum.typo3console:coreconfiguration'));
                 break;
             case 'helhum.typo3console:caching':
                 $action = $isDummyStep ? function () {} : array('Helhum\Typo3Console\Core\Booting\Scripts', 'initializeCachingFramework');
