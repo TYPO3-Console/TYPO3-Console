@@ -92,7 +92,7 @@ FAQ
 ..
 
 :Question: When will this be part of the TYPO3 CMS core?
-:Answer: It might find its way into TYPO3 CMS 7, who knows. Until then you can already use it as extension in TYPO3 6.2 **and** 7.x
+:Answer: It might find its way into TYPO3 CMS 8, who knows. Until then you can already use it as extension in TYPO3 6.2 **up to** 8.x
 
 
 
