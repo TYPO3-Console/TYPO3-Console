@@ -214,6 +214,7 @@ class Scripts
     {
         self::overrideImplementation(\TYPO3\CMS\Extbase\Mvc\Controller\Argument::class, \Helhum\Typo3Console\Mvc\Controller\Argument::class);
         self::overrideImplementation(\TYPO3\CMS\Extbase\Command\HelpCommandController::class, \Helhum\Typo3Console\Command\HelpCommandController::class);
+        self::overrideImplementation(\TYPO3\CMS\Extensionmanager\Command\ExtensionCommandController::class, \Helhum\Typo3Console\Command\ExtensionCommandController::class);
     }
 
     /**
