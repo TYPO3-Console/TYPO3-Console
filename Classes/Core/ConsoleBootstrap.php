@@ -121,7 +121,7 @@ class ConsoleBootstrap extends Bootstrap
      */
     public function requestRunLevel($runLevel)
     {
-        $sequence = $this->runLevel->buildDifferentialSequenceUpToLevel($runLevel);
+        $sequence = $this->runLevel->buildSequence($runLevel);
         $sequence->invoke($this);
     }
 
