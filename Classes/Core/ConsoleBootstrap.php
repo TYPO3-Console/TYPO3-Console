@@ -248,6 +248,12 @@ class ConsoleBootstrap extends Bootstrap
         define('TYPO3_cliMode', true);
         $GLOBALS['MCONF']['name'] = '_CLI_lowlevel';
         parent::baseSetup($pathPart);
+        if (!self::usesComposerClassLoading() && $this->applicationContext->isTesting()) {
+            echo 'TYPO3 Console does not work in application context Testing!' . PHP_EOL
+                . 'This is a reserved context for testing the TYPO3 core.' . PHP_EOL
+                . 'Please use subcontexts Development/Testing or Production/Testing instead.' . PHP_EOL;
+            exit(1);
+        }
         // I want to see deprecation messages
         error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
     }
@@ -257,9 +263,9 @@ class ConsoleBootstrap extends Bootstrap
      */
     protected function requireLibraries()
     {
-        if (!class_exists('Symfony\\Component\\Process\\Process')) {
-            require_once __DIR__ . '/../../Libraries/symfony-process.phar';
-        }
+//        if (!class_exists('Symfony\\Component\\Process\\Process')) {
+//            require_once __DIR__ . '/../../Libraries/symfony-process.phar';
+//        }
     }
 
     /**
