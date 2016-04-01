@@ -142,9 +142,7 @@ class ExtensionCommandController extends CommandController
     {
         $activeExtensions = [];
         foreach ($this->packageManager->getActivePackages() as $package) {
-            if (strpos($package->getPackagePath(), 'typo3conf/ext') !== false) {
-                $activeExtensions[] = $package->getPackageKey();
-            }
+            $activeExtensions[] = $package->getPackageKey();
         }
         $this->setupCommand($activeExtensions);
     }
