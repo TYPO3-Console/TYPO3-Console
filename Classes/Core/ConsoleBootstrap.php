@@ -28,12 +28,9 @@ namespace Helhum\Typo3Console\Core;
  ***************************************************************/
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
-use Helhum\Typo3Console\Core\Booting\Scripts;
 use Helhum\Typo3Console\Core\Booting\Sequence;
 use Helhum\Typo3Console\Error\ExceptionHandler;
 use Helhum\Typo3Console\Mvc\Cli\CommandManager;
-use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
-use TYPO3\CMS\Core\Cache\Frontend\StringFrontend;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility;

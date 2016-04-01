@@ -27,15 +27,10 @@ namespace Helhum\Typo3Console\Service;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use Helhum\Typo3Console\Parser\ParsingException;
-use Helhum\Typo3Console\Parser\PhpParser;
-use Psr\Log\LoggerInterface;
-use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\PathUtility;
 
 /**
  * Class CacheService

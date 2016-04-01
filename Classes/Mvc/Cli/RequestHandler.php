@@ -25,7 +25,6 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use Helhum\Typo3Console\Core\Booting\Scripts;
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Utility\GeneralUtility;

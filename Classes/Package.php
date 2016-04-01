@@ -28,8 +28,8 @@ namespace Helhum\Typo3Console;
  ***************************************************************/
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
-use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 use Helhum\Typo3Console\Core\ConsoleBootstrap as Bootstrap;
+use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 use TYPO3\CMS\Core\Package\PackageManager;
 
 /**
