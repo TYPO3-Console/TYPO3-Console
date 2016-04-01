@@ -49,13 +49,13 @@ class RunLevel
 
     /**
      * @param string $commandIdentifier
-     * @param string $runlevel
+     * @param string $runLevel
      * @api
      */
-    public function setRunLevelForCommand($commandIdentifier, $runlevel)
+    public function setRunLevelForCommand($commandIdentifier, $runLevel)
     {
         if (!isset($this->commandOptions[$commandIdentifier]['runLevel'])) {
-            $this->commandOptions[$commandIdentifier]['runLevel'] = $runlevel;
+            $this->commandOptions[$commandIdentifier]['runLevel'] = $runLevel;
         }
     }
 
@@ -194,7 +194,7 @@ class RunLevel
     protected function addStep($sequence, $stepIdentifier)
     {
         if (!empty($this->executedSteps[$stepIdentifier])) {
-            $sequence->addStep(new Step($stepIdentifier, function(){}));
+            $sequence->addStep(new Step($stepIdentifier, function () {}));
             return;
         }
         $this->executedSteps[$stepIdentifier] = true;
@@ -273,6 +273,10 @@ class RunLevel
         return self::LEVEL_FULL;
     }
 
+    /**
+     * @param string $commandIdentifier
+     * @return bool
+     */
     public function isCommandAvailable($commandIdentifier)
     {
         $expectedRunLevel = $this->getRunlevelForCommand($commandIdentifier);
