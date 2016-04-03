@@ -40,8 +40,8 @@ class InstallerScripts
 {
     const BINARY_PATH = 'typo3conf/ext/typo3_console/Scripts/';
     const EM_FLASH_MESSAGE_QUEUE_ID = 'extbase.flashmessages.tx_extensionmanager_tools_extensionmanagerextensionmanager';
-    const COPY_FAILED_MESSAGE_TITLE = 'Could not copy %s script to TYPO3 root directory!';
-    const COPY_FAILED_MESSAGE = 'Permission problem? Is there a file or directory named %s? Please copy it manually now to get the console command.';
+    const COPY_FAILED_MESSAGE_TITLE = 'Could not copy %s script to TYPO3 root directory (%s)!';
+    const COPY_FAILED_MESSAGE = 'Check the permissions of your root directory. Is there a file or directory named %s inside this directory?';
     const COPY_SUCCESS_MESSAGE = 'Successfully copied the %s script to TYPO3 root directory. Let\'s dance!';
 
     /**
@@ -77,8 +77,8 @@ class InstallerScripts
         $scriptName = self::isWindowsOs() ? 'typo3cms.bat' : 'typo3cms';
         $success = self::safeCopy($webDir . '/' . self::BINARY_PATH . $scriptName, $installDir . '/' . $scriptName, $relativeWebDir);
         if (!$success) {
-            $event->getIO()->write(sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName));
-            $event->getIO()->write(sprintf(self::COPY_FAILED_MESSAGE, $scriptName));
+            $event->getIO()->write('<error>' . sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName, $installDir) . '</error>');
+            $event->getIO()->write('<error>' . sprintf(self::COPY_FAILED_MESSAGE, $scriptName) . '</error>');
         }
     }
 
@@ -90,7 +90,7 @@ class InstallerScripts
         $scriptName = self::isWindowsOs() ? 'typo3cms.bat' : 'typo3cms';
         $success = self::safeCopy(PATH_site . self::BINARY_PATH . $scriptName, PATH_site . $scriptName);
         if (!$success) {
-            self::addFlashMessage(sprintf(self::COPY_FAILED_MESSAGE, $scriptName), sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName), AbstractMessage::WARNING);
+            self::addFlashMessage(sprintf(self::COPY_FAILED_MESSAGE, $scriptName), sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName, PATH_site), AbstractMessage::WARNING);
         } else {
             self::addFlashMessage(sprintf(self::COPY_SUCCESS_MESSAGE, $scriptName));
         }
