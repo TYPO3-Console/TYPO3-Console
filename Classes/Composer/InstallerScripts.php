@@ -48,15 +48,23 @@ class InstallerScripts
      * Called from composer
      *
      * @param ScriptEvent $event
+     * @param bool $calledFromPlugin
      * @return void
      */
-    public static function setupConsole(ScriptEvent $event)
+    public static function setupConsole(ScriptEvent $event, $calledFromPlugin = false)
     {
+        if (!$calledFromPlugin) {
+            $event->getIO()->write('<warn>Usage of Helhum\Typo3Console\Composer\InstallerScripts::setup is deprecated. Please remove this section from your root composer.json</warn>');
+            return;
+        }
+
         $config = self::getConfig($event);
         $installDir = self::getInstallDir($config);
         $webDir = self::getWebDir($config);
         $relativeWebDir = substr($webDir, strlen($installDir) + 1);
         $filesystem = new Filesystem();
+
+        // Special treatment if we are root package (for development and testing)
         if ($event->getComposer()->getPackage()->getName() === 'helhum/typo3-console') {
             $extDir = $webDir . '/typo3conf/ext';
             $consoleDir = $extDir . '/typo3_console';
@@ -65,6 +73,7 @@ class InstallerScripts
                 $filesystem->symlink($installDir, $consoleDir);
             }
         }
+
         $scriptName = self::isWindowsOs() ? 'typo3cms.bat' : 'typo3cms';
         $success = self::safeCopy($webDir . '/' . self::BINARY_PATH . $scriptName, $installDir . '/' . $scriptName, $relativeWebDir);
         if (!$success) {

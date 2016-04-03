@@ -57,9 +57,6 @@ Create a root ``composer.json`` file like this add the missing lines to your exi
 		"name": "typo3/cms-example-distribution",
 		"description" : "TYPO3 CMS Example Distribution",
 		"license": "GPL-2.0+",
-		"scripts": {
-			"post-autoload-dump": "Helhum\\Typo3Console\\Composer\\InstallerScripts::setupConsole"
-		},
 		"require": {
 			"typo3/cms": "^7.6.6",
 			"helhum/typo3-console": "^1.3.0"
