@@ -40,10 +40,6 @@ class CommandDispatcher
      */
     public function executeCommand($commandIdentifier, $arguments = array())
     {
-        $phpBinary = defined('PHP_BINARY') ? PHP_BINARY : (!empty($_SERVER['_']) ? $_SERVER['_'] : '');
-        if (preg_match('#typo3cms$#', $phpBinary)) {
-            $phpBinary = '';
-        }
         $commandLine = isset($_SERVER['argv']) ? $_SERVER['argv'] : array();
         $callingScript = array_shift($commandLine);
         $commandLineArguments = array();
@@ -57,7 +53,7 @@ class CommandDispatcher
             $commandLineArguments[] = $argumentValue;
         }
 
-        $scriptToExecute = (!empty($phpBinary) ? (escapeshellcmd($phpBinary) . ' ') : '') . escapeshellcmd($callingScript) . ' ' . implode(' ', array_map('escapeshellarg', $commandLineArguments));
+        $scriptToExecute = escapeshellcmd(PHP_BINARY) . ' ' . escapeshellcmd($callingScript) . ' ' . implode(' ', array_map('escapeshellarg', $commandLineArguments));
         $returnString = exec($scriptToExecute, $output, $returnValue);
         if ($returnValue > 0) {
             throw new \ErrorException(sprintf('Executing %s failed with message: ', $commandIdentifier) . LF . implode(LF, $output));
