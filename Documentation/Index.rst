@@ -36,7 +36,7 @@ TYPO3 Console
 		Helmut Hummel
 
 	:Email:
-		typo3@helhum.io
+		info@helhum.io
 
 	:License:
 		This document is published under the Open Content License
