@@ -61,6 +61,7 @@ script:
   - ./typo3cms database:updateschema "*"
   - ./typo3cms documentation:generatexsd TYPO3\\CMS\\Fluid\\ViewHelpers > /dev/null
   - rm -f .Build/Web/typo3conf/PackageStates.php && ./typo3cms install:generatepackagestates && [ -f ".Build/Web/typo3conf/PackageStates.php" ]
+  - rm .Build/Web/typo3temp/index.html && ./typo3cms install:fixfolderstructure && [ -f ".Build/Web/typo3temp/index.html" ]
 
 after_script:
   - >
