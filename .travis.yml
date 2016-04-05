@@ -7,8 +7,6 @@ php:
   - 5.6
 
 env:
-  global:
-    - secure: "2jkWz3b8tfN5yCHKbdn02Fd0doKcDXWAQW+h0DJcGzIqBT2OBn5xWHMCRketdo7J9BYcmIVipfCNVxN7QOmJCQeXUWhO4LQPLX0zDkXKP9Tht/cOA2HNNCcIcw5WMucEmeIXWP3ahNdGoUF72TSuKr58Y8VRTfjoTdIq9LL5RIY="
   matrix:
     - TYPO3_VERSION=6.2.*
 
@@ -59,4 +57,5 @@ script:
   - ./typo3cms backend:unlock
   - ./typo3cms cleanup:updatereferenceindex
   - ./typo3cms database:updateschema "*"
+  - rm -f typo3conf/PackageStates.php && ./typo3cms install:generatepackagestates && [ -f "typo3conf/PackageStates.php" ]
   - rm typo3temp/index.html && ./typo3cms install:fixfolderstructure && [ -f "typo3temp/index.html" ]
