@@ -83,7 +83,7 @@ class InstallCommandController extends CommandController {
 		$installationPackages = $this->getPackagesFromRootComposerFile();
 		foreach ($this->packageManager->getAvailablePackages() as $package) {
 			if (
-				in_array($package->getPackageKey(), $installationPackages)
+				in_array($package->getPackageKey(), $installationPackages, TRUE)
 				|| $package->isProtected()
 				|| ($package instanceof Package && $package->isPartOfMinimalUsableSystem())
 			) {
@@ -106,24 +106,24 @@ class InstallCommandController extends CommandController {
 	 */
 	protected function getPackagesFromRootComposerFile() {
 		if (!file_exists(PATH_site . 'composer.json')) {
-			$this->outputLine('No composer.json found in project root');
-			$this->sendAndExit(1);
+			$this->outputLine('No composer.json found in project root. Only activating required extensions!');
+			return array();
 		}
 
-		$composerData = json_decode(file_get_contents(PATH_site . 'composer.json'));
+		$composerData = @json_decode(file_get_contents(PATH_site . 'composer.json'), TRUE);
 
-		if (!is_object($composerData)) {
-			$this->outputLine('composer.json seems to be invalid');
+		if (!is_array($composerData)) {
+			$this->outputLine('composer.json is invalid!');
 			$this->sendAndExit(1);
 		}
 
 		$activePackageKey = 'active-packages';
-		if (!isset($composerData->extra->{$activePackageKey}) || !is_array($composerData->extra->{$activePackageKey})) {
-			$this->outputLine('No packages found to activate!');
-			$this->sendAndExit();
+		if (!isset($composerData['extra'][$activePackageKey]) || !is_array($composerData['extra'][$activePackageKey])) {
+			$this->outputLine('No packages found to activate. Only activating required extensions!');
+			return array();
 		}
 
-		return $composerData->extra->{$activePackageKey};
+		return $composerData['extra'][$activePackageKey];
 	}
 
     /**
