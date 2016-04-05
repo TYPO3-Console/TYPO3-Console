@@ -59,3 +59,4 @@ script:
   - ./typo3cms backend:unlock
   - ./typo3cms cleanup:updatereferenceindex
   - ./typo3cms database:updateschema "*"
+  - rm typo3temp/index.html && ./typo3cms install:fixfolderstructure && [ -f "typo3temp/index.html" ]
