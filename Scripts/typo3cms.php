@@ -9,6 +9,7 @@ call_user_func(function () {
     // Check again if path is set correctly.
     if (!getenv('TYPO3_PATH_WEB')) {
         echo 'Could not find TYPO3 installation root path! Make sure TYPO3_PATH_WEB environment variable is set correctly and your typo3cms binary is up to date!' . PHP_EOL;
+        echo 'Please also note, that as of typo3_console 2.0.0, the binary MUST be copied by the installer! A manual copy will not work!' . PHP_EOL;
         exit(1);
     }
 
