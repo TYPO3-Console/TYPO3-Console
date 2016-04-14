@@ -15,6 +15,12 @@ if (version_compare(PHP_VERSION, '5.5.0', '<')) {
     exit(1);
 }
 
+if ('{$relative-web-dir}' === '{$relative' . '-web-dir}') {
+    echo 'This script has been copied manually (or by a copy command in a composer script section) and will not work!' .  PHP_EOL;
+    echo 'Please rely on the plugin or the TYPO3 extension manager to copy the script automatically and remove manual copy commands from your composer script section!' .  PHP_EOL;
+    exit(1);
+}
+
 if (!getenv('TYPO3_PATH_WEB')) {
     putenv('TYPO3_PATH_WEB=' . __DIR__ . '/{$relative-web-dir}');
 }
