@@ -76,8 +76,9 @@ class InstallCommandController extends CommandController
     }
 
     /**
-     * Activates all packages that are configured in composer.json or are required. If no composerFilePath is
-     * given, the Typo3 root path (PATH_site) will be used for file lookup.
+     * Activates all packages that are configured in composer.json or are required.
+     *
+     * If no composerFilePath is given, the Typo3 root path (PATH_site) will be used for file lookup.
      *
      * @param bool $removeInactivePackages
      * @param string $composerFilesPath Path to composer files (will use PATH_site by default)
