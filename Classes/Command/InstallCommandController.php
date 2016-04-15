@@ -76,14 +76,17 @@ class InstallCommandController extends CommandController
     }
 
     /**
-     * Activates all packages that are configured in root composer.json or are required
+     * Activates all packages that are configured in composer.json or are required. If no composerFilePath is
+     * given, the Typo3 root path (PATH_site) will be used for file lookup.
      *
      * @param bool $removeInactivePackages
+     * @param string $composerFilesPath Path to composer files (will use PATH_site by default)
+     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
      */
-    public function generatePackageStatesCommand($removeInactivePackages = false)
+    public function generatePackageStatesCommand($removeInactivePackages = false, $composerFilesPath = '')
     {
         try {
-            $installationPackages = $this->getPackagesFromRootComposerFile();
+            $installationPackages = $this->getPackagesFromRootComposerFile($composerFilesPath);
         } catch (\Exception $e) {
             $this->outputLine('<error>' . $e->getMessage() . '</error>');
             $this->quit(1);
@@ -117,14 +120,24 @@ class InstallCommandController extends CommandController
     }
 
     /**
-     * @return array Array of packages keys in root composer.json
+     * @param string $composerFilesPath (optional) path to composer files (will use PATH_site by default)
+     * @return array Array of packages keys in composer.json
      */
-    protected function getPackagesFromRootComposerFile()
+    protected function getPackagesFromRootComposerFile($composerFilesPath = '')
     {
+        if (empty($composerFilesPath)) {
+            $composerFilesPath = PATH_site;
+        } else {
+            // make sure path has trailing slash
+            $composerFilesPath = rtrim($composerFilesPath, '/') . '/';
+        }
+
+        $composerJsonFile = $composerFilesPath . 'composer.json';
+
         // Look up configured active packages
         $configuredPackages = array();
-        if (file_exists(PATH_site . 'composer.json')) {
-            $composerData = json_decode(file_get_contents(PATH_site . 'composer.json'));
+        if (file_exists($composerJsonFile)) {
+            $composerData = json_decode(file_get_contents($composerJsonFile));
             if (!is_object($composerData)) {
                 throw new \RuntimeException('composer.json seems to be invalid', 1444596471);
             }
@@ -141,7 +154,7 @@ class InstallCommandController extends CommandController
 
         // Determine non typo3-cms-extension packages installed by composer
         $composerInstalledPackages = array();
-        $composerLockFile = PATH_site . 'composer.lock';
+        $composerLockFile = $composerFilesPath . 'composer.lock';
         if (file_exists($composerLockFile)) {
             $composerLock = json_decode(file_get_contents($composerLockFile));
             if ($composerLock) {
