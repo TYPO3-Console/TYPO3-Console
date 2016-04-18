@@ -78,7 +78,6 @@ class Scripts
         foreach (
             array(
                 'cache_core',
-                'cache_classes',
                 'dbal',
             ) as $id) {
             if (isset($cacheConfigurations[$id])) {
