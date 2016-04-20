@@ -49,7 +49,7 @@ class UncachedPackageManager extends PackageManager
         if ($this->packageStatesConfiguration === array()) {
             $this->scanAvailablePackages();
         } else {
-            $this->registerPackagesFromConfiguration();
+            $this->registerPackagesFromConfiguration($this->packageStatesConfiguration['packages']);
         }
 
         if ($this->consolePackageBootRequired($this->getPackage('typo3_console'))) {
@@ -81,6 +81,21 @@ class UncachedPackageManager extends PackageManager
      * Overload original method because the stupid TYPO3 core
      * tries to sort packages by dependencies before *DEACTIVATING* a package
      * In this case we do nothing now until this TYPO3 bug is fixed.
+     */
+    protected function sortActivePackagesByDependencies()
+    {
+        if (!$this->forceSavePackageStates) {
+            return array();
+        }
+        return parent::sortActivePackagesByDependencies();
+    }
+
+    /**
+     * Overload original method because the stupid TYPO3 core
+     * tries to sort packages by dependencies before *DEACTIVATING* a package
+     * In this case we do nothing now until this TYPO3 bug is fixed.
+     *
+     * @deprecated in 8.0 will be removed once 7.6 compatibility is removed
      */
     protected function sortAvailablePackagesByDependencies()
     {
