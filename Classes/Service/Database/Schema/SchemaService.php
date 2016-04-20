@@ -90,7 +90,7 @@ class SchemaService implements SingletonInterface
                     $statements = $updateStatements[$statementType];
                     $result = $this->schemaMigrationService->performUpdateQueries(
                         $statements,
-                        // Generate a map of statements as keys and TRUE as values
+                        // Generate a map of statements as keys and true as values
                         array_combine(array_keys($statements), array_fill(0, count($statements), true))
                     );
 

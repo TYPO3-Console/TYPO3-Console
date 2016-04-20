@@ -103,7 +103,7 @@ class CommandController implements CommandControllerInterface
      * Checks if the current request type is supported by the controller.
      *
      * @param \TYPO3\CMS\Extbase\Mvc\RequestInterface $request The current request
-     * @return bool TRUE if this request type is supported, otherwise FALSE
+     * @return bool true if this request type is supported, otherwise false
      * @api
      */
     public function canProcessRequest(\TYPO3\CMS\Extbase\Mvc\RequestInterface $request)

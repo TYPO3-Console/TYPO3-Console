@@ -48,7 +48,7 @@ class SchemaUpdateResult
   }
 
   /**
-   * Returns TRUE if updates where performed, FALSE otherwise
+   * Returns true if updates where performed, false otherwise
    *
    * @return bool
    */
@@ -93,7 +93,7 @@ class SchemaUpdateResult
   }
 
   /**
-   * Returns TRUE if errors did occur during schema update, FALSE otherwise
+   * Returns true if errors did occur during schema update, false otherwise
    *
    * @return bool
    */

@@ -82,7 +82,7 @@ class Argument
     protected $dataTypeClassSchema;
 
     /**
-     * TRUE if this argument is required
+     * true if this argument is required
      *
      * @var bool
      */
@@ -235,7 +235,7 @@ class Argument
     /**
      * Marks this argument to be required
      *
-     * @param bool $required TRUE if this argument should be required
+     * @param bool $required true if this argument should be required
      * @return \TYPO3\CMS\Extbase\Mvc\Controller\Argument $this
      * @api
      */
@@ -246,9 +246,9 @@ class Argument
     }
 
     /**
-     * Returns TRUE if this argument is required
+     * Returns true if this argument is required
      *
-     * @return bool TRUE if this argument is required
+     * @return bool true if this argument is required
      * @api
      */
     public function isRequired()
@@ -358,7 +358,7 @@ class Argument
     }
 
     /**
-     * @return bool TRUE if the argument is valid, FALSE otherwise
+     * @return bool true if the argument is valid, false otherwise
      * @api
      */
     public function isValid()
