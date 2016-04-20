@@ -36,8 +36,6 @@ class UncachedPackageManager extends PackageManager
         $this->loadPackageStates();
         $this->initializePackageObjects();
         $this->initializeCompatibilityLoadedExtArray();
-
-        $this->getPackage('typo3_console')->bootPackage($bootstrap);
     }
 
     protected function loadPackageStates()
@@ -51,19 +49,6 @@ class UncachedPackageManager extends PackageManager
         } else {
             $this->registerPackagesFromConfiguration($this->packageStatesConfiguration['packages']);
         }
-
-        if ($this->consolePackageBootRequired($this->getPackage('typo3_console'))) {
-            $this->packages['typo3_console'] = new \Helhum\Typo3Console\Package($this, 'typo3_console', $this->getPackage('typo3_console')->getPackagePath());
-        }
-    }
-
-    /**
-     * @param PackageInterface $consolePackage
-     * @return bool
-     */
-    protected function consolePackageBootRequired($consolePackage)
-    {
-        return !$consolePackage instanceof \Helhum\Typo3Console\Package;
     }
 
     /**

@@ -17,6 +17,7 @@ use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\Booting\Sequence;
 use Helhum\Typo3Console\Error\ExceptionHandler;
 use Helhum\Typo3Console\Mvc\Cli\CommandManager;
+use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility;
@@ -94,6 +95,7 @@ class ConsoleBootstrap extends Bootstrap
 
         $this->initializeCommandManager();
         $this->initializePackageManagement();
+        $this->registerRequestHandler(new RequestHandler($this));
 
         $requestHandler = $this->resolveCliRequestHandler();
         $requestHandler->handleRequest();
