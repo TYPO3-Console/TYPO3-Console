@@ -16,7 +16,7 @@ namespace Helhum\Typo3Console\Command;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 
 /**
- * Class SchedulerCommandController
+ * Class BackendCommandController
  */
 class BackendCommandController extends CommandController
 {
