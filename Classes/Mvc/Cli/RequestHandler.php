@@ -79,14 +79,19 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
      */
     public function handleRequest()
     {
-        $this->boot(isset($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : '');
+        // help command by default
+        if ($_SERVER['argc'] === 1) {
+            $_SERVER['argc'] = 2;
+            $_SERVER['argv'][] = 'help';
+        }
 
-        $commandLine = isset($_SERVER['argv']) ? $_SERVER['argv'] : array();
+        $commandLine = $_SERVER['argv'];
         $callingScript = array_shift($commandLine);
         if ($callingScript !== $_SERVER['_']) {
             $callingScript = $_SERVER['_'] . ' ' . $callingScript;
         }
 
+        $this->boot($_SERVER['argv'][1]);
         $this->request = $this->objectManager->get(\TYPO3\CMS\Extbase\Mvc\Cli\RequestBuilder::class)->build($commandLine, $callingScript);
         $this->response = new \TYPO3\CMS\Extbase\Mvc\Cli\Response();
         $this->dispatcher->dispatch($this->request, $this->response);
@@ -94,10 +99,6 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
         $this->response->send();
         $this->shutdown();
     }
-
-    /**
-     *
-     */
 
     /**
      * @param string $commandIdentifier
@@ -111,9 +112,6 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
         $this->dispatcher = $this->objectManager->get(\TYPO3\CMS\Extbase\Mvc\Dispatcher::class);
     }
 
-    /**
-     *
-     */
     protected function shutdown()
     {
         $this->bootstrap->shutdown();
@@ -134,11 +132,11 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
     /**
      * Checks if the request handler can handle the current request.
      *
-     * @return bool TRUE if it can handle the request, otherwise FALSE
+     * @return bool true if it can handle the request, otherwise false
      * @api
      */
     public function canHandleRequest()
     {
-        return PHP_SAPI === 'cli' ? 1 : 0;
+        return PHP_SAPI === 'cli' && isset($_SERVER['argc']) && isset($_SERVER['argv']);
     }
 }
