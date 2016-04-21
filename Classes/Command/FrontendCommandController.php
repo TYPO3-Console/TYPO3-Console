@@ -29,18 +29,14 @@ class FrontendCommandController extends CommandController
      */
     public function requestCommand($requestUrl)
     {
-
         // TODO: this needs heavy cleanup!
         $template = file_get_contents(PATH_typo3 . 'sysext/core/Tests/Functional/Fixtures/Frontend/request.tpl');
         $arguments = array(
             'documentRoot' => PATH_site,
-            'requestUrl' => $requestUrl,
+            'requestUrl' => $this->makeAbsolute($requestUrl),
         );
         // No other solution atm than to fake a CLI request type
-        $code = '<?php
-		define(\'TYPO3_REQUESTTYPE\', 6);
-		?>';
-        $code .= str_replace(array('{originalRoot}', '{arguments}'), array(PATH_site, var_export($arguments, true)), $template);
+        $code = str_replace(array('{originalRoot}', '{arguments}'), array(PATH_site, var_export($arguments, true)), $template);
         $process = new PhpProcess($code);
         $process->mustRun();
         $rawResponse = json_decode($process->getOutput());
@@ -52,5 +48,25 @@ class FrontendCommandController extends CommandController
         }
 
         $this->output($rawResponse->content);
+    }
+
+    /**
+     * Make URL absolute, so that the core fake frontend request bootstrap
+     * correctly configures the environment for trusted host pattern.
+     *
+     * @param string $url
+     * @return string
+     */
+    protected function makeAbsolute($url)
+    {
+        $parsedUrl = parse_url($url);
+        $finalUrl = '';
+        if (!isset($parsedUrl['scheme'])) {
+            $finalUrl .= 'http://';
+        }
+        if (!isset($parsedUrl['host'])) {
+            $finalUrl .= 'localhost';
+        }
+        return $finalUrl . '/' . ltrim($url, '/');
     }
 }
