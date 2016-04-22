@@ -28,12 +28,10 @@ class UncachedPackageManager extends PackageManager
      */
     protected $forceSavePackageStates = false;
 
-    /**
-     * @param Bootstrap $bootstrap
-     */
-    public function init(Bootstrap $bootstrap)
+    public function init()
     {
         $this->loadPackageStates();
+        $this->makeConsolePackageProtectedIfNeeded();
         $this->initializePackageObjects();
         $this->initializeCompatibilityLoadedExtArray();
     }
@@ -99,5 +97,13 @@ class UncachedPackageManager extends PackageManager
         $this->forceSavePackageStates = true;
         parent::sortAndSavePackageStates();
         $this->forceSavePackageStates = false;
+    }
+
+    protected function makeConsolePackageProtectedIfNeeded()
+    {
+        if (!file_exists(PATH_site . 'typo3conf/PackageStates.php')) {
+            // Force loading of the console in case we do not have a package states file yet (pre-install)
+            $this->getPackage('typo3_console')->setProtected(true);
+        }
     }
 }
