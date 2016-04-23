@@ -59,7 +59,7 @@
             "cms-package-dir": "{$vendor-dir}/typo3/cms",
             "web-dir": ".Build/Web",
             "Package": {
-                "protected": true
+                "partOfMinimalUsableSystem": true
             }
         }
     }
