@@ -31,15 +31,8 @@ class CacheCommandController extends CommandController
     protected $cacheService;
 
     /**
-     * Sets a custom logger for the service
-     */
-    protected function initializeObject()
-    {
-        $this->cacheService->setLogger($this->createDefaultLogger());
-    }
-
-    /**
      * Flushes all caches.
+     *
      * @param bool $force
      */
     public function flushCommand($force = false)
@@ -52,7 +45,7 @@ class CacheCommandController extends CommandController
         // Flush a second time to have extension caches and previously disabled core caches cleared when clearing not forced
         $this->cacheService->flush();
 
-        $this->outputLine('Flushed all caches.');
+        $this->outputLine(sprintf('%slushed all caches.', $force ? 'Force f' : 'F'));
     }
 
     /**
