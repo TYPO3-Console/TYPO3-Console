@@ -59,11 +59,14 @@ Create a root ``composer.json`` file like this add the missing lines to your exi
 		"license": "GPL-2.0+",
 		"require": {
 			"typo3/cms": "^7.6.6",
-			"helhum/typo3-console": "^1.3.0"
+			"helhum/typo3-console": "^3.0.0"
 		}
 	}
 
-Don't forget to **activate the extension** in the extension manager.
+Don't forget to **activate the extension** in the extension manager or directly on the shell ::
+
+	typo3/cli_dispatch.phpsh extbase extension:install typo3_console
+
 
 The ``typo3cms`` script will automatically be copied to your TYPO3 root directory.
 
