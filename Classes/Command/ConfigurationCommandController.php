@@ -14,11 +14,7 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
-use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
-use Helhum\Typo3Console\Service\Configuration\ConsoleRenderer\ConsoleRenderer;
-use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class ConfigurationCommandController
@@ -26,29 +22,16 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class ConfigurationCommandController extends CommandController implements SingletonInterface
 {
     /**
-     * @var ConfigurationService
+     * @var \Helhum\Typo3Console\Service\Configuration\ConfigurationService
+     * @inject
      */
     protected $configurationService;
-    /**
-     * @var ConsoleRenderer
-     */
-    private $consoleRenderer;
 
     /**
-     * ConfigurationCommandController constructor.
-     *
-     * @param ConfigurationManager $configurationManager
-     * @param ConfigurationService $configurationService
-     * @param array $activeConfiguration
-     * @param ConsoleRenderer $consoleRenderer
+     * @var \Helhum\Typo3Console\Service\Configuration\ConsoleRenderer\ConsoleRenderer
+     * @inject
      */
-    public function __construct(ConfigurationManager $configurationManager = null, ConfigurationService $configurationService = null, array $activeConfiguration = array(), ConsoleRenderer $consoleRenderer)
-    {
-        $configurationManager = $configurationManager ?: GeneralUtility::makeInstance(ConfigurationManager::class);
-        $activeConfiguration = $activeConfiguration ?: $GLOBALS['TYPO3_CONF_VARS'];
-        $this->configurationService = GeneralUtility::makeInstance(ConfigurationService::class, $configurationManager, $activeConfiguration);
-        $this->consoleRenderer = $consoleRenderer ?: GeneralUtility::makeInstance(ConsoleRenderer::class);
-    }
+    protected $consoleRenderer;
 
     /**
      * Removing system configuration by path

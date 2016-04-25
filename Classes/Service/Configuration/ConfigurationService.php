@@ -13,8 +13,10 @@ namespace Helhum\Typo3Console\Service\Configuration;
  *
  */
 
+use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class ConfigurationService
@@ -36,13 +38,13 @@ class ConfigurationService implements SingletonInterface
     /**
      * ConfigurationService constructor.
      *
-     * @param \TYPO3\CMS\Core\Configuration\ConfigurationManager $configurationManager
+     * @param ConfigurationManager $configurationManager
      * @param array $activeConfiguration
      */
-    public function __construct(\TYPO3\CMS\Core\Configuration\ConfigurationManager $configurationManager, array $activeConfiguration = array())
+    public function __construct(ConfigurationManager $configurationManager = null, array $activeConfiguration = array())
     {
-        $this->configurationManager = $configurationManager;
-        $this->activeConfiguration = $activeConfiguration;
+        $this->configurationManager = $configurationManager ?: GeneralUtility::makeInstance(ConfigurationManager::class);
+        $this->activeConfiguration = $activeConfiguration ?: $GLOBALS['TYPO3_CONF_VARS'];
     }
 
     /**
