@@ -13,9 +13,7 @@ namespace Helhum\Typo3Console\Service;
  *
  */
 
-use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
-use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -39,7 +37,8 @@ class CacheService implements SingletonInterface
     protected $packageManager;
 
     /**
-     * @var ConfigurationService
+     * @var \Helhum\Typo3Console\Service\Configuration\ConfigurationService
+     * @inject
      */
     protected $configurationService;
 
@@ -52,16 +51,10 @@ class CacheService implements SingletonInterface
      * Builds the dependencies correctly
      *
      * @param DatabaseConnection $databaseConnection
-     * @param ConfigurationManager $configurationManager
-     * @param ConfigurationService $configurationService
-     * @param array $activeConfiguration
      */
-    public function __construct(DatabaseConnection $databaseConnection = null, ConfigurationManager $configurationManager = null, ConfigurationService $configurationService = null, array $activeConfiguration = array())
+    public function __construct(DatabaseConnection $databaseConnection = null)
     {
         $this->databaseConnection = $databaseConnection ?: $GLOBALS['TYPO3_DB'];
-        $configurationManager = $configurationManager ?: GeneralUtility::makeInstance(ConfigurationManager::class);
-        $activeConfiguration = $activeConfiguration ?: $GLOBALS['TYPO3_CONF_VARS'];
-        $this->configurationService = GeneralUtility::makeInstance(ConfigurationService::class, $configurationManager, $activeConfiguration);
     }
 
     /**
