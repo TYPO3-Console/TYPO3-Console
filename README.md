@@ -23,7 +23,7 @@ Instead of typing
 just type:
 
 ```
-./typo3cms extension:install realurl
+./typo3cms extension:activate realurl
 ```
 
 ## Features
