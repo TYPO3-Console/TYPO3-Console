@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Tests\Unit\Service;
  *
  */
 
+use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
@@ -37,12 +38,12 @@ class CacheServiceTest extends UnitTestCase
      */
     protected function setCacheConfiguration($mockedConfiguration)
     {
-        $configurationManagerMock = $this->getMock(\TYPO3\CMS\Core\Configuration\ConfigurationManager::class);
-        $configurationManagerMock
+        $configurationServiceMock = $this->getMockBuilder(ConfigurationService::class)->disableOriginalConstructor()->getMock();
+        $configurationServiceMock
             ->expects($this->atLeastOnce())
-            ->method('getConfigurationValueByPath')
+            ->method('getActive')
             ->will($this->returnValue($mockedConfiguration));
-        $this->subject->_set('configurationManager', $configurationManagerMock);
+        $this->subject->_set('configurationService', $configurationServiceMock);
     }
 
     /**

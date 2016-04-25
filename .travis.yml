@@ -46,19 +46,20 @@ before_install:
 
 before_script:
   - composer require typo3/cms=$TYPO3_VERSION
+  - export PATH_WEB=".Build/Web"
 
 script:
   - >
     echo;
     echo "Running unit tests";
-    TYPO3_PATH_WEB=".Build/Web" .Build/bin/phpunit -c .Build/vendor/typo3/cms/typo3/sysext/core/Build/UnitTests.xml Tests/Unit/
+    TYPO3_PATH_WEB="$PATH_WEB" .Build/bin/phpunit -c .Build/vendor/typo3/cms/typo3/sysext/core/Build/UnitTests.xml Tests/Unit/
   - >
     echo;
     echo "Running php lint";
     find . -name \*.php ! -path "./.Build/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;
 
   # Basic functional tests - all commands should exit with 0
-  - ./typo3cms help && [ ! -f ".Build/Web/typo3conf/PackageStates.php" ]
+  - ./typo3cms help && [ ! -f "$PATH_WEB/typo3conf/PackageStates.php" ]
   - ./typo3cms install:setup --non-interactive --database-user-name="root" --database-host-name="localhost" --database-port="3306" --database-name="travis_test" --admin-user-name="admin" --admin-password="password" --site-name="Travis Install"
   - ./typo3cms help
   - ./typo3cms backend:lock
@@ -69,8 +70,14 @@ script:
   - ./typo3cms database:updateschema "*"
   - ./typo3cms frontend:request / > /dev/null
   - ./typo3cms documentation:generatexsd TYPO3\\CMS\\Fluid\\ViewHelpers > /dev/null
-  - rm -f .Build/Web/typo3conf/PackageStates.php && ./typo3cms install:generatepackagestates && [ -f ".Build/Web/typo3conf/PackageStates.php" ]
-  - rm .Build/Web/typo3temp/index.html && ./typo3cms install:fixfolderstructure && [ -f ".Build/Web/typo3temp/index.html" ]
+  - ./typo3cms configuration:show BE/installToolPassword
+  - ./typo3cms configuration:showLocal BE/installToolPassword
+  - ./typo3cms configuration:showActive BE/installToolPassword
+  - ./typo3cms configuration:set BE/installToolPassword foobar && grep installToolPassword $PATH_WEB/typo3conf/LocalConfiguration.php | grep foobar
+  - ./typo3cms configuration:remove BE/installToolPassword --force && [ -z "$(grep installToolPassword $PATH_WEB/typo3conf/LocalConfiguration.php)" ]
+  - ./typo3cms configuration:set BE/installToolPassword blablupp && grep installToolPassword $PATH_WEB/typo3conf/LocalConfiguration.php | grep blablupp
+  - rm -f $PATH_WEB/typo3conf/PackageStates.php && ./typo3cms install:generatepackagestates && [ -f "$PATH_WEB/typo3conf/PackageStates.php" ]
+  - rm $PATH_WEB/typo3temp/index.html && ./typo3cms install:fixfolderstructure && [ -f "$PATH_WEB/typo3temp/index.html" ]
 
 after_script:
   - >

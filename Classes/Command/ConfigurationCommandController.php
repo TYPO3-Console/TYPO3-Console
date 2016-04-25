@@ -14,7 +14,11 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
+use Helhum\Typo3Console\Service\Configuration\ConsoleRenderer\ConsoleRenderer;
+use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class ConfigurationCommandController
@@ -22,10 +26,29 @@ use TYPO3\CMS\Core\SingletonInterface;
 class ConfigurationCommandController extends CommandController implements SingletonInterface
 {
     /**
-     * @var \TYPO3\CMS\Core\Configuration\ConfigurationManager
-     * @inject
+     * @var ConfigurationService
      */
-    protected $configurationManager;
+    protected $configurationService;
+    /**
+     * @var ConsoleRenderer
+     */
+    private $consoleRenderer;
+
+    /**
+     * ConfigurationCommandController constructor.
+     *
+     * @param ConfigurationManager $configurationManager
+     * @param ConfigurationService $configurationService
+     * @param array $activeConfiguration
+     * @param ConsoleRenderer $consoleRenderer
+     */
+    public function __construct(ConfigurationManager $configurationManager = null, ConfigurationService $configurationService = null, array $activeConfiguration = array(), ConsoleRenderer $consoleRenderer)
+    {
+        $configurationManager = $configurationManager ?: GeneralUtility::makeInstance(ConfigurationManager::class);
+        $activeConfiguration = $activeConfiguration ?: $GLOBALS['TYPO3_CONF_VARS'];
+        $this->configurationService = GeneralUtility::makeInstance(ConfigurationService::class, $configurationManager, $activeConfiguration);
+        $this->consoleRenderer = $consoleRenderer ?: GeneralUtility::makeInstance(ConsoleRenderer::class);
+    }
 
     /**
      * Removing system configuration by path
@@ -35,18 +58,108 @@ class ConfigurationCommandController extends CommandController implements Single
      * @param array $paths Path to system configuration that should be removed. Multiple paths can be specified separated by comma
      * @param bool $force If set, do not ask for confirmation
      */
-    public function removeByPathCommand(array $paths, $force = false)
+    public function removeCommand(array $paths, $force = false)
     {
-        if (!$force) {
-            do {
-                $answer = strtolower($this->output->ask('Remove ' . implode(',', $paths) . ' from system configuration (TYPO3_CONF_VARS)? (y/N): '));
-            } while ($answer !== 'y' && $answer !== 'yes');
+        foreach ($paths as $path) {
+            if (!$this->configurationService->localIsActive($path)) {
+                $this->outputLine('<warning>The configuration path "%s" is overwritten by custom configuration options. Removing from local configuration will have no effect.</warning>', array($path));
+            }
+            if (!$force && $this->configurationService->hasLocal($path)) {
+                $answer = strtolower($this->output->ask('Remove ' . $path . ' from system configuration (TYPO3_CONF_VARS)? (y/N): ', 'n'));
+                if (strtolower($answer) === 'n') {
+                    continue;
+                }
+            }
+            $removed = $this->configurationService->removeLocal($path);
+            if ($removed) {
+                $this->outputLine('<info>Removed "%s" from system configuration</info>', array($path));
+            } else {
+                $this->outputLine('<warning>Path "%s" seems invalid or empty. Nothing done!</warning>', array($path));
+            }
         }
-        $removed = $this->configurationManager->removeLocalConfigurationKeysByPath($paths);
-        if (!$removed) {
-            $this->outputLine('Paths seems invalid or empty. Nothing done!');
-            $this->sendAndExit(1);
+    }
+
+    /**
+     * Show system configuration by path
+     *
+     * Example: ./typo3cms configuration:show DB
+     *
+     * @param string $path Path to system configuration.
+     */
+    public function showCommand($path)
+    {
+        if (!$this->configurationService->hasActive($path) && !$this->configurationService->hasLocal($path)) {
+            $this->outputLine('<error>No configuration found for path "%s"</error>', array($path));
+            $this->quit(1);
         }
-        $this->outputLine('Removed from system configuration');
+        if ($this->configurationService->localIsActive($path) && $this->configurationService->hasActive($path)) {
+            $active = $this->configurationService->getActive($path);
+            $this->outputLine($this->consoleRenderer->render($active));
+        } else {
+            $local = null;
+            $active = null;
+            if ($this->configurationService->hasLocal($path)) {
+                $local = $this->configurationService->getLocal($path);
+            }
+            if ($this->configurationService->hasActive($path)) {
+                $active = $this->configurationService->getActive($path);
+            }
+            $this->outputLine($this->consoleRenderer->renderDiff($local, $active));
+        }
+    }
+
+    /**
+     * Show active system configuration by path
+     *
+     * Example: ./typo3cms configuration:showActive DB
+     *
+     * @param string $path Path to system configuration.
+     */
+    public function showActiveCommand($path)
+    {
+        if (!$this->configurationService->hasActive($path)) {
+            $this->outputLine('<error>No configuration found for path "%s"</error>', array($path));
+            $this->quit(1);
+        }
+        $active = $this->configurationService->getActive($path);
+        $this->outputLine($this->consoleRenderer->render($active));
+    }
+
+    /**
+     * Show active system configuration by path
+     *
+     * Example: ./typo3cms configuration:showActive DB
+     *
+     * @param string $path Path to system configuration.
+     */
+    public function showLocalCommand($path)
+    {
+        if (!$this->configurationService->hasLocal($path)) {
+            $this->outputLine('<error>No configuration found for path "%s"</error>', array($path));
+            $this->quit(1);
+        }
+        $active = $this->configurationService->getLocal($path);
+        $this->outputLine($this->consoleRenderer->render($active));
+    }
+
+    /**
+     * Set system configuration by path.
+     *
+     * Example: ./typo3cms configuration:set DB/extTablesDefinitionScript extTables.php
+     *
+     * @param string $path Path to system configuration.
+     * @param string $value Value for system configuration.
+     */
+    public function setCommand($path, $value)
+    {
+        if (!$this->configurationService->hasLocal($path) || !$this->configurationService->localIsActive($path)) {
+            $this->outputLine('<error>Cannot set local configuration for path "%s"</error>', array($path));
+            $this->quit(1);
+        }
+        if ($this->configurationService->setLocal($path, $value)) {
+            $this->outputLine('<info>Successfully set value for path "%s"</info>', array($path));
+        } else {
+            $this->outputLine('<error>Could not set value "%s" for configuration path "%s"</error>', array($value, $path));
+        }
     }
 }
