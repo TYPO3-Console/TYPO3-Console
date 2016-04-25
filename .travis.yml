@@ -7,14 +7,14 @@ php:
 
 env:
   - TYPO3_VERSION=^7.6.0
-  - TYPO3_VERSION=dev-master
+  - TYPO3_VERSION=~8.0.0
 
 matrix:
   exclude:
     - php: 5.5
-      env: TYPO3_VERSION=dev-master
+      env: TYPO3_VERSION=~8.0.0
     - php: 5.6
-      env: TYPO3_VERSION=dev-master
+      env: TYPO3_VERSION=~8.0.0
 
 sudo: false
 cache:
