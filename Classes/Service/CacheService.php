@@ -13,7 +13,9 @@ namespace Helhum\Typo3Console\Service;
  *
  */
 
+use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
+use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -37,10 +39,9 @@ class CacheService implements SingletonInterface
     protected $packageManager;
 
     /**
-     * @var \TYPO3\CMS\Core\Configuration\ConfigurationManager
-     * @inject
+     * @var ConfigurationService
      */
-    protected $configurationManager;
+    protected $configurationService;
 
     /**
      * @var DatabaseConnection
@@ -48,13 +49,19 @@ class CacheService implements SingletonInterface
     protected $databaseConnection;
 
     /**
-     * Fetches and sets the logger instance
+     * Builds the dependencies correctly
      *
      * @param DatabaseConnection $databaseConnection
+     * @param ConfigurationManager $configurationManager
+     * @param ConfigurationService $configurationService
+     * @param array $activeConfiguration
      */
-    public function __construct(DatabaseConnection $databaseConnection = null)
+    public function __construct(DatabaseConnection $databaseConnection = null, ConfigurationManager $configurationManager = null, ConfigurationService $configurationService = null, array $activeConfiguration = array())
     {
         $this->databaseConnection = $databaseConnection ?: $GLOBALS['TYPO3_DB'];
+        $configurationManager = $configurationManager ?: GeneralUtility::makeInstance(ConfigurationManager::class);
+        $activeConfiguration = $activeConfiguration ?: $GLOBALS['TYPO3_CONF_VARS'];
+        $this->configurationService = GeneralUtility::makeInstance(ConfigurationService::class, $configurationManager, $activeConfiguration);
     }
 
     /**
@@ -125,7 +132,7 @@ class CacheService implements SingletonInterface
     public function getValidCacheGroups()
     {
         $validGroups = array();
-        foreach ($this->configurationManager->getConfigurationValueByPath('SYS/caching/cacheConfigurations') as $cacheConfiguration) {
+        foreach ($this->configurationService->getActive('SYS/caching/cacheConfigurations') as $cacheConfiguration) {
             if (isset($cacheConfiguration['groups']) && is_array($cacheConfiguration['groups'])) {
                 $validGroups = array_merge($validGroups, $cacheConfiguration['groups']);
             }

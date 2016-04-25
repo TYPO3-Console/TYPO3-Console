@@ -57,8 +57,6 @@ class ConsoleOutput
 
     /**
      * Creates and initializes the Symfony I/O instances
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -70,6 +68,8 @@ class ConsoleOutput
         $this->output->getFormatter()->setStyle('strike', new OutputFormatterStyle(null, null, array('conceal')));
         $this->output->getFormatter()->setStyle('success', new OutputFormatterStyle('green'));
         $this->output->getFormatter()->setStyle('warning', new OutputFormatterStyle('black', 'yellow'));
+        $this->output->getFormatter()->setStyle('ins', new OutputFormatterStyle('green'));
+        $this->output->getFormatter()->setStyle('del', new OutputFormatterStyle('red'));
     }
 
     /**
