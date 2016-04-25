@@ -16,7 +16,6 @@ namespace Helhum\Typo3Console\Command;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
-use Helhum\Typo3Console\Service;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 
 /**
