@@ -63,7 +63,9 @@ Create a root ``composer.json`` file like this add the missing lines to your exi
 		}
 	}
 
-Don't forget to **activate the extension** in the extension manager.
+Don't forget to **activate the extension** in the extension manager or via shell ::
+
+	./web/typo3/cli_dispatch.phpsh extbase extension:install typo3_console
 
 The ``typo3cms`` script will automatically be copied to your TYPO3 root directory.
 
