@@ -41,16 +41,18 @@ just type:
 
 ## Installation
 
-For the extension to work, it *must* be installed in the typo3conf/ext/ directory *not* in any other possible extension location.
+For the extension to work, it **must** be installed in the typo3conf/ext/ directory **not** in any other possible extension location.
+This directory **must not** be a symlink to another location!
 
-Don't forget to activate the extension in the extension manager, which will copy the `typo3cms` command line tool
-into the installation root directory..
+If you activate the extension in the extension manager, it will copy the `typo3cms` command line tool
+into the installation root directory. But it is also possible to create a symlink to `typo3conf/ext/typo3_console/Scripts/typo3cms`
+in any place you want. The console will activate itself on first usage.
 
 ### Linux and OS X Shell Installation
 
 ```
 git clone https://github.com/helhum/typo3_console.git typo3conf/ext/typo3_console
-php typo3/cli_dispatch.phpsh extbase extension:install typo3_console
+ln -s typo3conf/ext/typo3_console/Scripts/typo3cms typo3cms
 php typo3cms help
 ```
 

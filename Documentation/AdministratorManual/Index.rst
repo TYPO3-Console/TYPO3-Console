@@ -41,9 +41,7 @@ The extension will automatically be activated and the ``typo3cms`` script will a
 .. code-block:: bash
 
 	git clone https://github.com/helhum/typo3_console.git typo3conf/ext/typo3_console
-
-Don't forget to **activate the extension** in the extension manager. Once you active the extension
-the ``typo3cms`` script is automatically copied to your TYPO3 root directory.
+	ln -s typo3conf/ext/typo3_console/Scripts/typo3cms typo3cms
 
 3. Via composer
 ^^^^^^^^^^^^^^^
@@ -63,10 +61,6 @@ Create a root ``composer.json`` file like this add the missing lines to your exi
 		}
 	}
 
-Don't forget to **activate the extension** in the extension manager or directly on the shell ::
 
-	typo3/cli_dispatch.phpsh extbase extension:install typo3_console
-
-
-The ``typo3cms`` script will automatically be copied to your TYPO3 root directory.
+The ``typo3cms`` script will automatically be linked to your TYPO3 root directory and the extension will activate itself automatically as well.
 

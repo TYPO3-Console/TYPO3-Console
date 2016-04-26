@@ -13,7 +13,8 @@ namespace Helhum\Typo3Console\Package;
  *
  */
 
-use TYPO3\CMS\Core\Package\Package;
+use Helhum\Typo3Console\Core\ConsoleBootstrap;
+use TYPO3\CMS\Core\Core\ClassLoadingInformation;
 use TYPO3\CMS\Core\Package\PackageManager;
 
 /**
@@ -26,17 +27,25 @@ class UncachedPackageManager extends PackageManager
      */
     protected $forceSavePackageStates = false;
 
+    /**
+     * @var bool
+     */
+    protected $packageStatesFileExists = false;
+
     public function init()
     {
+        $this->packageStatesFileExists = @file_exists($this->packageStatesPathAndFilename);
         $this->loadPackageStates();
         $this->makeConsolePackageProtectedIfNeeded();
         $this->initializePackageObjects();
+        $this->autoActivateConsolePackageIfPossible();
+        $this->registerConsoleClassesIfNeeded();
         $this->initializeCompatibilityLoadedExtArray();
     }
 
     protected function loadPackageStates()
     {
-        $this->packageStatesConfiguration = file_exists($this->packageStatesPathAndFilename) ? include($this->packageStatesPathAndFilename) : array();
+        $this->packageStatesConfiguration = $this->packageStatesFileExists ? include($this->packageStatesPathAndFilename) : array();
         if (!isset($this->packageStatesConfiguration['version']) || $this->packageStatesConfiguration['version'] < 4) {
             $this->packageStatesConfiguration = array();
         }
@@ -53,8 +62,9 @@ class UncachedPackageManager extends PackageManager
      */
     protected function sortAndSavePackageStates()
     {
-        if (@file_exists($this->packageStatesPathAndFilename)) {
+        if ($this->packageStatesFileExists) {
             parent::sortAndSavePackageStates();
+            $this->packageStatesFileExists = true;
         }
     }
 
@@ -99,9 +109,29 @@ class UncachedPackageManager extends PackageManager
 
     protected function makeConsolePackageProtectedIfNeeded()
     {
-        if (!file_exists(PATH_site . 'typo3conf/PackageStates.php')) {
-            // Force loading of the console in case we do not have a package states file yet (pre-install)
+        // Force loading of the console in case no package states file is there
+        if (!$this->packageStatesFileExists) {
             $this->getPackage('typo3_console')->setProtected(true);
+        }
+    }
+
+    protected function autoActivateConsolePackageIfPossible()
+    {
+        if ($this->packageStatesFileExists && !$this->isPackageActive('typo3_console')) {
+            $this->scanAvailablePackages();
+            $this->activatePackage('typo3_console');
+            if (!ConsoleBootstrap::usesComposerClassLoading()) {
+                ClassLoadingInformation::dumpClassLoadingInformation();
+            }
+        }
+    }
+
+    protected function registerConsoleClassesIfNeeded()
+    {
+        if (!class_exists(\Helhum\Typo3Console\Core\Booting\RunLevel::class)) {
+            // Since the class loader now assumes that this class does not exist, we require it manually here
+            require __DIR__ . '/../Core/Booting/RunLevel.php';
+            ClassLoadingInformation::registerTransientClassLoadingInformationForPackage($this->getPackage('typo3_console'));
         }
     }
 }

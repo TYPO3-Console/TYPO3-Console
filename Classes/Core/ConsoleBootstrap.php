@@ -89,12 +89,13 @@ class ConsoleBootstrap extends Bootstrap
             $this->defineTypo3RequestTypes();
         }
         $this->requestId = uniqid();
+        $this->initializePackageManagement();
+
         $this->runLevel = new RunLevel();
         $this->setEarlyInstance(\Helhum\Typo3Console\Core\Booting\RunLevel::class, $this->runLevel);
         new ExceptionHandler();
 
         $this->initializeCommandManager();
-        $this->initializePackageManagement();
         $this->registerRequestHandler(new RequestHandler($this));
 
         $requestHandler = $this->resolveCliRequestHandler();
@@ -236,12 +237,6 @@ class ConsoleBootstrap extends Bootstrap
         define('TYPO3_cliMode', true);
         $GLOBALS['MCONF']['name'] = '_CLI_lowlevel';
         parent::baseSetup($pathPart);
-        if (!self::usesComposerClassLoading() && $this->applicationContext->isTesting()) {
-            echo 'TYPO3 Console does not work in application context Testing!' . PHP_EOL
-                . 'This is a reserved context for testing the TYPO3 core.' . PHP_EOL
-                . 'Please use subcontexts Development/Testing or Production/Testing instead.' . PHP_EOL;
-            exit(1);
-        }
         // I want to see deprecation messages
         error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
     }
@@ -266,7 +261,6 @@ class ConsoleBootstrap extends Bootstrap
     public function initializePackageManagement($packageManagerClassName = \Helhum\Typo3Console\Package\UncachedPackageManager::class)
     {
         require __DIR__ . '/../Package/UncachedPackageManager.php';
-
         $packageManager = new \Helhum\Typo3Console\Package\UncachedPackageManager();
         $this->setEarlyInstance(\TYPO3\CMS\Core\Package\PackageManager::class, $packageManager);
         Utility\ExtensionManagementUtility::setPackageManager($packageManager);
