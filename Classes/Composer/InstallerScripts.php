@@ -48,7 +48,6 @@ class InstallerScripts
         $config = self::getConfig($event);
         $installDir = self::getInstallDir($config);
         $webDir = self::getWebDir($config);
-        $relativeWebDir = substr($webDir, strlen($installDir) + 1);
         $filesystem = new Filesystem();
 
         // Special treatment if we are root package (for development and testing)
@@ -60,9 +59,21 @@ class InstallerScripts
                 $filesystem->symlink($installDir, $consoleDir);
             }
         }
-
-        $scriptName = self::isWindowsOs() ? 'typo3cms.bat' : 'typo3cms';
-        $success = self::safeCopy($webDir . '/' . self::BINARY_PATH . $scriptName, $installDir . '/' . $scriptName, $relativeWebDir);
+        if (self::isWindowsOs()) {
+            $scriptName = 'typo3cms.bat';
+            $success = self::safeCopy($webDir . '/' . self::BINARY_PATH . $scriptName, $webDir . '/' . $scriptName);
+        } else {
+            $scriptName = 'typo3cms';
+            $targetPath = $installDir . '/' . $scriptName;
+            if (file_exists($targetPath) && self::isTypo3CmsBinary($targetPath)) {
+                $success = @unlink($targetPath);
+            } else {
+                $success = true;
+            }
+            if ($success) {
+                $filesystem->symlink($webDir . '/' . self::BINARY_PATH . $scriptName, $targetPath, false);
+            }
+        }
         if (!$success) {
             $event->getIO()->write('<error>' . sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName, $installDir) . '</error>');
             $event->getIO()->write('<error>' . sprintf(self::COPY_FAILED_MESSAGE, $scriptName) . '</error>');
@@ -126,6 +137,14 @@ class InstallerScripts
             );
         }
         return $success;
+    }
+
+    protected static function isTypo3CmsBinary($fullTargetPath)
+    {
+        if (is_link($fullTargetPath) || strpos(file_get_contents($fullTargetPath), 'typo3cms.php') !== false) {
+            return true;
+        }
+        return false;
     }
 
     /**
