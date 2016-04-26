@@ -51,6 +51,9 @@
         "vendor-dir": ".Build/vendor",
         "bin-dir": ".Build/bin"
     },
+    "bin": [
+        "Scripts/typo3cms"
+    ],
     "extra": {
         "branch-alias": {
             "dev-master": "3.x-dev"

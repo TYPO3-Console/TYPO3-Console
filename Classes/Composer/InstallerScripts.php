@@ -59,6 +59,7 @@ class InstallerScripts
                 $filesystem->symlink($installDir, $consoleDir);
             }
         }
+        // @deprecated. can be removed once the typo3 installer takes care of installing binaries
         if (self::isWindowsOs()) {
             $scriptName = 'typo3cms.bat';
             $success = self::safeCopy($webDir . '/' . self::BINARY_PATH . $scriptName, $webDir . '/' . $scriptName);
