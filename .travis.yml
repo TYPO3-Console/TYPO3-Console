@@ -74,7 +74,7 @@ script:
   - ./typo3cms configuration:showLocal BE/installToolPassword
   - ./typo3cms configuration:showActive BE/installToolPassword
   - ./typo3cms configuration:set BE/installToolPassword foobar && grep installToolPassword $PATH_WEB/typo3conf/LocalConfiguration.php | grep foobar
-  - ./typo3cms configuration:remove BE/installToolPassword --force && [ -z "$(grep installToolPassword $PATH_WEB/typo3conf/LocalConfiguration.php)" ]
+  - ./typo3cms configuration:remove BE/installToolPassword --force && grep -v installToolPassword $PATH_WEB/typo3conf/LocalConfiguration.php
   - ./typo3cms configuration:set BE/installToolPassword blablupp && grep installToolPassword $PATH_WEB/typo3conf/LocalConfiguration.php | grep blablupp
   - rm -f $PATH_WEB/typo3conf/PackageStates.php && ./typo3cms install:generatepackagestates && [ -f "$PATH_WEB/typo3conf/PackageStates.php" ]
   - rm $PATH_WEB/typo3temp/index.html && ./typo3cms install:fixfolderstructure && [ -f "$PATH_WEB/typo3temp/index.html" ]
