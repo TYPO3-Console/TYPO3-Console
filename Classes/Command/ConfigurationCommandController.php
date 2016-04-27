@@ -48,8 +48,8 @@ class ConfigurationCommandController extends CommandController implements Single
                 $this->outputLine('<warning>The configuration path "%s" is overwritten by custom configuration options. Removing from local configuration will have no effect.</warning>', array($path));
             }
             if (!$force && $this->configurationService->hasLocal($path)) {
-                $answer = strtolower($this->output->ask('Remove ' . $path . ' from system configuration (TYPO3_CONF_VARS)? (y/N): ', 'n'));
-                if (strtolower($answer) === 'n') {
+                $reallyDelete = $this->output->askConfirmation('Remove ' . $path . ' from system configuration (TYPO3_CONF_VARS)? (yes/<b>no</b>): ', false);
+                if (!$reallyDelete) {
                     continue;
                 }
             }
