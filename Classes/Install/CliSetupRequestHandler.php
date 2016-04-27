@@ -185,7 +185,9 @@ class CliSetupRequestHandler
             $this->output->outputLine(sprintf('%s:', $command->getShortDescription()));
 
             $actionArguments = array();
+            /** @var \TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition $argumentDefinition */
             foreach ($command->getArgumentDefinitions() as $argumentDefinition) {
+                $isPasswordArgument = strpos(strtolower($argumentDefinition->getName()), 'password') !== false;
                 $argument = $arguments->getArgument($argumentDefinition->getName());
                 if (isset($this->givenRequestArguments[$argumentDefinition->getName()])) {
                     $actionArguments[$argumentDefinition->getName()] = $this->givenRequestArguments[$argumentDefinition->getName()];
@@ -199,13 +201,23 @@ class CliSetupRequestHandler
                     }
                     $argumentValue = null;
                     do {
-                        $argumentValue = $this->output->ask(
-                            sprintf(
-                                '<comment>%s (%s):</comment> ',
-                                $argumentDefinition->getDescription(),
-                                $argument->isRequired() ? 'required' : sprintf('default: "%s"', $argument->getDefaultValue())
-                            )
-                        );
+                        if ($isPasswordArgument) {
+                            $argumentValue = $this->output->askHiddenResponse(
+                                sprintf(
+                                    '<comment>%s (%s):</comment> ',
+                                    $argumentDefinition->getDescription(),
+                                    $argument->isRequired() ? 'required' : sprintf('default: "%s"', $argument->getDefaultValue())
+                                )
+                            );
+                        } else {
+                            $argumentValue = $this->output->ask(
+                                sprintf(
+                                    '<comment>%s (%s):</comment> ',
+                                    $argumentDefinition->getDescription(),
+                                    $argument->isRequired() ? 'required' : sprintf('default: "%s"', $argument->getDefaultValue())
+                                )
+                            );
+                        }
                     } while ($argumentDefinition->isRequired() && $argumentValue === null);
                     $actionArguments[$argumentDefinition->getName()] = $argumentValue !== null ? $argumentValue : $argument->getDefaultValue();
                 }
@@ -290,8 +302,7 @@ class CliSetupRequestHandler
      */
     protected function reloadConfiguration()
     {
-        $configurationManger = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class)->get(\TYPO3\CMS\Core\Configuration\ConfigurationManager::class);
-        $configurationManger->exportConfiguration();
+        GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\ConfigurationManager::class)->exportConfiguration();
     }
 
     // Logging and output related stuff
@@ -321,11 +332,14 @@ class CliSetupRequestHandler
         $subject = strtoupper($statusMessage->getSeverity()) . ': ' . $statusMessage->getTitle();
         switch ($statusMessage->getSeverity()) {
             case 'error':
-                $subject = '<error>' . $subject . '</error>';
+            case 'warning':
+                $subject = sprintf('<%1$s>' . $subject . '</%1$s>', $statusMessage->getSeverity());
             break;
             default:
         }
         $this->output->outputLine($subject);
-        $this->output->outputLine(wordwrap($statusMessage->getMessage()));
+        foreach (explode("\n", wordwrap($statusMessage->getMessage())) as $line) {
+            $this->output->outputLine(sprintf('<%1$s>' . $line . '</%1$s>', $statusMessage->getSeverity()));
+        }
     }
 }
