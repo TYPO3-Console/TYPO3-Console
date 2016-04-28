@@ -16,11 +16,14 @@ namespace Helhum\Typo3Console\Install;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition;
+use TYPO3\CMS\Extbase\Mvc\Controller\Argument;
 use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
 use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentTypeException;
 use TYPO3\CMS\Install\Controller\Action\ActionInterface;
 use TYPO3\CMS\Install\Controller\Exception\RedirectException;
 use TYPO3\CMS\Install\Status\StatusInterface;
+use TYPO3\CMS\Install\Status\WarningStatus;
 
 /**
  * This class acts as facade for the install tool step actions.
@@ -125,6 +128,17 @@ class CliSetupRequestHandler
     }
 
     /**
+     * Checks if the given action needs to be executed or not
+     *
+     * @param string $actionName
+     */
+    public function callNeedsExecution($actionName)
+    {
+        $needsExecution = $this->actionNeedsExecution($this->createActionWithNameAndArguments($actionName));
+        $this->output->outputLine((string)$needsExecution);
+    }
+
+    /**
      * @param string $actionName
      * @param array $arguments
      * @return ActionInterface
@@ -163,6 +177,20 @@ class CliSetupRequestHandler
     }
 
     /**
+     * @param ActionInterface $action
+     * @return bool|string
+     */
+    protected function actionNeedsExecution(ActionInterface $action)
+    {
+        try {
+            $needsExecution = $action->needsExecution();
+        } catch (\TYPO3\CMS\Install\Controller\Exception\RedirectException $e) {
+            return true;
+        }
+        return $needsExecution;
+    }
+
+    /**
      * @param string $actionName
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\AmbiguousCommandIdentifierException
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentTypeException
@@ -184,8 +212,12 @@ class CliSetupRequestHandler
             $this->output->outputLine();
             $this->output->outputLine(sprintf('%s:', $command->getShortDescription()));
 
+            if (!$this->dispatcher->executeCommand('install:' . strtolower($actionName) . 'needsexecution')) {
+                $this->output->outputLine('<info>No execution needed, skipped step!</info>');
+                return;
+            }
             $actionArguments = array();
-            /** @var \TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition $argumentDefinition */
+            /** @var CommandArgumentDefinition $argumentDefinition */
             foreach ($command->getArgumentDefinitions() as $argumentDefinition) {
                 $isPasswordArgument = strpos(strtolower($argumentDefinition->getName()), 'password') !== false;
                 $argument = $arguments->getArgument($argumentDefinition->getName());
@@ -193,7 +225,7 @@ class CliSetupRequestHandler
                     $actionArguments[$argumentDefinition->getName()] = $this->givenRequestArguments[$argumentDefinition->getName()];
                 } else {
                     if (!$this->interactiveSetup) {
-                        if ($argument->isRequired()) {
+                        if ($this->isArgumentRequired($argument)) {
                             throw new \RuntimeException(sprintf('Argument "%s" is not set, but is required and user interaction has been disabled!', $argument->getName()), 1405273316);
                         } else {
                             continue;
@@ -206,7 +238,7 @@ class CliSetupRequestHandler
                                 sprintf(
                                     '<comment>%s (%s):</comment> ',
                                     $argumentDefinition->getDescription(),
-                                    $argument->isRequired() ? 'required' : sprintf('default: "%s"', $argument->getDefaultValue())
+                                    $this->isArgumentRequired($argument) ? 'required' : sprintf('default: "%s"', $argument->getDefaultValue())
                                 )
                             );
                         } else {
@@ -214,11 +246,11 @@ class CliSetupRequestHandler
                                 sprintf(
                                     '<comment>%s (%s):</comment> ',
                                     $argumentDefinition->getDescription(),
-                                    $argument->isRequired() ? 'required' : sprintf('default: "%s"', $argument->getDefaultValue())
+                                    $this->isArgumentRequired($argument) ? 'required' : sprintf('default: "%s"', $argument->getDefaultValue())
                                 )
                             );
                         }
-                    } while ($argumentDefinition->isRequired() && $argumentValue === null);
+                    } while ($argument->isRequired() && $argumentValue === null);
                     $actionArguments[$argumentDefinition->getName()] = $argumentValue !== null ? $argumentValue : $argument->getDefaultValue();
                 }
             }
@@ -226,14 +258,32 @@ class CliSetupRequestHandler
             do {
                 $messages = @unserialize($this->dispatcher->executeCommand('install:' . strtolower($actionName), $actionArguments));
             } while ($messages === 'REDIRECT');
-            $messages = $messages ?: array();
 
-            $this->outputMessages($messages);
+            $stillNeedsExecution = (bool)$this->dispatcher->executeCommand('install:' . strtolower($actionName) . 'needsexecution');
+            if ($stillNeedsExecution) {
+                if (empty($messages)) {
+                    $warning = new WarningStatus();
+                    $warning->setTitle('Action was not executed successfully!');
+                    $warning->setMessage(
+                        'Please check if your input values are correct and you have all needed permissions!'
+                        . PHP_EOL . '(Could it be that you selected "use existing database", but the chosen database is not empty?)'
+                    );
+                    $messages = array($warning);
+                }
+                $this->outputMessages($messages);
+            } else {
+                $this->output->outputLine('<success>OK</success>');
+            }
 
             if ($loopCounter > 10) {
                 throw new \RuntimeException('Tried to dispatch "' . $actionName . '" ' . $loopCounter . ' times.', 1405269518);
             }
-        } while (!empty($messages));
+        } while ($stillNeedsExecution);
+    }
+
+    protected function isArgumentRequired(Argument $argument)
+    {
+        return $argument->isRequired() || $argument->getDefaultValue() === 'required';
     }
 
     /**
@@ -313,15 +363,10 @@ class CliSetupRequestHandler
      */
     protected function outputMessages(array $messages = array())
     {
-        if (empty($messages)) {
-            $this->output->outputLine('OK');
-            return;
-        }
         $this->output->outputLine();
         foreach ($messages as $statusMessage) {
             $this->outputStatusMessage($statusMessage);
         }
-        $this->output->outputLine();
     }
 
     /**

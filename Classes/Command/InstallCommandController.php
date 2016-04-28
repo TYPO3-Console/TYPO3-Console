@@ -134,6 +134,14 @@ class InstallCommandController extends CommandController
     }
 
     /**
+     * @internal
+     */
+    public function environmentAndFoldersNeedsExecutionCommand()
+    {
+        $this->cliSetupRequestHandler->callNeedsExecution('environmentAndFolders');
+    }
+
+    /**
      * Database connection details
      *
      * @param string $databaseUserName User name for database server
@@ -149,16 +157,32 @@ class InstallCommandController extends CommandController
     }
 
     /**
-     * Select a database name
-     *
-     * @param string $databaseName Name of the database
-     * @param bool $databaseCreate Create database (1) or use existing database (0)
      * @internal
      */
-    public function databaseSelectCommand($databaseName, $databaseCreate = true)
+    public function databaseConnectNeedsExecutionCommand()
+    {
+        $this->cliSetupRequestHandler->callNeedsExecution('databaseConnect');
+    }
+
+    /**
+     * Select a database name
+     *
+     * @param bool $databaseCreate Create database (1) or use existing database (0)
+     * @param string $databaseName Name of the database
+     * @internal
+     */
+    public function databaseSelectCommand($databaseCreate = true, $databaseName = 'required')
     {
         $selectType = $databaseCreate ? 'new' : 'existing';
         $this->cliSetupRequestHandler->executeActionWithArguments('databaseSelect', array('type' => $selectType, $selectType => $databaseName));
+    }
+
+    /**
+     * @internal
+     */
+    public function databaseSelectNeedsExecutionCommand()
+    {
+        $this->cliSetupRequestHandler->callNeedsExecution('databaseSelect');
     }
 
     /**
@@ -175,6 +199,14 @@ class InstallCommandController extends CommandController
     }
 
     /**
+     * @internal
+     */
+    public function databaseDataNeedsExecutionCommand()
+    {
+        $this->cliSetupRequestHandler->callNeedsExecution('databaseData');
+    }
+
+    /**
      * Write default configuration
      *
      * @param string $siteSetupType Specify the setup type: Download the list of distributions (loaddistribution), Create empty root page (createsite), Do nothing (donothing)
@@ -183,5 +215,13 @@ class InstallCommandController extends CommandController
     public function defaultConfigurationCommand($siteSetupType = 'createsite')
     {
         $this->cliSetupRequestHandler->executeActionWithArguments('defaultConfiguration', array('sitesetup' => $siteSetupType));
+    }
+
+    /**
+     * @internal
+     */
+    public function defaultConfigurationNeedsExecutionCommand()
+    {
+        $this->cliSetupRequestHandler->callNeedsExecution('defaultConfiguration');
     }
 }
