@@ -34,9 +34,19 @@ class ExtensionCommandController extends CommandController
     protected $signalSlotDispatcher;
 
     /**
+     * @var \TYPO3\CMS\Extensionmanager\Utility\ExtensionModelUtility
+     */
+    protected $extensionModelUtility;
+
+    /**
      * @var \TYPO3\CMS\Extensionmanager\Utility\InstallUtility
      */
     protected $extensionInstaller;
+
+    /**
+     * @var \TYPO3\CMS\Extensionmanager\Service\ExtensionManagementService
+     */
+    protected $extensionManagementService;
 
     /**
      * @var \TYPO3\CMS\Core\Package\PackageManager
@@ -52,11 +62,27 @@ class ExtensionCommandController extends CommandController
     }
 
     /**
+     * @param \TYPO3\CMS\Extensionmanager\Utility\ExtensionModelUtility $extensionModelUtility
+     */
+    public function injectExtensionModelUtility(\TYPO3\CMS\Extensionmanager\Utility\ExtensionModelUtility $extensionModelUtility)
+    {
+        $this->extensionModelUtility = $extensionModelUtility;
+    }
+
+    /**
      * @param \TYPO3\CMS\Extensionmanager\Utility\InstallUtility $extensionInstaller
      */
     public function injectExtensionInstaller(\TYPO3\CMS\Extensionmanager\Utility\InstallUtility $extensionInstaller)
     {
         $this->extensionInstaller = $extensionInstaller;
+    }
+
+    /**
+     * @param \TYPO3\CMS\Extensionmanager\Service\ExtensionManagementService $extensionManagementService
+     */
+    public function injectExtensionManagementService(\TYPO3\CMS\Extensionmanager\Service\ExtensionManagementService $extensionManagementService)
+    {
+        $this->extensionManagementService = $extensionManagementService;
     }
 
     /**
@@ -74,13 +100,43 @@ class ExtensionCommandController extends CommandController
      * recognised extension folder paths in TYPO3.
      *
      * @param array $extensionKeys
+     * @param bool $withDependencies
      */
-    public function activateCommand(array $extensionKeys)
+    public function activateCommand(array $extensionKeys, $withDependencies = false)
     {
         $this->emitPackagesMayHaveChangedSignal();
         foreach ($extensionKeys as $extensionKey) {
-            $this->extensionInstaller->install($extensionKey);
+            if ($withDependencies) {
+                try {
+                    $extension = $this->extensionModelUtility->mapExtensionArrayToModel(
+                        $this->extensionInstaller->enrichExtensionWithDetails($extensionKey)
+                    );
+
+                    $installationResult = $this->extensionManagementService->installExtension($extension);
+                    if ($installationResult === false) {
+                        $this->outputLine('<error>Dependencies for extension "%s" could not be resolved.</error>', [$extensionKey]);
+                    } else {
+                        foreach ($installationResult as $mode => $dependencyKeys) {
+                            if (!empty($dependencyKeys)) {
+                                $extensionKeysAsString = implode('", "', $dependencyKeys);
+                                if (count($dependencyKeys) === 1) {
+                                    $this->outputLine('<info>Extension "%s" has been %s.</info>', [$extensionKeysAsString, $mode]);
+                                } else {
+                                    $this->outputLine('<info>Extensions "%s" have been %s.</info>', [$extensionKeysAsString, $mode]);
+                                }
+                            }
+                        }
+                    }
+                } catch (\TYPO3\CMS\Extensionmanager\Exception\ExtensionManagerException $e) {
+                    $this->outputLine('<error>'.$e->getMessage().'</error>', [$extensionKey]);
+                } catch (\TYPO3\CMS\Core\Package\Exception\PackageStatesFileNotWritableException $e) {
+                    $this->outputLine('<error>'.$e->getMessage().'</error>', [$extensionKey]);
+                }
+            } else {
+                $this->extensionInstaller->install($extensionKey);
+            }
         }
+
         $extensionKeysAsString = implode('", "', $extensionKeys);
         if (count($extensionKeys) === 1) {
             $this->outputLine('<info>Extension "%s" is now active.</info>', [$extensionKeysAsString]);
