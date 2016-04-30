@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Install;
  *
  */
 
+use Helhum\Typo3Console\Install\Status\RedirectStatus;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -21,6 +22,7 @@ use TYPO3\CMS\Extbase\Mvc\Controller\Argument;
 use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
 use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentTypeException;
 use TYPO3\CMS\Install\Controller\Action\ActionInterface;
+use TYPO3\CMS\Install\Controller\Action\Step\StepInterface;
 use TYPO3\CMS\Install\Controller\Exception\RedirectException;
 use TYPO3\CMS\Install\Status\StatusInterface;
 use TYPO3\CMS\Install\Status\WarningStatus;
@@ -141,14 +143,14 @@ class CliSetupRequestHandler
     /**
      * @param string $actionName
      * @param array $arguments
-     * @return ActionInterface
+     * @return StepInterface|ActionInterface
      */
     protected function createActionWithNameAndArguments($actionName, array $arguments = array())
     {
         $classPrefix = 'TYPO3\\CMS\\Install\\Controller\\Action\\Step\\';
         $className = $classPrefix . ucfirst($actionName);
 
-        /** @var ActionInterface $action */
+        /** @var StepInterface|ActionInterface $action */
         $action = $this->objectManager->get($className);
         $action->setController('step');
         $action->setAction($actionName);
@@ -158,15 +160,15 @@ class CliSetupRequestHandler
     }
 
     /**
-     * @param ActionInterface $action
-     * @return bool|string
+     * @param StepInterface $action
+     * @return StatusInterface[]
      */
-    protected function executeAction(ActionInterface $action)
+    protected function executeAction(StepInterface $action)
     {
         try {
             $needsExecution = $action->needsExecution();
         } catch (\TYPO3\CMS\Install\Controller\Exception\RedirectException $e) {
-            return 'REDIRECT';
+            return array(new RedirectStatus());
         }
 
         if ($needsExecution) {
@@ -177,10 +179,10 @@ class CliSetupRequestHandler
     }
 
     /**
-     * @param ActionInterface $action
-     * @return bool|string
+     * @param StepInterface $action
+     * @return bool
      */
-    protected function actionNeedsExecution(ActionInterface $action)
+    protected function actionNeedsExecution(StepInterface $action)
     {
         try {
             $needsExecution = $action->needsExecution();
@@ -250,14 +252,14 @@ class CliSetupRequestHandler
                                 )
                             );
                         }
-                    } while ($argument->isRequired() && $argumentValue === null);
+                    } while ($this->isArgumentRequired($argument) && $argumentValue === null);
                     $actionArguments[$argumentDefinition->getName()] = $argumentValue !== null ? $argumentValue : $argument->getDefaultValue();
                 }
             }
 
             do {
                 $messages = @unserialize($this->dispatcher->executeCommand('install:' . strtolower($actionName), $actionArguments));
-            } while ($messages === 'REDIRECT');
+            } while (!empty($messages[0]) && $messages[0] instanceof RedirectStatus);
 
             $stillNeedsExecution = (bool)$this->dispatcher->executeCommand('install:' . strtolower($actionName) . 'needsexecution');
             if ($stillNeedsExecution) {
