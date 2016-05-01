@@ -78,10 +78,12 @@ class InstallCommandController extends CommandController
      * Example: TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS="info,info_pagetsconfig" ./typo3cms install:generatepackagestates
      *
      * @param bool $removeInactiveSystemExtensions Inactive extensions are removed from typo3/sysext (Handle with care!)
+     * @param bool $activateDefaultExtensions  If true, typo3/cms extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
+     * @throws \TYPO3\CMS\Core\Package\Exception\InvalidPackageStateException
      */
-    public function generatePackageStatesCommand($removeInactiveSystemExtensions = false)
+    public function generatePackageStatesCommand($removeInactiveSystemExtensions = false, $activateDefaultExtensions = false)
     {
-        $this->packageStatesGenerator->generate($this->packageManager);
+        $this->packageStatesGenerator->generate($this->packageManager, $activateDefaultExtensions);
 
         if ($removeInactiveSystemExtensions) {
             $activePackages = $this->packageManager->getActivePackages();
