@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Install;
 
 use Helhum\Typo3Console\Package\UncachedPackageManager;
 use TYPO3\CMS\Core\Package\Package;
+use TYPO3\CMS\Core\Utility\PathUtility;
 
 /**
  * This class generates the PackageStates.php file from composer.json configuration
@@ -23,17 +24,20 @@ class PackageStatesGenerator
 {
     /**
      * @param UncachedPackageManager $packageManager
+     * @param bool $activateDefaultExtensions
+     * @throws \TYPO3\CMS\Core\Package\Exception\ProtectedPackageKeyException
      */
-    public function generate(UncachedPackageManager $packageManager)
+    public function generate(UncachedPackageManager $packageManager, $activateDefaultExtensions = false)
     {
         $frameworkExtensionsFromConfiguration = $this->getFrameworkExtensionsFromConfiguration();
         foreach ($packageManager->getAvailablePackages() as $package) {
             if (
                 isset($frameworkExtensionsFromConfiguration[$package->getPackageKey()])
+                || ($activateDefaultExtensions && $package->isPartOfFactoryDefault())
                 || $package->isProtected()
                 || ($package instanceof Package && $package->isPartOfMinimalUsableSystem())
                 // Every extension available in typo3conf/ext is meant to be active
-                || strpos($package->getPackagePath(), 'typo3conf/ext/') !== false
+                || strpos(PathUtility::stripPathSitePrefix($package->getPackagePath()), 'typo3conf/ext/') !== false
             ) {
                 $packageManager->activatePackage($package->getPackageKey());
             } else {
