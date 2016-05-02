@@ -14,7 +14,6 @@ namespace Helhum\Typo3Console\Install;
  */
 
 use Helhum\Typo3Console\Package\UncachedPackageManager;
-use TYPO3\CMS\Core\Package\Package;
 use TYPO3\CMS\Core\Utility\PathUtility;
 
 /**
@@ -33,9 +32,9 @@ class PackageStatesGenerator
         foreach ($packageManager->getAvailablePackages() as $package) {
             if (
                 isset($frameworkExtensionsFromConfiguration[$package->getPackageKey()])
-                || ($activateDefaultExtensions && $package->isPartOfFactoryDefault())
                 || $package->isProtected()
-                || ($package instanceof Package && $package->isPartOfMinimalUsableSystem())
+                || $package->isPartOfMinimalUsableSystem()
+                || ($activateDefaultExtensions && $package->isPartOfFactoryDefault())
                 // Every extension available in typo3conf/ext is meant to be active
                 || strpos(PathUtility::stripPathSitePrefix($package->getPackagePath()), 'typo3conf/ext/') !== false
             ) {

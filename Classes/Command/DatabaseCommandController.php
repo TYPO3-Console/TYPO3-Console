@@ -27,9 +27,12 @@ namespace Helhum\Typo3Console\Command;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use Helhum\Typo3Console\ImportExport\Database\Process\MysqlCommand;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Helhum\Typo3Console\Service\Database\Schema\SchemaUpdateResult;
 use Helhum\Typo3Console\Service\Database\Schema\SchemaUpdateType;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\ProcessBuilder;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 
 /**
@@ -42,6 +45,12 @@ class DatabaseCommandController extends CommandController
      * @inject
      */
     protected $schemaService;
+
+    /**
+     * @var \Helhum\Typo3Console\ImportExport\Database\Configuration\ConnectionConfiguration
+     * @inject
+     */
+    protected $connectionConfiguration;
 
     /**
      * Mapping of schema update types to human-readable labels
@@ -90,6 +99,58 @@ class DatabaseCommandController extends CommandController
         } else {
             $this->output->outputLine('No schema updates matching the given types where performed');
         }
+    }
+
+    /**
+     * Read mysql from stdin.
+     *
+     * This means that this can not only be used to pass insert statements,
+     * it but works as well to pass SELECT statements to it.
+     * The mysql binary must be available in the path for this command to work.
+     */
+    public function importCommand()
+    {
+        $mysqlCommand = new MysqlCommand(
+            $this->connectionConfiguration->build(),
+            new ProcessBuilder()
+        );
+        $exitCode = $mysqlCommand->mysql(
+            array('--skip-column-names'),
+            STDIN,
+            function ($type, $output) {
+                if (Process::OUT === $type) {
+                    // Explicitly just echo out for now (avoid Symfony console formatting)
+                    echo $output;
+                } else {
+                    $this->output('<error>' . $output . '</error>');
+                }
+            }
+        );
+        $this->quit($exitCode);
+    }
+
+    /**
+     * Export the database (all tables) directly to stdout
+     *
+     * The mysqldump binary must be available in the path for this command to work.
+     */
+    public function exportCommand()
+    {
+        $mysqlCommand = new MysqlCommand(
+            $this->connectionConfiguration->build(),
+            new ProcessBuilder()
+        );
+        $exitCode = $mysqlCommand->mysqldump(
+            array(),
+            function ($type, $output) {
+                if (Process::OUT === $type) {
+                    echo $output;
+                } else {
+                    $this->output('<error>' . $output . '</error>');
+                }
+            }
+        );
+        $this->quit($exitCode);
     }
 
     /**

@@ -68,6 +68,8 @@ script:
   - ./typo3cms cache:listgroups
   - ./typo3cms cleanup:updatereferenceindex
   - ./typo3cms database:updateschema "*"
+  - ./typo3cms database:export > /dev/null
+  - echo "SELECT username from be_users where admin=1;" | ./typo3cms database:import
   - ./typo3cms frontend:request / > /dev/null
   - ./typo3cms documentation:generatexsd TYPO3\\CMS\\Fluid\\ViewHelpers > /dev/null
   - ./typo3cms configuration:show BE/installToolPassword
