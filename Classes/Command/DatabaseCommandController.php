@@ -13,13 +13,11 @@ namespace Helhum\Typo3Console\Command;
  *
  */
 
-use Helhum\Typo3Console\ImportExport\Database\Process\MysqlCommand;
+use Helhum\Typo3Console\Database\Process\MysqlCommand;
+use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
-use Helhum\Typo3Console\Service\Database\Schema\SchemaUpdateResult;
-use Helhum\Typo3Console\Service\Database\Schema\SchemaUpdateType;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
-use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 
 /**
  * Database command controller
@@ -27,36 +25,27 @@ use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 class DatabaseCommandController extends CommandController
 {
     /**
-     * @var \Helhum\Typo3Console\Service\Database\Schema\SchemaService
+     * @var \Helhum\Typo3Console\Service\Database\SchemaService
      * @inject
      */
     protected $schemaService;
 
     /**
-     * @var \Helhum\Typo3Console\ImportExport\Database\Configuration\ConnectionConfiguration
+     * @var \Helhum\Typo3Console\Database\Schema\SchemaUpdateResultRenderer
+     * @inject
+     */
+    protected $schemaUpdateResultRenderer;
+
+    /**
+     * @var \Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration
      * @inject
      */
     protected $connectionConfiguration;
 
     /**
-     * Mapping of schema update types to human-readable labels
-     *
-     * @var array
-     */
-    protected $schemaUpdateTypeLabels = array(
-        SchemaUpdateType::FIELD_ADD => 'Add fields',
-        SchemaUpdateType::FIELD_CHANGE => 'Change fields',
-        SchemaUpdateType::FIELD_DROP => 'Drop fields',
-        SchemaUpdateType::TABLE_ADD => 'Add tables',
-        SchemaUpdateType::TABLE_CHANGE => 'Change tables',
-        SchemaUpdateType::TABLE_CLEAR => 'Clear tables',
-        SchemaUpdateType::TABLE_DROP => 'Drop tables',
-    );
-
-    /**
      * Update database schema
      *
-     * See Helhum\Typo3Console\Service\Database\Schema\SchemaUpdateType for a list of valid schema update types.
+     * See Helhum\Typo3Console\Database\Schema\SchemaUpdateType for a list of valid schema update types.
      *
      * The list of schema update types supports wildcards to specify multiple types, e.g.:
      *
@@ -71,7 +60,7 @@ class DatabaseCommandController extends CommandController
     public function updateSchemaCommand(array $schemaUpdateTypes)
     {
         try {
-            $schemaUpdateTypes = $this->expandSchemaUpdateTypes($schemaUpdateTypes);
+            $schemaUpdateTypes = SchemaUpdateType::expandSchemaUpdateTypes($schemaUpdateTypes);
         } catch (\UnexpectedValueException $e) {
             $this->outputLine(sprintf('<error>%s</error>', $e->getMessage()));
             $this->sendAndExit(1);
@@ -81,7 +70,7 @@ class DatabaseCommandController extends CommandController
 
         if ($result->hasPerformedUpdates()) {
             $this->output->outputLine('<info>The following schema updates where performed:</info>');
-            $this->outputSchemaUpdateResult($result);
+            $this->schemaUpdateResultRenderer->render($result, $this->output);
         } else {
             $this->output->outputLine('No schema updates matching the given types where performed');
         }
@@ -137,71 +126,5 @@ class DatabaseCommandController extends CommandController
             }
         );
         $this->quit($exitCode);
-    }
-
-    /**
-     * Expands wildcards in schema update types, e.g. field.* or *.change
-     *
-     * @param array $schemaUpdateTypes List of schema update types
-     * @return SchemaUpdateType[]
-     * @throws \UnexpectedValueException If an invalid schema update type was passed
-     */
-    protected function expandSchemaUpdateTypes(array $schemaUpdateTypes)
-    {
-        $expandedSchemaUpdateTypes = array();
-        $schemaUpdateTypeConstants = array_values(SchemaUpdateType::getConstants());
-
-        // Collect total list of types by expanding wildcards
-        foreach ($schemaUpdateTypes as $schemaUpdateType) {
-            if (strpos($schemaUpdateType, '*') !== false) {
-                $matchPattern = '/' . str_replace('\\*', '.+', preg_quote($schemaUpdateType, '/')) . '/';
-                $matchingSchemaUpdateTypes = preg_grep($matchPattern, $schemaUpdateTypeConstants);
-                $expandedSchemaUpdateTypes = array_merge($expandedSchemaUpdateTypes, $matchingSchemaUpdateTypes);
-            } else {
-                $expandedSchemaUpdateTypes[] = $schemaUpdateType;
-            }
-        }
-
-        // Cast to enumeration objects to ensure valid values
-        foreach ($expandedSchemaUpdateTypes as &$schemaUpdateType) {
-            try {
-                $schemaUpdateType = SchemaUpdateType::cast($schemaUpdateType);
-            } catch (InvalidEnumerationValueException $e) {
-                throw new \UnexpectedValueException(sprintf(
-                    'Invalid schema update type "%s", must be one of: "%s"',
-                    $schemaUpdateType,
-                    implode('", "', $schemaUpdateTypeConstants)
-                ), 1439460396);
-            }
-        }
-
-        return $expandedSchemaUpdateTypes;
-    }
-
-    /**
-     * Renders a table for a schema update result
-     *
-     * @param SchemaUpdateResult $result Result of the schema update
-     * @return void
-     */
-    protected function outputSchemaUpdateResult(SchemaUpdateResult $result)
-    {
-        $tableRows = array();
-
-        foreach ($result->getPerformedUpdates() as $type => $numberOfUpdates) {
-            $tableRows[] = array($this->schemaUpdateTypeLabels[(string)$type], $numberOfUpdates);
-        }
-
-        $this->output->outputTable($tableRows, array('Type', 'Updates'));
-
-        if ($result->hasErrors()) {
-            foreach ($result->getErrors() as $type => $errors) {
-                $this->output->outputLine(sprintf('<error>Errors during "%s" schema update:</error>', $this->schemaUpdateTypeLabels[(string)$type]));
-
-                foreach ($errors as $error) {
-                    $this->output->outputFormatted('<error>' . $error . '</error>', array(), 2);
-                }
-            }
-        }
     }
 }
