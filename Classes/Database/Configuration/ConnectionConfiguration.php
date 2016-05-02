@@ -1,5 +1,5 @@
 <?php
-namespace Helhum\Typo3Console\ImportExport\Database\Configuration;
+namespace Helhum\Typo3Console\Database\Configuration;
 
 /*
  * This file is part of the TYPO3 console project.

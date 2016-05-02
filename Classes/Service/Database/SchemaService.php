@@ -1,5 +1,5 @@
 <?php
-namespace Helhum\Typo3Console\Service\Database\Schema;
+namespace Helhum\Typo3Console\Service\Database;
 
 /*
  * This file is part of the TYPO3 console project.
@@ -13,6 +13,8 @@ namespace Helhum\Typo3Console\Service\Database\Schema;
  *
  */
 
+use Helhum\Typo3Console\Database\Schema\SchemaUpdateResult;
+use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 
