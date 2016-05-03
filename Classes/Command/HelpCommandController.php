@@ -94,7 +94,7 @@ class HelpCommandController extends CommandController
         $this->outputLine('<comment>Available commands:</comment>');
 
         foreach ($this->commands as $shortCommandIdentifier => $command) {
-            $description = wordwrap($command->getShortDescription(), $this->output->getMaximumLineLength() - 43, PHP_EOL . str_repeat(' ', 43), TRUE);
+            $description = wordwrap($command->getShortDescription(), $this->output->getMaximumLineLength() - 43, PHP_EOL . str_repeat(' ', 43), true);
             $this->outputLine('%-2s<info>%-40s</info> %s', array(' ', $shortCommandIdentifier, $description));
         }
 
@@ -114,10 +114,10 @@ class HelpCommandController extends CommandController
         $this->outputLine($command->getShortDescription());
         $commandArgumentDefinitions = $command->getArgumentDefinitions();
         $usage = '';
-        $hasOptions = FALSE;
+        $hasOptions = false;
         foreach ($commandArgumentDefinitions as $commandArgumentDefinition) {
             if (!$commandArgumentDefinition->isRequired()) {
-                $hasOptions = TRUE;
+                $hasOptions = true;
             } else {
                 $usage .= sprintf(' <%s>', strtolower(preg_replace('/([A-Z])/', ' $1', $commandArgumentDefinition->getName())));
             }
@@ -131,7 +131,7 @@ class HelpCommandController extends CommandController
         if ($command->hasArguments()) {
             foreach ($commandArgumentDefinitions as $commandArgumentDefinition) {
                 $argumentDescription = $commandArgumentDefinition->getDescription();
-                $argumentDescription = wordwrap($argumentDescription, $this->output->getMaximumLineLength() - 23, PHP_EOL . str_repeat(' ', 23), TRUE);
+                $argumentDescription = wordwrap($argumentDescription, $this->output->getMaximumLineLength() - 23, PHP_EOL . str_repeat(' ', 23), true);
                 if ($commandArgumentDefinition->isRequired()) {
                     $argumentDescriptions[] = vsprintf('  <info>%-20s</info> %s', array($commandArgumentDefinition->getDashedName(), $argumentDescription));
                 } else {
