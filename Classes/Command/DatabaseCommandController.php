@@ -82,8 +82,11 @@ class DatabaseCommandController extends CommandController
      * This means that this can not only be used to pass insert statements,
      * it but works as well to pass SELECT statements to it.
      * The mysql binary must be available in the path for this command to work.
+     *
+     * @param bool $interactive
+     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
      */
-    public function importCommand()
+    public function importCommand($interactive = false)
     {
         $mysqlCommand = new MysqlCommand(
             $this->connectionConfiguration->build(),
@@ -99,7 +102,8 @@ class DatabaseCommandController extends CommandController
                 } else {
                     $this->output('<error>' . $output . '</error>');
                 }
-            }
+            },
+            $interactive
         );
         $this->quit($exitCode);
     }

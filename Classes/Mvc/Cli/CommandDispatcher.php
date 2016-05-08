@@ -14,7 +14,7 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 /**
- * Class Disptacher
+ * Class CommandDispatcher
  */
 class CommandDispatcher
 {
