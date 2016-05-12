@@ -46,7 +46,7 @@ class ExtensionInstallation
     {
         $db = $this->getDatabaseConnection();
 
-        $where = 'username = ' . $db->fullQuoteStr('_cli_lowlevel', 'be_users') . ' AND admin = 0';
+        $where = 'username = ' . $db->fullQuoteStr('_cli_lowlevel', 'be_users') . ' AND admin = 0 AND deleted = 0';
 
         $user = $db->exec_SELECTgetSingleRow('*', 'be_users', $where);
         if ($user) {
