@@ -33,7 +33,7 @@ class HelpCommandController extends CommandController
     /**
      * @var array
      */
-    protected $commandsByExtensionsAndControllers = array();
+    protected $commands = array();
 
     /**
      * Displays a short, general help message
@@ -46,10 +46,12 @@ class HelpCommandController extends CommandController
      */
     public function helpStubCommand()
     {
-        $this->outputLine('TYPO3 Console %s', array(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getExtensionVersion('typo3_console')));
-        $this->outputLine('usage: ' . $this->request->getCallingScript() . ' <command identifier>');
+        $this->outputLine('<info>TYPO3 Console</info> version <comment>%s</comment>', array(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getExtensionVersion('typo3_console')));
         $this->outputLine();
-        $this->outputLine('See \'' . $this->request->getCallingScript() . ' help\' for a list of all available commands.');
+        $this->outputLine('<comment>Usage:</comment>');
+        $this->outputLine('  command [options] [arguments]');
+        $this->outputLine();
+        $this->outputLine('See <info>help</info> for a list of all available commands.');
         $this->outputLine();
     }
 
@@ -64,6 +66,9 @@ class HelpCommandController extends CommandController
      */
     public function helpCommand($commandIdentifier = null)
     {
+        $this->outputLine('<info>TYPO3 Console</info> version <comment>%s</comment>', array(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getExtensionVersion('typo3_console')));
+        $this->outputLine();
+
         if ($commandIdentifier === null) {
             $this->displayHelpIndex();
         } else {
@@ -83,24 +88,18 @@ class HelpCommandController extends CommandController
     protected function displayHelpIndex()
     {
         $this->buildCommandsIndex();
-        $this->outputLine('TYPO3 Console %s', array(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getExtensionVersion('typo3_console')));
-        $this->outputLine('usage: ' . $this->request->getCallingScript() . ' <command identifier>');
+        $this->outputLine('<comment>Usage:</comment>');
+        $this->outputLine('  command [options] [arguments]');
         $this->outputLine();
-        $this->outputLine('The following commands are currently available:');
-        foreach ($this->commandsByExtensionsAndControllers as $extensionKey => $commandControllers) {
-            $this->outputLine('');
-            $this->outputLine('EXTENSION "%s":', array(strtoupper($extensionKey)));
-            $this->outputLine(str_repeat('-', $this->output->getMaximumLineLength()));
-            foreach ($commandControllers as $commands) {
-                foreach ($commands as $command) {
-                    $description = wordwrap($command->getShortDescription(), $this->output->getMaximumLineLength() - 43, PHP_EOL . str_repeat(' ', 43), true);
-                    $shortCommandIdentifier = $this->commandManager->getShortestIdentifierForCommand($command);
-                    $this->outputLine('%-2s%-40s %s', array(' ', $shortCommandIdentifier, $description));
-                }
-                $this->outputLine();
-            }
+        $this->outputLine('<comment>Available commands:</comment>');
+
+        foreach ($this->commands as $shortCommandIdentifier => $command) {
+            $description = wordwrap($command->getShortDescription(), $this->output->getMaximumLineLength() - 43, PHP_EOL . str_repeat(' ', 43), true);
+            $this->outputLine('%-2s<info>%-40s</info> %s', array(' ', $shortCommandIdentifier, $description));
         }
-        $this->outputLine('See \'' . $this->request->getCallingScript() . ' help <command identifier>\' for more information about a specific command.');
+
+        $this->outputLine();
+        $this->outputLine('See <info>help</info> <command> for more information about a specific command.');
         $this->outputLine();
     }
 
@@ -112,11 +111,7 @@ class HelpCommandController extends CommandController
      */
     protected function displayHelpForCommand(\TYPO3\CMS\Extbase\Mvc\Cli\Command $command)
     {
-        $this->outputLine();
         $this->outputLine($command->getShortDescription());
-        $this->outputLine();
-        $this->outputLine('COMMAND:');
-        $this->outputLine('%-2s%s', array(' ', $command->getCommandIdentifier()));
         $commandArgumentDefinitions = $command->getArgumentDefinitions();
         $usage = '';
         $hasOptions = false;
@@ -127,9 +122,9 @@ class HelpCommandController extends CommandController
                 $usage .= sprintf(' <%s>', strtolower(preg_replace('/([A-Z])/', ' $1', $commandArgumentDefinition->getName())));
             }
         }
-        $usage = $this->request->getCallingScript() . ' ' . $this->commandManager->getShortestIdentifierForCommand($command) . ($hasOptions ? ' [<options>]' : '') . $usage;
+        $usage = $this->commandManager->getShortestIdentifierForCommand($command) . ($hasOptions ? ' [<options>]' : '') . $usage;
         $this->outputLine();
-        $this->outputLine('USAGE:');
+        $this->outputLine('<comment>Usage:</comment>');
         $this->outputLine('  ' . $usage);
         $argumentDescriptions = array();
         $optionDescriptions = array();
@@ -138,29 +133,28 @@ class HelpCommandController extends CommandController
                 $argumentDescription = $commandArgumentDefinition->getDescription();
                 $argumentDescription = wordwrap($argumentDescription, $this->output->getMaximumLineLength() - 23, PHP_EOL . str_repeat(' ', 23), true);
                 if ($commandArgumentDefinition->isRequired()) {
-                    $argumentDescriptions[] = vsprintf('  %-20s %s', array($commandArgumentDefinition->getDashedName(), $argumentDescription));
+                    $argumentDescriptions[] = vsprintf('  <info>%-20s</info> %s', array($commandArgumentDefinition->getDashedName(), $argumentDescription));
                 } else {
-                    $optionDescriptions[] = vsprintf('  %-20s %s', array($commandArgumentDefinition->getDashedName(), $argumentDescription));
+                    $optionDescriptions[] = vsprintf('  <info>%-20s</info> %s', array($commandArgumentDefinition->getDashedName(), $argumentDescription));
                 }
             }
         }
         if (count($argumentDescriptions) > 0) {
             $this->outputLine();
-            $this->outputLine('ARGUMENTS:');
+            $this->outputLine('<comment>Arguments:</comment>');
             foreach ($argumentDescriptions as $argumentDescription) {
                 $this->outputLine($argumentDescription);
             }
         }
         if (count($optionDescriptions) > 0) {
             $this->outputLine();
-            $this->outputLine('OPTIONS:');
+            $this->outputLine('<comment>Options:</comment>');
             foreach ($optionDescriptions as $optionDescription) {
                 $this->outputLine($optionDescription);
             }
         }
         if ($command->getDescription() !== '') {
-            $this->outputLine();
-            $this->outputLine('DESCRIPTION:');
+            $this->outputLine('<comment>Help:</comment>');
             $descriptionLines = explode(chr(10), $command->getDescription());
             foreach ($descriptionLines as $descriptionLine) {
                 $this->outputLine('%-2s%s', array(' ', $descriptionLine));
@@ -187,7 +181,9 @@ class HelpCommandController extends CommandController
      */
     public function errorCommand(\TYPO3\CMS\Extbase\Mvc\Exception\CommandException $exception)
     {
-        $this->outputLine($exception->getMessage());
+        $this->outputLine('<info>TYPO3 Console</info> version <comment>%s</comment>', array(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getExtensionVersion('typo3_console')));
+        $this->outputLine();
+        $this->outputLine('<error>%s</error>', array($exception->getMessage()));
         if ($exception instanceof \TYPO3\CMS\Extbase\Mvc\Exception\AmbiguousCommandIdentifierException) {
             $this->outputLine('Please specify the complete command identifier. Matched commands:');
             foreach ($exception->getMatchingCommands() as $matchingCommand) {
@@ -195,8 +191,8 @@ class HelpCommandController extends CommandController
             }
         }
         $this->outputLine('');
-        $this->outputLine('Enter "' . $this->request->getCallingScript() . ' help" for an overview of all available commands');
-        $this->outputLine('or "' . $this->request->getCallingScript() . ' help <command identifier>" for a detailed description of the corresponding command.');
+        $this->outputLine('See <info>help</info> for an overview of all available commands');
+        $this->outputLine('or <info>help</info> <command> for a detailed description of the corresponding command.');
     }
 
     /**
@@ -209,22 +205,22 @@ class HelpCommandController extends CommandController
     {
         $availableCommands = $this->commandManager->getAvailableCommands();
         /** @var RunLevel $runLevel */
-        $runLevel = ConsoleBootstrap::getInstance()->getEarlyInstance(\Helhum\Typo3Console\Core\Booting\RunLevel::class);
+        $runLevel = ConsoleBootstrap::getInstance()->getEarlyInstance('Helhum\Typo3Console\Core\Booting\RunLevel');
+
         foreach ($availableCommands as $command) {
             if ($command->isInternal()) {
                 continue;
             }
-            $commandIdentifier = $command->getCommandIdentifier();
-            $extensionKey = strstr($commandIdentifier, ':', true);
-            $commandControllerClassName = $command->getControllerClassName();
-            $commandName = $command->getControllerCommandName();
 
             $shortCommandIdentifier = $this->commandManager->getShortestIdentifierForCommand($command);
+
             if ($runLevel->getMaximumAvailableRunLevel() === RunLevel::LEVEL_COMPILE && !$runLevel->isCommandAvailable($shortCommandIdentifier)) {
                 continue;
             }
 
-            $this->commandsByExtensionsAndControllers[$extensionKey][$commandControllerClassName][$commandName] = $command;
+            $this->commands[$shortCommandIdentifier] = $command;
         }
+
+        ksort($this->commands);
     }
 }
