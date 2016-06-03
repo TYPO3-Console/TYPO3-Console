@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Service;
  *
  */
 
+use Helhum\Typo3Console\Parser\PhpParser;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Reflection\ClassReflection;
 use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
@@ -48,19 +49,51 @@ class XsdGenerator
     public function generateXsd($viewHelperNamespace, $xsdNamespace)
     {
         $viewHelperNamespace = rtrim($viewHelperNamespace, '_\\') . $this->getDelimiterFromNamespace($viewHelperNamespace);
-
         $classNames = $this->getClassNamesInNamespace($viewHelperNamespace);
         if (count($classNames) === 0) {
             throw new Exception(sprintf('No ViewHelpers found in namespace "%s"', $viewHelperNamespace), 1330029328);
         }
+        return $this->generateXsdFromClassNames($classNames, $xsdNamespace);
+    }
 
+    /**
+     * Generate the XML Schema definition for a given namespace.
+     * It will generate an XSD file for all view helpers in this namespace.
+     *
+     * @param array $viewHelperPaths One or more paths to a view helper class files
+     * @param string $xsdNamespace $xsdNamespace unique target namespace used in the XSD schema (for example "http://yourdomain.org/ns/viewhelpers")
+     * @return string XML Schema definition
+     * @throws Exception
+     */
+    public function generateXsdFromClassFiles(array $viewHelperPaths, $xsdNamespace)
+    {
+        $classNames = $this->getClassNamesInPaths($viewHelperPaths);
+        if (count($classNames) === 0) {
+            throw new Exception(sprintf('No ViewHelpers found in paths "%s"', implode(',', $viewHelperPaths)), 1464982249);
+        }
+        return $this->generateXsdFromClassNames($classNames, $xsdNamespace);
+    }
+
+    /**
+     * Generate the XML Schema definition for a given namespace.
+     * It will generate an XSD file for all view helpers in this namespace.
+     *
+     * @param array $classNames One or more view helper class names
+     * @param string $xsdNamespace $xsdNamespace unique target namespace used in the XSD schema (for example "http://yourdomain.org/ns/viewhelpers")
+     * @return string XML Schema definition
+     * @throws Exception
+     */
+    protected function generateXsdFromClassNames(array $classNames, $xsdNamespace)
+    {
+        if (count($classNames) === 0) {
+            throw new Exception(sprintf('No ViewHelper classes given'), 1464984856);
+        }
         $xmlRootNode = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?>
-			<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="' . $xsdNamespace . '"></xsd:schema>');
+            <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="' . $xsdNamespace . '"></xsd:schema>');
 
         foreach ($classNames as $className) {
-            $this->generateXmlForClassName($className, $viewHelperNamespace, $xmlRootNode);
+            $this->generateXmlForClassName($className, $xmlRootNode);
         }
-
         return $xmlRootNode->asXML();
     }
 
@@ -68,19 +101,13 @@ class XsdGenerator
      * Generate the XML Schema for a given class name.
      *
      * @param string $className Class name to generate the schema for.
-     * @param string $viewHelperNamespace Namespace prefix. Used to split off the first parts of the class name.
      * @param \SimpleXMLElement $xmlRootNode XML root node where the xsd:element is appended.
      * @return void
      */
-    protected function generateXmlForClassName($className, $viewHelperNamespace, \SimpleXMLElement $xmlRootNode)
+    protected function generateXmlForClassName($className, \SimpleXMLElement $xmlRootNode)
     {
         $reflectionClass = new ClassReflection($className);
-        if (!$reflectionClass->isSubclassOf($this->abstractViewHelperReflectionClass)) {
-            return;
-        }
-
-        $tagName = $this->getTagNameForClass($className, $viewHelperNamespace);
-
+        $tagName = $this->getTagNameForClass($className);
         $xsdElement = $xmlRootNode->addChild('xsd:element');
         $xsdElement['name'] = $tagName;
         $this->docCommentParser->parseDocComment($reflectionClass->getDocComment());
@@ -141,21 +168,35 @@ class XsdGenerator
      * as the Extbase Reflection Service cannot return all implementations
      * of Fluid AbstractViewHelpers
      *
-     * @param string $namespace
+     * @param array $paths
      * @return array Array of all class names inside a given namespace.
      */
-    protected function getClassNamesInNamespace($namespace)
+    protected function getClassNamesInPaths(array $paths)
     {
-        $packageKey = $this->getPackageKeyFromNamespace($namespace);
-        $viewHelperClassFiles = GeneralUtility::getAllFilesAndFoldersInPath(
-            array(),
-            $this->packageManager->getPackage($packageKey)->getPackagePath() . 'Classes/ViewHelpers/',
-            'php'
-        );
+        $viewHelperClassFiles = array();
+        foreach ($paths as $path) {
+            $viewHelperClassFiles = array_merge(
+                $viewHelperClassFiles,
+                GeneralUtility::getAllFilesAndFoldersInPath(
+                    array(),
+                    $path,
+                    'php'
+                )
+            );
+        }
         $affectedViewHelperClassNames = array();
         foreach ($viewHelperClassFiles as $filePathAndFilename) {
-            $potentialViewHelperClassName = $this->getClassNameFromNamespaceAndPath($namespace, $filePathAndFilename);
-            if (is_subclass_of($potentialViewHelperClassName, \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper::class)) {
+            $potentialViewHelperClassName = $this->getClassNameFromFile($filePathAndFilename);
+            if (strpos($potentialViewHelperClassName, 'ViewHelpers') === false) {
+                continue;
+            }
+            if (
+                is_subclass_of($potentialViewHelperClassName, \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper::class)
+                || is_subclass_of($potentialViewHelperClassName, \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper::class)
+            ) {
+                if (!class_exists($potentialViewHelperClassName)) {
+                    require $filePathAndFilename;
+                }
                 $classReflection = new \ReflectionClass($potentialViewHelperClassName);
                 if ($classReflection->isAbstract() === true) {
                     continue;
@@ -165,6 +206,25 @@ class XsdGenerator
         }
         sort($affectedViewHelperClassNames);
         return $affectedViewHelperClassNames;
+    }
+
+    /**
+     * Get all class names inside this namespace and return them as array.
+     * This has to be done by iterating over class files for TYPO3 CMS
+     * as the Extbase Reflection Service cannot return all implementations
+     * of Fluid AbstractViewHelpers
+     *
+     * @param string $namespace
+     * @return array Array of all class names inside a given namespace.
+     */
+    protected function getClassNamesInNamespace($namespace)
+    {
+        $packageKey = $this->getPackageKeyFromNamespace($namespace);
+        $viewHelperClassFilePaths[] = $this->packageManager->getPackage($packageKey)->getPackagePath() . 'Classes/ViewHelpers/';
+        if ($packageKey === 'fluid') {
+            $viewHelperClassFilePaths[] = realpath(PATH_site . 'typo3/') . '/../vendor/typo3fluid/fluid/src/ViewHelpers/';
+        }
+        return $this->getClassNamesInPaths($viewHelperClassFilePaths);
     }
 
     /**
@@ -185,17 +245,15 @@ class XsdGenerator
     }
 
     /**
-     * @param string $namespace
      * @param string $filePath
      * @return string
      */
-    protected function getClassNameFromNamespaceAndPath($namespace, $filePath)
+    protected function getClassNameFromFile($filePath)
     {
-        $delimiter = $this->getDelimiterFromNamespace($namespace);
-        list($packagePath, $classesPath) = explode('Classes/ViewHelpers/', $filePath);
-        // TODO: This is psr-4 style like in TYPO3 CMS, but what about others?
-        $classSuffix = str_replace('/', $delimiter, str_replace('.php', '', $classesPath));
-        return $namespace . $classSuffix;
+        $phpParser = new PhpParser();
+        $parsedClass = $phpParser->parseClassFile($filePath);
+
+        return $parsedClass->getFullyQualifiedClassName();
     }
 
     /**
@@ -206,13 +264,6 @@ class XsdGenerator
     {
         return strpos($namespace, '\\') === false ? '_' : '\\';
     }
-
-    /**
-     * The reflection class for AbstractViewHelper. Is needed quite often, that's why we use a pre-initialized one.
-     *
-     * @var \TYPO3\CMS\Extbase\Reflection\ClassReflection
-     */
-    protected $abstractViewHelperReflectionClass;
 
     /**
      * The doc comment parser.
@@ -229,27 +280,17 @@ class XsdGenerator
     protected $reflectionService;
 
     /**
-     * Constructor. Sets $this->abstractViewHelperReflectionClass
-     *
-     */
-    public function __construct()
-    {
-        $this->abstractViewHelperReflectionClass = new \TYPO3\CMS\Extbase\Reflection\ClassReflection(\TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper::class);
-    }
-
-    /**
      * Get a tag name for a given ViewHelper class.
      * Example: For the View Helper TYPO3\CMS\Fluid\ViewHelpers\Form\SelectViewHelper, and the
      * namespace prefix TYPO3\CMS\Fluid\ViewHelpers\, this method returns "form.select".
      *
      * @param string $className Class name
-     * @param string $namespace Base namespace to use
      * @return string Tag name
      */
-    protected function getTagNameForClass($className, $namespace)
+    protected function getTagNameForClass($className)
     {
         /// Strip namespace from the beginning and "ViewHelper" from the end of the class name
-        $strippedClassName = substr($className, strlen($namespace), -10);
+        $strippedClassName = substr($className, strpos($className, 'ViewHelpers') + 12, -10);
         $classNameParts = explode('\\', $strippedClassName);
         return implode(
             '.',
