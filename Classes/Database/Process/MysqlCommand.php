@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Database\Process;
  *
  */
 
+use Helhum\Typo3Console\Mvc\Cli\InteractiveProcess;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
@@ -47,15 +48,22 @@ class MysqlCommand
      * @param array $additionalArguments
      * @param resource $inputStream
      * @param null $outputCallback
+     * @param bool $interactive
      * @return int
      */
-    public function mysql(array $additionalArguments = array(), $inputStream = STDIN, $outputCallback = null)
+    public function mysql(array $additionalArguments = array(), $inputStream = STDIN, $outputCallback = null, $interactive = false)
     {
         $this->processBuilder->setPrefix('mysql');
         $this->processBuilder->setArguments(array_merge($this->buildConnectionArguments(), $additionalArguments));
-        $process = $this->processBuilder->getProcess();
-        $process->setInput($inputStream);
-        return $process->run($this->buildDefaultOutputCallback($outputCallback));
+        if ($interactive) {
+            // I did not figure out how to change pipes with symfony/process
+            $interactiveProcess = new InteractiveProcess();
+            return $interactiveProcess->run($this->processBuilder->getProcess()->getCommandLine());
+        } else {
+            $process = $this->processBuilder->getProcess();
+            $process->setInput($inputStream);
+            return $process->run($this->buildDefaultOutputCallback($outputCallback));
+        }
     }
 
     /**
