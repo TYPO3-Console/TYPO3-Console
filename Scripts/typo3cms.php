@@ -20,7 +20,7 @@ call_user_func(function () {
         $typo3Root = getenv('TYPO3_PATH_WEB');
     } else {
         // Not symlinked (hopefully), so we can assume the docroot from the location of this file
-        $typo3Root = __DIR__ . '/../../../..';
+        $typo3Root = dirname(dirname(dirname(dirname(__DIR__))));
     }
 
     $classLoader = require_once realpath($typo3Root . '/typo3') . '/../vendor/autoload.php';
