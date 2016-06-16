@@ -65,6 +65,8 @@ script:
   - ./typo3cms help
   - ./typo3cms backend:lock
   - ./typo3cms backend:unlock
+  - ./typo3cms backend:lockforeditors
+  - ./typo3cms backend:unlockforeditors
   - ./typo3cms cache:flush
   - ./typo3cms cache:listgroups
   - ./typo3cms cleanup:updatereferenceindex

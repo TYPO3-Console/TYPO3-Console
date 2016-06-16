@@ -149,6 +149,9 @@ class ConfigurationService implements SingletonInterface
     }
 
     /**
+     * Returns true if the value is stored in the LocalConfiguration.php file and
+     * is NOT overridden later (e.g. in AdditionalConfiguration.php)
+     *
      * @param string $path
      * @return bool
      */
