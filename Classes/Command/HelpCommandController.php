@@ -36,6 +36,8 @@ class HelpCommandController extends CommandController
     protected $commands = array();
 
     /**
+     * Help (short)
+     *
      * Displays a short, general help message
      *
      * This only outputs the Extbase version number, context and some hint about how to
@@ -56,6 +58,8 @@ class HelpCommandController extends CommandController
     }
 
     /**
+     * Help
+     *
      * Display help for a command
      *
      * The help command displays help for a given command:
@@ -104,7 +108,7 @@ class HelpCommandController extends CommandController
     }
 
     /**
-     * Render help text for a single command
+     * Display help text for a single command
      *
      * @param \TYPO3\CMS\Extbase\Mvc\Cli\Command $command
      * @return void

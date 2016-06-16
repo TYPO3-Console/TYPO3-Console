@@ -32,6 +32,8 @@ use Helhum\Typo3Console\Mvc\Controller\CommandController;
 class BackendCommandController extends CommandController
 {
     /**
+     * Lock backend
+     *
      * Restrict backend access for every user (including admins)
      *
      * @param string $redirectUrl URL to redirect to when the backend is accessed
@@ -55,7 +57,10 @@ class BackendCommandController extends CommandController
     }
 
     /**
-     * Unlocks the backend access
+     * Unlock backend
+     *
+     * Unlocks the backend access (after having been locked with
+     * backend:lock for example)
      */
     public function unlockCommand()
     {
@@ -82,7 +87,9 @@ class BackendCommandController extends CommandController
     protected $configurationService;
 
     /**
-     * Restrict backend access.
+     * Lock backend (editors)
+     *
+     * Restrict backend access to admin only
      */
     public function lockForEditorsCommand()
     {
@@ -98,6 +105,8 @@ class BackendCommandController extends CommandController
     }
 
     /**
+     * Unlock backend (editors)
+     *
      * Unlocks the backend access for editors
      */
     public function unlockForEditorsCommand()
