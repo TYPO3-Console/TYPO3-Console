@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Service;
  *
  */
 
+use Helhum\Typo3Console\Parser\ParsingException;
 use Helhum\Typo3Console\Parser\PhpParser;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Reflection\ClassReflection;
@@ -186,7 +187,11 @@ class XsdGenerator
         }
         $affectedViewHelperClassNames = array();
         foreach ($viewHelperClassFiles as $filePathAndFilename) {
-            $potentialViewHelperClassName = $this->getClassNameFromFile($filePathAndFilename);
+            try {
+                $potentialViewHelperClassName = $this->getClassNameFromFile($filePathAndFilename);
+            } catch (ParsingException $e) {
+                continue;
+            }
             if (strpos($potentialViewHelperClassName, 'ViewHelpers') === false) {
                 continue;
             }
