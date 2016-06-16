@@ -27,6 +27,8 @@ class SchedulerCommandController extends CommandController
     protected $scheduler;
 
     /**
+     * Run scheduler
+     *
      * Executes tasks that are registered in the scheduler module
      *
      * @param int $taskId Uid of the task that should be executed (instead of all scheduled tasks)

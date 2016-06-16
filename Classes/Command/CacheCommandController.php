@@ -32,7 +32,7 @@ class CacheCommandController extends CommandController
     /**
      * Flushes all caches.
      *
-     * @param bool $force
+     * @param bool $force If true, cache is forcibly flushed
      */
     public function flushCommand($force = false)
     {
@@ -48,9 +48,17 @@ class CacheCommandController extends CommandController
     }
 
     /**
-     * Flushes all caches in specified groups.
+     * Flushes all caches (groups)
      *
-     * @param array $groups
+     * Flushes all caches in specified groups.
+     * Valid group names are, default:
+     *
+     * - system
+     * - frontend
+     * - page
+     * - configuration
+     *
+     * @param array $groups An array, on CLI specified as CSV value, of names of cache groups to flush
      */
     public function flushGroupsCommand(array $groups)
     {
@@ -64,10 +72,12 @@ class CacheCommandController extends CommandController
     }
 
     /**
+     * Flush cache by tags
+     *
      * Flushes caches by tags, optionally only caches in specified groups.
      *
-     * @param array $tags
-     * @param array $groups
+     * @param array $tags Array of tags, on CLI specified as CSV value, of tags to flush
+     * @param array $groups Optional array of groups, on CLI specified as CSV value, of groups in which to flush tags
      */
     public function flushTagsCommand(array $tags, array $groups = null)
     {
@@ -81,6 +91,8 @@ class CacheCommandController extends CommandController
     }
 
     /**
+     * List cache groups
+     *
      * Lists all registered cache groups.
      */
     public function listGroupsCommand()

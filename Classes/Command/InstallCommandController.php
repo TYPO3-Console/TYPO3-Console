@@ -80,6 +80,8 @@ class InstallCommandController extends CommandController
     }
 
     /**
+     * Generate PackageStates.php
+     *
      * Writes the typo3conf/PackageStates.php file.
      *
      * Marks the following extensions as active in the process:
@@ -112,6 +114,8 @@ class InstallCommandController extends CommandController
     }
 
     /**
+     * Fix folder structure
+     *
      * Automatically create files and folders, required for a TYPO3 installation.
      *
      * This command is great e.g. for creating the typo3temp folder structure during deployment
@@ -139,6 +143,8 @@ class InstallCommandController extends CommandController
     }
 
     /**
+     * Check environment / create folders
+     *
      * Check environment and create folder structure
      *
      * @internal
@@ -157,6 +163,8 @@ class InstallCommandController extends CommandController
     }
 
     /**
+     * Connect to database
+     *
      * Database connection details
      *
      * @param string $databaseUserName User name for database server
@@ -180,7 +188,9 @@ class InstallCommandController extends CommandController
     }
 
     /**
-     * Select a database name
+     * Select database
+     *
+     * Select a database by name
      *
      * @param bool $databaseCreate Create database (1) or use existing database (0)
      * @param string $databaseName Name of the database
@@ -201,7 +211,9 @@ class InstallCommandController extends CommandController
     }
 
     /**
-     * Admin user and site name
+     * Add database data
+     *
+     * Adds admin user and site name in database
      *
      * @param string $adminUserName Username of your first admin user
      * @param string $adminPassword Password of first admin user
@@ -214,6 +226,8 @@ class InstallCommandController extends CommandController
     }
 
     /**
+     * Check if database data command is needed
+     *
      * @internal
      */
     public function databaseDataNeedsExecutionCommand()
@@ -224,6 +238,13 @@ class InstallCommandController extends CommandController
     /**
      * Write default configuration
      *
+     * Writes default configuration for the TYPO3 site based on the
+     * provided $siteSetupType. Valid values are:
+     *
+     * - loaddistribution (which loads a list of distributions you can install)
+     * - createsite (which creates an empty root page and setup)
+     * - none (which unsurprisingly does nothing at all)
+     *
      * @param string $siteSetupType Specify the setup type: Download the list of distributions (loaddistribution), Create empty root page (createsite), Do nothing (none)
      * @internal
      */
@@ -233,6 +254,8 @@ class InstallCommandController extends CommandController
     }
 
     /**
+     * Check if default configuration needs to be written
+     *
      * @internal
      */
     public function defaultConfigurationNeedsExecutionCommand()

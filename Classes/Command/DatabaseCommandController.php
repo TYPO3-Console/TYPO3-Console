@@ -55,7 +55,7 @@ class DatabaseCommandController extends CommandController
      *
      * To avoid shell matching all types with wildcards should be quoted.
      *
-     * @param array $schemaUpdateTypes List of schema update types
+     * @param array $schemaUpdateTypes List of schema update types (see \Helhum\Typo3Console\Database\Schema\SchemaUpdateType Enum for values)
      */
     public function updateSchemaCommand(array $schemaUpdateTypes)
     {
@@ -77,13 +77,13 @@ class DatabaseCommandController extends CommandController
     }
 
     /**
-     * Read mysql from stdin.
+     * Import mysql (stdin)
      *
      * This means that this can not only be used to pass insert statements,
      * it but works as well to pass SELECT statements to it.
      * The mysql binary must be available in the path for this command to work.
      *
-     * @param bool $interactive
+     * @param bool $interactive If true, import process runs as interactive to let you enter queries manually
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
      */
     public function importCommand($interactive = false)
@@ -109,6 +109,8 @@ class DatabaseCommandController extends CommandController
     }
 
     /**
+     * Export database
+     *
      * Export the database (all tables) directly to stdout
      *
      * The mysqldump binary must be available in the path for this command to work.
