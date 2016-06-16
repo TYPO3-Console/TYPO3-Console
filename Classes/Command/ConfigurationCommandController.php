@@ -34,12 +34,14 @@ class ConfigurationCommandController extends CommandController implements Single
     protected $consoleRenderer;
 
     /**
-     * Removing system configuration by path
+     * Remove configuration option
+     *
+     * Removes a system configuration option by path
      *
      * Example: ./typo3cms configuration:removebypath DB,EXT/EXTCONF/realurl
      *
-     * @param array $paths Path to system configuration that should be removed. Multiple paths can be specified separated by comma
-     * @param bool $force If set, do not ask for confirmation
+     * @param array $paths Path to system configuration that should be removed. Multiple paths can be specified separated by commas
+     * @param bool $force If set, does not ask for confirmation
      */
     public function removeCommand(array $paths, $force = false)
     {
@@ -63,11 +65,13 @@ class ConfigurationCommandController extends CommandController implements Single
     }
 
     /**
-     * Show system configuration by path
+     * Show configuration option
+     *
+     * Shows system configuration option value by path
      *
      * Example: ./typo3cms configuration:show DB
      *
-     * @param string $path Path to system configuration.
+     * @param string $path Path to system configuration option
      */
     public function showCommand($path)
     {
@@ -92,11 +96,13 @@ class ConfigurationCommandController extends CommandController implements Single
     }
 
     /**
-     * Show active system configuration by path
+     * Show active configuration
+     *
+     * Shows active system configuration by path
      *
      * Example: ./typo3cms configuration:showActive DB
      *
-     * @param string $path Path to system configuration.
+     * @param string $path Path to system configuration
      */
     public function showActiveCommand($path)
     {
@@ -109,11 +115,13 @@ class ConfigurationCommandController extends CommandController implements Single
     }
 
     /**
-     * Show active system configuration by path
+     * Show local configuration
      *
-     * Example: ./typo3cms configuration:showActive DB
+     * Shows local configuration option value by path
      *
-     * @param string $path Path to system configuration.
+     * Example: ./typo3cms configuration:showLocal DB
+     *
+     * @param string $path Path to local system configuration
      */
     public function showLocalCommand($path)
     {
@@ -126,12 +134,14 @@ class ConfigurationCommandController extends CommandController implements Single
     }
 
     /**
-     * Set system configuration by path.
+     * Set configuration option value
+     *
+     * Set system configuration option value by path.
      *
      * Example: ./typo3cms configuration:set DB/extTablesDefinitionScript extTables.php
      *
-     * @param string $path Path to system configuration.
-     * @param string $value Value for system configuration.
+     * @param string $path Path to system configuration
+     * @param string $value Value for system configuration
      */
     public function setCommand($path, $value)
     {

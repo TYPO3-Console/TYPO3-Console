@@ -32,11 +32,13 @@ class CleanupCommandController extends CommandController
     protected $persistenceIntegrityService;
 
     /**
+     * Update reference index
+     *
      * Updates reference index to ensure data integrity
      *
      * @param bool $dryRun If set, index is only checked without performing any action
-     * @param bool $verbose Whether to output results or not
-     * @param bool $showProgress Whether to output a progress bar
+     * @param bool $verbose Whether or not to output results
+     * @param bool $showProgress Whether or not to output a progress bar
      */
     public function updateReferenceIndexCommand($dryRun = false, $verbose = false, $showProgress = false)
     {
