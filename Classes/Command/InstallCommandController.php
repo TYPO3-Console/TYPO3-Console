@@ -54,9 +54,22 @@ class InstallCommandController extends CommandController
      * @param string $adminUserName
      * @param string $adminPassword
      * @param string $siteName
+     * @param string $siteSetupType
      */
-    public function setupCommand($nonInteractive = false, $databaseUserName = '', $databaseUserPassword = '', $databaseHostName = '', $databasePort = '', $databaseSocket = '', $databaseName = '', $databaseCreate = '', $adminUserName = '', $adminPassword = '', $siteName = 'New TYPO3 Console site')
-    {
+    public function setupCommand(
+        $nonInteractive = false,
+        $databaseUserName = '',
+        $databaseUserPassword = '',
+        $databaseHostName = '',
+        $databasePort = '',
+        $databaseSocket = '',
+        $databaseName = '',
+        $databaseCreate = '',
+        $adminUserName = '',
+        $adminPassword = '',
+        $siteName = 'New TYPO3 Console site',
+        $siteSetupType = 'none'
+    ) {
         $this->outputLine();
         $this->outputLine('<options=bold>Welcome to the console installer of TYPO3 CMS!</options=bold>');
 
@@ -211,10 +224,10 @@ class InstallCommandController extends CommandController
     /**
      * Write default configuration
      *
-     * @param string $siteSetupType Specify the setup type: Download the list of distributions (loaddistribution), Create empty root page (createsite), Do nothing (donothing)
+     * @param string $siteSetupType Specify the setup type: Download the list of distributions (loaddistribution), Create empty root page (createsite), Do nothing (none)
      * @internal
      */
-    public function defaultConfigurationCommand($siteSetupType = 'createsite')
+    public function defaultConfigurationCommand($siteSetupType = 'none')
     {
         $this->cliSetupRequestHandler->executeActionWithArguments('defaultConfiguration', array('sitesetup' => $siteSetupType));
     }
