@@ -39,7 +39,7 @@ class SchemaUpdateResult
     }
 
     /**
-     * Returns true if updates where performed, false otherwise
+     * Returns true if updates were performed, false otherwise
      *
      * @return bool
      */

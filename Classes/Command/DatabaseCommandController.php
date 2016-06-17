@@ -69,10 +69,10 @@ class DatabaseCommandController extends CommandController
         $result = $this->schemaService->updateSchema($schemaUpdateTypes);
 
         if ($result->hasPerformedUpdates()) {
-            $this->output->outputLine('<info>The following schema updates where performed:</info>');
+            $this->output->outputLine('<info>The following schema updates were performed:</info>');
             $this->schemaUpdateResultRenderer->render($result, $this->output);
         } else {
-            $this->output->outputLine('No schema updates matching the given types where performed');
+            $this->output->outputLine('No schema updates matching the given types were performed');
         }
     }
 
