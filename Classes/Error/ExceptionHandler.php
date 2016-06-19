@@ -29,38 +29,16 @@ class ExceptionHandler
     /**
      * Formats and echoes the exception for the command line
      *
-     * @param \Exception $exception The exception object
+     * @param \Exception|\Throwable $exception The exception object
      * @return void
      */
     public function handleException($exception)
     {
-        $pathPosition = strpos($exception->getFile(), 'ext/');
-        $filePathAndName = ($pathPosition !== false) ? substr($exception->getFile(), $pathPosition) : $exception->getFile();
-
-        $exceptionCodeNumber = ($exception->getCode() > 0) ? '#' . $exception->getCode() . ': ' : '';
-
-        echo PHP_EOL . 'Uncaught Exception in TYPO3 CMS ' . $exceptionCodeNumber . $exception->getMessage() . PHP_EOL;
-        echo 'thrown in file ' . $filePathAndName . PHP_EOL;
-        echo 'in line ' . $exception->getLine() . PHP_EOL;
-        if ($exception instanceof \TYPO3\Flow\Exception) {
-            echo 'Reference code: ' . $exception->getReferenceCode() . PHP_EOL;
-        }
-
+        $this->outputSingleException($exception);
         $indent = '  ';
         while (($exception = $exception->getPrevious()) !== null) {
             echo PHP_EOL . $indent . 'Nested exception:' . PHP_EOL;
-            $pathPosition = strpos($exception->getFile(), 'Packages/');
-            $filePathAndName = ($pathPosition !== false) ? substr($exception->getFile(), $pathPosition) : $exception->getFile();
-
-            $exceptionCodeNumber = ($exception->getCode() > 0) ? '#' . $exception->getCode() . ': ' : '';
-
-            echo PHP_EOL . $indent . 'Uncaught Exception in Flow ' . $exceptionCodeNumber . $exception->getMessage() . PHP_EOL;
-            echo $indent . 'thrown in file ' . $filePathAndName . PHP_EOL;
-            echo $indent . 'in line ' . $exception->getLine() . PHP_EOL;
-            if ($exception instanceof \TYPO3\Flow\Exception) {
-                echo 'Reference code: ' . $exception->getReferenceCode() . PHP_EOL;
-            }
-
+            $this->outputSingleException($exception, $indent);
             $indent .= '  ';
         }
 
@@ -86,5 +64,19 @@ class ExceptionHandler
 
         echo PHP_EOL;
         exit(1);
+    }
+
+    /**
+     * @param \Exception|\Throwable $exception
+     * @param string $indent
+     */
+    protected function outputSingleException($exception, $indent = '')
+    {
+        $pathPosition = strpos($exception->getFile(), 'ext/');
+        $filePathAndName = ($pathPosition !== false) ? substr($exception->getFile(), $pathPosition) : $exception->getFile();
+        $exceptionCodeNumber = ($exception->getCode() > 0) ? '#' . $exception->getCode() . ': ' : '';
+        echo PHP_EOL . $indent . 'Uncaught Exception in TYPO3 CMS: ' . $exceptionCodeNumber . $exception->getMessage() . PHP_EOL;
+        echo $indent . 'thrown in file ' . $filePathAndName . PHP_EOL;
+        echo $indent . 'in line ' . $exception->getLine() . PHP_EOL;
     }
 }
