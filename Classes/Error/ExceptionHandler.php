@@ -13,70 +13,129 @@ namespace Helhum\Typo3Console\Error;
  *
  */
 
+use Symfony\Component\Console\Output\ConsoleOutput;
+
 /**
  * Class ExceptionHandler
  */
 class ExceptionHandler
 {
     /**
-     * Register Exception Handler
+     * @var ConsoleOutput
      */
-    public function __construct()
+    protected $output;
+
+    /**
+     * @param ConsoleOutput $output
+     */
+    public function __construct(ConsoleOutput $output = null)
     {
-        set_exception_handler(array($this, 'handleException'));
+        $this->output = $output ?: new ConsoleOutput();
     }
 
     /**
-     * Formats and echoes the exception for the command line
+     * Formats and echoes the exception for the command line.
      *
      * @param \Exception|\Throwable $exception The exception object
      * @return void
      */
     public function handleException($exception)
     {
-        $this->outputSingleException($exception);
-        $indent = '  ';
-        while (($exception = $exception->getPrevious()) !== null) {
-            echo PHP_EOL . $indent . 'Nested exception:' . PHP_EOL;
-            $this->outputSingleException($exception, $indent);
-            $indent .= '  ';
-        }
-
-        if (function_exists('xdebug_get_function_stack')) {
-            $backtraceSteps = xdebug_get_function_stack();
-        } else {
-            $backtraceSteps = debug_backtrace();
-        }
-
-        for ($index = 0; $index < count($backtraceSteps); $index ++) {
-            echo PHP_EOL . '#' . $index . ' ';
-            if (isset($backtraceSteps[$index]['class'])) {
-                echo $backtraceSteps[$index]['class'];
-            }
-            if (isset($backtraceSteps[$index]['function'])) {
-                echo '::' . $backtraceSteps[$index]['function'] . '()';
-            }
-            echo PHP_EOL;
-            if (isset($backtraceSteps[$index]['file'])) {
-                echo '   ' . $backtraceSteps[$index]['file'] . (isset($backtraceSteps[$index]['line']) ? ':' . $backtraceSteps[$index]['line'] : '') . PHP_EOL;
-            }
-        }
+        $this->renderException($exception);
 
         echo PHP_EOL;
         exit(1);
     }
 
     /**
+     * Renders Exception with trace and nested exceptions with trace.
+     *
      * @param \Exception|\Throwable $exception
-     * @param string $indent
      */
-    protected function outputSingleException($exception, $indent = '')
+    protected function renderException($exception)
     {
-        $pathPosition = strpos($exception->getFile(), 'ext/');
-        $filePathAndName = ($pathPosition !== false) ? substr($exception->getFile(), $pathPosition) : $exception->getFile();
+        $this->output->writeln('');
+        $this->outputException($exception);
+        $this->output->writeln('');
+        $this->outputTrace($exception);
+        $previousException = $exception;
+        while (($previousException = $previousException->getPrevious()) !== null) {
+            $this->output->writeln('');
+            $this->outputException($previousException);
+            $this->output->writeln('');
+            $this->outputTrace($previousException);
+        }
+    }
+
+    /**
+     * Output formatted exception.
+     *
+     * @param \Exception|\Throwable $exception
+     */
+    protected function outputException($exception)
+    {
         $exceptionCodeNumber = ($exception->getCode() > 0) ? '#' . $exception->getCode() . ': ' : '';
-        echo PHP_EOL . $indent . 'Uncaught Exception in TYPO3 CMS: ' . $exceptionCodeNumber . $exception->getMessage() . PHP_EOL;
-        echo $indent . 'thrown in file ' . $filePathAndName . PHP_EOL;
-        echo $indent . 'in line ' . $exception->getLine() . PHP_EOL;
+
+        $title = sprintf('[ %s ]', get_class($exception));
+        $exceptionTitle = sprintf('%s%s', $exceptionCodeNumber, $exception->getMessage());
+        $exceptionFile = sprintf('thrown in file %s', $this->getPossibleShortenedFileName($exception->getFile()));
+        $exceptionLine = sprintf('in line %s', $exception->getLine());
+
+        $maxLength = max([strlen($title), strlen($exceptionTitle), strlen($exceptionFile), strlen($exceptionLine)]);
+        $this->output->writeln($this->padMessage('', $maxLength));
+        $this->output->writeln($this->padMessage($title, $maxLength));
+        $this->output->writeln($this->padMessage($exceptionTitle, $maxLength));
+        $this->output->writeln($this->padMessage($exceptionFile, $maxLength));
+        $this->output->writeln($this->padMessage($exceptionLine, $maxLength));
+        $this->output->writeln($this->padMessage('', $maxLength));
+    }
+
+    /**
+     * Output formatted trace.
+     *
+     * @param \Exception|\Throwable $exception
+     */
+    protected function outputTrace($exception)
+    {
+        $this->output->writeln('<comment>Exception trace:</comment>');
+        $backtraceSteps = $exception->getTrace();
+        foreach ($backtraceSteps as $index => $step) {
+            $traceLine = '#' . $index . ' ';
+            if (isset($backtraceSteps[$index]['class'])) {
+                $traceLine .= $backtraceSteps[$index]['class'];
+            }
+            if (isset($backtraceSteps[$index]['function'])) {
+                $traceLine .= (isset($backtraceSteps[$index]['class']) ? '::' : '') . $backtraceSteps[$index]['function'] . '()';
+            }
+            $this->output->writeln(sprintf('<info>%s</info>', $traceLine));
+            if (isset($backtraceSteps[$index]['file'])) {
+                $this->output->writeln('   ' . $this->getPossibleShortenedFileName($backtraceSteps[$index]['file']) . (isset($backtraceSteps[$index]['line']) ? ':' . $backtraceSteps[$index]['line'] : ''));
+            }
+        }
+    }
+
+    /**
+     * Right pad message.
+     *
+     * @param string $message
+     * @param int $maxLength
+     * @return string
+     */
+    protected function padMessage($message, $maxLength)
+    {
+        return '<error> ' . $message . str_pad('', $maxLength - strlen($message), ' ') . ' </error>';
+    }
+
+    /**
+     * Shorten file name if inside extension or core extension.
+     *
+     * @param string $fileName
+     * @return string
+     */
+    protected function getPossibleShortenedFileName($fileName) {
+        $pathPosition = strpos($fileName, 'typo3conf/ext/');
+        $pathAndFilename = ($pathPosition !== false) ? substr($fileName, $pathPosition) : $fileName;
+        $pathPosition = strpos($pathAndFilename, 'typo3/sysext/');
+        return ($pathPosition !== false) ? substr($pathAndFilename, $pathPosition) : $pathAndFilename;
     }
 }

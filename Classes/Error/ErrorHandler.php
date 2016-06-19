@@ -25,15 +25,6 @@ class ErrorHandler
     protected $exceptionalErrors = array();
 
     /**
-     * Constructs this error handler - registers itself as the default error handler.
-     *
-     */
-    public function __construct()
-    {
-        set_error_handler(array($this, 'handleError'));
-    }
-
-    /**
      * Defines which error levels result should result in an exception thrown.
      *
      * @param array $exceptionalErrors An array of E_* error levels
@@ -56,7 +47,6 @@ class ErrorHandler
      * @param int $errorLine Line number where the error occurred
      * @return void
      * @throws \TYPO3\CMS\Core\Error\Exception with the data passed to this method
-     * @throws \Exception
      */
     public function handleError($errorLevel, $errorMessage, $errorFile, $errorLine)
     {
@@ -74,12 +64,8 @@ class ErrorHandler
             E_RECOVERABLE_ERROR  => 'Catchable Fatal Error'
         );
 
-        if (in_array($errorLevel, (array)$this->exceptionalErrors)) {
-            if (class_exists(\TYPO3\CMS\Core\Error\Exception::class)) {
-                throw new \TYPO3\CMS\Core\Error\Exception($errorLevels[$errorLevel] . ': ' . $errorMessage . ' in ' . $errorFile . ' line ' . $errorLine, 1);
-            } else {
-                throw new \Exception($errorLevels[$errorLevel] . ': ' . $errorMessage . ' in ' . $errorFile . ' line ' . $errorLine, 1);
-            }
+        if (in_array($errorLevel, (array)$this->exceptionalErrors, true)) {
+            throw new \TYPO3\CMS\Core\Error\Exception($errorLevels[$errorLevel] . ': ' . $errorMessage . ' in ' . $errorFile . ' line ' . $errorLine, 1);
         }
     }
 }

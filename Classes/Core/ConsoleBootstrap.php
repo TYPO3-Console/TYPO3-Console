@@ -88,12 +88,13 @@ class ConsoleBootstrap extends Bootstrap
         if (!is_callable(array($this, 'setRequestType'))) {
             $this->defineTypo3RequestTypes();
         }
-        $this->requestId = uniqid();
+        $this->requestId = uniqid('console_request_', true);
         $this->initializePackageManagement();
 
         $this->runLevel = new RunLevel();
         $this->setEarlyInstance(\Helhum\Typo3Console\Core\Booting\RunLevel::class, $this->runLevel);
-        new ExceptionHandler();
+        $exceptionHandler = new ExceptionHandler();
+        set_exception_handler(array($exceptionHandler, 'handleException'));
 
         $this->initializeCommandManager();
         $this->registerRequestHandler(new RequestHandler($this));
@@ -313,15 +314,9 @@ class ConsoleBootstrap extends Bootstrap
      *
      * @return Bootstrap
      * @internal This is not a public API method, do not use in own extensions
-     * @todo: This is only for master "compatibility". Once 6.2 compatibility is removed, we can call these methods directly.
      */
     public function applyAdditionalConfigurationSettings()
     {
-        if (is_callable(array($this, 'initializeErrorHandling'))) {
-            $this->initializeErrorHandling();
-        } else {
-            $this->initializeExceptionHandling();
-        }
         $this->setFinalCachingFrameworkCacheConfiguration()
             ->defineLoggingAndExceptionConstants()
             ->unsetReservedGlobalVariables();
