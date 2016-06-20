@@ -17,26 +17,16 @@ use Helhum\Typo3Console\Mvc\Controller\CommandController;
 
 /**
  * Commands for (un)restricting backend access.
- *
- * = Examples for global lock and unlock =
- *
- * <code>./typo3cms backend:lock</code> Every request to TYPO3 backend will be denied.
- * <code>./typo3cms backend:lock 'http://domain.tld/maintenance.html' </code> Every request to TYPO3 backend will be denied and users will be redirected to given URL.
- * <code>./typo3cms backend:unlock</code> Makes the TYPO3 backend available again.
- *
- * = Examples for editor lock and unlock =
- *
- * <code>./typo3cms backend:lockforeditors</code> Editors won't be able to access the TYPO3 backend.
- * <code>./typo3cms backend:unlockforeditors</code> Editors can access the TYPO3 backend again.
  */
 class BackendCommandController extends CommandController
 {
     /**
      * Lock backend
      *
-     * Restrict backend access for every user (including admins)
+     * Deny backend access for <b>every</b> user (including admins).
      *
      * @param string $redirectUrl URL to redirect to when the backend is accessed
+     * @see typo3_console:backend:unlock
      */
     public function lockCommand($redirectUrl = null)
     {
@@ -59,8 +49,8 @@ class BackendCommandController extends CommandController
     /**
      * Unlock backend
      *
-     * Unlocks the backend access (after having been locked with
-     * backend:lock for example)
+     * Allow backend access again (e.g. after having been locked with backend:lock command).
+     * @see typo3_console:backend:lock
      */
     public function unlockCommand()
     {
@@ -87,9 +77,12 @@ class BackendCommandController extends CommandController
     protected $configurationService;
 
     /**
-     * Lock backend (editors)
+     * Lock backend for editors
      *
-     * Restrict backend access to admin only
+     * Deny backend access, but only for editors.
+     * Admins will still be able to log in and work with the backend.
+     *
+     * @see typo3_console:backend:unlockforeditors
      */
     public function lockForEditorsCommand()
     {
@@ -105,9 +98,11 @@ class BackendCommandController extends CommandController
     }
 
     /**
-     * Unlock backend (editors)
+     * Unlock backend for editors
      *
-     * Unlocks the backend access for editors
+     * Allow backend access for editors again (e.g. after having been locked with backend:lockforeditors command).
+     *
+     * @see typo3_console:backend:lockforeditors
      */
     public function unlockForEditorsCommand()
     {

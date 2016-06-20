@@ -41,20 +41,22 @@ class InstallCommandController extends CommandController
     protected $packageStatesGenerator;
 
     /**
-     * TYPO3 Setup. Use as cli replacement for the web installation process.
+     * TYPO3 Setup. Use as command line replacement for the web installation process.
      *
-     * @param bool $nonInteractive
-     * @param string $databaseUserName
-     * @param string $databaseUserPassword
-     * @param string $databaseHostName
-     * @param string $databasePort
-     * @param string $databaseSocket
-     * @param string $databaseName
-     * @param string $databaseCreate
-     * @param string $adminUserName
-     * @param string $adminPassword
-     * @param string $siteName
-     * @param string $siteSetupType
+     * Manually enter details on the command line or non interactive for automated setups.
+     *
+     * @param bool $nonInteractive If specified, optional arguments are not requested, but default values are assumed.
+     * @param string $databaseUserName User name for database server
+     * @param string $databaseUserPassword User password for database server
+     * @param string $databaseHostName Host name of database server
+     * @param string $databasePort TCP Port of database server
+     * @param string $databaseSocket Unix Socket to connect to (if localhost is given as hostname and this is kept empty, a socket connection will be established)
+     * @param string $databaseName Name of the database
+     * @param bool $useExistingDatabase If set an empty database with the specified name will be used. Otherwise a database with the specified name is created.
+     * @param string $adminUserName User name of the administrative backend user account to be created
+     * @param string $adminPassword Password of the administrative backend user account to be created
+     * @param string $siteName Site Name
+     * @param string $siteSetupType Can be either <code>no</code> (which unsurprisingly does nothing at all), <code>site</code> (which creates an empty root page and setup) or <code>dist</code> (which loads a list of distributions you can install)
      */
     public function setupCommand(
         $nonInteractive = false,
@@ -64,7 +66,7 @@ class InstallCommandController extends CommandController
         $databasePort = '',
         $databaseSocket = '',
         $databaseName = '',
-        $databaseCreate = '',
+        $useExistingDatabase = false,
         $adminUserName = '',
         $adminPassword = '',
         $siteName = 'New TYPO3 Console site',
@@ -80,27 +82,28 @@ class InstallCommandController extends CommandController
     }
 
     /**
-     * Generate PackageStates.php
+     * Generate PackageStates.php file.
      *
-     * Writes the typo3conf/PackageStates.php file.
+     * Generates and writes <code>typo3conf/PackageStates.php</code> file.
+     * Goal is to not have this file in version control, but generate it on <code>composer install</code>.
      *
-     * Marks the following extensions as active in the process:
-     * * third party extensions
-     * * all core extensions that are required (or part of minimal usable system)
-     * * all core extensions which are provided in the TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS environment variable
-     * Extension keys in this variable must be separated by comma and without spaces.
+     * Marks the following extensions as active:
      *
-     * Example: TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS="info,info_pagetsconfig" ./typo3cms install:generatepackagestates
+     * - Third party extensions
+     * - All core extensions that are required (or part of minimal usable system)
+     * - All core extensions which are provided in the TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS environment variable. Extension keys in this variable must be separated by comma and without spaces.
      *
-     * @param bool $removeInactiveSystemExtensions Inactive extensions are removed from typo3/sysext (Handle with care!)
-     * @param bool $activateDefaultExtensions  If true, typo3/cms extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
+     * <b>Example:</b> <code>TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS="info,info_pagetsconfig" ./typo3cms install:generatepackagestates</code>
+     *
+     * @param bool $removeInactive Inactive extensions are <comment>removed</comment> from <code>typo3/sysext</code>. <comment>Handle with care!</comment>
+     * @param bool $activateDefault  If true, <code>typo3/cms</code> extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
      * @throws \TYPO3\CMS\Core\Package\Exception\InvalidPackageStateException
      */
-    public function generatePackageStatesCommand($removeInactiveSystemExtensions = false, $activateDefaultExtensions = false)
+    public function generatePackageStatesCommand($removeInactive = false, $activateDefault = false)
     {
-        $this->packageStatesGenerator->generate($this->packageManager, $activateDefaultExtensions);
+        $this->packageStatesGenerator->generate($this->packageManager, $activateDefault);
 
-        if ($removeInactiveSystemExtensions) {
+        if ($removeInactive) {
             $activePackages = $this->packageManager->getActivePackages();
             foreach ($this->packageManager->getAvailablePackages() as $package) {
                 if (empty($activePackages[$package->getPackageKey()])) {
@@ -192,13 +195,13 @@ class InstallCommandController extends CommandController
      *
      * Select a database by name
      *
-     * @param bool $databaseCreate Create database (1) or use existing database (0)
+     * @param bool $useExistingDatabase Use existing database (1), or create database (0)
      * @param string $databaseName Name of the database
      * @internal
      */
-    public function databaseSelectCommand($databaseCreate = true, $databaseName = 'required')
+    public function databaseSelectCommand($useExistingDatabase = false, $databaseName = 'required')
     {
-        $selectType = $databaseCreate ? 'new' : 'existing';
+        $selectType = $useExistingDatabase ? 'existing' : 'new';
         $this->cliSetupRequestHandler->executeActionWithArguments('databaseSelect', array('type' => $selectType, $selectType => $databaseName));
     }
 
@@ -215,8 +218,8 @@ class InstallCommandController extends CommandController
      *
      * Adds admin user and site name in database
      *
-     * @param string $adminUserName Username of your first admin user
-     * @param string $adminPassword Password of first admin user
+     * @param string $adminUserName Username of to be created administrative user account
+     * @param string $adminPassword Password of to be created administrative user account
      * @param string $siteName Site name
      * @internal
      */
@@ -241,16 +244,29 @@ class InstallCommandController extends CommandController
      * Writes default configuration for the TYPO3 site based on the
      * provided $siteSetupType. Valid values are:
      *
-     * - loaddistribution (which loads a list of distributions you can install)
-     * - createsite (which creates an empty root page and setup)
-     * - none (which unsurprisingly does nothing at all)
+     * - dist (which loads a list of distributions you can install)
+     * - site (which creates an empty root page and setup)
+     * - no (which unsurprisingly does nothing at all)
      *
      * @param string $siteSetupType Specify the setup type: Download the list of distributions (loaddistribution), Create empty root page (createsite), Do nothing (none)
      * @internal
      */
     public function defaultConfigurationCommand($siteSetupType = 'none')
     {
-        $this->cliSetupRequestHandler->executeActionWithArguments('defaultConfiguration', array('sitesetup' => $siteSetupType));
+        switch ($siteSetupType) {
+            case 'site':
+            case 'createsite':
+                $argument = ['sitesetup' => 'createsite'];
+                break;
+            case 'dist':
+            case 'loaddistribution':
+                $argument = ['sitesetup' => 'loaddistribution'];
+                break;
+            case 'no':
+            default:
+                $argument = ['sitesetup' => 'none'];
+        }
+        $this->cliSetupRequestHandler->executeActionWithArguments('defaultConfiguration', $argument);
     }
 
     /**

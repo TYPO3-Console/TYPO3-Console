@@ -45,17 +45,27 @@ class DatabaseCommandController extends CommandController
     /**
      * Update database schema
      *
-     * See Helhum\Typo3Console\Database\Schema\SchemaUpdateType for a list of valid schema update types.
+     * Valid schema update types are:
+     *
+     * - field.add
+     * - field.change
+     * - field.drop
+     * - table.add
+     * - table.change
+     * - table.drop
+     * - table.clear
      *
      * The list of schema update types supports wildcards to specify multiple types, e.g.:
      *
-     * "*" (all updates)
-     * "field.*" (all field updates)
-     * "*.add,*.change" (all add/change updates)
+     * - "*" (all updates)
+     * - "field.*" (all field updates)
+     * - "*.add,*.change" (all add/change updates)
      *
      * To avoid shell matching all types with wildcards should be quoted.
      *
-     * @param array $schemaUpdateTypes List of schema update types (see \Helhum\Typo3Console\Database\Schema\SchemaUpdateType Enum for values)
+     * <b>Example:</b> <code>./typo3cms database:updateschema "*.add,*.change"</code>
+     *
+     * @param array $schemaUpdateTypes List of schema update types
      */
     public function updateSchemaCommand(array $schemaUpdateTypes)
     {
@@ -77,13 +87,18 @@ class DatabaseCommandController extends CommandController
     }
 
     /**
-     * Import mysql (stdin)
+     * Import mysql from stdin
      *
      * This means that this can not only be used to pass insert statements,
      * it but works as well to pass SELECT statements to it.
      * The mysql binary must be available in the path for this command to work.
+     * This obviously only works when MySQL ist used as DBMS.
      *
-     * @param bool $interactive If true, import process runs as interactive to let you enter queries manually
+     * <b>Example (import):</b> <code>ssh remote.server '/path/to/typo3cms database:export' | ./typo3cms database:import</code>
+     * <b>Example (select):</b> <code>echo 'SELECT username from be_users WHERE admin=1;' | ./typo3cms database:import</code>
+     * <b>Example (interactive):</b> <code>./typo3cms database:import --interactive</code>
+     *
+     * @param bool $interactive Open an interactive mysql shell using the TYPO3 connection settings.
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
      */
     public function importCommand($interactive = false)
@@ -98,6 +113,7 @@ class DatabaseCommandController extends CommandController
             function ($type, $output) {
                 if (Process::OUT === $type) {
                     // Explicitly just echo out for now (avoid Symfony console formatting)
+                    // Todo: use output with OUTPUT_RAW once available in the API
                     echo $output;
                 } else {
                     $this->output('<error>' . $output . '</error>');
@@ -109,11 +125,11 @@ class DatabaseCommandController extends CommandController
     }
 
     /**
-     * Export database
+     * Export database.
      *
-     * Export the database (all tables) directly to stdout
-     *
+     * Export the database (all tables) directly to stdout.
      * The mysqldump binary must be available in the path for this command to work.
+     * This obviously only works when MySQL ist used as DBMS.
      */
     public function exportCommand()
     {

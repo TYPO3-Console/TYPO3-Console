@@ -70,6 +70,7 @@ class ConsoleOutput
         $this->output->getFormatter()->setStyle('warning', new OutputFormatterStyle('black', 'yellow'));
         $this->output->getFormatter()->setStyle('ins', new OutputFormatterStyle('green'));
         $this->output->getFormatter()->setStyle('del', new OutputFormatterStyle('red'));
+        $this->output->getFormatter()->setStyle('code', new OutputFormatterStyle(null, null, array('bold')));
     }
 
     /**

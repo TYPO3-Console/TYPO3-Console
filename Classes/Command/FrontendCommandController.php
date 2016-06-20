@@ -23,11 +23,11 @@ use TYPO3\CMS\Core\Tests\Functional\Framework\Frontend\Response;
 class FrontendCommandController extends CommandController
 {
     /**
-     * Submit frontend request
+     * Submit frontend request.
      *
-     * Submits a frontend request to TYPO3 on the specified URL
+     * Submits a frontend request to TYPO3 on the specified URL.
      *
-     * @param string $requestUrl URL to make a frontend request
+     * @param string $requestUrl URL to make a frontend request.
      */
     public function requestCommand($requestUrl)
     {
