@@ -1,0 +1,55 @@
+{namespace d=Helhum\Typo3Console\ViewHelpers}
+.. include:: ../Includes.txt
+
+
+.. _typo3_console-command-reference:
+
+{title -> d:format.underline(withCharacter: '=')}
+
+.. note:
+
+  This reference uses ``./typo3cms`` as the command to invoke. If you are on
+  Windows, this will probably not work, there you need to use ``typo3cms.bat``
+  instead.
+
+
+The following reference was automatically generated from code on {f:format.date(date: 'now', format: '%Y-%m-%d %H:%M:%S')}
+
+<f:for each="{allCommandsByPackageKey}" as="allCommands" key="packageKey">
+.. _`{title}: {packageKey}`:
+
+<d:format.underline withCharacter="-">Extension *{packageKey}*</d:format.underline>
+
+<f:for each="{allCommands}" as="command">
+.. _`{title}: {packageKey} {command.identifier}`:
+
+<d:format.underline withCharacter="*">``{command.identifier}``</d:format.underline>
+
+**{command.shortDescription}**
+
+{command.description -> f:format.raw()}
+
+<f:if condition="{command.arguments}">Arguments
+^^^^^^^^^
+
+<f:for each="{command.arguments}" key="name" as="description">``{name}``
+  {description -> f:format.raw()}
+</f:for>
+</f:if>
+
+<f:if condition="{command.options}">Options
+^^^^^^^
+
+<f:for each="{command.options}" key="name" as="description">``{name}``
+  {description -> f:format.raw()}
+</f:for>
+</f:if>
+
+<f:if condition="{command.relatedCommands}">Related commands
+^^^^^^^^^^^^^^^^
+
+<f:for each="{command.relatedCommands}" key="relatedCommandIdentifier" as="relatedCommandDescription">``{relatedCommandIdentifier}``
+  {relatedCommandDescription -> f:format.raw()}
+</f:for>
+</f:if>
+</f:for></f:for>

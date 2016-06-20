@@ -10,6 +10,7 @@ return array(
         \Helhum\Typo3Console\Command\DatabaseCommandController::class,
         \Helhum\Typo3Console\Command\ConfigurationCommandController::class,
         \Helhum\Typo3Console\Command\FrontendCommandController::class,
+        \Helhum\Typo3Console\Command\CommandReferenceCommandController::class,
     ),
     'runLevels' => array(
         'typo3_console:install:databasedata' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL ,
