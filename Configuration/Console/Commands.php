@@ -10,12 +10,14 @@ return array(
         \Helhum\Typo3Console\Command\DatabaseCommandController::class,
         \Helhum\Typo3Console\Command\ConfigurationCommandController::class,
         \Helhum\Typo3Console\Command\FrontendCommandController::class,
+        \Helhum\Typo3Console\Command\CommandReferenceCommandController::class,
     ),
     'runLevels' => array(
         'typo3_console:install:databasedata' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL ,
         'typo3_console:install:defaultconfiguration' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL ,
         'typo3_console:install:*' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE ,
         'typo3_console:cache:flush' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE ,
+        'typo3_console:commandreference:render' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL ,
     ),
     'bootingSteps' => array(
         'typo3_console:install:databasedata' => array(

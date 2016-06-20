@@ -16,7 +16,7 @@ Command Reference
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2016-07-12 17:41:21
+The following reference was automatically generated from code on 2016-07-16 17:59:28
 
 
 .. _`Command Reference: typo3_console`:
