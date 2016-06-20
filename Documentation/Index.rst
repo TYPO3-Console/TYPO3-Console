@@ -58,3 +58,4 @@ TYPO3 Console
 
 	Introduction/Index
 	AdministratorManual/Index
+	CommandReference/Index
