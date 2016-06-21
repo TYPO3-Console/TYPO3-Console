@@ -73,6 +73,14 @@ class ConsoleOutput
     }
 
     /**
+     * @return SymfonyConsoleOutput
+     */
+    public function getSymfonyConsoleOutput()
+    {
+        return $this->output;
+    }
+
+    /**
      * Returns the desired maximum line length for console output.
      *
      * @return int
