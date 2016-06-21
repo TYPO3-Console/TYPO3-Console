@@ -14,7 +14,7 @@ Command Reference
   instead.
 
 
-The following reference was automatically generated from code on 2016-06-21 16:10:10
+The following reference was automatically generated from code on 2016-06-21 18:55:35
 
 
 .. _`Command Reference: typo3_console`:
@@ -383,6 +383,11 @@ Export the database (all tables) directly to stdout.
 The mysqldump binary must be available in the path for this command to work.
 This obviously only works when MySQL ist used as DBMS.
 
+**This command passes the plain text database password to the command line process.**
+This means, that users that have the permission to observe running processes,
+will be able to read your password.
+If this imposes a security risk for you, then refrain from using this command!
+
 
 
 
@@ -404,6 +409,11 @@ This obviously only works when MySQL ist used as DBMS.
 **Example (import):** ``ssh remote.server '/path/to/typo3cms database:export' | ./typo3cms database:import``
 **Example (select):** ``echo 'SELECT username from be_users WHERE admin=1;' | ./typo3cms database:import``
 **Example (interactive):** ``./typo3cms database:import --interactive``
+
+**This command passes the plain text database password to the command line process.**
+This means, that users that have the permission to observe running processes,
+will be able to read your password.
+If this imposes a security risk for you, then refrain from using this command!
 
 
 
