@@ -39,16 +39,25 @@ class SchemaUpdateResultRenderer
      *
      * @param SchemaUpdateResult $result Result of the schema update
      * @param ConsoleOutput $output
+     * @param bool $includeStatements
+     * @param int $maxStatementLength
      */
-    public function render(SchemaUpdateResult $result, ConsoleOutput $output)
+    public function render(SchemaUpdateResult $result, ConsoleOutput $output, $includeStatements = false, $maxStatementLength = 60)
     {
-        $tableRows = array();
+        $tableRows = [];
 
-        foreach ($result->getPerformedUpdates() as $type => $numberOfUpdates) {
-            $tableRows[] = array($this->schemaUpdateTypeLabels[(string)$type], $numberOfUpdates);
+        foreach ($result->getPerformedUpdates() as $type => $performedUpdates) {
+            $row = [$this->schemaUpdateTypeLabels[(string)$type], count($performedUpdates)];
+            if ($includeStatements) {
+                $row = [$this->schemaUpdateTypeLabels[(string)$type], implode(chr(10) . chr(10), $this->getTruncatedQueries($performedUpdates, $maxStatementLength))];
+            }
+            $tableRows[] = $row;
         }
-
-        $output->outputTable($tableRows, array('Type', 'Updates'));
+        $tableHeader = ['Type', 'Updates'];
+        if ($includeStatements) {
+            $tableHeader = ['Type', 'SQL Statements'];
+        }
+        $output->outputTable($tableRows, $tableHeader);
 
         if ($result->hasErrors()) {
             foreach ($result->getErrors() as $type => $errors) {
@@ -59,5 +68,24 @@ class SchemaUpdateResultRenderer
                 }
             }
         }
+    }
+
+    /**
+     * Truncate (wrap) query strings at a certain number of characters
+     *
+     * @param array $queries
+     * @param int $truncateAt
+     * @return array
+     */
+    protected function getTruncatedQueries(array $queries, $truncateAt)
+    {
+        foreach ($queries as &$query) {
+            $truncatedLines = [];
+            foreach (explode(chr(10), $query) as $line) {
+                $truncatedLines[] = wordwrap($line, $truncateAt, chr(10), true);
+            }
+            $query = implode(chr(10), $truncatedLines);
+        }
+        return $queries;
     }
 }

@@ -14,7 +14,7 @@ Command Reference
   instead.
 
 
-The following reference was automatically generated from code on 2016-06-21 18:55:35
+The following reference was automatically generated from code on 2016-06-21 22:24:35
 
 
 .. _`Command Reference: typo3_console`:
@@ -461,6 +461,12 @@ Arguments
   List of schema update types
 
 
+
+Options
+^^^^^^^
+
+``--verbose``
+  If set, database queries performed are shown in output
 
 
 
