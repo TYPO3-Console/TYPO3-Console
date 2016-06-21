@@ -98,6 +98,11 @@ class DatabaseCommandController extends CommandController
      * <b>Example (select):</b> <code>echo 'SELECT username from be_users WHERE admin=1;' | ./typo3cms database:import</code>
      * <b>Example (interactive):</b> <code>./typo3cms database:import --interactive</code>
      *
+     * <warning>This command passes the plain text database password to the command line process.</warning>
+     * This means, that users that have the permission to observe running processes,
+     * will be able to read your password.
+     * If this imposes a security risk for you, then refrain from using this command!
+     *
      * @param bool $interactive Open an interactive mysql shell using the TYPO3 connection settings.
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
      */
@@ -110,15 +115,7 @@ class DatabaseCommandController extends CommandController
         $exitCode = $mysqlCommand->mysql(
             array('--skip-column-names'),
             STDIN,
-            function ($type, $output) {
-                if (Process::OUT === $type) {
-                    // Explicitly just echo out for now (avoid Symfony console formatting)
-                    // Todo: use output with OUTPUT_RAW once available in the API
-                    echo $output;
-                } else {
-                    $this->output('<error>' . $output . '</error>');
-                }
-            },
+            $this->buildOutputClosure(),
             $interactive
         );
         $this->quit($exitCode);
@@ -130,6 +127,11 @@ class DatabaseCommandController extends CommandController
      * Export the database (all tables) directly to stdout.
      * The mysqldump binary must be available in the path for this command to work.
      * This obviously only works when MySQL ist used as DBMS.
+     *
+     * <warning>This command passes the plain text database password to the command line process.</warning>
+     * This means, that users that have the permission to observe running processes,
+     * will be able to read your password.
+     * If this imposes a security risk for you, then refrain from using this command!
      */
     public function exportCommand()
     {
@@ -139,14 +141,23 @@ class DatabaseCommandController extends CommandController
         );
         $exitCode = $mysqlCommand->mysqldump(
             array(),
-            function ($type, $output) {
-                if (Process::OUT === $type) {
-                    echo $output;
-                } else {
-                    $this->output('<error>' . $output . '</error>');
-                }
-            }
+            $this->buildOutputClosure()
         );
         $this->quit($exitCode);
+    }
+
+    /**
+     * @return \Closure
+     */
+    protected function buildOutputClosure()
+    {
+        return function ($type, $data) {
+            $output = $this->output->getSymfonyConsoleOutput();
+            if (Process::OUT === $type) {
+                $output->write($data, $output::OUTPUT_RAW);
+            } elseif (Process::ERR === $type) {
+                $output->getErrorOutput()->write($data);
+            }
+        };
     }
 }
