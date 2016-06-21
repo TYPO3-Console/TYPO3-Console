@@ -14,7 +14,7 @@ Command Reference
   instead.
 
 
-The following reference was automatically generated from code on 21-06-16
+The following reference was automatically generated from code on 2016-06-21 16:10:10
 
 
 .. _`Command Reference: typo3_console`:
