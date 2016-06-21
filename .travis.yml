@@ -70,7 +70,7 @@ script:
   - ./typo3cms cache:flush
   - ./typo3cms cache:listgroups
   - ./typo3cms cleanup:updatereferenceindex
-  - ./typo3cms database:updateschema "*"
+  - ./typo3cms database:updateschema "*" --verbose
   - ./typo3cms database:export > /dev/null
   - echo "SELECT username from be_users where admin=1;" | ./typo3cms database:import
   - ./typo3cms frontend:request / > /dev/null

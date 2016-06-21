@@ -66,8 +66,10 @@ class DatabaseCommandController extends CommandController
      * <b>Example:</b> <code>./typo3cms database:updateschema "*.add,*.change"</code>
      *
      * @param array $schemaUpdateTypes List of schema update types
+     * @param bool $verbose If set, database queries performed are shown in output
+     * @throws \TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException
      */
-    public function updateSchemaCommand(array $schemaUpdateTypes)
+    public function updateSchemaCommand(array $schemaUpdateTypes, $verbose = false)
     {
         try {
             $schemaUpdateTypes = SchemaUpdateType::expandSchemaUpdateTypes($schemaUpdateTypes);
@@ -80,7 +82,7 @@ class DatabaseCommandController extends CommandController
 
         if ($result->hasPerformedUpdates()) {
             $this->output->outputLine('<info>The following schema updates were performed:</info>');
-            $this->schemaUpdateResultRenderer->render($result, $this->output);
+            $this->schemaUpdateResultRenderer->render($result, $this->output, $verbose);
         } else {
             $this->output->outputLine('No schema updates matching the given types were performed');
         }
