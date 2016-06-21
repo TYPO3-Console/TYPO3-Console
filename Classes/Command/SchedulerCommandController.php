@@ -29,21 +29,23 @@ class SchedulerCommandController extends CommandController
     /**
      * Run scheduler
      *
-     * Executes tasks that are registered in the scheduler module
+     * Executes tasks that are registered in the scheduler module.
+     *
+     * <b>Example:</b> <code>./typo3cms scheduler:run 42 --force</code>
      *
      * @param int $taskId Uid of the task that should be executed (instead of all scheduled tasks)
-     * @param bool $forceExecution When specifying a single task, the execution can be forced with this flag. The task will then be executed even if it is not scheduled for execution yet.
+     * @param bool $force The execution can be forced with this flag. The task will then be executed even if it is not scheduled for execution yet. Only works, when a task is specified.
      */
-    public function runCommand($taskId = null, $forceExecution = false)
+    public function runCommand($taskId = null, $force = false)
     {
         if ($taskId !== null) {
             if ($taskId <= 0) {
                 $this->outputLine('Task Id must be higher than zero.');
                 $this->sendAndExit(1);
             }
-            $this->executeSingleTask($taskId, $forceExecution);
+            $this->executeSingleTask($taskId, $force);
         } else {
-            if ($forceExecution) {
+            if ($force) {
                 $this->outputLine('Execution can only be forced when a single task is specified.');
                 $this->sendAndExit(2);
             }

@@ -30,9 +30,11 @@ class CacheCommandController extends CommandController
     protected $cacheService;
 
     /**
-     * Flushes all caches.
+     * Flush all caches.
      *
-     * @param bool $force If true, cache is forcibly flushed
+     * Flushes TYPO3 core caches first and after that, flushes caches from extensions.
+     *
+     * @param bool $force Cache is forcibly flushed (low level operations are performed)
      */
     public function flushCommand($force = false)
     {
@@ -48,17 +50,19 @@ class CacheCommandController extends CommandController
     }
 
     /**
-     * Flushes all caches (groups)
+     * Flush all caches in specified groups.
      *
      * Flushes all caches in specified groups.
-     * Valid group names are, default:
+     * Valid group names are by default:
      *
+     * - all
+     * - lowlevel
+     * - pages
      * - system
-     * - frontend
-     * - page
-     * - configuration
      *
-     * @param array $groups An array, on CLI specified as CSV value, of names of cache groups to flush
+     * <b>Example:</b> <code>./typo3cms cache:groups pages,all</code>
+     *
+     * @param array $groups An array of names (specified as comma separated values) of cache groups to flush
      */
     public function flushGroupsCommand(array $groups)
     {
@@ -76,8 +80,10 @@ class CacheCommandController extends CommandController
      *
      * Flushes caches by tags, optionally only caches in specified groups.
      *
-     * @param array $tags Array of tags, on CLI specified as CSV value, of tags to flush
-     * @param array $groups Optional array of groups, on CLI specified as CSV value, of groups in which to flush tags
+     * <b>Example:</b> <code>./typo3cms cache:flushtags news_123 pages,all</code>
+     *
+     * @param array $tags Array of tags (specified as comma separated values) to flush.
+     * @param array $groups Optional array of groups (specified as comma separated values) for which to flush tags. If no group is specified, caches of all groups are flushed.
      */
     public function flushTagsCommand(array $tags, array $groups = null)
     {

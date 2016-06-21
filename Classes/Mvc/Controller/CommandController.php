@@ -371,7 +371,7 @@ class CommandController implements CommandControllerInterface
      */
     protected function createDefaultLogger($minimumLevel = LogLevel::DEBUG, $options = array())
     {
-        $options['output'] = new SymfonyConsoleOutput();
+        $options['output'] = $this->output->getSymfonyConsoleOutput();
         $logger = new Logger(get_class($this));
         $logger->addWriter($minimumLevel, new ConsoleWriter($options));
 

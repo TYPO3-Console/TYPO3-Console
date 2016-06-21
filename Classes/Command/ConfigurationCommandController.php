@@ -34,13 +34,16 @@ class ConfigurationCommandController extends CommandController implements Single
     protected $consoleRenderer;
 
     /**
-     * Remove configuration option
+     * Remove configuration option.
      *
-     * Removes a system configuration option by path
+     * Removes a system configuration option by path.
      *
-     * Example: ./typo3cms configuration:removebypath DB,EXT/EXTCONF/realurl
+     * For this command to succeed, the configuration option(s) must be in
+     * LocalConfiguration.php and not be overridden elsewhere.
      *
-     * @param array $paths Path to system configuration that should be removed. Multiple paths can be specified separated by commas
+     * <b>Example:</b> <code>./typo3cms configuration:remove DB,EXT/EXTCONF/realurl</code>
+     *
+     * @param array $paths Path to system configuration that should be removed. Multiple paths can be specified separated by comma
      * @param bool $force If set, does not ask for confirmation
      */
     public function removeCommand(array $paths, $force = false)
@@ -65,11 +68,13 @@ class ConfigurationCommandController extends CommandController implements Single
     }
 
     /**
-     * Show configuration option
+     * Show configuration value.
      *
-     * Shows system configuration option value by path
+     * Shows system configuration value by path.
+     * If the currently active configuration differs from the value in LocalConfiguration.php
+     * the difference between these values is shown.
      *
-     * Example: ./typo3cms configuration:show DB
+     * <b>Example:</b> <code>./typo3cms configuration:show DB</code>
      *
      * @param string $path Path to system configuration option
      */
@@ -96,11 +101,12 @@ class ConfigurationCommandController extends CommandController implements Single
     }
 
     /**
-     * Show active configuration
+     * Show active configuration value.
      *
-     * Shows active system configuration by path
+     * Shows active system configuration by path.
+     * Shows the configuration value that is currently effective, no matter where and how it is set.
      *
-     * Example: ./typo3cms configuration:showActive DB
+     * <b>Example:</b> <code>./typo3cms configuration:showActive DB</code>
      *
      * @param string $path Path to system configuration
      */
@@ -115,13 +121,16 @@ class ConfigurationCommandController extends CommandController implements Single
     }
 
     /**
-     * Show local configuration
+     * Show local configuration value.
      *
-     * Shows local configuration option value by path
+     * Shows local configuration option value by path.
+     * Shows the value which is stored in LocalConfiguration.php.
+     * Note that this value could be overridden. Use <code>./typo3cms configuration:show [path]</code> to see if this is the case.
      *
-     * Example: ./typo3cms configuration:showLocal DB
+     * <b>Example:</b> <code>./typo3cms configuration:showLocal DB</code>
      *
      * @param string $path Path to local system configuration
+     * @see typo3_console:configuration:show
      */
     public function showLocalCommand($path)
     {
@@ -134,11 +143,11 @@ class ConfigurationCommandController extends CommandController implements Single
     }
 
     /**
-     * Set configuration option value
+     * Set configuration value.
      *
      * Set system configuration option value by path.
      *
-     * Example: ./typo3cms configuration:set DB/extTablesDefinitionScript extTables.php
+     * <b>Example:</b> <code>./typo3cms configuration:set SYS/fileCreateMask 0664</code>
      *
      * @param string $path Path to system configuration
      * @param string $value Value for system configuration

@@ -98,7 +98,7 @@ class HelpCommandController extends CommandController
         $this->outputLine('<comment>Available commands:</comment>');
 
         foreach ($this->commands as $shortCommandIdentifier => $command) {
-            $description = wordwrap($command->getShortDescription(), $this->output->getMaximumLineLength() - 43, PHP_EOL . str_repeat(' ', 43), true);
+            $description = $this->wordWrap($command->getShortDescription(), 43);
             $this->outputLine('%-2s<info>%-40s</info> %s', array(' ', $shortCommandIdentifier, $description));
         }
 
@@ -135,7 +135,7 @@ class HelpCommandController extends CommandController
         if ($command->hasArguments()) {
             foreach ($commandArgumentDefinitions as $commandArgumentDefinition) {
                 $argumentDescription = $commandArgumentDefinition->getDescription();
-                $argumentDescription = wordwrap($argumentDescription, $this->output->getMaximumLineLength() - 23, PHP_EOL . str_repeat(' ', 23), true);
+                $argumentDescription = $this->wordWrap($argumentDescription, 23);
                 if ($commandArgumentDefinition->isRequired()) {
                     $argumentDescriptions[] = vsprintf('  <info>%-20s</info> %s', array($commandArgumentDefinition->getDashedName(), $argumentDescription));
                 } else {
@@ -158,6 +158,7 @@ class HelpCommandController extends CommandController
             }
         }
         if ($command->getDescription() !== '') {
+            $this->outputLine();
             $this->outputLine('<comment>Help:</comment>');
             $descriptionLines = explode(chr(10), $command->getDescription());
             foreach ($descriptionLines as $descriptionLine) {
@@ -167,10 +168,10 @@ class HelpCommandController extends CommandController
         $relatedCommandIdentifiers = $command->getRelatedCommandIdentifiers();
         if ($relatedCommandIdentifiers !== array()) {
             $this->outputLine();
-            $this->outputLine('SEE ALSO:');
+            $this->outputLine('<comment>Related Commands:</comment>');
             foreach ($relatedCommandIdentifiers as $commandIdentifier) {
                 $command = $this->commandManager->getCommandByIdentifier($commandIdentifier);
-                $this->outputLine('%-2s%s (%s)', array(' ', $commandIdentifier, $command->getShortDescription()));
+                $this->outputLine('%-2s%s (%s)', array(' ', $this->commandManager->getShortestIdentifierForCommand($command), $command->getShortDescription()));
             }
         }
         $this->outputLine();
@@ -226,5 +227,16 @@ class HelpCommandController extends CommandController
         }
 
         ksort($this->commands);
+    }
+
+    /**
+     * @param string $stringToWrap
+     * @param int $indent
+     * @return string
+     */
+    protected function wordWrap($stringToWrap, $indent)
+    {
+        $formatter = $this->output->getSymfonyConsoleOutput()->getFormatter();
+        return wordwrap($formatter->format($stringToWrap), $this->output->getMaximumLineLength() - $indent, PHP_EOL . str_repeat(' ', $indent), true);
     }
 }
