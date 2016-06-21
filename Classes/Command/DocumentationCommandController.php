@@ -65,7 +65,8 @@ class DocumentationCommandController extends CommandController implements Single
             $this->sendAndExit(1);
         }
         if ($targetFile === null) {
-            echo $xsdSchema;
+            $output = $this->output->getSymfonyConsoleOutput();
+            $output->write($xsdSchema, $output::OUTPUT_RAW);
         } else {
             file_put_contents($targetFile, $xsdSchema);
         }
