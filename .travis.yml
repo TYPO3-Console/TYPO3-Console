@@ -3,8 +3,8 @@ language: php
 branches:
   only:
     - master
-    - 1.1.x
     - develop
+    - /^[0-9]+\.[0-9]+\.[0-9]+$/
 
 php:
   - 5.5
