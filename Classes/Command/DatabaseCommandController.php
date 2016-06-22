@@ -73,8 +73,9 @@ class DatabaseCommandController extends CommandController {
 	 * To avoid shell matching all types with wildcards should be quoted.
 	 *
 	 * @param array $schemaUpdateTypes List of schema update types
+	 * @param bool $verbose If set, database queries performed are shown in output
 	 */
-	public function updateSchemaCommand(array $schemaUpdateTypes) {
+	public function updateSchemaCommand(array $schemaUpdateTypes, $verbose = FALSE) {
 		try {
 			$schemaUpdateTypes = $this->expandSchemaUpdateTypes($schemaUpdateTypes);
 		} catch (\UnexpectedValueException $e) {
@@ -86,7 +87,7 @@ class DatabaseCommandController extends CommandController {
 
 		if ($result->hasPerformedUpdates()) {
 			$this->output->outputLine('<info>The following schema updates where performed:</info>');
-			$this->outputSchemaUpdateResult($result);
+			$this->outputSchemaUpdateResult($result, $verbose);
 		} else {
 			$this->output->outputLine('No schema updates matching the given types where performed');
 		}
@@ -134,25 +135,54 @@ class DatabaseCommandController extends CommandController {
 	 * Renders a table for a schema update result
 	 *
 	 * @param SchemaUpdateResult $result Result of the schema update
+	 * @param bool $includeStatements TRUE to include the performed statements in the output, FALSE otherwise
+	 * @param int $maxStatementLength Wrap statements at the given number of characters
 	 * @return void
 	 */
-	protected function outputSchemaUpdateResult(SchemaUpdateResult $result) {
+	protected function outputSchemaUpdateResult(SchemaUpdateResult $result, $includeStatements = FALSE, $maxStatementLength = 60) {
 		$tableRows = array();
 
-		foreach ($result->getPerformedUpdates() as $type => $numberOfUpdates) {
-			$tableRows[] = array($this->schemaUpdateTypeLabels[(string)$type], $numberOfUpdates);
+		foreach ($result->getPerformedUpdates() as $type => $performedUpdates) {
+			$row = array($this->schemaUpdateTypeLabels[(string)$type], count($performedUpdates));
+			if ($includeStatements) {
+				$row = array($this->schemaUpdateTypeLabels[(string)$type], implode(chr(10) . chr(10), $this->getTruncatedQueries($performedUpdates, $maxStatementLength)));
+			}
+			$tableRows[] = $row;
 		}
 
-		$this->output->outputTable($tableRows, array('Type', 'Updates'));
+		$tableHeader = array('Type', 'Updates');
+
+		if ($includeStatements) {
+			$tableHeader = array('Type', 'SQL Statements');
+		}
+
+		$this->output->outputTable($tableRows, $tableHeader);
 
 		if ($result->hasErrors()) {
 			foreach ($result->getErrors() as $type => $errors) {
 				$this->output->outputLine(sprintf('<error>Errors during "%s" schema update:</error>', $this->schemaUpdateTypeLabels[(string)$type]));
-
 				foreach ($errors as $error) {
 					$this->output->outputFormatted('<error>' . $error . '</error>', array(), 2);
 				}
 			}
 		}
+	}
+
+	/**
+	 * Truncate (wrap) query strings at a certain number of characters
+	 *
+	 * @param array $queries
+	 * @param int $truncateAt
+	 * @return array
+	 */
+	protected function getTruncatedQueries(array $queries, $truncateAt) {
+		foreach ($queries as &$query) {
+			$truncatedLines = array();
+			foreach (explode(chr(10), $query) as $line) {
+				$truncatedLines[] = wordwrap($line, $truncateAt, chr(10), true);
+			}
+			$query = implode(chr(10), $truncatedLines);
+		}
+		return $queries;
 	}
 }

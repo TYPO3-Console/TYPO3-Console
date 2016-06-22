@@ -94,7 +94,7 @@ class SchemaService implements SingletonInterface {
 					);
 
 					if ($result === TRUE) {
-						$updateResult->addPerformedUpdates($schemaUpdateType, count($statements));
+						$updateResult->addPerformedUpdates($schemaUpdateType, $statements);
 					} elseif (is_array($result)) {
 						$updateResult->addErrors($schemaUpdateType, $result);
 					}

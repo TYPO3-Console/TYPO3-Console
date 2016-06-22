@@ -62,6 +62,6 @@ script:
   - ./typo3cms backend:lock
   - ./typo3cms backend:unlock
   - ./typo3cms cleanup:updatereferenceindex
-  - ./typo3cms database:updateschema "*"
+  - ./typo3cms database:updateschema "*" --verbose
   - rm -f typo3conf/PackageStates.php && ./typo3cms install:generatepackagestates && [ -f "typo3conf/PackageStates.php" ]
   - rm typo3temp/index.html && ./typo3cms install:fixfolderstructure && [ -f "typo3temp/index.html" ]
