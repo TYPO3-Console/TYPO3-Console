@@ -70,7 +70,7 @@ class SchemaUpdateResult
      */
     public function addPerformedUpdates(SchemaUpdateType $schemaUpdateType, array $updates)
     {
-        $this->performedUpdates[(string)$schemaUpdateType] = array_merge((array)$this->performedUpdates[(string)$schemaUpdateType], $updates);;
+        $this->performedUpdates[(string)$schemaUpdateType] = array_merge((array)$this->performedUpdates[(string)$schemaUpdateType], $updates);
     }
 
     /**
