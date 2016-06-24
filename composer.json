@@ -10,6 +10,9 @@
         "commandline"
     ],
     "homepage": "http://insight.helhum.io/post/104528981610/about-the-beauty-and-power-of-typo3-console",
+    "support": {
+        "issues": "https://github.com/helhum/typo3_console/issues"
+    },
     "authors": [
         {
             "name": "Helmut Hummel",
