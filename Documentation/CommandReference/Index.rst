@@ -14,7 +14,7 @@ Command Reference
   instead.
 
 
-The following reference was automatically generated from code on 2016-06-21 22:24:35
+The following reference was automatically generated from code on 2016-06-28 09:20:43
 
 
 .. _`Command Reference: typo3_console`:
@@ -513,15 +513,13 @@ Options
 **Activate extension(s).**
 
 Activates one or more extensions by key.
-
-The extension files must be present in one of the
-recognised extension folder paths in TYPO3.
+Marks extensions as active, sets them up and clears caches for every activated extension.
 
 Arguments
 ^^^^^^^^^
 
 ``--extension-keys``
-  Array of extension keys to activate, on CLI specified as a list of CSV values
+  Extension keys to activate. Separate multiple extension keys with comma.
 
 
 
@@ -534,18 +532,16 @@ Arguments
 ``extension:deactivate``
 ************************
 
-**Deactivate extension(s)**
+**Deactivate extension(s).**
 
-Deactivates one or more extensions by key
-
-The extension files must be present in one of the
-recognised extension folder paths in TYPO3.
+Deactivates one or more extensions by key.
+Marks extensions as inactive in the system and clears caches for every deactivated extension.
 
 Arguments
 ^^^^^^^^^
 
 ``--extension-keys``
-  Array of extension keys to deactivate, on CLI specified as a list of CSV values
+  Extension keys to deactivate. Separate multiple extension keys with comma.
 
 
 
@@ -576,20 +572,20 @@ creating or updating this info properly during extension (de-)activation.
 ``extension:setup``
 *******************
 
-**Setup extension(s)**
+**Set up extension(s)**
 
 Sets up one or more extensions by key.
-
 Set up means:
-* Database migrations and additions
-* Importing files and data
-* Writing default extension configuration
+
+- Database migrations and additions
+- Importing files and data
+- Writing default extension configuration
 
 Arguments
 ^^^^^^^^^
 
 ``--extension-keys``
-  
+  Extension keys to set up. Separate multiple extension keys with comma.
 
 
 
@@ -604,11 +600,27 @@ Arguments
 
 **Set up all active extensions**
 
-Sets up all extension that are active and not part of typo3/cms package
+Sets up all extensions that are marked as active in the system.
+
+This command is especially useful for deployment, where extensions
+are already marked as active, but have not been set up yet or might have changed. It ensures every necessary
+setup step for the (changed) extensions is performed.
+As an additional benefit no caches are flushed, which significantly improves performance of this command
+and avoids unnecessary cache clearing.
 
 
 
 
+
+Related commands
+^^^^^^^^^^^^^^^^
+
+``extension:setup``
+  Set up extension(s)
+``install:generatepackagestates``
+  Generate PackageStates.php file.
+``cache:flush``
+  Flush all caches.
 
 
 
