@@ -47,22 +47,35 @@ class SchemaUpdateResult {
   }
 
   /**
+    * Returns the list of performed update types including the count
+    *
+    * @return array
+    */
+   public function getPerformedUpdateTypes() {
+     $typesCount = array();
+     foreach ($this->performedUpdates as $type => $performedUpdates) {
+       $typesCount[$type] = count($performedUpdates);
+     }
+     return $typesCount;
+   }
+
+  /**
    * Returns TRUE if updates where performed, FALSE otherwise
    *
    * @return boolean
    */
   public function hasPerformedUpdates() {
-    return count($this->performedUpdates);
+    return count($this->performedUpdates) > 0;
   }
 
   /**
    * Adds to the number of updates performed for a schema update type
    *
    * @param SchemaUpdateType $schemaUpdateType Schema update type
-   * @param int $numberOfUpdates Number of updates performed
+   * @param array $updates Updates performed
    */
-  public function addPerformedUpdates(SchemaUpdateType $schemaUpdateType, $numberOfUpdates) {
-    $this->performedUpdates[(string)$schemaUpdateType] += $numberOfUpdates;
+  public function addPerformedUpdates(SchemaUpdateType $schemaUpdateType, array $updates) {
+    $this->performedUpdates[(string)$schemaUpdateType] = array_merge((array)$this->performedUpdates[(string)$schemaUpdateType], $updates);
   }
 
   /**
