@@ -16,7 +16,6 @@ namespace Helhum\Typo3Console\Mvc\Controller;
 use Helhum\Typo3Console\Log\Writer\ConsoleWriter;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Output\ConsoleOutput as SymfonyConsoleOutput;
 use TYPO3\CMS\Core\Authentication\AbstractUserAuthentication;
 use TYPO3\CMS\Core\Log\Logger;
 use TYPO3\CMS\Core\Log\LogLevel;
@@ -36,7 +35,7 @@ use TYPO3\CMS\Extbase\Mvc\ResponseInterface;
  *
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class CommandController implements CommandControllerInterface
+abstract class CommandController implements CommandControllerInterface
 {
     /**
      * @var Request
