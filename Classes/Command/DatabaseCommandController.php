@@ -156,7 +156,7 @@ class DatabaseCommandController extends CommandController
         return function ($type, $data) {
             $output = $this->output->getSymfonyConsoleOutput();
             if (Process::OUT === $type) {
-                $output->write($data, $output::OUTPUT_RAW);
+                echo $data;
             } elseif (Process::ERR === $type) {
                 $output->getErrorOutput()->write($data);
             }
