@@ -17,7 +17,7 @@ call_user_func(function () {
     if (getenv('TYPO3_PATH_WEB')) {
         // In case we are symlinked (like for travis tests),
         // we need to accept the location from the outside to find the autoload.php
-        $typo3Root = getenv('TYPO3_PATH_WEB');
+        $typo3Root = rtrim(getenv('TYPO3_PATH_WEB'), '/\\');
     } else {
         // Not symlinked (hopefully), so we can assume the docroot from the location of this file
         $typo3Root = dirname(dirname(dirname(dirname(__DIR__))));
@@ -30,9 +30,11 @@ call_user_func(function () {
         putenv('TYPO3_PATH_WEB=' . $typo3Root);
     }
 
-    define('PATH_site', strtr(getenv('TYPO3_PATH_WEB'), '\\', '/') . '/');
+    define('PATH_site', str_replace('\\', '/', getenv('TYPO3_PATH_WEB')) . '/');
     define('PATH_thisScript', realpath(PATH_site . 'typo3/cli_dispatch.phpsh'));
 
+    // This require is needed so that the console works in non composer mode,
+    // where requiring the main autoload.php is not enough to load extension classes
     require __DIR__ . '/../Classes/Core/ConsoleBootstrap.php';
     $bootstrap = new \Helhum\Typo3Console\Core\ConsoleBootstrap(getenv('TYPO3_CONTEXT') ?: 'Production');
     $bootstrap->run($classLoader);
