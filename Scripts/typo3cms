@@ -2,8 +2,6 @@
 <?php
 if (file_exists(__DIR__ . '/typo3cms.php')) {
     require __DIR__ . '/typo3cms.php';
-} elseif (file_exists(__DIR__ . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php')) {
-    require __DIR__ . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php';
 }
 echo 'Could not find console! Make sure typo3cms binary is up to date!' . PHP_EOL;
 exit(1);
