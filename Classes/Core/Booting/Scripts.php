@@ -131,10 +131,6 @@ class Scripts
      */
     public static function initializeExtensionConfiguration(ConsoleBootstrap $bootstrap)
     {
-        // Manual load GlobalDebugFunctions.php for TYPO3 CMS <= 7.3
-        if (file_exists(PATH_site . 'typo3/sysext/core/Classes/Core/GlobalDebugFunctions.php')) {
-            require_once PATH_site . 'typo3/sysext/core/Classes/Core/GlobalDebugFunctions.php';
-        }
         ExtensionManagementUtility::loadExtLocalconf();
         $bootstrap->applyAdditionalConfigurationSettings();
     }
@@ -186,7 +182,7 @@ class Scripts
     }
 
     /**
-     * Provide cleaned imlementation of TYPO3 CMS core classes.
+     * Provide cleaned implementation of TYPO3 CMS core classes.
      * Can only be called *after* extension configuration is loaded (needs extbase configuration)!
      *
      * @param ConsoleBootstrap $bootstrap
@@ -196,6 +192,7 @@ class Scripts
         self::overrideImplementation(\TYPO3\CMS\Extbase\Mvc\Controller\Argument::class, \Helhum\Typo3Console\Mvc\Controller\Argument::class);
         self::overrideImplementation(\TYPO3\CMS\Extbase\Command\HelpCommandController::class, \Helhum\Typo3Console\Command\HelpCommandController::class);
         self::overrideImplementation(\TYPO3\CMS\Extensionmanager\Command\ExtensionCommandController::class, \Helhum\Typo3Console\Command\ExtensionCommandController::class);
+        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerTypeConverter(\Helhum\Typo3Console\Property\TypeConverter\ArrayConverter::class);
     }
 
     /**

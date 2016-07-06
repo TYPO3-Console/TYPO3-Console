@@ -192,25 +192,22 @@ class ConsoleBootstrap extends Bootstrap
      * Iterates over the registered request handlers and determines which one fits best.
      *
      * @return RequestHandlerInterface A request handler
-     * @throws \TYPO3\CMS\Core\Error\Exception
+     * @throws \RuntimeException
      */
     public function resolveCliRequestHandler()
     {
-        if (empty($this->requestHandlers)) {
-            throw new \InvalidArgumentException('No request handlers found. Make sure the extension typo3_console is active and try again.', 1417863425);
-        }
         $suitableRequestHandlers = array();
         foreach ($this->requestHandlers as $requestHandler) {
             if ($requestHandler->canHandleRequest() > 0) {
                 $priority = $requestHandler->getPriority();
                 if (isset($suitableRequestHandlers[$priority])) {
-                    throw new \TYPO3\CMS\Core\Error\Exception('More than one request handler with the same priority can handle the request, but only one handler may be active at a time!', 1176475350);
+                    throw new \RuntimeException('More than one request handler with the same priority can handle the request, but only one handler may be active at a time!', 1176475350);
                 }
                 $suitableRequestHandlers[$priority] = $requestHandler;
             }
         }
         if (empty($suitableRequestHandlers)) {
-            throw new \InvalidArgumentException('No request handler found that can handle that request.', 1417863426);
+            throw new \RuntimeException('No request handler found that can handle that request.', 1417863426);
         }
         ksort($suitableRequestHandlers);
         return array_pop($suitableRequestHandlers);
@@ -261,7 +258,6 @@ class ConsoleBootstrap extends Bootstrap
      */
     public function initializePackageManagement($packageManagerClassName = \Helhum\Typo3Console\Package\UncachedPackageManager::class)
     {
-        require __DIR__ . '/../Package/UncachedPackageManager.php';
         $packageManager = new \Helhum\Typo3Console\Package\UncachedPackageManager();
         $this->setEarlyInstance(\TYPO3\CMS\Core\Package\PackageManager::class, $packageManager);
         Utility\ExtensionManagementUtility::setPackageManager($packageManager);
