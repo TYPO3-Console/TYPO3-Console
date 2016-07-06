@@ -16,7 +16,6 @@ namespace Helhum\Typo3Console\Composer;
 use Composer\Script\Event as ScriptEvent;
 use TYPO3\CMS\Composer\Plugin\Config;
 use TYPO3\CMS\Composer\Plugin\Util\Filesystem;
-use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -86,10 +85,6 @@ class InstallerScripts
      */
     public static function postInstallExtension()
     {
-        if (Bootstrap::usesComposerClassLoading()) {
-            // Composer has done its job already. Nothing to do for us here!
-            return;
-        }
         $scriptName = self::isWindowsOs() ? 'typo3cms.bat' : 'typo3cms';
         $success = self::safeCopy(PATH_site . self::BINARY_PATH . $scriptName, PATH_site . $scriptName);
         if (!$success) {
