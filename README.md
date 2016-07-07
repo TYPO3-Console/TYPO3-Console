@@ -1,4 +1,4 @@
-TYPO3 CMS Console [![Build Status](https://travis-ci.org/helhum/typo3_console.svg?branch=master)](https://travis-ci.org/helhum/typo3_console)
+TYPO3 CMS Console [![Build Status](https://travis-ci.org/TYPO3-Console/typo3_console.svg?branch=1.1.x)](https://travis-ci.org/helhum/typo3_console)
 =================
 
 Many frameworks come with command helper tools that enables interactions on the command line easily.
