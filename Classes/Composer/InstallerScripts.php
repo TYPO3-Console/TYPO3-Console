@@ -36,6 +36,7 @@ class InstallerScripts
      * @param ScriptEvent $event
      * @param bool $calledFromPlugin
      * @return void
+     * @throws \RuntimeException
      */
     public static function setupConsole(ScriptEvent $event, $calledFromPlugin = false)
     {
@@ -57,6 +58,10 @@ class InstallerScripts
                 $filesystem->ensureDirectoryExists($extDir);
                 $filesystem->symlink($installDir, $consoleDir);
             }
+        }
+        $pluginConfig = \Helhum\Typo3ConsolePlugin\Config::load($event->getIO(), $event->getComposer()->getConfig());
+        if (!$pluginConfig->get('install-binary')) {
+            return;
         }
         // @deprecated. can be removed once the typo3 installer takes care of installing binaries
         if (self::isWindowsOs()) {
