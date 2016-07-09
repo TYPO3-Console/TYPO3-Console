@@ -94,7 +94,7 @@ class DatabaseCommandController extends CommandController
      * This means that this can not only be used to pass insert statements,
      * it but works as well to pass SELECT statements to it.
      * The mysql binary must be available in the path for this command to work.
-     * This obviously only works when MySQL ist used as DBMS.
+     * This obviously only works when MySQL is used as DBMS.
      *
      * <b>Example (import):</b> <code>ssh remote.server '/path/to/typo3cms database:export' | ./typo3cms database:import</code>
      * <b>Example (select):</b> <code>echo 'SELECT username from be_users WHERE admin=1;' | ./typo3cms database:import</code>
@@ -128,7 +128,7 @@ class DatabaseCommandController extends CommandController
      *
      * Export the database (all tables) directly to stdout.
      * The mysqldump binary must be available in the path for this command to work.
-     * This obviously only works when MySQL ist used as DBMS.
+     * This obviously only works when MySQL is used as DBMS.
      *
      * <warning>This command passes the plain text database password to the command line process.</warning>
      * This means, that users that have the permission to observe running processes,
