@@ -14,7 +14,7 @@ Command Reference
   instead.
 
 
-The following reference was automatically generated from code on 2016-06-28 09:20:43
+The following reference was automatically generated from code on 2016-07-12 17:41:21
 
 
 .. _`Command Reference: typo3_console`:
@@ -381,7 +381,7 @@ Related commands
 
 Export the database (all tables) directly to stdout.
 The mysqldump binary must be available in the path for this command to work.
-This obviously only works when MySQL ist used as DBMS.
+This obviously only works when MySQL is used as DBMS.
 
 **This command passes the plain text database password to the command line process.**
 This means, that users that have the permission to observe running processes,
@@ -404,7 +404,7 @@ If this imposes a security risk for you, then refrain from using this command!
 This means that this can not only be used to pass insert statements,
 it but works as well to pass SELECT statements to it.
 The mysql binary must be available in the path for this command to work.
-This obviously only works when MySQL ist used as DBMS.
+This obviously only works when MySQL is used as DBMS.
 
 **Example (import):** ``ssh remote.server '/path/to/typo3cms database:export' | ./typo3cms database:import``
 **Example (select):** ``echo 'SELECT username from be_users WHERE admin=1;' | ./typo3cms database:import``
