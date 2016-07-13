@@ -66,37 +66,38 @@ class ExtensionCommandController extends CommandController
      */
     public function activateCommand(array $extensionKeys)
     {
-        $this->emitPackagesMayHaveChangedSignal();
-        $installedExtensions = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getLoadedExtensionListArray();
+		$this->emitPackagesMayHaveChangedSignal();
+		$installedExtensions = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getLoadedExtensionListArray();
 
-        $extensionKeysAsString = implode('", "', $extensionKeys);
-        foreach ($extensionKeys as $extensionKey) {
-                try {
-                        if (in_array($extensionKey, $installedExtensions)) {
-                                continue; 
-			}
+		$extensionKeysAsString = implode('", "', $extensionKeys);
+		foreach ($extensionKeys as $extensionKey) {
+			try {
+				if (in_array($extensionKey, $installedExtensions)) {
+					continue; 
+				}
 				
-                        $extension = $this->extensionModelUtility->mapExtensionArrayToModel(
-                                $this->extensionInstaller->enrichExtensionWithDetails($extensionKey)
-                        );
-                        if ($this->managementService->installExtension($extension) === false) {
-                                $this->outputLine('<error>Extension "%s" could not be installed.</error>', [$extensionKey]);
-                                $this->sendAndExit(2);
-                        }
-                }
-                catch (\TYPO3\CMS\Extensionmanager\Exception\ExtensionManagerException $e) {
-                        $this->outputLine('<error>There was an exception: "%s".</error>', [$e->getMessage()]);
-                        $this->sendAndExit(2);
-                } catch (\TYPO3\CMS\Core\Package\Exception\PackageStatesFileNotWritableException $e) {
-                        $this->outputLine('<error>There was an exception: "%s".</error>', [$e->getMessage()]);
-                        $this->sendAndExit(2);
-                }
+				$extension = $this->extensionModelUtility->mapExtensionArrayToModel(
+					$this->extensionInstaller->enrichExtensionWithDetails($extensionKey)
+				);
+				
+				if ($this->managementService->installExtension($extension) === false) {
+					$this->outputLine('<error>Extension "%s" could not be installed.</error>', [$extensionKey]);
+					$this->sendAndExit(2);
+				}
+			}
+			catch (\TYPO3\CMS\Extensionmanager\Exception\ExtensionManagerException $e) {
+				$this->outputLine('<error>There was an exception: "%s".</error>', [$e->getMessage()]);
+				$this->sendAndExit(2);
+			} catch (\TYPO3\CMS\Core\Package\Exception\PackageStatesFileNotWritableException $e) {
+				$this->outputLine('<error>There was an exception: "%s".</error>', [$e->getMessage()]);
+				$this->sendAndExit(2);
+			}
         }
 	
-        if (count($extensionKeys) === 1) {
-                $this->outputLine('<info>Extension "%s" is now active.</info>', [$extensionKeysAsString]);
+		if (count($extensionKeys) === 1) {
+			$this->outputLine('<info>Extension "%s" is now active.</info>', [$extensionKeysAsString]);
         } else {
-                $this->outputLine('<info>Extensions "%s" are now active.</info>', [$extensionKeysAsString]);
+            $this->outputLine('<info>Extensions "%s" are now active.</info>', [$extensionKeysAsString]);
         }
     }
 
