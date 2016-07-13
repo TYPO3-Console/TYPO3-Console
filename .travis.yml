@@ -27,7 +27,7 @@ matrix:
 sudo: false
 cache:
   directories:
-    - $HOME/.composer/cache
+    - $HOME/.composer
 
 addons:
   apt:
@@ -42,6 +42,8 @@ before_install:
   - phpenv config-rm xdebug.ini
   - composer self-update
   - composer --version
+  - [ -f "$HOME/.composer/vendor/bin/phar-composer" ] || composer global require clue/phar-composer
+  - mkdir -p Libraries && $HOME/.composer/vendor/bin/phar-composer build 'symfony/process=^2.7||^3.1' Libraries/symfony-process.phar
 
 before_script:
   - composer require typo3/cms=$TYPO3_VERSION
