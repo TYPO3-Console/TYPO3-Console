@@ -57,6 +57,13 @@
     "bin": [
         "Scripts/typo3cms"
     ],
+    "scripts": {
+        "create-libs": [
+            "mkdir -p Libraries",
+            "[ -f $HOME/.composer/vendor/bin/phar-composer ] || composer global require clue/phar-composer",
+            "$HOME/.composer/vendor/bin/phar-composer build 'symfony/process=^2.7||^3.1' Libraries/symfony-process.phar"
+        ]
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "3.x-dev"
