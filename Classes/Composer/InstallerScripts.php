@@ -16,8 +16,6 @@ namespace Helhum\Typo3Console\Composer;
 use Composer\Script\Event as ScriptEvent;
 use TYPO3\CMS\Composer\Plugin\Config;
 use TYPO3\CMS\Composer\Plugin\Util\Filesystem;
-use TYPO3\CMS\Core\Messaging\AbstractMessage;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class for Composer and Extension Manager install scripts
@@ -25,7 +23,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class InstallerScripts
 {
     const BINARY_PATH = 'typo3conf/ext/typo3_console/Scripts/';
-    const EM_FLASH_MESSAGE_QUEUE_ID = 'extbase.flashmessages.tx_extensionmanager_tools_extensionmanagerextensionmanager';
     const COPY_FAILED_MESSAGE_TITLE = 'Could not copy %s script to TYPO3 root directory (%s)!';
     const COPY_FAILED_MESSAGE = 'Check the permissions of your root directory. Is there a file or directory named %s inside this directory?';
     const COPY_SUCCESS_MESSAGE = 'Successfully copied the %s script to TYPO3 root directory. Let\'s dance!';
@@ -41,7 +38,8 @@ class InstallerScripts
     public static function setupConsole(ScriptEvent $event, $calledFromPlugin = false)
     {
         if (!$calledFromPlugin) {
-            $event->getIO()->write('<comment>Usage of Helhum\Typo3Console\Composer\InstallerScripts::setupConsole is deprecated. Please remove this section from your root composer.json</comment>');
+            // @deprecated
+            $event->getIO()->writeError('<warning>Usage of Helhum\Typo3Console\Composer\InstallerScripts::setupConsole is deprecated. Please remove this section from your root composer.json</warning>');
             return;
         }
 
@@ -66,36 +64,24 @@ class InstallerScripts
         // @deprecated. can be removed once the typo3 installer takes care of installing binaries
         if (self::isWindowsOs()) {
             $scriptName = 'typo3cms.bat';
-            $success = self::safeCopy($webDir . '/' . self::BINARY_PATH . $scriptName, $webDir . '/' . $scriptName);
+            $success = self::safeCopy($pathToScriptsDirectory . $scriptName, $webDir . '/' . $scriptName);
         } else {
             $scriptName = 'typo3cms';
             $targetPath = $installDir . '/' . $scriptName;
-            if (file_exists($targetPath) && self::isTypo3CmsBinary($targetPath)) {
-                $success = @unlink($targetPath);
-            } else {
-                $success = true;
+            $success = true;
+            if (file_exists($targetPath)) {
+                $success = false;
+                if (self::isTypo3CmsBinary($targetPath)) {
+                    $success = @unlink($targetPath);
+                }
             }
             if ($success) {
-                $filesystem->symlink($webDir . '/' . self::BINARY_PATH . $scriptName, $targetPath, false);
+                $filesystem->symlink($pathToScriptsDirectory . $scriptName, $targetPath, false);
             }
         }
         if (!$success) {
-            $event->getIO()->write('<error>' . sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName, $installDir) . '</error>');
-            $event->getIO()->write('<error>' . sprintf(self::COPY_FAILED_MESSAGE, $scriptName) . '</error>');
-        }
-    }
-
-    /**
-     * Called from TYPO3 CMS extension manager
-     */
-    public static function postInstallExtension()
-    {
-        $scriptName = self::isWindowsOs() ? 'typo3cms.bat' : 'typo3cms';
-        $success = self::safeCopy(PATH_site . self::BINARY_PATH . $scriptName, PATH_site . $scriptName);
-        if (!$success) {
-            self::addFlashMessage(sprintf(self::COPY_FAILED_MESSAGE, $scriptName), sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName, PATH_site), AbstractMessage::WARNING);
-        } else {
-            self::addFlashMessage(sprintf(self::COPY_SUCCESS_MESSAGE, $scriptName));
+            $event->getIO()->writeError('<error>' . sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName, $installDir) . '</error>');
+            $event->getIO()->writeError('<error>' . sprintf(self::COPY_FAILED_MESSAGE, $scriptName) . '</error>');
         }
     }
 
@@ -106,8 +92,9 @@ class InstallerScripts
      * @param string $fullTargetPath Target path to which the script should be copied to
      * @param string $relativeWebDir Relative path to the web directory (which equals the TYPO3 root directory currently)
      * @return bool
+     * @internal
      */
-    protected static function safeCopy($fullSourcePath, $fullTargetPath, $relativeWebDir = '')
+    public static function safeCopy($fullSourcePath, $fullTargetPath, $relativeWebDir = '')
     {
         if (file_exists($fullTargetPath)) {
             if (!is_file($fullTargetPath)) {
@@ -118,7 +105,7 @@ class InstallerScripts
                 // File is there: gladly ignore
                 return true;
             }
-            if (strpos(file_get_contents($fullTargetPath), 'typo3cms.php') === false) {
+            if (!self::isTypo3CmsBinary($fullTargetPath)) {
                 // File is there but does not seem to be a previous version of our script: better ignore
                 return false;
             }
@@ -142,10 +129,7 @@ class InstallerScripts
 
     protected static function isTypo3CmsBinary($fullTargetPath)
     {
-        if (is_link($fullTargetPath) || strpos(file_get_contents($fullTargetPath), 'typo3cms.php') !== false) {
-            return true;
-        }
-        return false;
+        return strpos(file_get_contents($fullTargetPath), 'typo3cms.php') !== false;
     }
 
     /**
@@ -159,26 +143,6 @@ class InstallerScripts
             return true;
         }
         return false;
-    }
-
-    /**
-     * Creates a Message object and adds it to the FlashMessageQueue.
-     *
-     * @param string $messageBody The message
-     * @param string $messageTitle Optional message title
-     * @param int $severity Optional severity, must be one of \TYPO3\CMS\Core\Messaging\FlashMessage constants
-     * @param bool $storeInSession Optional, defines whether the message should be stored in the session (default) or not
-     * @return void
-     * @throws \InvalidArgumentException if the message body is no string
-     */
-    public static function addFlashMessage($messageBody, $messageTitle = '', $severity = AbstractMessage::OK, $storeInSession = true)
-    {
-        if (!is_string($messageBody)) {
-            throw new \InvalidArgumentException('The message body must be of type string, "' . gettype($messageBody) . '" given.', 1418250286);
-        }
-        $flashMessage = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Messaging\FlashMessage::class, $messageBody, $messageTitle, $severity, $storeInSession);
-        $queue = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Messaging\FlashMessageQueue::class, self::EM_FLASH_MESSAGE_QUEUE_ID);
-        $queue->enqueue($flashMessage);
     }
 
     /**
@@ -206,5 +170,19 @@ class InstallerScripts
     protected static function getConfig(ScriptEvent $event)
     {
         return Config::load($event->getComposer());
+    }
+
+    /**
+     * @deprecated This never was public API, just use EM
+     */
+    public static function postInstallExtension()
+    {
+    }
+
+    /**
+     * @deprecated This never was public API, just use your own flash message queue
+     */
+    public static function addFlashMessage()
+    {
     }
 }
