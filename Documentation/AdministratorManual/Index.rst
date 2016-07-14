@@ -40,8 +40,9 @@ The extension will automatically be activated and the ``typo3cms`` script will a
 
 .. code-block:: bash
 
-	git clone https://github.com/helhum/typo3_console.git typo3conf/ext/typo3_console
+	git clone https://github.com/TYPO3-Console/typo3_console.git typo3conf/ext/typo3_console
 	ln -s typo3conf/ext/typo3_console/Scripts/typo3cms typo3cms
+	composer create-libs --working-dir=typo3conf/ext/typo3_console
 
 3. Via composer
 ^^^^^^^^^^^^^^^

@@ -11,7 +11,7 @@
     ],
     "homepage": "http://insight.helhum.io/post/104528981610/about-the-beauty-and-power-of-typo3-console",
     "support": {
-        "issues": "https://github.com/helhum/typo3_console/issues"
+        "issues": "https://github.com/TYPO3-Console/typo3_console/issues"
     },
     "authors": [
         {
@@ -61,7 +61,7 @@
         "create-libs": [
             "mkdir -p Libraries",
             "[ -f $HOME/.composer/vendor/bin/phar-composer ] || composer global require clue/phar-composer",
-            "[ -f Libraries/symfony-process.phar ] || $HOME/.composer/vendor/bin/phar-composer build 'symfony/process=^2.7||^3.1' Libraries/symfony-process.phar",
+            "[ -f Libraries/symfony-process.phar ] || $HOME/.composer/vendor/bin/phar-composer build 'symfony/process=~2.7.0' Libraries/symfony-process.phar",
             "chmod -x Libraries/*"
         ]
     },
