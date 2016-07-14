@@ -92,6 +92,12 @@ after_script:
         # Cleanup before we upload
         git reset --hard HEAD && git clean -fx
 
+        # Create phar libs
+        composer global require clue/phar-composer
+        mkdir Libraries
+        $HOME/.composer/vendor/bin/phar-composer build 'symfony/process=^2.7||^3.1' Libraries/symfony-process.phar
+
+        # Upload
         TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
         echo "Uploading release ${TRAVIS_TAG} to TER"
         .Build/bin/upload . "$TYPO3_ORG_USERNAME" "$TYPO3_ORG_PASSWORD" "$TAG_MESSAGE"
