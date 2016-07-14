@@ -152,8 +152,12 @@ class CacheService implements SingletonInterface
      */
     protected function forceFlushCoreFileAndDatabaseCaches()
     {
+        // @deprecated Will be removed once TYPO3 7.6 support is removed
+        if (is_dir(PATH_site . 'typo3temp/Cache')) {
+            GeneralUtility::rmdir(PATH_site . 'typo3temp/Cache', true);
+        }
         // Delete typo3temp/Cache
-        GeneralUtility::rmdir(PATH_site . 'typo3temp/Cache', true);
+        GeneralUtility::rmdir(PATH_site . 'typo3temp/var/Cache', true);
         // Get all table names starting with 'cf_' and truncate them
         $tables = $this->databaseConnection->admin_get_tables();
         foreach ($tables as $table) {
