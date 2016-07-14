@@ -1,30 +1,28 @@
 language: php
-
+sudo: false
 branches:
   only:
     - master
     - develop
+    - /^[0-9]+\.x$/
+    - /^[0-9]+\.[0-9]+\.x$/
     - /^[0-9]+\.[0-9]+\.[0-9]+$/
 
-php:
-  - 5.5
-  - 5.6
-  - 7
-
-env:
-  - TYPO3_VERSION=^7.6.0
-  - TYPO3_VERSION=dev-master
-
 matrix:
+  include:
+    - php: 5.5
+      env: TYPO3_VERSION=^7.6
+    - php: 5.6
+      env: TYPO3_VERSION=^7.6
+    - php: 7
+      env: TYPO3_VERSION=^7.6
+    - php: 7
+      env: TYPO3_VERSION=^8
+    - php: 7
+      env: TYPO3_VERSION=dev-master
   allow_failures:
     - env: TYPO3_VERSION=dev-master
-  exclude:
-    - php: 5.5
-      env: TYPO3_VERSION=dev-master
-    - php: 5.6
-      env: TYPO3_VERSION=dev-master
 
-sudo: false
 cache:
   directories:
     - $HOME/.composer/cache
@@ -93,9 +91,7 @@ after_script:
         git reset --hard HEAD && git clean -fx
 
         # Create phar libs
-        composer global require clue/phar-composer
-        mkdir Libraries
-        $HOME/.composer/vendor/bin/phar-composer build 'symfony/process=^2.7||^3.1' Libraries/symfony-process.phar
+        composer create-libs
 
         # Upload
         TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
