@@ -32,7 +32,7 @@ class FrontendCommandController extends CommandController
     public function requestCommand($requestUrl)
     {
         // TODO: this needs heavy cleanup!
-        $template = file_get_contents(PATH_typo3 . 'sysext/core/Tests/Functional/Fixtures/Frontend/request.tpl');
+        $template = file_get_contents(__DIR__ . '/../../Scripts/request.tpl');
         $arguments = array(
             'documentRoot' => PATH_site,
             'requestUrl' => $this->makeAbsolute($requestUrl),
@@ -42,7 +42,7 @@ class FrontendCommandController extends CommandController
         $process = new PhpProcess($code);
         $process->mustRun();
         $rawResponse = json_decode($process->getOutput());
-        if ($rawResponse === null || $rawResponse->status === Response::STATUS_Failure) {
+        if ($rawResponse === null || $rawResponse->status === 'failure') {
             $this->outputLine('<error>An error occurred while trying to request the specified URL.</error>');
             $this->outputLine(sprintf('<error>Error: %s</error>', !empty($rawResponse->error) ? $rawResponse->error : 'Could not decode response. Please check your error log!'));
             $this->outputLine(sprintf('<error>Content: %s</error>', $process->getOutput()));
