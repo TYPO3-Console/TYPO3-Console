@@ -59,7 +59,8 @@
     ],
     "scripts": {
         "set-version": [
-            "Helhum\\Typo3Console\\Composer\\InstallerScripts::setVersion"
+            "Helhum\\Typo3Console\\Composer\\InstallerScripts::setVersion",
+            "cp -f Resources/Private/ExtensionArtifacts/* . # Ignore arguments"
         ],
         "create-libs": [
             "mkdir -p Libraries",
@@ -69,8 +70,8 @@
         ],
         "build-extension": [
             "@create-libs",
-            "rm -rf Resources/Private/CommandReference/",
-            "cp -f Resources/Private/ExtensionArtifacts/* ."
+            "rm -rf Resources/Private/ExtensionArtifacts/",
+            "rm -rf Resources/Private/CommandReference/"
         ]
     },
     "extra": {
