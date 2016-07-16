@@ -24,9 +24,25 @@ Target group: **Administrators**, **Developers**
 Installation
 ------------
 
-There are **three** ways to properly install the extension.
+There are two ways to properly install the extension. Using git to clone the
+the repository is deprecated and most likely will not work any more in the near future.
 
-1. Installation with Extension Manager
+1. Composer installation
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+In case you use composer to manage dependencies of your TYPO3 project,
+you can just issue the following composer command in your project root directory.
+
+.. code-block:: bash
+
+	composer require helhum/typo3-console
+
+The ``typo3cms`` binary will be installed by composer in the specified bin-dir (by default ``vendor/bin``).
+
+In case you are unsure how to create a composer based TYPO3 project, you can check out
+this `TYPO3 distribution`_, which already provides TYPO3 Console integration.
+
+2. Installation with Extension Manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For the extension to work, it **must** be installed in the ``typo3conf/ext/`` directory **not** in any other possible extension location.
@@ -35,33 +51,4 @@ This is the default location when downloading it from TER with the Extension Man
 The extension will automatically be activated and the ``typo3cms`` script will also copied to your TYPO3 root directory.
 
 
-2. Clone the repository
-^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
-
-	git clone https://github.com/TYPO3-Console/typo3_console.git typo3conf/ext/typo3_console
-	ln -s typo3conf/ext/typo3_console/Scripts/typo3cms typo3cms
-	composer create-libs --working-dir=typo3conf/ext/typo3_console
-
-3. Via composer
-^^^^^^^^^^^^^^^
-
-Create a root ``composer.json`` file like this add the missing lines to your existing ``composer.json`` file and run `composer update` or `composer install` respectively ::
-
-	{
-		"repositories": [
-			{ "type": "composer", "url": "https://composer.typo3.org/" }
-		],
-		"name": "typo3/cms-example-distribution",
-		"description" : "TYPO3 CMS Example Distribution",
-		"license": "GPL-2.0+",
-		"require": {
-			"typo3/cms": "^7.6.6",
-			"helhum/typo3-console": "^3.0.0"
-		}
-	}
-
-
-The ``typo3cms`` script will automatically be linked to your TYPO3 root directory and the extension will activate itself automatically as well.
-
+.. _`TYPO3 distribution`: https://github.com/helhum/TYPO3-Distribution

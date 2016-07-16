@@ -48,14 +48,10 @@ If you activate the extension in the extension manager, it will copy the `typo3c
 into the installation root directory. But it is also possible to create a symlink to `typo3conf/ext/typo3_console/Scripts/typo3cms`
 in any place you want. The console will activate itself on first usage.
 
-### Linux and OS X Shell Installation
+### Composer Installation
 
-```
-git clone https://github.com/TYPO3-Console/typo3_console.git typo3conf/ext/typo3_console
-ln -s typo3conf/ext/typo3_console/Scripts/typo3cms typo3cms
-composer create-libs --working-dir=typo3conf/ext/typo3_console
-php typo3cms help
-```
+In your TYPO3 project root, just do `composer require helhum/typo3-console`.
+The `typo3cms` binary will be installed by composer in the specified bin-dir (by default `vendor/bin`).
 
 ## ToDo & Ideas
 

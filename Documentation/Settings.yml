@@ -4,10 +4,10 @@
 
 ---
 conf.py:
-  copyright: 2014
+  copyright: 2016
   project: TYPO3 Console
-  version: 1.0
-  release: 1.0.0
+  version: 3.2.0
+  release: 3.2.0
   latex_documents:
   - - Index
     - typo3_console.tex
@@ -20,12 +20,12 @@ conf.py:
     preamble: \usepackage{typo3}
   intersphinx_mapping:
     t3tsref:
-    - http://docs.typo3.org/typo3cms/TyposcriptReference/
+    - https://docs.typo3.org/typo3cms/TyposcriptReference/
     - null
     t3start:
-    - http://docs.typo3.org/typo3cms/GettingStartedTutorial/
+    - https://docs.typo3.org/typo3cms/GettingStartedTutorial/
     - null
     t3editors:
-    - http://docs.typo3.org/typo3cms/EditorsTutorial/
+    - https://docs.typo3.org/typo3cms/EditorsTutorial/
     - null
 ...
