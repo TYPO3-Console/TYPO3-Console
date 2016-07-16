@@ -61,7 +61,13 @@ class InstallerScripts
         if (!$pluginConfig->get('install-binary')) {
             return;
         }
+        $binDir = trim(substr($event->getComposer()->getConfig()->get('bin-dir'), strlen($config->getBaseDir())), '/');
         // @deprecated. can be removed once the typo3 installer takes care of installing binaries
+        $event->getIO()->writeError('<warning>Usage of "./typo3cms" binary has been deprecated.</warning>');
+        $event->getIO()->writeError('<warning>Please use ' . $binDir . '/typo3cms instead.</warning>');
+        $event->getIO()->writeError('<warning>To get rid of this message, set "install-binary" option to false</warning>');
+        $event->getIO()->writeError('<warning>in "extra -> helhum/typo3-console" section of root composer.json.</warning>');
+        $pathToScriptsDirectory = __DIR__ . '/../../Scripts/';
         if (self::isWindowsOs()) {
             $scriptName = 'typo3cms.bat';
             $success = self::safeCopy($pathToScriptsDirectory . $scriptName, $webDir . '/' . $scriptName);
