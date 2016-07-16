@@ -132,7 +132,8 @@ class ExceptionHandler
      * @param string $fileName
      * @return string
      */
-    protected function getPossibleShortenedFileName($fileName) {
+    protected function getPossibleShortenedFileName($fileName)
+    {
         $pathPosition = strpos($fileName, 'typo3conf/ext/');
         $pathAndFilename = ($pathPosition !== false) ? substr($fileName, $pathPosition) : $fileName;
         $pathPosition = strpos($pathAndFilename, 'typo3/sysext/');

@@ -1,5 +1,7 @@
-/Classes/Hook/ExtensionInstallation.php export-ignore
-/Libraries/* export-ignore
+/Classes/Hook/ export-ignore
+/Libraries/ export-ignore
+/Resources/Private/ExtensionArtifacts/ export-ignore
+/Tests/ export-ignore
 /.gitattributes export-ignore
 /.gitignore export-ignore
 /.php_cs export-ignore

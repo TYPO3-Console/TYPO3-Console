@@ -34,6 +34,7 @@ class InstallerScripts
      * @param bool $calledFromPlugin
      * @return void
      * @throws \RuntimeException
+     * @internal
      */
     public static function setupConsole(ScriptEvent $event, $calledFromPlugin = false)
     {
@@ -80,6 +81,28 @@ class InstallerScripts
             $event->getIO()->writeError('<error>' . sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName, $installDir) . '</error>');
             $event->getIO()->writeError('<error>' . sprintf(self::COPY_FAILED_MESSAGE, $scriptName) . '</error>');
         }
+    }
+
+    /**
+     * @param ScriptEvent $event
+     * @internal
+     * @throws \RuntimeException
+     */
+    public static function setVersion(ScriptEvent $event)
+    {
+        $version = $event->getArguments()[0];
+        if (!preg_match('/\d+\.\d+\.\d+/', $version)) {
+            throw new \RuntimeException('No valid version number provided!', 1468672604);
+        }
+        $docConfigFile = __DIR__ . '/../../Documentation/Settings.yml';
+        $content = file_get_contents($docConfigFile);
+        $content = preg_replace('/(version|release): \d+\.\d+\.\d+/', '$1: ' . $version, $content);
+        file_put_contents($docConfigFile, $content);
+
+        $extEmConfFile = __DIR__ . '/../../Resources/Private/ExtensionArtifacts/ext_emconf.php';
+        $content = file_get_contents($extEmConfFile);
+        $content = preg_replace('/(\'version\' => )\'\d+\.\d+\.\d+/', '$1\'' . $version, $content);
+        file_put_contents($extEmConfFile, $content);
     }
 
     /**

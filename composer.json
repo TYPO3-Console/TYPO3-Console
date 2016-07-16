@@ -62,6 +62,13 @@
             "@composer global require clue/phar-composer",
             "[ -f Libraries/symfony-process.phar ] || $HOME/.composer/vendor/bin/phar-composer build 'symfony/process=~2.7.0' Libraries/symfony-process.phar",
             "chmod -x Libraries/*"
+        ],
+        "set-version": [
+            "Helhum\\Typo3Console\\Composer\\InstallerScripts::setVersion"
+        ],
+        "build-extension": [
+            "@set-version",
+            "cp -f Resources/Private/ExtensionArtifacts/* . # We ignore arguments: "
         ]
     },
     "extra": {

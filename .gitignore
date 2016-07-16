@@ -1,3 +1,8 @@
 /.Build/*
+/Classes/Hook/ExtensionInstallation.php
+/Libraries/*
+/ext_emconf.php
+/ext_icon.png
+/ext_localconf.php
 /composer.lock
 /typo3cms

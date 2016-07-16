@@ -32,7 +32,7 @@ class FrontendCommandController extends CommandController
     public function requestCommand($requestUrl)
     {
         // TODO: this needs heavy cleanup!
-        $template = file_get_contents(__DIR__ . '/../../Scripts/request.tpl');
+        $template = file_get_contents(__DIR__ . '/../../Resources/Private/Templates/request.tpl');
         $arguments = array(
             'documentRoot' => PATH_site,
             'requestUrl' => $this->makeAbsolute($requestUrl),
