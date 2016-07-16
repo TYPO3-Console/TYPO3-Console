@@ -15,7 +15,6 @@ namespace Helhum\Typo3Console\Mvc\Cli;
 
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use TYPO3\CMS\Core\Core\Bootstrap;
-use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
@@ -105,34 +104,37 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
 
     protected function registerCommands()
     {
+        foreach ($this->getCommandConfigurationFiles() as $packageKey => $commandsFileName) {
+            $commandConfiguration = require $commandsFileName;
+            $this->registerCommandsFromConfiguration($commandConfiguration, $packageKey);
+        }
+    }
+
+    protected function getCommandConfigurationFiles()
+    {
+        $commandConfigurationFiles['typo3_console'] = __DIR__ . '/../../../Configuration/Console/Commands.php';
         /** @var PackageManager $packageManager */
         $packageManager = $this->bootstrap->getEarlyInstance(PackageManager::class);
         foreach ($packageManager->getActivePackages() as $package) {
+            if ($package->getPackageKey() === 'typo3_console') {
+                // happens in non composer mode when we have an extension
+                continue;
+            }
             $possibleCommandsFileName = $package->getPackagePath() . '/Configuration/Console/Commands.php';
             if (!file_exists($possibleCommandsFileName)) {
                 continue;
             }
-            $commandConfiguration = require $possibleCommandsFileName;
-            $this->ensureValidCommandsConfiguration($commandConfiguration, $package);
-            foreach ($commandConfiguration['controllers'] as $controller) {
-                $this->bootstrap->getCommandManager()->registerCommandController($controller);
-            }
-            foreach ($commandConfiguration['runLevels'] as $commandIdentifier => $runLevel) {
-                $this->bootstrap->setRunLevelForCommand($commandIdentifier, $runLevel);
-            }
-            foreach ($commandConfiguration['bootingSteps'] as $commandIdentifier => $bootingSteps) {
-                foreach ((array)$bootingSteps as $bootingStep) {
-                    $this->bootstrap->addBootingStepForCommand($commandIdentifier, $bootingStep);
-                }
-            }
+            $commandConfigurationFiles[$package->getPackageKey()] = $possibleCommandsFileName;
         }
+        return $commandConfigurationFiles;
     }
 
     /**
      * @param mixed $commandConfiguration
-     * @param PackageInterface $package
+     * @param string $packageKey
+     * @throws \RuntimeException
      */
-    protected function ensureValidCommandsConfiguration($commandConfiguration, PackageInterface $package)
+    protected function ensureValidCommandsConfiguration($commandConfiguration, $packageKey)
     {
         if (
             !is_array($commandConfiguration)
@@ -144,7 +146,7 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
             || !isset($commandConfiguration['bootingSteps'])
             || !is_array($commandConfiguration['bootingSteps'])
         ) {
-            throw new \RuntimeException($package->getPackageKey() . ' defines invalid commands in Configuration/Console/Commands.php', 1461186959);
+            throw new \RuntimeException($packageKey . ' defines invalid commands in Configuration/Console/Commands.php', 1461186959);
         }
     }
 
@@ -174,5 +176,27 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
     public function canHandleRequest()
     {
         return PHP_SAPI === 'cli' && isset($_SERVER['argc']) && isset($_SERVER['argv']);
+    }
+
+    /**
+     * @param $commandConfiguration
+     * @param $packageKey
+     * @throws \RuntimeException
+     */
+    protected function registerCommandsFromConfiguration($commandConfiguration, $packageKey)
+    {
+        $this->ensureValidCommandsConfiguration($commandConfiguration, $packageKey);
+
+        foreach ($commandConfiguration['controllers'] as $controller) {
+            $this->bootstrap->getCommandManager()->registerCommandController($controller);
+        }
+        foreach ($commandConfiguration['runLevels'] as $commandIdentifier => $runLevel) {
+            $this->bootstrap->setRunLevelForCommand($commandIdentifier, $runLevel);
+        }
+        foreach ($commandConfiguration['bootingSteps'] as $commandIdentifier => $bootingSteps) {
+            foreach ((array)$bootingSteps as $bootingStep) {
+                $this->bootstrap->addBootingStepForCommand($commandIdentifier, $bootingStep);
+            }
+        }
     }
 }
