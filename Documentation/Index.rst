@@ -30,7 +30,7 @@ TYPO3 Console
 		command line,console
 
 	:Copyright:
-		2014
+		2016
 
 	:Author:
 		Helmut Hummel

@@ -1,6 +1,5 @@
 {
     "name": "helhum/typo3-console",
-    "type": "typo3-cms-extension",
     "description": "A reliable and powerful command line interface for TYPO3 CMS",
     "keywords": [
         "TYPO3",
@@ -11,7 +10,7 @@
     ],
     "homepage": "http://insight.helhum.io/post/104528981610/about-the-beauty-and-power-of-typo3-console",
     "support": {
-        "issues": "https://github.com/helhum/typo3_console/issues"
+        "issues": "https://github.com/TYPO3-Console/typo3_console/issues"
     },
     "authors": [
         {
@@ -60,9 +59,16 @@
     "scripts": {
         "create-libs": [
             "mkdir -p Libraries",
-            "[ -f $HOME/.composer/vendor/bin/phar-composer ] || composer global require clue/phar-composer",
-            "[ -f Libraries/symfony-process.phar ] || $HOME/.composer/vendor/bin/phar-composer build 'symfony/process=^2.7||^3.1' Libraries/symfony-process.phar",
+            "@composer global require clue/phar-composer",
+            "[ -f Libraries/symfony-process.phar ] || $HOME/.composer/vendor/bin/phar-composer build 'symfony/process=~2.7.0' Libraries/symfony-process.phar",
             "chmod -x Libraries/*"
+        ],
+        "set-version": [
+            "Helhum\\Typo3Console\\Composer\\InstallerScripts::setVersion"
+        ],
+        "build-extension": [
+            "@set-version",
+            "cp -f Resources/Private/ExtensionArtifacts/* . # We ignore arguments: "
         ]
     },
     "extra": {

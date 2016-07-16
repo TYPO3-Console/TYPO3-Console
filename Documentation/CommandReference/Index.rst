@@ -7,11 +7,13 @@
 Command Reference
 =================
 
-.. note:
+.. note::
 
   This reference uses ``./typo3cms`` as the command to invoke. If you are on
   Windows, this will probably not work, there you need to use ``typo3cms.bat``
   instead.
+  In composer based installations, the ``typo3cms`` binary will be located
+  in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
 The following reference was automatically generated from code on 2016-07-12 17:41:21

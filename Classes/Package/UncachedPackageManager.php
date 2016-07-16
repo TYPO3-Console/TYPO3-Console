@@ -32,9 +32,15 @@ class UncachedPackageManager extends PackageManager
      */
     protected $packageStatesFileExists = false;
 
+    /**
+     * @var bool
+     */
+    protected $hasExtension = false;
+
     public function init()
     {
         $this->packageStatesFileExists = @file_exists($this->packageStatesPathAndFilename);
+        $this->hasExtension = @file_exists(PATH_site . 'typo3conf/ext/typo3_console/ext_emconf.php');
         $this->loadPackageStates();
         $this->makeConsolePackageProtectedIfNeeded();
         $this->initializePackageObjects();
@@ -110,14 +116,14 @@ class UncachedPackageManager extends PackageManager
     protected function makeConsolePackageProtectedIfNeeded()
     {
         // Force loading of the console in case no package states file is there
-        if (!$this->packageStatesFileExists) {
+        if ($this->hasExtension && !$this->packageStatesFileExists) {
             $this->getPackage('typo3_console')->setProtected(true);
         }
     }
 
     protected function autoActivateConsolePackageIfPossible()
     {
-        if ($this->packageStatesFileExists && !$this->isPackageActive('typo3_console')) {
+        if ($this->hasExtension && $this->packageStatesFileExists && !$this->isPackageActive('typo3_console')) {
             $this->scanAvailablePackages();
             $this->activatePackage('typo3_console');
             if (!ConsoleBootstrap::usesComposerClassLoading()) {
@@ -128,7 +134,7 @@ class UncachedPackageManager extends PackageManager
 
     protected function registerConsoleClassesIfNeeded()
     {
-        if (!class_exists(\Helhum\Typo3Console\Core\Booting\RunLevel::class)) {
+        if ($this->hasExtension && !class_exists(\Helhum\Typo3Console\Core\Booting\RunLevel::class)) {
             // Since the class loader now assumes that this class does not exist, we require it manually here
             require __DIR__ . '/../Core/Booting/RunLevel.php';
             ClassLoadingInformation::registerTransientClassLoadingInformationForPackage($this->getPackage('typo3_console'));

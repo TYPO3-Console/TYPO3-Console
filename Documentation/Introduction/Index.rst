@@ -93,5 +93,5 @@ FAQ
 
 
 
-.. _`blog post`: http://insight.helhum.io
+.. _`blog post`: http://insight.helhum.io/post/104528981610/about-the-beauty-and-power-of-typo3console
 
