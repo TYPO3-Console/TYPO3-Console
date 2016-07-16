@@ -48,15 +48,6 @@ class InstallerScripts
         $webDir = self::getWebDir($config);
         $filesystem = new Filesystem();
 
-        // Special treatment if we are root package (for development and testing)
-        if ($event->getComposer()->getPackage()->getName() === 'helhum/typo3-console') {
-            $extDir = $webDir . '/typo3conf/ext';
-            $consoleDir = $extDir . '/typo3_console';
-            if (!file_exists($consoleDir)) {
-                $filesystem->ensureDirectoryExists($extDir);
-                $filesystem->symlink($installDir, $consoleDir);
-            }
-        }
         $pluginConfig = \Helhum\Typo3ConsolePlugin\Config::load($event->getIO(), $event->getComposer()->getConfig());
         if (!$pluginConfig->get('install-binary')) {
             return;

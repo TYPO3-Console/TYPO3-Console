@@ -1,6 +1,5 @@
 {
     "name": "helhum/typo3-console",
-    "type": "typo3-cms-extension",
     "description": "A reliable and powerful command line interface for TYPO3 CMS",
     "keywords": [
         "TYPO3",
