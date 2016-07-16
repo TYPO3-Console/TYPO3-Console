@@ -1,6 +1,7 @@
 /Classes/Hook/ export-ignore
 /Libraries/ export-ignore
 /Resources/Private/ExtensionArtifacts/ export-ignore
+/Resources/Private/CommandReference/ export-ignore
 /Tests/ export-ignore
 /.gitattributes export-ignore
 /.gitignore export-ignore

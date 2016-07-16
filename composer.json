@@ -36,12 +36,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Helhum\\Typo3Console\\": "Classes"
+            "Helhum\\Typo3Console\\": "Classes/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Helhum\\Typo3Console\\Tests\\": "Tests",
+            "Helhum\\Typo3Console\\Tests\\": "Tests/",
+            "Helhum\\Typo3Console\\": "Resources/Private/CommandReference/src",
             "TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/core/Tests/"
         }
     },
@@ -68,7 +69,8 @@
         ],
         "build-extension": [
             "@create-libs",
-            "cp -f Resources/Private/ExtensionArtifacts/* . # We ignore arguments: "
+            "rm -rf Resources/Private/CommandReference/",
+            "cp -f Resources/Private/ExtensionArtifacts/* ."
         ]
     },
     "extra": {
