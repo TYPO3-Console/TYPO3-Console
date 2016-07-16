@@ -97,8 +97,9 @@ after_script:
         # Cleanup before we upload
         git reset --hard HEAD && git clean -fx
 
-        # Create phar libs
-        composer create-libs
+        # Build extension files
+        composer set-version $TRAVIS_TAG
+        composer build-extension
 
         # Upload
         TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
