@@ -14,11 +14,17 @@ matrix:
       env: TYPO3_VERSION=^7.6
     - php: 5.6
       env: TYPO3_VERSION=^7.6
-    - php: 7
+    - php: 7.0
       env: TYPO3_VERSION=^7.6
-    - php: 7
+    - php: 7.0
       env: TYPO3_VERSION=^8
-    - php: 7
+    - php: 7.0
+      env: TYPO3_VERSION=dev-master
+    - php: 7.1
+      env: TYPO3_VERSION=^7.6
+    - php: 7.1
+      env: TYPO3_VERSION=^8
+    - php: 7.1
       env: TYPO3_VERSION=dev-master
   allow_failures:
     - env: TYPO3_VERSION=dev-master
@@ -37,9 +43,8 @@ notifications:
     - helmut@typo3.org
 
 before_install:
-  - phpenv config-rm xdebug.ini
-  - composer self-update
-  - composer --version
+  - echo $TRAVIS_PHP_VERSION
+  - if php -i | grep -q xdebug; then phpenv config-rm xdebug.ini; fi
 
 before_script:
   - >
