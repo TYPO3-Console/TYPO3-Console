@@ -64,7 +64,7 @@ class Scripts
     public static function initializeErrorHandling()
     {
         $errorHandler = new ErrorHandler();
-        $errorHandler->setExceptionalErrors(array(E_WARNING, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_STRICT, E_RECOVERABLE_ERROR));
+        $errorHandler->setExceptionalErrors(array(E_WARNING, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_RECOVERABLE_ERROR));
         set_error_handler(array($errorHandler, 'handleError'));
         ini_set('display_errors', 1);
         if (((bool)ini_get('display_errors') && strtolower(ini_get('display_errors')) !== 'on' && strtolower(ini_get('display_errors')) !== '1') || !(bool)ini_get('display_errors')) {
