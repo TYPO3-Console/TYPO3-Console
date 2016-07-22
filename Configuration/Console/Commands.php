@@ -21,8 +21,7 @@ return array(
     ),
     'bootingSteps' => array(
         'typo3_console:install:databasedata' => array(
-            'helhum.typo3console:database',
-            'helhum.typo3console:enablecorecaches'
+            'helhum.typo3console:database'
         ),
         'typo3_console:install:defaultconfiguration' => array('helhum.typo3console:database'),
         'typo3_console:cache:flush' => array('helhum.typo3console:database'),

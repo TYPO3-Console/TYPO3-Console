@@ -209,11 +209,11 @@ class RunLevel
             case 'helhum.typo3console:extensionconfiguration':
                 $sequence->addStep(new Step('helhum.typo3console:extensionconfiguration', array(\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeExtensionConfiguration')));
                 break;
+
+            // Part of full runtime
             case 'helhum.typo3console:enablecorecaches':
                 $sequence->addStep(new Step('helhum.typo3console:enablecorecaches', array(\Helhum\Typo3Console\Core\Booting\Scripts::class, 'reEnableOriginalCoreCaches')), 'helhum.typo3console:database');
                 break;
-
-            // Part of full runtime
             case 'helhum.typo3console:database':
                 $sequence->addStep(new Step('helhum.typo3console:database', array(\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeDatabaseConnection')), 'helhum.typo3console:errorhandling');
                 break;
