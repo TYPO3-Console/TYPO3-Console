@@ -13,8 +13,11 @@ namespace Helhum\Typo3Console\Core\Booting;
  *
  */
 
+use Helhum\Typo3Console\Core\Cache\FakeDatabaseBackend;
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Helhum\Typo3Console\Error\ErrorHandler;
+use TYPO3\CMS\Core\Cache\Backend\NullBackend;
+use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
@@ -49,7 +52,11 @@ class Scripts
                 'extbase_datamapfactory_datamap',
             ) as $id) {
             self::$earlyCachesConfiguration[$id] = $cacheConfigurations[$id];
-            $cacheConfigurations[$id]['backend'] = \TYPO3\CMS\Core\Cache\Backend\NullBackend::class;
+            if (empty($cacheConfigurations[$id]['backend']) || $cacheConfigurations[$id]['backend'] === Typo3DatabaseBackend::class) {
+                $cacheConfigurations[$id]['backend'] = FakeDatabaseBackend::class;
+            } else {
+                $cacheConfigurations[$id]['backend'] = NullBackend::class;
+            }
             $cacheConfigurations[$id]['options'] = array();
         }
     }
