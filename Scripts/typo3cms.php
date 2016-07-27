@@ -17,7 +17,7 @@ call_user_func(function () {
     if (getenv('TYPO3_PATH_WEB')) {
         // In case we are symlinked (like for travis tests),
         // we need to accept the location from the outside to find the autoload.php
-        $typo3Root = rtrim(getenv('TYPO3_PATH_WEB'), '/\\');
+        $typo3Root = getenv('TYPO3_PATH_WEB');
     } else {
         // Assume TYPO3 web root and vendor dir (only one is applicable at the same time)
         // Both only works if the package is *NOT* symlinked to the typo3conf/ext or vendor folder
@@ -43,7 +43,7 @@ call_user_func(function () {
         putenv('TYPO3_PATH_WEB=' . $typo3Root);
     }
 
-    define('PATH_site', str_replace('\\', '/', getenv('TYPO3_PATH_WEB')) . '/');
+    define('PATH_site', str_replace('\\', '/', rtrim(getenv('TYPO3_PATH_WEB'), '\\/')) . '/');
     define('PATH_thisScript', realpath(PATH_site . 'typo3/cli_dispatch.phpsh'));
 
     if (!class_exists('Helhum\\Typo3Console\\Core\\ConsoleBootstrap')) {
