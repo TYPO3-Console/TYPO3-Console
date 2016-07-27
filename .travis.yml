@@ -9,6 +9,7 @@ branches:
     - /^[0-9]+\.[0-9]+\.[0-9]+$/
 
 matrix:
+  fast_finish: true
   include:
     - php: 5.5
       env: TYPO3_VERSION=^7.6
