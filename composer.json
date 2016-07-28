@@ -72,10 +72,12 @@
             "cp -f Resources/Private/ExtensionArtifacts/* . # Ignore arguments"
         ],
         "create-libs": [
-            "mkdir -p Libraries",
-            "@composer global require clue/phar-composer",
-            "[ -f Libraries/symfony-process.phar ] || $HOME/.composer/vendor/bin/phar-composer build 'symfony/process=~2.7.0' Libraries/symfony-process.phar",
-            "chmod -x Libraries/*"
+            "mkdir -p Libraries/temp",
+            "[ -f $HOME/.composer/vendor/bin/phar-composer ] || composer global require clue/phar-composer",
+            "[ -f Libraries/symfony-process.phar ] || cd Libraries/temp && composer require symfony/process=~2.7.0 && composer config classmap-authoritative true && composer config prepend-autoloader false && composer dump-autoload",
+            "[ -f Libraries/symfony-process.phar ] || $HOME/.composer/vendor/bin/phar-composer build Libraries/temp/ Libraries/symfony-process.phar",
+            "chmod -x Libraries/*.phar",
+            "rm -rf Libraries/temp"
         ],
         "build-extension": [
             "@create-libs",

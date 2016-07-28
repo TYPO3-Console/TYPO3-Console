@@ -244,9 +244,7 @@ class ConsoleBootstrap extends Bootstrap
      */
     protected function requireLibraries()
     {
-        if (!class_exists('Symfony\\Component\\Process\\Process')) {
-            require_once 'phar://' . __DIR__ . '/../../Libraries/symfony-process.phar/vendor/autoload.php';
-        }
+        @include 'phar://' . __DIR__ . '/../../Libraries/symfony-process.phar/vendor/autoload.php';
     }
 
     /**
