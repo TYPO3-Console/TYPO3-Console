@@ -34,7 +34,7 @@ class ConfigurationCommandController extends CommandController implements Single
     protected $consoleRenderer;
 
     /**
-     * Remove configuration option.
+     * Remove configuration option
      *
      * Removes a system configuration option by path.
      *
@@ -68,7 +68,7 @@ class ConfigurationCommandController extends CommandController implements Single
     }
 
     /**
-     * Show configuration value.
+     * Show configuration value
      *
      * Shows system configuration value by path.
      * If the currently active configuration differs from the value in LocalConfiguration.php
@@ -101,7 +101,7 @@ class ConfigurationCommandController extends CommandController implements Single
     }
 
     /**
-     * Show active configuration value.
+     * Show active configuration value
      *
      * Shows active system configuration by path.
      * Shows the configuration value that is currently effective, no matter where and how it is set.
@@ -121,7 +121,7 @@ class ConfigurationCommandController extends CommandController implements Single
     }
 
     /**
-     * Show local configuration value.
+     * Show local configuration value
      *
      * Shows local configuration option value by path.
      * Shows the value which is stored in LocalConfiguration.php.
@@ -143,7 +143,7 @@ class ConfigurationCommandController extends CommandController implements Single
     }
 
     /**
-     * Set configuration value.
+     * Set configuration value
      *
      * Set system configuration option value by path.
      *
