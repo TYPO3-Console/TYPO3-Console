@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\Command;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use TYPO3\CMS\Extbase\Mvc\Cli\Command;
 
 /**
  * A Command Controller which provides help for available commands
@@ -31,7 +32,7 @@ class HelpCommandController extends CommandController
     protected $commandManager;
 
     /**
-     * @var array
+     * @var Command[]
      */
     protected $commands = array();
 

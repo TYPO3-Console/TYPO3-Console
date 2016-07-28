@@ -44,7 +44,7 @@ class ExtensionCommandController extends CommandController
     protected $packageManager;
 
     /**
-     * Activate extension(s).
+     * Activate extension(s)
      *
      * Activates one or more extensions by key.
      * Marks extensions as active, sets them up and clears caches for every activated extension.
@@ -67,7 +67,7 @@ class ExtensionCommandController extends CommandController
     }
 
     /**
-     * Deactivate extension(s).
+     * Deactivate extension(s)
      *
      * Deactivates one or more extensions by key.
      * Marks extensions as inactive in the system and clears caches for every deactivated extension.

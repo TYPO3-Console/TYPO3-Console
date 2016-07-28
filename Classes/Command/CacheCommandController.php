@@ -30,7 +30,7 @@ class CacheCommandController extends CommandController
     protected $cacheService;
 
     /**
-     * Flush all caches.
+     * Flush all caches
      *
      * Flushes TYPO3 core caches first and after that, flushes caches from extensions.
      *
@@ -50,7 +50,7 @@ class CacheCommandController extends CommandController
     }
 
     /**
-     * Flush all caches in specified groups.
+     * Flush all caches in specified groups
      *
      * Flushes all caches in specified groups.
      * Valid group names are by default:

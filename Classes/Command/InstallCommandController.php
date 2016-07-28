@@ -41,8 +41,9 @@ class InstallCommandController extends CommandController
     protected $packageStatesGenerator;
 
     /**
-     * TYPO3 Setup. Use as command line replacement for the web installation process.
+     * TYPO3 Setup
      *
+     * Use as command line replacement for the web installation process.
      * Manually enter details on the command line or non interactive for automated setups.
      *
      * @param bool $nonInteractive If specified, optional arguments are not requested, but default values are assumed.
@@ -82,7 +83,7 @@ class InstallCommandController extends CommandController
     }
 
     /**
-     * Generate PackageStates.php file.
+     * Generate PackageStates.php file
      *
      * Generates and writes <code>typo3conf/PackageStates.php</code> file.
      * Goal is to not have this file in version control, but generate it on <code>composer install</code>.

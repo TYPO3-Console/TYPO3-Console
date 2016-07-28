@@ -124,7 +124,7 @@ class DatabaseCommandController extends CommandController
     }
 
     /**
-     * Export database.
+     * Export database to stdout
      *
      * Export the database (all tables) directly to stdout.
      * The mysqldump binary must be available in the path for this command to work.
