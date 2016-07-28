@@ -106,6 +106,11 @@ class InstallerScripts
         $content = file_get_contents($extEmConfFile);
         $content = preg_replace('/(\'version\' => )\'\d+\.\d+\.\d+/', '$1\'' . $version, $content);
         file_put_contents($extEmConfFile, $content);
+
+        $helpCommandFile = __DIR__ . '/../Command/HelpCommandController.php';
+        $content = file_get_contents($helpCommandFile);
+        $content = preg_replace('/(private \$version = )\'\d+\.\d+\.\d+/', '$1\'' . $version, $content);
+        file_put_contents($helpCommandFile, $content);
     }
 
     /**

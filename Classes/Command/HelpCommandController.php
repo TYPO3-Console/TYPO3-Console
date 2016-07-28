@@ -26,6 +26,13 @@ use TYPO3\CMS\Extbase\Mvc\Cli\Command;
 class HelpCommandController extends CommandController
 {
     /**
+     * Current version number
+     *
+     * @var string
+     */
+    private $version = '3.2.2';
+
+    /**
      * @var \Helhum\Typo3Console\Mvc\Cli\CommandManager
      * @inject
      */
@@ -35,28 +42,6 @@ class HelpCommandController extends CommandController
      * @var Command[]
      */
     protected $commands = array();
-
-    /**
-     * Help (short)
-     *
-     * Displays a short, general help message
-     *
-     * This only outputs the Extbase version number, context and some hint about how to
-     * get more help about commands.
-     *
-     * @return void
-     * @internal
-     */
-    public function helpStubCommand()
-    {
-        $this->outputLine('<info>TYPO3 Console</info> version <comment>%s</comment>', array(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getExtensionVersion('typo3_console')));
-        $this->outputLine();
-        $this->outputLine('<comment>Usage:</comment>');
-        $this->outputLine('  command [options] [arguments]');
-        $this->outputLine();
-        $this->outputLine('See <info>help</info> for a list of all available commands.');
-        $this->outputLine();
-    }
 
     /**
      * Help
@@ -71,7 +56,7 @@ class HelpCommandController extends CommandController
      */
     public function helpCommand($commandIdentifier = null)
     {
-        $this->outputLine('<info>TYPO3 Console</info> version <comment>%s</comment>', array(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getExtensionVersion('typo3_console')));
+        $this->outputLine('<info>TYPO3 Console</info> version <comment>%s</comment>', array($this->version));
         $this->outputLine();
 
         if ($commandIdentifier === null) {
