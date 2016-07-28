@@ -26,7 +26,6 @@ namespace Helhum\Typo3Console\Command;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Cli\Command;
 use TYPO3\CMS\Extbase\Mvc\Exception\CommandException;
 use TYPO3\CMS\Fluid\View\StandaloneView;
@@ -99,7 +98,6 @@ class CommandReferenceCommandController extends CommandController
         $commands = $this->buildCommandsIndex($availableCommands);
         $allCommands = array();
         foreach ($commands as $command) {
-
             if (!in_array(explode(':', $command->getCommandIdentifier())[0], $extensionKeysToRender, true)) {
                 $this->outputLine(sprintf('<warning>Skipped command "%s"</warning>', $command->getCommandIdentifier()));
                 continue;
