@@ -39,7 +39,7 @@
         "symfony/process": "^2.7 || ^3.1"
     },
     "require-dev": {
-        "namelesscoder/typo3-repository-client": "1.1.x-dev",
+        "namelesscoder/typo3-repository-client": "^1.2.0",
         "mikey179/vfsStream": "~1.6.0",
         "phpunit/phpunit": "~4.8.0"
     },
