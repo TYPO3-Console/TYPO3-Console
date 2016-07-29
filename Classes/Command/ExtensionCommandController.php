@@ -14,6 +14,8 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Core\ClassLoadingInformation;
 
 /**
  * CommandController for working with extension management through CLI
@@ -140,14 +142,22 @@ class ExtensionCommandController extends CommandController
     /**
      * Dump class auto-load
      *
-     * Updates class loading information.
+     * Updates class loading information in non composer managed TYPO3 installations.
      *
      * This command is only needed during development. The extension manager takes care
      * creating or updating this info properly during extension (de-)activation.
+     *
+     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
      */
     public function dumpAutoloadCommand()
     {
-        $this->dumpClassLoadingInformationCommand();
+        if (Bootstrap::usesComposerClassLoading()) {
+            $this->output->outputLine('<error>Class loading information is managed by composer. Use "composer dump-autoload" command to update the information.</error>');
+            $this->quit(1);
+        } else {
+            ClassLoadingInformation::dumpClassLoadingInformation();
+            $this->output->outputLine('Class Loading information has been updated.');
+        }
     }
 
     /**
@@ -162,12 +172,12 @@ class ExtensionCommandController extends CommandController
      * Dump class auto-load (DEPRECATED)
      *
      * Updates class loading information.
-     * Use "dumpautoload" instead!
+     * Use <code>extension:dumpautoload</code> instead!
      *
      * @return void
      * @internal
      * @deprecated use dumpautoload instead
-     * @see typo3_console:extension:dumpautoload
+     * @see extensionmanager:extension:dumpautoload
      */
     public function dumpClassLoadingInformationCommand()
     {
@@ -185,7 +195,7 @@ class ExtensionCommandController extends CommandController
      * @return void
      * @internal
      * @deprecated use activate instead
-     * @see typo3_console:extension:activate
+     * @see extensionmanager:extension:activate
      */
     public function installCommand($extensionKey)
     {
@@ -203,7 +213,7 @@ class ExtensionCommandController extends CommandController
      * @return void
      * @internal
      * @deprecated use deactivate instead
-     * @see typo3_console:extension:deactivate
+     * @see extensionmanager:extension:deactivate
      */
     public function uninstallCommand($extensionKey)
     {
