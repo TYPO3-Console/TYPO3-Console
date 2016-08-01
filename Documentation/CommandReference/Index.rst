@@ -16,7 +16,7 @@ Command Reference
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2016-07-16 17:59:28
+The following reference was automatically generated from code on 2016-08-01 10:56:27
 
 
 .. _`Command Reference: typo3_console`:
@@ -121,7 +121,7 @@ Related commands
 ``cache:flush``
 ***************
 
-**Flush all caches.**
+**Flush all caches**
 
 Flushes TYPO3 core caches first and after that, flushes caches from extensions.
 
@@ -142,7 +142,7 @@ Options
 ``cache:flushgroups``
 *********************
 
-**Flush all caches in specified groups.**
+**Flush all caches in specified groups**
 
 Flushes all caches in specified groups.
 Valid group names are by default:
@@ -242,7 +242,7 @@ Options
 ``configuration:remove``
 ************************
 
-**Remove configuration option.**
+**Remove configuration option**
 
 Removes a system configuration option by path.
 
@@ -274,7 +274,7 @@ Options
 ``configuration:set``
 *********************
 
-**Set configuration value.**
+**Set configuration value**
 
 Set system configuration option value by path.
 
@@ -299,7 +299,7 @@ Arguments
 ``configuration:show``
 **********************
 
-**Show configuration value.**
+**Show configuration value**
 
 Shows system configuration value by path.
 If the currently active configuration differs from the value in LocalConfiguration.php
@@ -324,7 +324,7 @@ Arguments
 ``configuration:showactive``
 ****************************
 
-**Show active configuration value.**
+**Show active configuration value**
 
 Shows active system configuration by path.
 Shows the configuration value that is currently effective, no matter where and how it is set.
@@ -348,7 +348,7 @@ Arguments
 ``configuration:showlocal``
 ***************************
 
-**Show local configuration value.**
+**Show local configuration value**
 
 Shows local configuration option value by path.
 Shows the value which is stored in LocalConfiguration.php.
@@ -370,7 +370,7 @@ Related commands
 ^^^^^^^^^^^^^^^^
 
 ``configuration:show``
-  Show configuration value.
+  Show configuration value
 
 
 
@@ -379,7 +379,7 @@ Related commands
 ``database:export``
 *******************
 
-**Export database.**
+**Export database to stdout**
 
 Export the database (all tables) directly to stdout.
 The mysqldump binary must be available in the path for this command to work.
@@ -512,7 +512,7 @@ Options
 ``extension:activate``
 **********************
 
-**Activate extension(s).**
+**Activate extension(s)**
 
 Activates one or more extensions by key.
 Marks extensions as active, sets them up and clears caches for every activated extension.
@@ -534,7 +534,7 @@ Arguments
 ``extension:deactivate``
 ************************
 
-**Deactivate extension(s).**
+**Deactivate extension(s)**
 
 Deactivates one or more extensions by key.
 Marks extensions as inactive in the system and clears caches for every deactivated extension.
@@ -558,7 +558,7 @@ Arguments
 
 **Dump class auto-load**
 
-Updates class loading information.
+Updates class loading information in non composer managed TYPO3 installations.
 
 This command is only needed during development. The extension manager takes care
 creating or updating this info properly during extension (de-)activation.
@@ -620,9 +620,9 @@ Related commands
 ``extension:setup``
   Set up extension(s)
 ``install:generatepackagestates``
-  Generate PackageStates.php file.
+  Generate PackageStates.php file
 ``cache:flush``
-  Flush all caches.
+  Flush all caches
 
 
 
@@ -631,7 +631,7 @@ Related commands
 ``frontend:request``
 ********************
 
-**Submit frontend request.**
+**Submit frontend request**
 
 Submits a frontend request to TYPO3 on the specified URL.
 
@@ -642,6 +642,55 @@ Arguments
   URL to make a frontend request.
 
 
+
+
+
+
+
+.. _`Command Reference: typo3_console help`:
+
+``help``
+********
+
+**Help**
+
+Display help for a command
+
+The help command displays help for a given command:
+./typo3cms help <command identifier>
+
+
+
+Options
+^^^^^^^
+
+``--command-identifier``
+  Identifier of a command for more details
+
+
+
+
+
+.. _`Command Reference: typo3_console help:autocomplete`:
+
+``help:autocomplete``
+*********************
+
+**Generate shell auto complete script**
+
+Inspired by and copied code from https://github.com/bamarni/symfony-console-autocomplete
+See https://github.com/bamarni/symfony-console-autocomplete/blob/master/README.md
+for a description how to install the script in your system.
+
+
+
+Options
+^^^^^^^
+
+``--shell``
+  "bash" or "zsh"
+``--aliases``
+  Aliases for the typo3cms command
 
 
 
@@ -669,7 +718,7 @@ This command is great e.g. for creating the typo3temp folder structure during de
 ``install:generatepackagestates``
 *********************************
 
-**Generate PackageStates.php file.**
+**Generate PackageStates.php file**
 
 Generates and writes ``typo3conf/PackageStates.php`` file.
 Goal is to not have this file in version control, but generate it on ``composer install``.
@@ -701,8 +750,9 @@ Options
 ``install:setup``
 *****************
 
-**TYPO3 Setup. Use as command line replacement for the web installation process.**
+**TYPO3 Setup**
 
+Use as command line replacement for the web installation process.
 Manually enter details on the command line or non interactive for automated setups.
 
 
