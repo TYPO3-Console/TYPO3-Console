@@ -209,6 +209,12 @@ class HelpCommandController extends CommandController
         $commandsOptions = [];
         $commands = [];
         foreach ($this->commands as $commandIdentifier => $command) {
+            $commandIdentifier = strtolower($commandIdentifier);
+            if ($commandIdentifier === 'help:autocomplete') {
+                $commandIdentifier = 'autocomplete';
+            } elseif ($commandIdentifier === 'help:help') {
+                $commandIdentifier = 'help';
+            }
             $commands[] = $commandIdentifier;
             $commandsDescriptions[$commandIdentifier] = $command->getShortDescription();
             $commandsOptionsDescriptions[$commandIdentifier] = [];

@@ -17,7 +17,7 @@ _%%SCRIPT%%()
     if [[ ${cur} == --* ]]; then
         state="option"
         opts=(%%SHARED_OPTIONS%%)
-    elif [[ $cur == $com ]]; then
+    elif [[ $cur == $com || $com == "help" ]]; then
         state="command"
         coms=(%%COMMANDS%%)
     fi

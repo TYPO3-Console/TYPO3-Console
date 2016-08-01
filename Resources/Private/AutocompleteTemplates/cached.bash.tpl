@@ -36,7 +36,7 @@ _%%SCRIPT%%()
     fi
 
     # completing for a command
-    if [[ $cur == $com ]]; then
+    if [[ $cur == $com  || $com == "help" ]]; then
         coms="%%COMMANDS%%"
 
         COMPREPLY=($(compgen -W "${coms}" -- ${cur}))
