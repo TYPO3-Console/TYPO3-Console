@@ -43,7 +43,7 @@ class CommandReferenceCommandController extends CommandController
         'commandReferences' => [
             'typo3_console' => [
                 'title' => 'Command Reference',
-                'extensionKeys' => ['typo3_console', 'extensionmanager'],
+                'extensionKeys' => ['typo3_console', 'extensionmanager', 'extbase'],
             ]
         ]
     ];
