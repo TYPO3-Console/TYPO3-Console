@@ -54,6 +54,8 @@ before_script:
       # If this fails, we forgot to update version numbers before tagging the release
       test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
     fi
+  - composer extension-create-libs && ls -la Libraries/*.phar | grep -v ^-rwx
+  - git clean -dffx
   - composer require typo3/cms=$TYPO3_VERSION
   - export TYPO3_PATH_WEB="$PWD/.Build/Web"
   - ln -s Scripts/typo3cms typo3cms
@@ -73,7 +75,6 @@ script:
     if [ -n "$TRAVIS_TAG" ]; then
       ./typo3cms | grep $TRAVIS_TAG
     fi
-  - composer create-libs && ls -la Libraries/*.phar | grep -v ^-rwx
   - ./typo3cms help && [ ! -f "$TYPO3_PATH_WEB/typo3conf/PackageStates.php" ]
   - ./typo3cms install:setup --non-interactive --database-user-name="root" --database-host-name="localhost" --database-port="3306" --database-name="travis_test" --admin-user-name="admin" --admin-password="password" --site-name="Travis Install" --site-setup-type="createsite"
   - echo 'select uid,title from pages limit 1' | ./typo3cms database:import | sed 's/[[:blank:]]//g' | grep 1Home
@@ -112,8 +113,7 @@ after_script:
         git reset --hard HEAD && git clean -fx
 
         # Build extension files
-        composer set-version $TRAVIS_TAG
-        composer build-extension
+        composer extension-release
 
         # Upload
         TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`

@@ -45,13 +45,16 @@
     },
     "autoload": {
         "psr-4": {
-            "Helhum\\Typo3Console\\": "Classes/"
+            "Helhum\\Typo3Console\\": [
+                "Classes/",
+                "Resources/Private/ExtensionArtifacts/src/"
+            ]
         }
     },
     "autoload-dev": {
         "psr-4": {
             "Helhum\\Typo3Console\\Tests\\": "Tests/",
-            "Helhum\\Typo3Console\\": "Resources/Private/CommandReference/src",
+            "Helhum\\Typo3Console\\": "Resources/Private/CommandReference/src/",
             "TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/core/Tests/"
         }
     },
@@ -68,10 +71,12 @@
     ],
     "scripts": {
         "set-version": [
-            "Helhum\\Typo3Console\\Composer\\InstallerScripts::setVersion",
-            "cp -f Resources/Private/ExtensionArtifacts/* . # Ignore arguments"
+            "Helhum\\Typo3Console\\Composer\\InstallerScripts::setVersion"
         ],
-        "create-libs": [
+        "extension-copy-artifacts": [
+            "cp -f Resources/Private/ExtensionArtifacts/ext_* ."
+        ],
+        "extension-create-libs": [
             "mkdir -p Libraries/temp",
             "[ -f $HOME/.composer/vendor/bin/phar-composer ] || composer global require clue/phar-composer",
             "[ -f Libraries/symfony-process.phar ] || cd Libraries/temp && composer require symfony/process=~2.7.0 && composer config classmap-authoritative true && composer config prepend-autoloader false && composer dump-autoload",
@@ -79,10 +84,18 @@
             "chmod -x Libraries/*.phar",
             "rm -rf Libraries/temp"
         ],
-        "build-extension": [
-            "@create-libs",
+        "extension-build": [
+            "@extension-create-libs",
+            "@extension-copy-artifacts"
+        ],
+        "extension-release": [
+            "@extension-build",
             "rm -rf Resources/Private/ExtensionArtifacts/",
             "rm -rf Resources/Private/CommandReference/"
+        ],
+        "extension-clean": [
+            "rm -rf Libraries",
+            "rm -f ext_*"
         ]
     },
     "extra": {
