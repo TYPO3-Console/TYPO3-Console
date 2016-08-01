@@ -50,5 +50,31 @@ This is the default location when downloading it from TER with the Extension Man
 
 The extension will automatically be activated and the ``typo3cms`` script will also copied to your TYPO3 root directory.
 
-
 .. _`TYPO3 distribution`: https://github.com/helhum/TYPO3-Distribution
+
+
+Shell auto complete
+-------------------
+
+You can get shell auto completion either for bash or zsh shells.
+
+1. Temporary auto complete
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To get temporary auto complete for the commands in the current TYPO3 installation directory,
+type ``eval "$(bin/typo3cms autocomplete bash)"`` or ``eval "$(bin/typo3cms autocomplete zsh)"``
+depending on the shell you are using.
+
+2. Permanent auto complete
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Put the above command into your ``.profile`` file, or use any other technique to permanently
+install the generated completion script in your environment.
+
+.. note::
+
+  The ``typo3cms`` command may show commands that are specific to the current TYPO3 installation.
+  However the auto completion script that is generated is static. This means if you permanently install the script
+  generated for one TYPO3 installation, you may get unexpected results in another one.
+
+
