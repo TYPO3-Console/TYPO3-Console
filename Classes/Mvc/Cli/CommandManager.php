@@ -50,6 +50,18 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
     }
 
     /**
+     * @param string $commandIdentifier
+     * @return \TYPO3\CMS\Extbase\Mvc\Cli\Command
+     */
+    public function getCommandByIdentifier($commandIdentifier)
+    {
+        if ($commandIdentifier === 'autocomplete') {
+            $commandIdentifier = 'extbase:help:autocomplete';
+        }
+        return parent::getCommandByIdentifier($commandIdentifier);
+    }
+
+    /**
      * Make sure the object manager is set
      *
      * @return \TYPO3\CMS\Extbase\Mvc\Cli\Command[]
