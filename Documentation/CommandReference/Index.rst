@@ -16,13 +16,40 @@ Command Reference
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2016-08-01 10:56:27
+The following reference was automatically generated from code on 2016-08-02 22:10:31
 
 
 .. _`Command Reference: typo3_console`:
 
 Extension *typo3_console*
 -------------------------
+
+
+.. _`Command Reference: typo3_console autocomplete`:
+
+``autocomplete``
+****************
+
+**Generate shell auto complete script**
+
+Inspired by and copied code from https://github.com/bamarni/symfony-console-autocomplete
+See https://github.com/bamarni/symfony-console-autocomplete/blob/master/README.md
+for a description how to install the script in your system.
+
+
+
+Options
+^^^^^^^
+
+``--shell``
+  "bash" or "zsh"
+``--aliases``
+  Aliases for the typo3cms command
+``--dynamic``
+  Dynamic auto completion is slower but more flexible
+
+
+
 
 
 .. _`Command Reference: typo3_console backend:lock`:
@@ -666,31 +693,8 @@ Options
 
 ``--command-identifier``
   Identifier of a command for more details
-
-
-
-
-
-.. _`Command Reference: typo3_console help:autocomplete`:
-
-``help:autocomplete``
-*********************
-
-**Generate shell auto complete script**
-
-Inspired by and copied code from https://github.com/bamarni/symfony-console-autocomplete
-See https://github.com/bamarni/symfony-console-autocomplete/blob/master/README.md
-for a description how to install the script in your system.
-
-
-
-Options
-^^^^^^^
-
-``--shell``
-  "bash" or "zsh"
-``--aliases``
-  Aliases for the typo3cms command
+``--raw``
+  Raw output of commands only
 
 
 
