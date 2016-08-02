@@ -196,7 +196,7 @@ class Scripts
      */
     public static function provideCleanClassImplementations(ConsoleBootstrap $bootstrap)
     {
-        self::overrideImplementation(\TYPO3\CMS\Extbase\Mvc\Controller\Argument::class, \Helhum\Typo3Console\Mvc\Controller\Argument::class);
+        self::overrideImplementation(\TYPO3\CMS\Extbase\Mvc\Cli\Command::class, \Helhum\Typo3Console\Mvc\Cli\Command::class);
         self::overrideImplementation(\TYPO3\CMS\Extbase\Command\HelpCommandController::class, \Helhum\Typo3Console\Command\HelpCommandController::class);
         self::overrideImplementation(\TYPO3\CMS\Extensionmanager\Command\ExtensionCommandController::class, \Helhum\Typo3Console\Command\ExtensionCommandController::class);
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerTypeConverter(\Helhum\Typo3Console\Property\TypeConverter\ArrayConverter::class);
