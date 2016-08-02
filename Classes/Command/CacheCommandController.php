@@ -89,7 +89,11 @@ class CacheCommandController extends CommandController
     {
         try {
             $this->cacheService->flushByTagsAndGroups($tags, $groups);
-            $this->outputLine('Flushed caches by tags "' . implode('","', $tags) . '" in groups: "' . implode('","', $groups) . '"');
+            if ($groups === null) {
+                $this->outputLine('Flushed caches by tags "' . implode('","', $tags) . '"');
+            } else {
+                $this->outputLine('Flushed caches by tags "' . implode('","', $tags) . '" in groups: "' . implode('","', $groups) . '"');
+            }
         } catch (NoSuchCacheGroupException $e) {
             $this->outputLine($e->getMessage());
             $this->sendAndExit(1);
