@@ -250,10 +250,10 @@ class InstallCommandController extends CommandController
      * - site (which creates an empty root page and setup)
      * - no (which unsurprisingly does nothing at all)
      *
-     * @param string $siteSetupType Specify the setup type: Download the list of distributions (loaddistribution), Create empty root page (createsite), Do nothing (none)
+     * @param string $siteSetupType Specify the setup type: Download the list of distributions (dist), Create empty root page (site), Do nothing (no)
      * @internal
      */
-    public function defaultConfigurationCommand($siteSetupType = 'none')
+    public function defaultConfigurationCommand($siteSetupType = 'no')
     {
         switch ($siteSetupType) {
             case 'site':
