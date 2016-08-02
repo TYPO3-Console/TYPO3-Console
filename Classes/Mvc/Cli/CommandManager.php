@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Cli\Command;
 
 /**
  * Class CommandManager
@@ -59,6 +60,18 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
             $commandIdentifier = 'extbase:help:autocomplete';
         }
         return parent::getCommandByIdentifier($commandIdentifier);
+    }
+
+    /**
+     * @param Command $command
+     * @return string
+     */
+    public function getShortestIdentifierForCommand(Command $command)
+    {
+        if ($command->getCommandIdentifier() === 'extbase:help:autocomplete') {
+            return 'autocomplete';
+        }
+        return parent::getShortestIdentifierForCommand($command);
     }
 
     /**

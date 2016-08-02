@@ -1,8 +1,8 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-_%%SCRIPT%%()
+_typo3console()
 {
-    local cur script coms opts com
+    local cur script com opts
     COMPREPLY=()
     _get_comp_words_by_ref -n : cur words
 
@@ -23,26 +23,24 @@ _%%SCRIPT%%()
 
     # completing for an option
     if [[ ${cur} == --* ]] ; then
-        opts="%%SHARED_OPTIONS%%"
-
-        case "$com" in
-        %%SWITCH_CONTENT%%
-        esac
-
+        opts=$script
+        [[ -n $com ]] && opts=$opts" help "$com
+        opts=$($opts 2>/dev/null | sed -n '/Options/,/^$/p' | sed -e '1d;$d' | sed 's/[^--]*\(--.*\)/\1/' | sed -En 's/[^ ]*(-(-[[:alnum:]]+){1,}).*/\1/p' | awk '{$1=$1};1'; exit ${PIPESTATUS[0]});
+        [[ $? -eq 0 ]] || return 0;
         COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
         __ltrim_colon_completions "$cur"
 
-        return 0;
+        return 0
     fi
 
     # completing for a command
     if [[ $cur == $com || $com == "help" ]]; then
-        coms="%%COMMANDS%%"
-
+        coms=$($script help --raw 2>/dev/null | awk '{print $1}'; exit ${PIPESTATUS[0]})
+        [[ $? -eq 0 ]] || return 0;
         COMPREPLY=($(compgen -W "${coms}" -- ${cur}))
         __ltrim_colon_completions "$cur"
 
-        return 0
+        return 0;
     fi
 }
 
