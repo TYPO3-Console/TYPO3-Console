@@ -87,6 +87,9 @@ script:
   - ./typo3cms backend:lockforeditors
   - ./typo3cms backend:unlockforeditors
   - ./typo3cms cache:flush
+  - ./typo3cms cache:flushgroups pages
+  - ./typo3cms cache:flushtags foo
+  - ./typo3cms cache:flushtags foo pages
   - ./typo3cms cache:listgroups
   - ./typo3cms cleanup:updatereferenceindex
   - ./typo3cms database:updateschema "*" --verbose
