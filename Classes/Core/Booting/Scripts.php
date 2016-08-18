@@ -51,6 +51,9 @@ class Scripts
                 'extbase_typo3dbbackend_queries',
                 'extbase_datamapfactory_datamap',
             ) as $id) {
+            if (!isset($cacheConfigurations[$id])) {
+                continue;
+            }
             self::$earlyCachesConfiguration[$id] = $cacheConfigurations[$id];
             if (empty($cacheConfigurations[$id]['backend']) || $cacheConfigurations[$id]['backend'] === Typo3DatabaseBackend::class) {
                 $cacheConfigurations[$id]['backend'] = FakeDatabaseBackend::class;
