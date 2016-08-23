@@ -54,6 +54,7 @@ before_script:
       # If this fails, we forgot to update version numbers before tagging the release
       test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
     fi
+  - rm Libraries/symfony-process.phar
   - composer extension-create-libs && ls -la Libraries/*.phar | grep -v ^-rwx
   - git clean -dffx
   - composer require typo3/cms=$TYPO3_VERSION
