@@ -39,14 +39,13 @@ just type:
 * Support for all other Extbase command controllers
 
 
-## Installation
+## Installation as extension from TYPO3 Extension Repository (TER) 
 
+Download and install the extension with the extension manager module.
 For the extension to work, it **must** be installed in the typo3conf/ext/ directory **not** in any other possible extension location.
 This directory **must not** be a symlink to another location!
-
-If you activate the extension in the extension manager, it will copy the `typo3cms` command line tool
-into the installation root directory. But it is also possible to create a symlink to `typo3conf/ext/typo3_console/Scripts/typo3cms`
-in any place you want. The console will activate itself on first usage.
+The extension manager, will copy the `typo3cms` command line tool
+into the installation root directory during activation.
 
 ### Composer Installation
 
