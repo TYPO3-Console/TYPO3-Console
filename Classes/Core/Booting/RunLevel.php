@@ -269,7 +269,10 @@ class RunLevel
         $availableRunlevel = $this->getMaximumAvailableRunLevel();
         $isAvailable = true;
         if ($availableRunlevel === self::LEVEL_COMPILE) {
-            if (in_array($expectedRunLevel, array(self::LEVEL_FULL, self::LEVEL_MINIMAL))) {
+            if (in_array($expectedRunLevel, array(self::LEVEL_FULL, self::LEVEL_MINIMAL), true)) {
+                $isAvailable = false;
+            } elseif ($commandIdentifier === 'cache:flush') {
+                // @TODO: find a nicer way to hide this command when TYPO3 is not installed yet
                 $isAvailable = false;
             }
         }
