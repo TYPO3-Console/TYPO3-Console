@@ -30,6 +30,13 @@ class CacheCommandController extends CommandController
     protected $cacheService;
 
     /**
+     * Whether the command needs admin access to perform its job
+     *
+     * @var bool
+     */
+    protected $requestAdminPermissions = true;
+
+    /**
      * Flush all caches
      *
      * Flushes TYPO3 core caches first and after that, flushes caches from extensions.
@@ -121,5 +128,26 @@ class CacheCommandController extends CommandController
                 $this->outputLine('The following cache groups are registered: "' . implode('", "', $groups) . '".');
                 break;
         }
+    }
+
+    /**
+     * Flush cache for $cacheType with data handler implementation
+     *
+     * @param string $cacheType either "system" or "all"
+     * @return void
+     * @throws \UnexpectedValueException
+     */
+    public function flushCacheWithDataHandlerHandlerCommand($cacheType)
+    {
+        if (!in_array($cacheType, ['system', 'all'], true)) {
+            throw new \UnexpectedValueException('Only cache type "system" or "all" allowed. Given "'. $cacheType . '"');
+        }
+
+        /** @var \TYPO3\CMS\Core\DataHandling\DataHandler $dataHandler */
+        $dataHandler = $this->objectManager->get('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
+        $dataHandler->start([], []);
+        $dataHandler->clear_cacheCmd($cacheType);
+
+        $this->outputLine(ucfirst($cacheType) . ' caches have been cleared via dataHandler');
     }
 }
