@@ -16,8 +16,11 @@ namespace Helhum\Typo3Console\Command;
 use Helhum\Typo3Console\Database\Process\MysqlCommand;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use Helhum\Typo3Console\Service\Database\ImportService;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Database command controller
@@ -146,6 +149,30 @@ class DatabaseCommandController extends CommandController
             $this->buildOutputClosure()
         );
         $this->quit($exitCode);
+    }
+
+    /**
+     * Import static content from extension file "ext_tables_static+adt.sql" to database
+     *
+     * @return void
+     */
+    public function importStaticDataCommand()
+    {
+        /** @var ImportService $importService */
+        $importService = $this->objectManager->get(ImportService::class);
+        $importService->setOutput($this->output);
+        $extensionKeys = ExtensionManagementUtility::getLoadedExtensionListArray();
+        foreach ($extensionKeys as $extensionKey) {
+            try {
+                $importService->importStaticSql($extensionKey);
+            } catch (\Helhum\Typo3Console\Service\Database\Exception $exception) {
+                $this->output->outputFormatted(
+                    '<error>Mysql error during static data import: "[%s] %s"</error>',
+                    [$exception->getCode(), $exception->getMessage()]
+                );
+                $this->sendAndExit(1);
+            }
+        }
     }
 
     /**
