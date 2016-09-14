@@ -14,8 +14,10 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use Helhum\Typo3Console\Utility\ExtensionManagerListUtility;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\ClassLoadingInformation;
+use TYPO3\CMS\Extensionmanager\Utility\FileHandlingUtility;
 
 /**
  * CommandController for working with extension management through CLI
@@ -137,6 +139,29 @@ class ExtensionCommandController extends CommandController
             $activeExtensions[] = $package->getPackageKey();
         }
         $this->setupCommand($activeExtensions);
+    }
+
+    /**
+     * Create uploads folder for active extensions
+     *
+     * @cli
+     * @return void
+     */
+    public function createExtensionFoldersCommand()
+    {
+        /** @var ExtensionManagerListUtility $listUtility */
+        $listUtility = $this->objectManager->get(ExtensionManagerListUtility::class);
+        /** @var FileHandlingUtility $fileHandlingUtility */
+        $fileHandlingUtility = $this->objectManager->get(FileHandlingUtility::class);
+        $extensions = $listUtility->getAvailableAndInstalledExtensionsWithAdditionalInformation();
+        foreach ($extensions as $extension) {
+            if (isset($extension['installed']) && $extension['installed']) {
+                // Pass the complete extension information to the file-handling-function.
+                // Only the extensions key is not sufficient
+                $fileHandlingUtility->ensureConfiguredDirectoriesExist($extension);
+            }
+        }
+        $this->outputLine('Create configured directories for installed extensions');
     }
 
     /**
