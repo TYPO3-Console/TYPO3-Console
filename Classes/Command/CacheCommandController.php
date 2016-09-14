@@ -137,7 +137,7 @@ class CacheCommandController extends CommandController
      * @return void
      * @throws \UnexpectedValueException
      */
-    public function flushCacheWithDataHandlerHandlerCommand($cacheType)
+    public function flushCacheWithDataHandlerCommand($cacheType)
     {
         if (!in_array($cacheType, ['system', 'all'], true)) {
             throw new \UnexpectedValueException('Only cache type "system" or "all" allowed. Given "'. $cacheType . '"');
