@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\Command;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\ClassLoadingInformation;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
  * CommandController for working with extension management through CLI
@@ -158,6 +159,16 @@ class ExtensionCommandController extends CommandController
             ClassLoadingInformation::dumpClassLoadingInformation();
             $this->output->outputLine('Class Loading information has been updated.');
         }
+    }
+
+    /**
+     * List all installed extensions
+     *
+     * @return void
+     */
+    public function listInstalledCommand()
+    {
+        $this->outputLine('%s', [implode(',', ExtensionManagementUtility::getLoadedExtensionListArray())]);
     }
 
     /**
