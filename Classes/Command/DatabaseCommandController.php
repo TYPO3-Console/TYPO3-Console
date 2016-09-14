@@ -161,17 +161,18 @@ class DatabaseCommandController extends CommandController
         /** @var ImportService $importService */
         $importService = $this->objectManager->get(ImportService::class);
         $importService->setOutput($this->output);
+
+        // Register signal slot to save md5 values to registry
+        $this->objectManager->get(\TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class)->connect(
+           \TYPO3\CMS\Extensionmanager\Utility\InstallUtility::class,
+           'afterExtensionStaticSqlImport',
+            $importService,
+            'writeMd5Value'
+        );
+
         $extensionKeys = ExtensionManagementUtility::getLoadedExtensionListArray();
         foreach ($extensionKeys as $extensionKey) {
-            try {
-                $importService->importStaticSql($extensionKey);
-            } catch (\Helhum\Typo3Console\Service\Database\Exception $exception) {
-                $this->output->outputFormatted(
-                    '<error>Mysql error during static data import: "[%s] %s"</error>',
-                    [$exception->getCode(), $exception->getMessage()]
-                );
-                $this->sendAndExit(1);
-            }
+            $importService->importStaticSql($extensionKey);
         }
     }
 

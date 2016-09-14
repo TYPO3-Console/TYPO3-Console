@@ -14,7 +14,6 @@ namespace Helhum\Typo3Console\Service\Database;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
-use Helhum\Typo3Console\Service\Md5FilesHandler;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -31,9 +30,16 @@ class ImportService implements SingletonInterface
     protected $schemaMigrationService;
 
     /**
-     * @var Md5FilesHandler
+     * @var \Helhum\Typo3Console\Utility\InstallUtility
+     * @inject
      */
-    protected $md5FilesHandler;
+    protected $installUtility;
+
+    /**
+     * @var \TYPO3\CMS\Core\Registry
+     * @inject
+     */
+    protected $registry;
 
     /**
      * @var ConsoleOutput
@@ -59,64 +65,44 @@ class ImportService implements SingletonInterface
      */
     public function importStaticSql($extensionKey)
     {
-        try {
-            $extTablesStaticSqlFile = ExtensionManagementUtility::extPath($extensionKey) .
-                'ext_tables_static+adt.sql';
+        $absoluteExtensionPath = ExtensionManagementUtility::extPath($extensionKey);
+        $extensionRelativePath = str_replace(PATH_site, '', $absoluteExtensionPath);
+        $staticSqlFile = 'ext_tables_static+adt.sql';
+        $absolutePathToSqlFile = $absoluteExtensionPath . $staticSqlFile;
+        $relativePathToSqlFile = $extensionRelativePath . $staticSqlFile;
 
-            if (
-                !file_exists($extTablesStaticSqlFile) ||
-                !is_readable($extTablesStaticSqlFile) ||
-                !$this->isTableUpdateNeeded($extensionKey)
-            ) {
-                return;
-            }
-
-            $this->outputFormatted('Importing static sql data for extension "%s"', [$extensionKey]);
-
-            $rawDefinitions = GeneralUtility::getUrl($extTablesStaticSqlFile);
-            $statements = $this->schemaMigrationService->getStatementArray($rawDefinitions, true);
-            list($statementsPerTable, $insertCount) = $this->schemaMigrationService->getCreateTables($statements, true);
-            // Traverse the tables
-            foreach ($statementsPerTable as $table => $query) {
-
-                $this->executeAdminQuery('DROP TABLE IF EXISTS ' . $table);
-                $this->executeAdminQuery($query);
-                if ($insertCount[$table]) {
-                    $insertStatements = $this->schemaMigrationService->getTableInsertStatements($statements, $table);
-                    foreach ($insertStatements as $statement) {
-                        $this->executeAdminQuery($statement);
-                    }
-                }
-            }
-            $this->getMd5FilesHandler()->update($extensionKey, md5($rawDefinitions));
-        } catch (\Helhum\Typo3Console\Service\Database\Exception $exception) {
-            // Remove md5 file at error
-            $this->getMd5FilesHandler()->removeFile($extensionKey);
-            throw $exception;
+        if (
+            !file_exists($absolutePathToSqlFile) ||
+            !is_readable($absolutePathToSqlFile) ||
+            !$this->isTableUpdateNeeded($relativePathToSqlFile)
+        ) {
+            return;
         }
+
+        // Force import of static database content
+        $this->registry->set('extensionDataImport', $relativePathToSqlFile, 0);
+
+        $this->outputFormatted('Importing static sql data for extension "%s"' . PHP_EOL, [$extensionKey]);
+        $this->outputFormatted(GeneralUtility::getUrl($absolutePathToSqlFile), [], 2);
+
+        $this->installUtility->importStaticSqlFile($extensionRelativePath);
     }
 
     /**
-     * Wrapper for \TYPO3\CMS\Core\Database\DatabaseConnection::admin_query
+     * Write md5 value of $extTablesStaticSqlFile to TYPO3 registry.
      *
-     * This method is originally derived from \TYPO3\CMS\Core\Database\DatabaseConnection::admin_query
-     * with the only difference, that query statements are put out to the console window before execution.
+     * Called by signal "afterExtensionStaticSqlImport" from extension manager
      *
-     * @param string $query Query to execute
-     * @return bool|\mysqli_result|object
-     * @throws \Helhum\Typo3Console\Service\Database\Exception
+     * @param string $extTablesStaticSqlFile
+     * @return void
      */
-    protected function executeAdminQuery($query)
+    public function writeMd5Value($extTablesStaticSqlFile)
     {
-        $result = $this->getDatabaseConnection()->admin_query($query);
-        $this->outputFormatted($query, [], 2);
-        if ($this->getDatabaseConnection()->sql_error()) {
-            throw new \Helhum\Typo3Console\Service\Database\Exception(
-                $this->getDatabaseConnection()->sql_error(),
-                $this->getDatabaseConnection()->sql_errno()
-            );
-        }
-        return $result;
+        $this->registry->set(
+            'extensionDataImport',
+            $extTablesStaticSqlFile,
+            md5_file(PATH_site . $extTablesStaticSqlFile)
+        );
     }
 
     /**
@@ -139,36 +125,12 @@ class ImportService implements SingletonInterface
     /**
      * Check if table update is needed using md5 checksum for the content of "ext_tables_static+adt.sql" file.
      *
-     * @param string $extension Extension name
+     * @param string $extTablesStaticSqlFile Path to extension static database content
      * @return bool
      */
-    protected function isTableUpdateNeeded($extension)
+    protected function isTableUpdateNeeded($extTablesStaticSqlFile)
     {
-        $md5 = md5_file(ExtensionManagementUtility::extPath($extension) . 'ext_tables_static+adt.sql');
-        return ($md5 !== $this->getMd5FilesHandler()->getMd5($extension));
-    }
-
-    /**
-     * Get database connection
-     *
-     * @return \TYPO3\CMS\Core\Database\DatabaseConnection
-     */
-    protected function getDatabaseConnection()
-    {
-        return $GLOBALS['TYPO3_DB'];
-    }
-
-
-    /**
-     * Get md5 files handler service class
-     *
-     * @return Md5FilesHandler
-     */
-    protected function getMd5FilesHandler()
-    {
-        if ($this->md5FilesHandler === null) {
-            $this->md5FilesHandler = GeneralUtility::makeInstance(Md5FilesHandler::class, 'staticImport');
-        }
-        return $this->md5FilesHandler;
+        $md5 = md5_file(PATH_site . $extTablesStaticSqlFile);
+        return $this->registry->get('extensionDataImport', $extTablesStaticSqlFile) !== $md5;
     }
 }
