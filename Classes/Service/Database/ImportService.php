@@ -60,10 +60,11 @@ class ImportService implements SingletonInterface
      * Import static SQL data (normally used for ext_tables_static+adt.sql)
      *
      * @param string $extensionKey Import static data for extension
+     * @param bool $force Force import of static database data
      * @throws \Helhum\Typo3Console\Service\Database\Exception
      * @see \TYPO3\CMS\Extensionmanager\Utility\InstallUtility::importStaticSql
      */
-    public function importStaticSql($extensionKey)
+    public function importStaticSql($extensionKey, $force)
     {
         $absoluteExtensionPath = ExtensionManagementUtility::extPath($extensionKey);
         $extensionRelativePath = str_replace(PATH_site, '', $absoluteExtensionPath);
@@ -74,7 +75,10 @@ class ImportService implements SingletonInterface
         if (
             !file_exists($absolutePathToSqlFile) ||
             !is_readable($absolutePathToSqlFile) ||
-            !$this->isTableUpdateNeeded($relativePathToSqlFile)
+            !(
+                $this->isTableUpdateNeeded($relativePathToSqlFile) ||
+                $force
+            )
         ) {
             return;
         }

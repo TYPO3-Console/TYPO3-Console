@@ -154,9 +154,10 @@ class DatabaseCommandController extends CommandController
     /**
      * Import static content from extension file "ext_tables_static+adt.sql" to database
      *
+     * @param bool $force Force import of static database data
      * @return void
      */
-    public function importStaticDataCommand()
+    public function importStaticDataCommand($force = false)
     {
         /** @var ImportService $importService */
         $importService = $this->objectManager->get(ImportService::class);
@@ -172,7 +173,7 @@ class DatabaseCommandController extends CommandController
 
         $extensionKeys = ExtensionManagementUtility::getLoadedExtensionListArray();
         foreach ($extensionKeys as $extensionKey) {
-            $importService->importStaticSql($extensionKey);
+            $importService->importStaticSql($extensionKey, $force);
         }
     }
 
