@@ -197,7 +197,7 @@ class InstallCommandController extends CommandController
      *
      * Select a database by name
      *
-     * @param bool $useExistingDatabase Use existing database (1), or create database (0)
+     * @param bool $useExistingDatabase Use already existing database?
      * @param string $databaseName Name of the database
      * @internal
      */
