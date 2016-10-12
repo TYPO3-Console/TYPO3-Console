@@ -121,7 +121,7 @@ class CliSetupRequestHandler
         // TODO: provide pre- and post-execute signals?
         $messages = $this->executeAction($this->createActionWithNameAndArguments($actionName, $arguments));
         // TODO: ultimately get rid of that!
-        if ($actionName === 'databaseData') {
+        if ($messages === [] && $actionName === 'databaseData') {
             /** @var DatabaseConnection $db */
             $db = $GLOBALS['TYPO3_DB'];
             $db->exec_INSERTquery('be_users', array('username' => '_cli_lowlevel'));
