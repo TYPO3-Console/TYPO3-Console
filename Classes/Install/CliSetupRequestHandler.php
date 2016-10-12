@@ -238,20 +238,30 @@ class CliSetupRequestHandler
                     }
                     $argumentValue = null;
                     do {
-                        if ($isPasswordArgument) {
+                        $defaultValue = $argument->getDefaultValue();
+                        $isRequired = $this->isArgumentRequired($argument);
+                        if ($isPasswordArgument && $isRequired) {
                             $argumentValue = $this->output->askHiddenResponse(
+                                sprintf(
+                                    '<comment>%s:</comment> ',
+                                    $argumentDefinition->getDescription()
+                                )
+                            );
+                        } elseif (is_bool($argument->getValue())) {
+                            $argumentValue = (int)$this->output->askConfirmation(
                                 sprintf(
                                     '<comment>%s (%s):</comment> ',
                                     $argumentDefinition->getDescription(),
-                                    $this->isArgumentRequired($argument) ? 'required' : sprintf('default: "%s"', $argument->getDefaultValue())
-                                )
+                                    $isRequired ? 'required' : ($defaultValue ? 'Y/n' : 'y/N')
+                                ),
+                                $defaultValue
                             );
                         } else {
                             $argumentValue = $this->output->ask(
                                 sprintf(
                                     '<comment>%s (%s):</comment> ',
                                     $argumentDefinition->getDescription(),
-                                    $this->isArgumentRequired($argument) ? 'required' : sprintf('default: "%s"', $argument->getDefaultValue())
+                                    $isRequired ? 'required' : sprintf('default: "%s"', $defaultValue === false ? '0' : $defaultValue)
                                 )
                             );
                         }
