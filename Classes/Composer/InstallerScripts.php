@@ -38,12 +38,16 @@ class InstallerScripts
      */
     public static function setupConsole(ScriptEvent $event, $calledFromPlugin = false)
     {
-        if ($event->getComposer()->getPackage()->getName() === 'helhum/typo3-console') {
-            return;
-        }
         if (!$calledFromPlugin) {
             // @deprecated
             $event->getIO()->writeError('<warning>Usage of Helhum\Typo3Console\Composer\InstallerScripts::setupConsole is deprecated. Please remove this section from your root composer.json</warning>');
+            return;
+        }
+        if ($event->getComposer()->getPackage()->getName() === 'helhum/typo3-console') {
+            return;
+        }
+        $pluginConfig = \Helhum\Typo3ConsolePlugin\Config::load($event->getIO(), $event->getComposer()->getConfig());
+        if (!$pluginConfig->get('install-binary')) {
             return;
         }
 
@@ -51,13 +55,9 @@ class InstallerScripts
         $installDir = self::getInstallDir($config);
         $webDir = self::getWebDir($config);
         $filesystem = new Filesystem();
-
-        $pluginConfig = \Helhum\Typo3ConsolePlugin\Config::load($event->getIO(), $event->getComposer()->getConfig());
-        if (!$pluginConfig->get('install-binary')) {
-            return;
-        }
         $binDir = trim(substr($event->getComposer()->getConfig()->get('bin-dir'), strlen($config->getBaseDir())), '/');
-        // @deprecated. can be removed once the typo3 installer takes care of installing binaries
+
+        // @deprecated. Use composer binary installer instead
         $event->getIO()->writeError('<warning>Usage of "./typo3cms" binary has been deprecated.</warning>');
         $event->getIO()->writeError('<warning>Please use ' . $binDir . '/typo3cms instead.</warning>');
         $event->getIO()->writeError('<warning>To get rid of this message, set "install-binary" option to false</warning>');
