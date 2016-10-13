@@ -105,8 +105,9 @@ class CliSetupRequestHandler
         $this->givenRequestArguments = $givenRequestArguments;
 
         $firstInstallPath = PATH_site . 'FIRST_INSTALL';
-        if (!file_exists($firstInstallPath))
+        if (!file_exists($firstInstallPath)) {
             touch($firstInstallPath);
+        }
 
         foreach ($this->installationActions as $actionName) {
             $this->dispatchAction($actionName);
