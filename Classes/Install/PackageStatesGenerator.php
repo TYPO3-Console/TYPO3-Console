@@ -29,6 +29,7 @@ class PackageStatesGenerator
     public function generate(UncachedPackageManager $packageManager, $activateDefaultExtensions = false)
     {
         $frameworkExtensionsFromConfiguration = $this->getFrameworkExtensionsFromConfiguration();
+        $packageManager->scanAvailablePackages();
         foreach ($packageManager->getAvailablePackages() as $package) {
             if (
                 isset($frameworkExtensionsFromConfiguration[$package->getPackageKey()])
