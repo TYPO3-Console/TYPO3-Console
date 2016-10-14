@@ -14,7 +14,8 @@ namespace Helhum\Typo3Console\Composer;
  */
 
 use Composer\Script\Event as ScriptEvent;
-use TYPO3\CMS\Composer\Plugin\Config;
+use Helhum\Typo3ConsolePlugin\Config as PluginConfig;
+use TYPO3\CMS\Composer\Plugin\Config as Typo3Config;
 use TYPO3\CMS\Composer\Plugin\Util\Filesystem;
 
 /**
@@ -39,11 +40,50 @@ class InstallerScripts
     public static function setupConsole(ScriptEvent $event, $calledFromPlugin = false)
     {
         if (!$calledFromPlugin) {
-            // @deprecated
+            // @deprecated will be removed with 4.0
             $event->getIO()->writeError('<warning>Usage of Helhum\Typo3Console\Composer\InstallerScripts::setupConsole is deprecated. Please remove this section from your root composer.json</warning>');
             return;
         }
+        if ($event->getComposer()->getPackage()->getName() === 'helhum/typo3-console') {
+            return;
+        }
+        self::installExtension($event);
         self::installBinary($event);
+    }
+
+    /**
+     * @param ScriptEvent $event
+     */
+    private static function installExtension(ScriptEvent $event) {
+        $io = $event->getIO();
+        $composer = $event->getComposer();
+
+        $composerConfig = $composer->getConfig();
+        $typo3Config = Typo3Config::load($composer);
+        $pluginConfig = PluginConfig::load($io, $composerConfig);
+
+        $webDir = $typo3Config->get('web-dir');
+        $filesystem = new Filesystem();
+        $extensionDir = "$webDir/typo3conf/ext/typo3_console";
+
+        if ($pluginConfig->get('install-extension-dummy')) {
+            $extResourcesDir = __DIR__ . '/../../Resources/Private/ExtensionArtifacts';
+            $resources = [
+                'ext_icon.png',
+                'ext_emconf.php',
+            ];
+            foreach ($resources as $resource) {
+                $target = "$extensionDir/$resource";
+                $filesystem->ensureDirectoryExists(basename($target));
+                $filesystem->copy("$extResourcesDir/$resource", $target);
+            }
+            $io->writeError('<info>TYPO3 Console: Installed TYPO3 extension into TYPO3 extension directory</info>');
+        } else {
+            if (file_exists($extensionDir) || is_dir($extensionDir)) {
+                $filesystem->removeDirectory($extensionDir);
+                $io->writeError('<info>TYPO3 Console: Removed TYPO3 extension from TYPO3 extension directory</info>');
+            }
+        }
     }
 
     /**
@@ -52,24 +92,21 @@ class InstallerScripts
      */
     private static function installBinary(ScriptEvent $event)
     {
-        if ($event->getComposer()->getPackage()->getName() === 'helhum/typo3-console') {
-            return;
-        }
-        $pluginConfig = \Helhum\Typo3ConsolePlugin\Config::load($event->getIO(), $event->getComposer()->getConfig());
+        $pluginConfig = PluginConfig::load($event->getIO(), $event->getComposer()->getConfig());
         if (!$pluginConfig->get('install-binary')) {
             return;
         }
-        $config = Config::load($event->getComposer());
+        $config = Typo3Config::load($event->getComposer());
         $installDir = $config->getBaseDir();
         $webDir = $config->get('web-dir');
         $filesystem = new Filesystem();
         $binDir = trim(substr($event->getComposer()->getConfig()->get('bin-dir'), strlen($config->getBaseDir())), '/');
 
         // @deprecated. Use composer binary installer instead
-        $event->getIO()->writeError('<warning>Usage of "./typo3cms" binary has been deprecated.</warning>');
-        $event->getIO()->writeError('<warning>Please use ' . $binDir . '/typo3cms instead.</warning>');
+        $event->getIO()->writeError('<warning>Usage of "./typo3cms" binary has been deprecated</warning>');
+        $event->getIO()->writeError('<warning>Please use ' . $binDir . '/typo3cms instead</warning>');
         $event->getIO()->writeError('<warning>To get rid of this message, set "install-binary" option to false</warning>');
-        $event->getIO()->writeError('<warning>in "extra -> helhum/typo3-console" section of root composer.json.</warning>');
+        $event->getIO()->writeError('<warning>in "extra -> helhum/typo3-console" section of root composer.json</warning>');
         $pathToScriptsDirectory = __DIR__ . '/../../Scripts/';
         if (self::isWindowsOs()) {
             $scriptName = 'typo3cms.bat';
