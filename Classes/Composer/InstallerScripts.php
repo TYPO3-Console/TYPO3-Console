@@ -43,6 +43,15 @@ class InstallerScripts
             $event->getIO()->writeError('<warning>Usage of Helhum\Typo3Console\Composer\InstallerScripts::setupConsole is deprecated. Please remove this section from your root composer.json</warning>');
             return;
         }
+        self::installBinary($event);
+    }
+
+    /**
+     * @param ScriptEvent $event
+     * @deprecated will be removed with 4.0
+     */
+    private static function installBinary(ScriptEvent $event)
+    {
         if ($event->getComposer()->getPackage()->getName() === 'helhum/typo3-console') {
             return;
         }
@@ -50,10 +59,9 @@ class InstallerScripts
         if (!$pluginConfig->get('install-binary')) {
             return;
         }
-
-        $config = self::getConfig($event);
-        $installDir = self::getInstallDir($config);
-        $webDir = self::getWebDir($config);
+        $config = Config::load($event->getComposer());
+        $installDir = $config->getBaseDir();
+        $webDir = $config->get('web-dir');
         $filesystem = new Filesystem();
         $binDir = trim(substr($event->getComposer()->getConfig()->get('bin-dir'), strlen($config->getBaseDir())), '/');
 
@@ -176,6 +184,7 @@ class InstallerScripts
     /**
      * @param Config $config
      * @return string
+     * @deprecated will be removed with 4.0
      */
     protected static function getInstallDir(Config $config)
     {
@@ -185,6 +194,7 @@ class InstallerScripts
     /**
      * @param Config $config
      * @return string
+     * @deprecated will be removed with 4.0
      */
     protected static function getWebDir(Config $config)
     {
@@ -194,6 +204,7 @@ class InstallerScripts
     /**
      * @param ScriptEvent $event
      * @return Config
+     * @deprecated will be removed with 4.0
      */
     protected static function getConfig(ScriptEvent $event)
     {
@@ -201,14 +212,14 @@ class InstallerScripts
     }
 
     /**
-     * @deprecated This never was public API, just use EM
+     * @deprecated will be removed with 4.0
      */
     public static function postInstallExtension()
     {
     }
 
     /**
-     * @deprecated This never was public API, just use your own flash message queue
+     * @deprecated will be removed with 4.0
      */
     public static function addFlashMessage()
     {
