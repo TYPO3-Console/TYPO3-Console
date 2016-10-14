@@ -27,10 +27,12 @@ class SchemaUpdateResultRenderer
     protected $schemaUpdateTypeLabels = array(
         SchemaUpdateType::FIELD_ADD => 'Add fields',
         SchemaUpdateType::FIELD_CHANGE => 'Change fields',
+        SchemaUpdateType::FIELD_PREFIX => 'Prefix fields',
         SchemaUpdateType::FIELD_DROP => 'Drop fields',
         SchemaUpdateType::TABLE_ADD => 'Add tables',
         SchemaUpdateType::TABLE_CHANGE => 'Change tables',
         SchemaUpdateType::TABLE_CLEAR => 'Clear tables',
+        SchemaUpdateType::TABLE_PREFIX => 'Prefix tables',
         SchemaUpdateType::TABLE_DROP => 'Drop tables',
     );
 
