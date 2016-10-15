@@ -24,7 +24,7 @@
     "require": {
         "ext-Phar": "*",
         "php": ">=5.5.0",
-        "helhum/typo3-console-plugin": "^1.3.0",
+        "helhum/typo3-console-plugin": "^1.5.0",
 
         "typo3/cms-backend": "^7.6 || ^8.0",
         "typo3/cms-core": "^7.6 || ^8.0",
@@ -90,7 +90,8 @@
         ],
         "extension-release": [
             "@extension-build",
-            "rm -rf Resources/Private/ExtensionArtifacts/",
+            "rm Resources/Private/ExtensionArtifacts/ext_*",
+            "rm -rf Tests/",
             "rm -rf Resources/Private/CommandReference/"
         ],
         "extension-clean": [

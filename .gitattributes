@@ -1,4 +1,5 @@
-/Resources/Private/ExtensionArtifacts/ export-ignore
+/Resources/Private/ExtensionArtifacts/src/ export-ignore
+/Resources/Private/ExtensionArtifacts/src/ext_localconf.php export-ignore
 /Resources/Private/CommandReference/ export-ignore
 /Tests/ export-ignore
 /.gitattributes export-ignore
