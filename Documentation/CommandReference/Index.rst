@@ -16,7 +16,7 @@ Command Reference
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2016-10-15 12:53:16
+The following reference was automatically generated from code on 2016-10-15 14:34:35
 
 
 .. _`Command Reference: typo3_console`:
@@ -440,9 +440,11 @@ Valid schema update types are:
 
 - field.add
 - field.change
+- field.prefix
 - field.drop
 - table.add
 - table.change
+- table.prefix
 - table.drop
 - table.clear
 
