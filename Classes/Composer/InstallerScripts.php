@@ -14,7 +14,8 @@ namespace Helhum\Typo3Console\Composer;
  */
 
 use Composer\Script\Event as ScriptEvent;
-use TYPO3\CMS\Composer\Plugin\Config;
+use Helhum\Typo3ConsolePlugin\Config as PluginConfig;
+use TYPO3\CMS\Composer\Plugin\Config as Typo3Config;
 use TYPO3\CMS\Composer\Plugin\Util\Filesystem;
 
 /**
@@ -39,29 +40,79 @@ class InstallerScripts
     public static function setupConsole(ScriptEvent $event, $calledFromPlugin = false)
     {
         if (!$calledFromPlugin) {
-            // @deprecated
+            // @deprecated will be removed with 4.0
             $event->getIO()->writeError('<warning>Usage of Helhum\Typo3Console\Composer\InstallerScripts::setupConsole is deprecated. Please remove this section from your root composer.json</warning>');
             return;
         }
         if ($event->getComposer()->getPackage()->getName() === 'helhum/typo3-console') {
             return;
         }
-        $pluginConfig = \Helhum\Typo3ConsolePlugin\Config::load($event->getIO(), $event->getComposer()->getConfig());
+        self::installExtension($event);
+        self::installBinary($event);
+    }
+
+    /**
+     * @param ScriptEvent $event
+     * @deprecated will be removed with 5.0
+     */
+    private static function installExtension(ScriptEvent $event) {
+        $io = $event->getIO();
+        $composer = $event->getComposer();
+
+        $composerConfig = $composer->getConfig();
+        $typo3Config = Typo3Config::load($composer);
+        $pluginConfig = PluginConfig::load($io, $composerConfig);
+
+        $webDir = $typo3Config->get('web-dir');
+        $filesystem = new Filesystem();
+        $extensionDir = "$webDir/typo3conf/ext/typo3_console";
+
+        if ($pluginConfig->get('install-extension-dummy')) {
+            // @deprecated. Use composer binary installer instead
+            $io->writeError('<warning>Installation of TYPO3 extension has been deprecated</warning>');
+            $io->writeError('<warning>To get rid of this message, set "install-extension-dummy" option to false</warning>');
+            $io->writeError('<warning>in "extra -> helhum/typo3-console" section of root composer.json</warning>');
+
+            $extResourcesDir = __DIR__ . '/../../Resources/Private/ExtensionArtifacts';
+            $resources = [
+                'ext_icon.png',
+                'ext_emconf.php',
+            ];
+            foreach ($resources as $resource) {
+                $target = "$extensionDir/$resource";
+                $filesystem->ensureDirectoryExists(basename($target));
+                $filesystem->copy("$extResourcesDir/$resource", $target);
+            }
+            $io->writeError('<info>TYPO3 Console: Installed TYPO3 extension into TYPO3 extension directory</info>');
+        } else {
+            if (file_exists($extensionDir) || is_dir($extensionDir)) {
+                $filesystem->removeDirectory($extensionDir);
+                $io->writeError('<info>TYPO3 Console: Removed TYPO3 extension from TYPO3 extension directory</info>');
+            }
+        }
+    }
+
+    /**
+     * @param ScriptEvent $event
+     * @deprecated will be removed with 4.0
+     */
+    private static function installBinary(ScriptEvent $event)
+    {
+        $pluginConfig = PluginConfig::load($event->getIO(), $event->getComposer()->getConfig());
         if (!$pluginConfig->get('install-binary')) {
             return;
         }
-
-        $config = self::getConfig($event);
-        $installDir = self::getInstallDir($config);
-        $webDir = self::getWebDir($config);
+        $config = Typo3Config::load($event->getComposer());
+        $installDir = $config->getBaseDir();
+        $webDir = $config->get('web-dir');
         $filesystem = new Filesystem();
         $binDir = trim(substr($event->getComposer()->getConfig()->get('bin-dir'), strlen($config->getBaseDir())), '/');
 
         // @deprecated. Use composer binary installer instead
-        $event->getIO()->writeError('<warning>Usage of "./typo3cms" binary has been deprecated.</warning>');
-        $event->getIO()->writeError('<warning>Please use ' . $binDir . '/typo3cms instead.</warning>');
+        $event->getIO()->writeError('<warning>Usage of "./typo3cms" binary has been deprecated</warning>');
+        $event->getIO()->writeError('<warning>Please use ' . $binDir . '/typo3cms instead</warning>');
         $event->getIO()->writeError('<warning>To get rid of this message, set "install-binary" option to false</warning>');
-        $event->getIO()->writeError('<warning>in "extra -> helhum/typo3-console" section of root composer.json.</warning>');
+        $event->getIO()->writeError('<warning>in "extra -> helhum/typo3-console" section of root composer.json</warning>');
         $pathToScriptsDirectory = __DIR__ . '/../../Scripts/';
         if (self::isWindowsOs()) {
             $scriptName = 'typo3cms.bat';
@@ -176,6 +227,7 @@ class InstallerScripts
     /**
      * @param Config $config
      * @return string
+     * @deprecated will be removed with 4.0
      */
     protected static function getInstallDir(Config $config)
     {
@@ -185,6 +237,7 @@ class InstallerScripts
     /**
      * @param Config $config
      * @return string
+     * @deprecated will be removed with 4.0
      */
     protected static function getWebDir(Config $config)
     {
@@ -194,6 +247,7 @@ class InstallerScripts
     /**
      * @param ScriptEvent $event
      * @return Config
+     * @deprecated will be removed with 4.0
      */
     protected static function getConfig(ScriptEvent $event)
     {
@@ -201,14 +255,14 @@ class InstallerScripts
     }
 
     /**
-     * @deprecated This never was public API, just use EM
+     * @deprecated will be removed with 4.0
      */
     public static function postInstallExtension()
     {
     }
 
     /**
-     * @deprecated This never was public API, just use your own flash message queue
+     * @deprecated will be removed with 4.0
      */
     public static function addFlashMessage()
     {
