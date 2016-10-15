@@ -26,12 +26,12 @@ class SchemaService implements SingletonInterface
     /**
      * Group of safe statements
      */
-    const STATEMENT_GROUP_SAFE = 1;
+    const STATEMENT_GROUP_SAFE = 'add_create_change';
 
     /**
      * Group of destructive statements
      */
-    const STATEMENT_GROUP_DESTRUCTIVE = 2;
+    const STATEMENT_GROUP_DESTRUCTIVE = 'drop_rename';
 
     /**
      * @var \TYPO3\CMS\Install\Service\SqlSchemaMigrationService
