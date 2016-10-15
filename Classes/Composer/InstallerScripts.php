@@ -54,7 +54,8 @@ class InstallerScripts
     /**
      * @param ScriptEvent $event
      */
-    private static function installExtension(ScriptEvent $event) {
+    private static function installExtension(ScriptEvent $event)
+    {
         $io = $event->getIO();
         $composer = $event->getComposer();
 

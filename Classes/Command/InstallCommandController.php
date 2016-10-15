@@ -80,7 +80,6 @@ class InstallCommandController extends CommandController
 
         $this->ensureInstallationPossible($nonInteractive, $force);
 
-
         $this->cliSetupRequestHandler->setup(!$nonInteractive, $this->request->getArguments());
 
         $this->outputLine();

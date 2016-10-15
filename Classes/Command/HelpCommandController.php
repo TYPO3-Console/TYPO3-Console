@@ -241,8 +241,7 @@ class HelpCommandController extends CommandController
 SWITCHCASE;
 
         $switchContent = '';
-        $zsh_describe = function ($value, $description = null)
-        {
+        $zsh_describe = function ($value, $description = null) {
             $value = '"' . str_replace(':', '\\:', $value);
             if (!empty($description)) {
                 $value .= ':' . escapeshellcmd($description);
@@ -264,7 +263,7 @@ SWITCHCASE;
                 array('%%COMMAND%%', '%%COMMAND_OPTIONS%%'),
                 array($command, implode(' ', $options)),
                 $switchCaseTemplate
-            )."\n        ";
+            ) . "\n        ";
         }
         $switchContent = rtrim($switchContent, ' ');
 
