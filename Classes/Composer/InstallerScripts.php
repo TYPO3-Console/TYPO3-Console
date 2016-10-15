@@ -55,7 +55,8 @@ class InstallerScripts
      * @param ScriptEvent $event
      * @deprecated will be removed with 5.0
      */
-    private static function installExtension(ScriptEvent $event) {
+    private static function installExtension(ScriptEvent $event)
+    {
         $io = $event->getIO();
         $composer = $event->getComposer();
 
