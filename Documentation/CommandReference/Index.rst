@@ -16,7 +16,7 @@ Command Reference
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2016-10-15 14:34:35
+The following reference was automatically generated from code on 2016-10-17 12:08:09
 
 
 .. _`Command Reference: typo3_console`:
@@ -593,6 +593,31 @@ This command is only needed during development. The extension manager takes care
 creating or updating this info properly during extension (de-)activation.
 
 
+
+
+
+
+
+.. _`Command Reference: typo3_console extension:list`:
+
+``extension:list``
+******************
+
+**List extensions that are available in the system**
+
+
+
+
+
+Options
+^^^^^^^
+
+``--active``
+  Only show active extensions
+``--inactive``
+  Only show inactive extensions
+``--raw``
+  Enable machine readable output (just extension keys separated by line feed)
 
 
 
