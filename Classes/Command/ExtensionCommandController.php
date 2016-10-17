@@ -161,15 +161,25 @@ class ExtensionCommandController extends CommandController
     }
 
     /**
-     * List active extensions
+     * List extensions that are available in the system
      *
-     * @param bool $raw True for a comma separated list of extension keys
-     * @return void
+     * @param bool $active Only show active extensions
+     * @param bool $inactive Only show inactive extensions
+     * @param bool $raw Enable machine readable output (just extension keys separated by line feed)
      */
-    public function listActiveCommand($raw = false)
+    public function listCommand($active = false, $inactive = false, $raw = false)
     {
         $extensionInformation = [];
-        foreach ($this->packageManager->getActivePackages() as $package) {
+        if (!$active || $inactive) {
+            $this->emitPackagesMayHaveChangedSignal();
+            $packages = $this->packageManager->getAvailablePackages();
+        } else {
+            $packages = $this->packageManager->getActivePackages();
+        }
+        foreach ($packages as $package) {
+            if ($inactive && $this->packageManager->isPackageActive($package->getPackageKey())) {
+                continue;
+            }
             $metaData = $package->getPackageMetaData();
             $extensionInformation[] = [
                 'package_key' => $package->getPackageKey(),
@@ -178,7 +188,7 @@ class ExtensionCommandController extends CommandController
             ];
         }
         if ($raw) {
-            $this->outputLine('%s', [implode(',', array_column($extensionInformation, 'package_key'))]);
+            $this->outputLine('%s', [implode(PHP_EOL, array_column($extensionInformation, 'package_key'))]);
         } else {
             $this->output->outputTable(
                 $extensionInformation,
