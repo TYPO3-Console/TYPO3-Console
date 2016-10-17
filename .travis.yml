@@ -20,15 +20,15 @@ matrix:
     - php: 7.0
       env: TYPO3_VERSION=^8
     - php: 7.0
-      env: TYPO3_VERSION=dev-master
+      env: TYPO3_VERSION="dev-master as 8.3.1"
     - php: 7.1
       env: TYPO3_VERSION=^7.6
     - php: 7.1
       env: TYPO3_VERSION=^8
     - php: 7.1
-      env: TYPO3_VERSION=dev-master
+      env: TYPO3_VERSION="dev-master as 8.3.1"
   allow_failures:
-    - env: TYPO3_VERSION=dev-master
+    - env: TYPO3_VERSION="dev-master as 8.3.1"
 
 cache:
   directories:
@@ -56,7 +56,7 @@ before_script:
     fi
   - composer extension-create-libs && ls -la Libraries/*.phar | grep -v ^-rwx
   - git clean -dffx
-  - composer require typo3/cms=$TYPO3_VERSION
+  - composer require typo3/cms="$TYPO3_VERSION"
   - export TYPO3_PATH_WEB="$PWD/.Build/Web"
   - ln -s Scripts/typo3cms typo3cms
 
