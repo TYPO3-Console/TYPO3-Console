@@ -161,6 +161,33 @@ class ExtensionCommandController extends CommandController
     }
 
     /**
+     * List active extensions
+     *
+     * @param bool $raw True for a comma separated list of extension keys
+     * @return void
+     */
+    public function listActiveCommand($raw = false)
+    {
+        $extensionInformation = [];
+        foreach ($this->packageManager->getActivePackages() as $package) {
+            $metaData = $package->getPackageMetaData();
+            $extensionInformation[] = [
+                'package_key' => $package->getPackageKey(),
+                'version' => $metaData->getVersion(),
+                'description' => $metaData->getDescription(),
+            ];
+        }
+        if ($raw) {
+            $this->outputLine('%s', [implode(',', array_column($extensionInformation, 'package_key'))]);
+        } else {
+            $this->output->outputTable(
+                $extensionInformation,
+                ['Package key', 'Version', 'Description']
+            );
+        }
+    }
+
+    /**
      * Emits packages may have changed signal
      */
     protected function emitPackagesMayHaveChangedSignal()
