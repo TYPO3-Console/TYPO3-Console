@@ -78,7 +78,7 @@ class Command
         }
         if (count($classNameParts) !== 4 || strpos($classNameParts[3], 'CommandController') === false) {
             throw new \InvalidArgumentException(
-                'Invalid controller class name "' . $controllerClassName . '". Class name must end with "CommandController".',
+                'Invalid controller class name "' . $controllerClassName . '". Class name must have exactly 4 parts and must end with "CommandController" (e.g. Vendor\ExtensionName\Command\MySimpleCommandController).',
                 1305100019
             );
         }

@@ -16,13 +16,22 @@ namespace Helhum\Typo3Console\Service\Database;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateResult;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\ArrayUtility;
 
 /**
  * Service for database schema migrations
  */
 class SchemaService implements SingletonInterface
 {
+    /**
+     * Group of safe statements
+     */
+    const STATEMENT_GROUP_SAFE = 'add_create_change';
+
+    /**
+     * Group of destructive statements
+     */
+    const STATEMENT_GROUP_DESTRUCTIVE = 'drop_rename';
+
     /**
      * @var \TYPO3\CMS\Install\Service\SqlSchemaMigrationService
      * @inject
@@ -41,13 +50,15 @@ class SchemaService implements SingletonInterface
      * @var array
      */
     protected $schemaUpdateTypesStatementTypesMapping = array(
-        SchemaUpdateType::FIELD_ADD => array('add'),
-        SchemaUpdateType::FIELD_CHANGE => array('change'),
-        SchemaUpdateType::FIELD_DROP => array('drop'),
-        SchemaUpdateType::TABLE_ADD => array('create_table'),
-        SchemaUpdateType::TABLE_CHANGE => array('change_table'),
-        SchemaUpdateType::TABLE_CLEAR => array('clear_table'),
-        SchemaUpdateType::TABLE_DROP => array('drop_table'),
+        SchemaUpdateType::FIELD_ADD => array('add' => self::STATEMENT_GROUP_SAFE),
+        SchemaUpdateType::FIELD_CHANGE => array('change' => self::STATEMENT_GROUP_SAFE),
+        SchemaUpdateType::FIELD_PREFIX => array('change' => self::STATEMENT_GROUP_DESTRUCTIVE),
+        SchemaUpdateType::FIELD_DROP => array('drop' => self::STATEMENT_GROUP_DESTRUCTIVE),
+        SchemaUpdateType::TABLE_ADD => array('create_table' => self::STATEMENT_GROUP_SAFE),
+        SchemaUpdateType::TABLE_CHANGE => array('change_table' => self::STATEMENT_GROUP_SAFE),
+        SchemaUpdateType::TABLE_CLEAR => array('clear_table' => self::STATEMENT_GROUP_DESTRUCTIVE),
+        SchemaUpdateType::TABLE_PREFIX => array('change_table' => self::STATEMENT_GROUP_DESTRUCTIVE),
+        SchemaUpdateType::TABLE_DROP => array('drop_table' => self::STATEMENT_GROUP_DESTRUCTIVE),
     );
 
     /**
@@ -64,18 +75,19 @@ class SchemaService implements SingletonInterface
         $addCreateChange = $this->schemaMigrationService->getDatabaseExtra($expectedSchema, $currentSchema);
         $dropRename = $this->schemaMigrationService->getDatabaseExtra($currentSchema, $expectedSchema);
 
-        $updateStatements = array();
-        ArrayUtility::mergeRecursiveWithOverrule($updateStatements, $this->schemaMigrationService->getUpdateSuggestions($addCreateChange));
-        ArrayUtility::mergeRecursiveWithOverrule($updateStatements, $this->schemaMigrationService->getUpdateSuggestions($dropRename, 'remove'));
+        $updateStatements = array(
+            self::STATEMENT_GROUP_SAFE => $this->schemaMigrationService->getUpdateSuggestions($addCreateChange),
+            self::STATEMENT_GROUP_DESTRUCTIVE => $this->schemaMigrationService->getUpdateSuggestions($dropRename, 'remove'),
+        );
 
         $updateResult = new SchemaUpdateResult();
 
         foreach ($schemaUpdateTypes as $schemaUpdateType) {
             $statementTypes = $this->getStatementTypes($schemaUpdateType);
 
-            foreach ($statementTypes as $statementType) {
-                if (isset($updateStatements[$statementType])) {
-                    $statements = $updateStatements[$statementType];
+            foreach ($statementTypes as $statementType => $statementGroup) {
+                if (isset($updateStatements[$statementGroup][$statementType])) {
+                    $statements = $updateStatements[$statementGroup][$statementType];
                     $result = $this->schemaMigrationService->performUpdateQueries(
                         $statements,
                         // Generate a map of statements as keys and true as values

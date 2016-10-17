@@ -37,6 +37,11 @@ class SchemaUpdateType extends Enumeration
     const FIELD_CHANGE = 'field.change';
 
     /**
+    * Prefix a field
+    */
+    const FIELD_PREFIX = 'field.prefix';
+
+    /**
      * Drop a field
      */
     const FIELD_DROP = 'field.drop';
@@ -50,6 +55,11 @@ class SchemaUpdateType extends Enumeration
      * Change a table
      */
     const TABLE_CHANGE = 'table.change';
+
+    /**
+    * Prefix a table
+    */
+    const TABLE_PREFIX = 'table.prefix';
 
     /**
      * Drop a table

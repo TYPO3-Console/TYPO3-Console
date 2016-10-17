@@ -16,7 +16,7 @@ Command Reference
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2016-08-02 22:10:31
+The following reference was automatically generated from code on 2016-10-15 14:34:35
 
 
 .. _`Command Reference: typo3_console`:
@@ -467,9 +467,11 @@ Valid schema update types are:
 
 - field.add
 - field.change
+- field.prefix
 - field.drop
 - table.add
 - table.change
+- table.prefix
 - table.drop
 - table.clear
 
@@ -766,6 +768,8 @@ Options
 
 ``--non-interactive``
   If specified, optional arguments are not requested, but default values are assumed.
+``--force``
+  Force installation of TYPO3, even if ``LocalConfiguration.php`` file already exists.
 ``--database-user-name``
   User name for database server
 ``--database-user-password``

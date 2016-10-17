@@ -42,10 +42,10 @@ class UncachedPackageManager extends PackageManager
         $this->packageStatesFileExists = @file_exists($this->packageStatesPathAndFilename);
         $this->hasExtension = @file_exists(PATH_site . 'typo3conf/ext/typo3_console/ext_emconf.php');
         $this->loadPackageStates();
-        $this->makeConsolePackageProtectedIfNeeded();
+        $this->makeConsolePackageProtected();
         $this->initializePackageObjects();
-        $this->autoActivateConsolePackageIfPossible();
-        $this->registerConsoleClassesIfNeeded();
+        $this->ensureClassLoadingInformationExists();
+        $this->autoActivateConsolePackage();
         $this->initializeCompatibilityLoadedExtArray();
     }
 
@@ -113,31 +113,47 @@ class UncachedPackageManager extends PackageManager
         $this->forceSavePackageStates = false;
     }
 
-    protected function makeConsolePackageProtectedIfNeeded()
+    /**
+     * Workaround for non composer mode
+     *
+     * Force loading of the console in case no package states file is there
+     * This is needed for installation or package states file generation commands
+     */
+    protected function makeConsolePackageProtected()
     {
-        // Force loading of the console in case no package states file is there
         if ($this->hasExtension && !$this->packageStatesFileExists) {
             $this->getPackage('typo3_console')->setProtected(true);
         }
     }
 
-    protected function autoActivateConsolePackageIfPossible()
+    /**
+     * Workaround for non composer mode
+     *
+     * @deprecated since 8.0 will be removed once 7.6 compatiblity is removed
+     */
+    protected function ensureClassLoadingInformationExists()
+    {
+        if (!ConsoleBootstrap::usesComposerClassLoading() && !ClassLoadingInformation::isClassLoadingInformationAvailable()) {
+            ClassLoadingInformation::dumpClassLoadingInformation();
+            ClassLoadingInformation::registerClassLoadingInformation();
+        }
+    }
+
+    /**
+     * Workaround for non composer mode
+     *
+     * Make sure the extension is active
+     */
+    protected function autoActivateConsolePackage()
     {
         if ($this->hasExtension && $this->packageStatesFileExists && !$this->isPackageActive('typo3_console')) {
             $this->scanAvailablePackages();
             $this->activatePackage('typo3_console');
             if (!ConsoleBootstrap::usesComposerClassLoading()) {
+                // Activate Package does not permanently update autoload info
+                // thus we must do so here manually
                 ClassLoadingInformation::dumpClassLoadingInformation();
             }
-        }
-    }
-
-    protected function registerConsoleClassesIfNeeded()
-    {
-        if ($this->hasExtension && !class_exists(\Helhum\Typo3Console\Core\Booting\RunLevel::class)) {
-            // Since the class loader now assumes that this class does not exist, we require it manually here
-            require __DIR__ . '/../Core/Booting/RunLevel.php';
-            ClassLoadingInformation::registerTransientClassLoadingInformationForPackage($this->getPackage('typo3_console'));
         }
     }
 }

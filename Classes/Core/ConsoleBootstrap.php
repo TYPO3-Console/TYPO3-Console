@@ -256,6 +256,11 @@ class ConsoleBootstrap extends Bootstrap
      */
     public function initializePackageManagement($packageManagerClassName = \Helhum\Typo3Console\Package\UncachedPackageManager::class)
     {
+        // Make sure the package manager class is available
+        // the extension might not be active yet, but will be activated in this class
+        if (!self::usesComposerClassLoading() && !class_exists(\Helhum\Typo3Console\Package\UncachedPackageManager::class)) {
+            require __DIR__ . '/../Package/UncachedPackageManager.php';
+        }
         $packageManager = new \Helhum\Typo3Console\Package\UncachedPackageManager();
         $this->setEarlyInstance(\TYPO3\CMS\Core\Package\PackageManager::class, $packageManager);
         Utility\ExtensionManagementUtility::setPackageManager($packageManager);

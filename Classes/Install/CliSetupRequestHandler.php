@@ -105,8 +105,9 @@ class CliSetupRequestHandler
         $this->givenRequestArguments = $givenRequestArguments;
 
         $firstInstallPath = PATH_site . 'FIRST_INSTALL';
-        if (!file_exists($firstInstallPath))
+        if (!file_exists($firstInstallPath)) {
             touch($firstInstallPath);
+        }
 
         foreach ($this->installationActions as $actionName) {
             $this->dispatchAction($actionName);
@@ -124,7 +125,7 @@ class CliSetupRequestHandler
         // TODO: provide pre- and post-execute signals?
         $messages = $this->executeAction($this->createActionWithNameAndArguments($actionName, $arguments));
         // TODO: ultimately get rid of that!
-        if ($actionName === 'databaseData') {
+        if ($messages === [] && $actionName === 'databaseData') {
             /** @var DatabaseConnection $db */
             $db = $GLOBALS['TYPO3_DB'];
             $db->exec_INSERTquery('be_users', array('username' => '_cli_lowlevel'));
@@ -238,20 +239,30 @@ class CliSetupRequestHandler
                     }
                     $argumentValue = null;
                     do {
-                        if ($isPasswordArgument) {
+                        $defaultValue = $argument->getDefaultValue();
+                        $isRequired = $this->isArgumentRequired($argument);
+                        if ($isPasswordArgument && $isRequired) {
                             $argumentValue = $this->output->askHiddenResponse(
+                                sprintf(
+                                    '<comment>%s:</comment> ',
+                                    $argumentDefinition->getDescription()
+                                )
+                            );
+                        } elseif (is_bool($argument->getValue())) {
+                            $argumentValue = (int)$this->output->askConfirmation(
                                 sprintf(
                                     '<comment>%s (%s):</comment> ',
                                     $argumentDefinition->getDescription(),
-                                    $this->isArgumentRequired($argument) ? 'required' : sprintf('default: "%s"', $argument->getDefaultValue())
-                                )
+                                    $isRequired ? 'required' : ($defaultValue ? 'Y/n' : 'y/N')
+                                ),
+                                $defaultValue
                             );
                         } else {
                             $argumentValue = $this->output->ask(
                                 sprintf(
                                     '<comment>%s (%s):</comment> ',
                                     $argumentDefinition->getDescription(),
-                                    $this->isArgumentRequired($argument) ? 'required' : sprintf('default: "%s"', $argument->getDefaultValue())
+                                    $isRequired ? 'required' : sprintf('default: "%s"', $defaultValue === false ? '0' : $defaultValue)
                                 )
                             );
                         }

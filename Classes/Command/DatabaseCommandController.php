@@ -49,9 +49,11 @@ class DatabaseCommandController extends CommandController
      *
      * - field.add
      * - field.change
+     * - field.prefix
      * - field.drop
      * - table.add
      * - table.change
+     * - table.prefix
      * - table.drop
      * - table.clear
      *
