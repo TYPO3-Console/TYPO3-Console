@@ -104,8 +104,12 @@ script:
   - ./typo3cms configuration:set BE/installToolPassword foobar && grep installToolPassword $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php | grep foobar
   - ./typo3cms configuration:remove BE/installToolPassword --force && grep -qv installToolPassword $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php
   - ./typo3cms configuration:set BE/installToolPassword blablupp && grep installToolPassword $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php | grep blablupp
-  - rm -f $TYPO3_PATH_WEB/typo3conf/PackageStates.php && ./typo3cms install:generatepackagestates && [ -f "$TYPO3_PATH_WEB/typo3conf/PackageStates.php" ]
+  - rm -f $TYPO3_PATH_WEB/typo3conf/PackageStates.php && ./typo3cms install:generatepackagestates --activate-default && [ -f "$TYPO3_PATH_WEB/typo3conf/PackageStates.php" ]
   - rm $TYPO3_PATH_WEB/typo3temp/index.html && ./typo3cms install:fixfolderstructure && [ -f "$TYPO3_PATH_WEB/typo3temp/index.html" ]
+  - ./typo3cms extension:list
+  - ./typo3cms extension:list --raw | grep extbase
+  - ./typo3cms extension:list --active --raw | grep extbase
+  - ./typo3cms extension:list --inactive --raw | tr '\n' ' ' | grep -v extbase
 
 after_script:
   - >
