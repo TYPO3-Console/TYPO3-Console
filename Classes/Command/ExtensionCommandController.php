@@ -16,7 +16,6 @@ namespace Helhum\Typo3Console\Command;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\ClassLoadingInformation;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
  * CommandController for working with extension management through CLI
@@ -162,13 +161,30 @@ class ExtensionCommandController extends CommandController
     }
 
     /**
-     * List all installed extensions
+     * List active extensions
      *
+     * @param bool $raw True for a comma separated list of extension keys
      * @return void
      */
-    public function listInstalledCommand()
+    public function listActiveCommand($raw = false)
     {
-        $this->outputLine('%s', [implode(',', ExtensionManagementUtility::getLoadedExtensionListArray())]);
+        $extensionInformation = [];
+        foreach ($this->packageManager->getActivePackages() as $package) {
+            $metaData = $package->getPackageMetaData();
+            $extensionInformation[] = [
+                'package_key' => $package->getPackageKey(),
+                'version' => $metaData->getVersion(),
+                'description' => $metaData->getDescription(),
+            ];
+        }
+        if ($raw) {
+            $this->outputLine('%s', [implode(',', array_column($extensionInformation, 'package_key'))]);
+        } else {
+            $this->output->outputTable(
+                $extensionInformation,
+                ['Package key', 'Version', 'Description']
+            );
+        }
     }
 
     /**
