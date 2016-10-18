@@ -81,7 +81,7 @@ class InstallerScripts
             ];
             foreach ($resources as $resource) {
                 $target = "$extensionDir/$resource";
-                $filesystem->ensureDirectoryExists(basename($target));
+                $filesystem->ensureDirectoryExists(dirname($target));
                 $filesystem->copy("$extResourcesDir/$resource", $target);
             }
             $io->writeError('<info>TYPO3 Console: Installed TYPO3 extension into TYPO3 extension directory</info>');
