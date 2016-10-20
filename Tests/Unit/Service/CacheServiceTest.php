@@ -13,7 +13,9 @@ namespace Helhum\Typo3Console\Tests\Unit\Service;
  *
  */
 
+use Helhum\Typo3Console\Service\CacheService;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
+use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
@@ -28,7 +30,9 @@ class CacheServiceTest extends UnitTestCase
 
     public function setup()
     {
-        $this->subject = $this->getAccessibleMock(\Helhum\Typo3Console\Service\CacheService::class, array('getLogger'));
+        $cacheManagerMock = $this->getMockBuilder(CacheManager::class)->disableOriginalConstructor()->getMock();
+        $configurationServiceMock = $this->getMockBuilder(ConfigurationService::class)->disableOriginalConstructor()->getMock();
+        $this->subject = new CacheService($cacheManagerMock, $configurationServiceMock);
     }
 
     /**
@@ -43,7 +47,7 @@ class CacheServiceTest extends UnitTestCase
             ->expects($this->atLeastOnce())
             ->method('getActive')
             ->will($this->returnValue($mockedConfiguration));
-        $this->subject->_set('configurationService', $configurationServiceMock);
+        $this->inject($this->subject, 'configurationService', $configurationServiceMock);
     }
 
     /**
