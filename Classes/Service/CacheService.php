@@ -13,32 +13,25 @@ namespace Helhum\Typo3Console\Service;
  *
  */
 
+use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
+use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * Class CacheService
- * TODO: This is not really a service in DDD terms: it does not act on domain models, it has dependencies and it holds som kind of state (logger) find a better name/pattern for that.
+ * Cache Service handles all cache clearing related tasks
  */
 class CacheService implements SingletonInterface
 {
     /**
-     * @var \TYPO3\CMS\Core\Cache\CacheManager
-     * @inject
+     * @var CacheManager
      */
     protected $cacheManager;
 
     /**
-     * @var \TYPO3\CMS\Core\Package\PackageManager
-     * @inject
-     */
-    protected $packageManager;
-
-    /**
-     * @var \Helhum\Typo3Console\Service\Configuration\ConfigurationService
-     * @inject
+     * @var ConfigurationService
      */
     protected $configurationService;
 
@@ -50,10 +43,17 @@ class CacheService implements SingletonInterface
     /**
      * Builds the dependencies correctly
      *
+     * @param CacheManager $cacheManager
+     * @param ConfigurationService $configurationService
      * @param DatabaseConnection $databaseConnection
      */
-    public function __construct(DatabaseConnection $databaseConnection = null)
+    public function __construct(
+        CacheManager $cacheManager,
+        ConfigurationService $configurationService,
+        DatabaseConnection $databaseConnection = null)
     {
+        $this->cacheManager = $cacheManager;
+        $this->configurationService = $configurationService;
         $this->databaseConnection = $databaseConnection ?: $GLOBALS['TYPO3_DB'];
     }
 
