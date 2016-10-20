@@ -14,9 +14,11 @@ namespace Helhum\Typo3Console\Service;
  */
 
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
+use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -68,6 +70,31 @@ class CacheService implements SingletonInterface
             $this->forceFlushCoreFileAndDatabaseCaches();
         }
         $this->cacheManager->flushCaches();
+    }
+
+    /**
+     * Flushes caches using the data handler. This should not be necessary any more in the future.
+     * Although we trigger the cache flush API here, the real intention is to trigger
+     * hook subscribers, so that they can do their job (flushing "other" caches when cache is flushed.
+     * For example realurl subscribes to these hooks.
+     *
+     * We use "all" because this method is only called from "flush" command which is indeed meant
+     * to flush all caches. Besides that, "all" is really all caches starting from TYPO3 8.x
+     * thus it would make sense for the hook subscribers to act on that cache clear type.
+     *
+     * However if you find a valid use case for us to also call "pages" here, then please create
+     * a pull request and describe this case. "system" or "temp_cached" will not be added however
+     * because these are deprecated since TYPO3 8.x
+     *
+     * Besides that, this DataHandler API is probably something to be removed in TYPO3,
+     * so we deprecate and mark this method as internal at the same time.
+     *
+     * @deprecated
+     * @internal
+     */
+    public function flushCachesWithDataHandler()
+    {
+        self::createDataHandlerFromGlobals()->clear_cacheCmd('all');
     }
 
     /**
@@ -166,5 +193,22 @@ class CacheService implements SingletonInterface
                 $this->databaseConnection->exec_TRUNCATEquery($tableName);
             }
         }
+    }
+
+    /**
+     * Create a data handler instance from global state (with user being admin)
+     * @internal
+     * @return DataHandler
+     */
+    private static function createDataHandlerFromGlobals()
+    {
+        if (empty($GLOBALS['BE_USER']) || !$GLOBALS['BE_USER'] instanceof BackendUserAuthentication) {
+            throw new \RuntimeException('No backend user initialized. flushCachesWithDataHandler needs fully initialized TYPO3', 1477066610);
+        }
+        $user = clone $GLOBALS['BE_USER'];
+        $user->admin = 1;
+        $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
+        $dataHandler->start([], [], $user);
+        return $dataHandler;
     }
 }
