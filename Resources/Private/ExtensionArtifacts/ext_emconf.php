@@ -11,7 +11,7 @@ $EM_CONF[$_EXTKEY] = array(
   'author' => 'Helmut Hummel',
   'author_email' => 'info@helhum.io',
   'author_company' => 'helhum.io',
-  'version' => '4.0.0',
+  'version' => '3.5.0',
   'constraints' =>
   array(
     'depends' =>
