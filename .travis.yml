@@ -76,6 +76,7 @@ script:
       typo3cms | grep $TRAVIS_TAG
     fi
   - typo3cms help && [ ! -f "$TYPO3_PATH_WEB/typo3conf/PackageStates.php" ]
+  - ln -s FinalConfiguration.php $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php
   - typo3cms install:setup --non-interactive --database-user-name="root" --database-host-name="localhost" --database-port="3306" --database-name="travis_test" --admin-user-name="admin" --admin-password="password" --site-name="Travis Install" --site-setup-type="createsite"
   - echo 'select uid,title from pages limit 1' | typo3cms database:import | sed 's/[[:blank:]]//g' | grep 1Home
   - typo3cms help

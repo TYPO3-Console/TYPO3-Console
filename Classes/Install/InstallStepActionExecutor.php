@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Install;
  *
  */
 
+use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Install\Controller\Action\ActionInterface;
@@ -32,12 +33,26 @@ class InstallStepActionExecutor
     private $objectManager;
 
     /**
-     * @param ObjectManager $objectManager
+     * @var ConfigurationManager
      */
-    public function __construct(ObjectManager $objectManager)
+    private $configurationManager;
+
+    /**
+     * @var SilentConfigurationUpgradeService
+     */
+    private $silentConfigurationUpgradeService;
+
+    /**
+     * @param ObjectManager $objectManager
+     * @param ConfigurationManager|null $configurationManager
+     * @param SilentConfigurationUpgradeService|null $silentConfigurationUpgradeService
+     */
+    public function __construct(ObjectManager $objectManager, ConfigurationManager $configurationManager = null, SilentConfigurationUpgradeService $silentConfigurationUpgradeService = null)
     {
         // @deprecated Object Manager can be removed, once TYPO3 7.6 support is removed
         $this->objectManager = $objectManager;
+        $this->configurationManager = $configurationManager ?: GeneralUtility::makeInstance(ConfigurationManager::class);
+        $this->silentConfigurationUpgradeService = $silentConfigurationUpgradeService ?: $objectManager->get(SilentConfigurationUpgradeService::class);
     }
 
     /**
@@ -86,11 +101,29 @@ class InstallStepActionExecutor
             return new InstallStepResponse(true, $messages, true);
         }
         if ($needsExecution && !$dryRun) {
+            $this->ensureLocalConfigurationFileExists();
             $messages = $action->execute();
             $this->executeSilentConfigurationUpgradesIfNeeded();
             $needsExecution = false;
         }
         return new InstallStepResponse($needsExecution, $messages);
+    }
+
+    /**
+     * This is a hack to allow installation on environments like platformsh
+     * where LocalConfiguration.php is a symlink to a writable mount,
+     * while typo3conf is not writable.
+     */
+    private function ensureLocalConfigurationFileExists()
+    {
+        $localConfPath = $this->configurationManager->getLocalConfigurationFileLocation();
+        $localConfDir = dirname($localConfPath);
+        if (!file_exists($localConfDir)) {
+            GeneralUtility::mkdir_deep($localConfDir);
+        }
+        if (!file_exists($localConfPath)) {
+            touch($localConfPath);
+        }
     }
 
     /**
@@ -101,15 +134,11 @@ class InstallStepActionExecutor
      */
     private function executeSilentConfigurationUpgradesIfNeeded()
     {
-        if (!file_exists(GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\ConfigurationManager::class)->getLocalConfigurationFileLocation())) {
-            return;
-        }
-        $upgradeService = $this->objectManager->get(SilentConfigurationUpgradeService::class);
         $count = 0;
         do {
             try {
                 $count++;
-                $upgradeService->execute();
+                $this->silentConfigurationUpgradeService->execute();
                 $redirect = false;
             } catch (RedirectException $e) {
                 $redirect = true;
@@ -126,6 +155,6 @@ class InstallStepActionExecutor
      */
     private function reloadConfiguration()
     {
-        GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\ConfigurationManager::class)->exportConfiguration();
+        $this->configurationManager->exportConfiguration();
     }
 }

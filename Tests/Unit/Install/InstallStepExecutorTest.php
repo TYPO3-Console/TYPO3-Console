@@ -15,9 +15,11 @@ namespace Helhum\Typo3Console\Tests\Unit\Install;
 
 use Helhum\Typo3Console\Install\InstallStepActionExecutor;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
+use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Install\Controller\Action\Step\AbstractStepAction;
 use TYPO3\CMS\Install\Controller\Exception\RedirectException;
+use TYPO3\CMS\Install\Service\SilentConfigurationUpgradeService;
 
 class InstallStepExecutorTest extends UnitTestCase
 {
@@ -97,7 +99,13 @@ class InstallStepExecutorTest extends UnitTestCase
         $objectManagerMock->expects($this->any())
             ->method('get')
             ->willReturn($actionMock);
-        $executor = new InstallStepActionExecutor($objectManagerMock);
+        $configurationManagerMock = $this->getMockBuilder(ConfigurationManager::class)->disableOriginalConstructor()->getMock();
+        $configurationManagerMock->expects($this->any())
+            ->method('getLocalConfigurationFileLocation')
+            ->willReturn(__FILE__);
+        $silentConfigurationUpgradeServiceMock = $this->getMockBuilder(SilentConfigurationUpgradeService::class)->disableOriginalConstructor()->getMock();
+
+        $executor = new InstallStepActionExecutor($objectManagerMock, $configurationManagerMock, $silentConfigurationUpgradeServiceMock);
         $response = $executor->executeActionWithArguments('test', []);
         $this->assertFalse($response->actionNeedsExecution());
     }

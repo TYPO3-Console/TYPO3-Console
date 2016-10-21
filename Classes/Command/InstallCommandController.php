@@ -301,7 +301,8 @@ class InstallCommandController extends CommandController
     {
         $localConfFile = PATH_typo3conf . 'LocalConfiguration.php';
         $packageStatesFile = PATH_typo3conf . 'PackageStates.php';
-        if (!$force && file_exists($localConfFile)) {
+
+        if (!$force && @is_file($localConfFile)) {
             $this->outputLine();
             $this->outputLine('<error>TYPO3 seems to be already set up!</error>');
             $proceed = !$nonInteractive;
@@ -317,11 +318,11 @@ class InstallCommandController extends CommandController
                 $this->outputLine('<error>Installation aborted!</error>');
                 $this->quit(2);
             }
+            @unlink($localConfFile);
         }
-        @unlink($localConfFile);
         @unlink($packageStatesFile);
         clearstatcache();
-        if (file_exists($localConfFile)) {
+        if (@is_file($localConfFile)) {
             $this->outputLine();
             $this->outputLine('<error>Unable to delete configuration file!</error>');
             $this->outputLine('<error>Installation aborted!</error>');
