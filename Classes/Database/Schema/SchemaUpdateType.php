@@ -81,7 +81,7 @@ class SchemaUpdateType extends Enumeration
     public static function expandSchemaUpdateTypes(array $schemaUpdateTypes)
     {
         $expandedSchemaUpdateTypes = array();
-        $schemaUpdateTypeConstants = array_values(SchemaUpdateType::getConstants());
+        $schemaUpdateTypeConstants = array_values(self::getConstants());
 
         // Collect total list of types by expanding wildcards
         foreach ($schemaUpdateTypes as $schemaUpdateType) {
@@ -97,7 +97,7 @@ class SchemaUpdateType extends Enumeration
         // Cast to enumeration objects to ensure valid values
         foreach ($expandedSchemaUpdateTypes as &$schemaUpdateType) {
             try {
-                $schemaUpdateType = SchemaUpdateType::cast($schemaUpdateType);
+                $schemaUpdateType = self::cast($schemaUpdateType);
             } catch (InvalidEnumerationValueException $e) {
                 throw new InvalidEnumerationValueException(sprintf(
                     'Invalid schema update type "%s", must be one of: "%s"',

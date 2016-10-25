@@ -53,6 +53,17 @@ return Symfony\CS\Config\Config::create()
         'extra_empty_lines',
         'phpdoc_no_package',
         'phpdoc_scalar',
-        'no_empty_lines_after_phpdocs'
+        'no_empty_lines_after_phpdocs',
+        'array_element_white_space_after_comma',
+        'function_typehint_space',
+        'hash_to_slash_comment',
+        'join_function',
+        'lowercase_cast',
+        'namespace_no_leading_whitespace',
+        'native_function_casing',
+        'no_empty_statement',
+        'self_accessor',
+        'short_bool_cast',
+        'unneeded_control_parentheses'
     ])
     ->finder($finder);

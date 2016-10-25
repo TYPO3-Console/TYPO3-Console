@@ -180,7 +180,8 @@ class RunLevel
     protected function addStep($sequence, $stepIdentifier)
     {
         if (!empty($this->executedSteps[$stepIdentifier])) {
-            $sequence->addStep(new Step($stepIdentifier, function () {}));
+            $sequence->addStep(new Step($stepIdentifier, function () {
+            }));
             return;
         }
         $this->executedSteps[$stepIdentifier] = true;

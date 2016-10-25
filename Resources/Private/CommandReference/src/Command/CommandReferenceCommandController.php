@@ -92,7 +92,9 @@ class CommandReferenceCommandController extends CommandController
         }
         $referenceConfiguration = $this->settings['commandReferences'][$reference];
         $extensionKeysToRender = $referenceConfiguration['extensionKeys'];
-        array_walk($extensionKeysToRender, function (&$extensionKey) {$extensionKey = strtolower($extensionKey);});
+        array_walk($extensionKeysToRender, function (&$extensionKey) {
+            $extensionKey = strtolower($extensionKey);
+        });
 
         $availableCommands = $this->commandManager->getAvailableCommands();
         $commands = $this->buildCommandsIndex($availableCommands);
