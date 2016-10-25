@@ -1,5 +1,10 @@
-TYPO3 CMS Console [![Build Status](https://travis-ci.org/TYPO3-Console/typo3_console.svg?branch=master)](https://travis-ci.org/TYPO3-Console/typo3_console)
+TYPO3 CMS Console
 =================
+
+[![Build Status](https://travis-ci.org/TYPO3-Console/typo3_console.svg?branch=master)](https://travis-ci.org/TYPO3-Console/typo3_console)
+[![StyleCI](https://styleci.io/repos/19455482/shield?branch=master)](https://styleci.io/repos/19455482)
+[![Latest Stable Version](https://poser.pugx.org/helhum/typo3-console/v/stable.svg)](https://packagist.org/packages/helhum/typo3-console)
+[![Total Downloads](https://poser.pugx.org/helhum/typo3-console/downloads.svg)](https://packagist.org/packages/helhum/typo3-console)
 
 Many frameworks come with command helper tools that enables interactions on the command line easily.
 TYPO3 CMS currently has CLI support, but no dedicated command tool but only a CLI dispatcher script
