@@ -80,7 +80,7 @@ class SchemaUpdateType extends Enumeration
      */
     public static function expandSchemaUpdateTypes(array $schemaUpdateTypes)
     {
-        $expandedSchemaUpdateTypes = array();
+        $expandedSchemaUpdateTypes = [];
         $schemaUpdateTypeConstants = array_values(self::getConstants());
 
         // Collect total list of types by expanding wildcards

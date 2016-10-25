@@ -29,7 +29,7 @@ class Scripts
     /**
      * @var array
      */
-    protected static $earlyCachesConfiguration = array();
+    protected static $earlyCachesConfiguration = [];
 
     /**
      * @param ConsoleBootstrap $bootstrap
@@ -44,13 +44,13 @@ class Scripts
     {
         $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
         foreach (
-            array(
+            [
                 'extbase_object',
                 'extbase_reflection',
                 'extbase_typo3dbbackend_tablecolumns',
                 'extbase_typo3dbbackend_queries',
                 'extbase_datamapfactory_datamap',
-            ) as $id) {
+            ] as $id) {
             if (!isset($cacheConfigurations[$id])) {
                 continue;
             }
@@ -60,15 +60,15 @@ class Scripts
             } else {
                 $cacheConfigurations[$id]['backend'] = NullBackend::class;
             }
-            $cacheConfigurations[$id]['options'] = array();
+            $cacheConfigurations[$id]['options'] = [];
         }
     }
 
     public static function initializeErrorHandling()
     {
         $errorHandler = new ErrorHandler();
-        $errorHandler->setExceptionalErrors(array(E_WARNING, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_RECOVERABLE_ERROR));
-        set_error_handler(array($errorHandler, 'handleError'));
+        $errorHandler->setExceptionalErrors([E_WARNING, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_RECOVERABLE_ERROR]);
+        set_error_handler([$errorHandler, 'handleError']);
         ini_set('display_errors', 1);
         if (((bool)ini_get('display_errors') && strtolower(ini_get('display_errors')) !== 'on' && strtolower(ini_get('display_errors')) !== '1') || !(bool)ini_get('display_errors')) {
             echo 'WARNING: Fatal errors will be suppressed due to your PHP config. You should consider enabling display_errors in your php.ini file!' . chr(10);
@@ -82,10 +82,10 @@ class Scripts
     {
         $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
         foreach (
-            array(
+            [
                 'cache_core',
                 'dbal',
-            ) as $id) {
+            ] as $id) {
             if (isset($cacheConfigurations[$id])) {
                 self::$earlyCachesConfiguration[$id] = $cacheConfigurations[$id];
             }
@@ -110,7 +110,7 @@ class Scripts
         $reflectionObject = new \ReflectionObject($cacheManager);
         $property = $reflectionObject->getProperty('caches');
         $property->setAccessible(true);
-        $property->setValue($cacheManager, array());
+        $property->setValue($cacheManager, []);
     }
 
     /**

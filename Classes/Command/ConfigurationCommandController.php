@@ -50,7 +50,7 @@ class ConfigurationCommandController extends CommandController implements Single
     {
         foreach ($paths as $path) {
             if (!$this->configurationService->localIsActive($path)) {
-                $this->outputLine('<warning>The configuration path "%s" is overwritten by custom configuration options. Removing from local configuration will have no effect.</warning>', array($path));
+                $this->outputLine('<warning>The configuration path "%s" is overwritten by custom configuration options. Removing from local configuration will have no effect.</warning>', [$path]);
             }
             if (!$force && $this->configurationService->hasLocal($path)) {
                 $reallyDelete = $this->output->askConfirmation('Remove ' . $path . ' from system configuration (TYPO3_CONF_VARS)? (yes/<b>no</b>): ', false);
@@ -60,9 +60,9 @@ class ConfigurationCommandController extends CommandController implements Single
             }
             $removed = $this->configurationService->removeLocal($path);
             if ($removed) {
-                $this->outputLine('<info>Removed "%s" from system configuration</info>', array($path));
+                $this->outputLine('<info>Removed "%s" from system configuration</info>', [$path]);
             } else {
-                $this->outputLine('<warning>Path "%s" seems invalid or empty. Nothing done!</warning>', array($path));
+                $this->outputLine('<warning>Path "%s" seems invalid or empty. Nothing done!</warning>', [$path]);
             }
         }
     }
@@ -81,7 +81,7 @@ class ConfigurationCommandController extends CommandController implements Single
     public function showCommand($path)
     {
         if (!$this->configurationService->hasActive($path) && !$this->configurationService->hasLocal($path)) {
-            $this->outputLine('<error>No configuration found for path "%s"</error>', array($path));
+            $this->outputLine('<error>No configuration found for path "%s"</error>', [$path]);
             $this->quit(1);
         }
         if ($this->configurationService->localIsActive($path) && $this->configurationService->hasActive($path)) {
@@ -113,7 +113,7 @@ class ConfigurationCommandController extends CommandController implements Single
     public function showActiveCommand($path)
     {
         if (!$this->configurationService->hasActive($path)) {
-            $this->outputLine('<error>No configuration found for path "%s"</error>', array($path));
+            $this->outputLine('<error>No configuration found for path "%s"</error>', [$path]);
             $this->quit(1);
         }
         $active = $this->configurationService->getActive($path);
@@ -135,7 +135,7 @@ class ConfigurationCommandController extends CommandController implements Single
     public function showLocalCommand($path)
     {
         if (!$this->configurationService->hasLocal($path)) {
-            $this->outputLine('<error>No configuration found for path "%s"</error>', array($path));
+            $this->outputLine('<error>No configuration found for path "%s"</error>', [$path]);
             $this->quit(1);
         }
         $active = $this->configurationService->getLocal($path);
@@ -155,13 +155,13 @@ class ConfigurationCommandController extends CommandController implements Single
     public function setCommand($path, $value)
     {
         if (!$this->configurationService->hasLocal($path) || !$this->configurationService->localIsActive($path)) {
-            $this->outputLine('<error>Cannot set local configuration for path "%s"</error>', array($path));
+            $this->outputLine('<error>Cannot set local configuration for path "%s"</error>', [$path]);
             $this->quit(1);
         }
         if ($this->configurationService->setLocal($path, $value)) {
-            $this->outputLine('<info>Successfully set value for path "%s"</info>', array($path));
+            $this->outputLine('<info>Successfully set value for path "%s"</info>', [$path]);
         } else {
-            $this->outputLine('<error>Could not set value "%s" for configuration path "%s"</error>', array($value, $path));
+            $this->outputLine('<error>Could not set value "%s" for configuration path "%s"</error>', [$value, $path]);
         }
     }
 }

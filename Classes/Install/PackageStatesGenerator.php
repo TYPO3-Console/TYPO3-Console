@@ -52,7 +52,7 @@ class PackageStatesGenerator
      */
     public function getFrameworkExtensionsFromConfiguration()
     {
-        $configuredExtensions = array();
+        $configuredExtensions = [];
         if (getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS')) {
             $configuredExtensions = array_flip(explode(',', getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS')));
         }

@@ -46,34 +46,34 @@ class ConfigurationServiceTest extends UnitTestCase
     /**
      * @var array
      */
-    protected $activeConfiguration = array(
-        'main' => array(
+    protected $activeConfiguration = [
+        'main' => [
             'default' => 'value',
             'bla' => 'blupp',
             'baz' => 'bah',
             'foo' => 'bar'
-        )
-    );
+        ]
+    ];
 
     public function setup()
     {
         $this->configurationManager = $this->getMock(ConfigurationManager::class);
         $this->configurationManager->expects($this->any())
             ->method('getLocalConfiguration')
-            ->willReturn(array(
-                'main' => array(
+            ->willReturn([
+                'main' => [
                     'bla' => 'blupp',
                     'bazz' => 'buh',
                     'foo' => 'baz'
-                )
-            ));
+                ]
+            ]);
         $this->configurationManager->expects($this->any())
             ->method('getDefaultConfiguration')
-            ->willReturn(array(
-                'main' => array(
+            ->willReturn([
+                'main' => [
                     'default' => 'value',
-                )
-            ));
+                ]
+            ]);
         $this->subject = new ConfigurationService($this->configurationManager, $this->activeConfiguration);
     }
 
@@ -101,12 +101,12 @@ class ConfigurationServiceTest extends UnitTestCase
     public function getActiveWillReturnActiveConfiguration()
     {
         $this->assertSame(
-            array(
+            [
                 'default' => 'value',
                 'bla' => 'blupp',
                 'bazz' => 'buh',
                 'foo' => 'baz'
-            ),
+            ],
             $this->subject->getLocal('main')
         );
     }
@@ -117,12 +117,12 @@ class ConfigurationServiceTest extends UnitTestCase
     public function getLocalWillReturnMergedDefaultConfiguration()
     {
         $this->assertSame(
-            array(
+            [
                 'default' => 'value',
                 'bla' => 'blupp',
                 'baz' => 'bah',
                 'foo' => 'bar'
-            ),
+            ],
             $this->subject->getActive('main')
         );
     }

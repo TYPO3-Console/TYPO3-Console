@@ -32,7 +32,7 @@ class ConsoleWriter extends AbstractWriter
      */
     protected $messageWrap = '|';
 
-    protected $severityTagMapping = array(
+    protected $severityTagMapping = [
         LogLevel::EMERGENCY => '<error>|</error>',
         LogLevel::ALERT => '<error>|</error>',
         LogLevel::CRITICAL => '<error>|</error>',
@@ -41,7 +41,7 @@ class ConsoleWriter extends AbstractWriter
         LogLevel::NOTICE => '<fg=yellow>|</fg=yellow>',
         LogLevel::INFO => '<info>|</info>',
         LogLevel::DEBUG => '|'
-    );
+    ];
     /**
      * @param OutputInterface $output
      */

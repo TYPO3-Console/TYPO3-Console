@@ -54,6 +54,7 @@ return Symfony\CS\Config\Config::create()
         'phpdoc_no_package',
         'phpdoc_scalar',
         'no_empty_lines_after_phpdocs',
+        'short_array_syntax',
         'array_element_white_space_after_comma',
         'function_typehint_space',
         'hash_to_slash_comment',

@@ -51,11 +51,11 @@ class UncachedPackageManager extends PackageManager
 
     protected function loadPackageStates()
     {
-        $this->packageStatesConfiguration = $this->packageStatesFileExists ? include($this->packageStatesPathAndFilename) : array();
+        $this->packageStatesConfiguration = $this->packageStatesFileExists ? include($this->packageStatesPathAndFilename) : [];
         if (!isset($this->packageStatesConfiguration['version']) || $this->packageStatesConfiguration['version'] < 4) {
-            $this->packageStatesConfiguration = array();
+            $this->packageStatesConfiguration = [];
         }
-        if ($this->packageStatesConfiguration === array()) {
+        if ($this->packageStatesConfiguration === []) {
             $this->scanAvailablePackages();
         } else {
             $this->registerPackagesFromConfiguration($this->packageStatesConfiguration['packages']);
@@ -82,7 +82,7 @@ class UncachedPackageManager extends PackageManager
     protected function sortActivePackagesByDependencies()
     {
         if (!$this->forceSavePackageStates) {
-            return array();
+            return [];
         }
         return parent::sortActivePackagesByDependencies();
     }

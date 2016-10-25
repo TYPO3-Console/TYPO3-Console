@@ -1,5 +1,5 @@
 <?php
-$EM_CONF[$_EXTKEY] = array(
+$EM_CONF[$_EXTKEY] = [
   'title' => 'TYPO3 Console',
   'description' => 'A reliable and powerful command line interface for TYPO3 CMS',
   'category' => 'cli',
@@ -13,16 +13,16 @@ $EM_CONF[$_EXTKEY] = array(
   'author_company' => 'helhum.io',
   'version' => '4.0.0',
   'constraints' =>
-  array(
+  [
     'depends' =>
-    array(
+    [
       'typo3' => '7.6.0-8.4.99',
-    ),
+    ],
     'conflicts' =>
-    array(
-    ),
+    [
+    ],
     'suggests' =>
-    array(
-    ),
-  ),
-);
+    [
+    ],
+  ],
+];

@@ -117,11 +117,11 @@ class PhpParserTest extends UnitTestCase
      */
     public function nonNamespacedClassesDataProvider()
     {
-        return array(
-            'normal class' => array('class Tx_Ext_Bar {', array('className' => 'Bar', 'namespace' => 'Tx_Ext', 'separator' => '_', 'full' => 'Tx_Ext_Bar')),
-            'abstract class' => array('abstract class Tx_Ext_BarAbstract {', array('className' => 'BarAbstract', 'namespace' => 'Tx_Ext', 'separator' => '_', 'full' => 'Tx_Ext_BarAbstract')),
-            'without namespace' => array('class TxExtBar {', array('className' => 'TxExtBar', 'namespace' => '', 'separator' => '', 'full' => 'TxExtBar')),
-        );
+        return [
+            'normal class' => ['class Tx_Ext_Bar {', ['className' => 'Bar', 'namespace' => 'Tx_Ext', 'separator' => '_', 'full' => 'Tx_Ext_Bar']],
+            'abstract class' => ['abstract class Tx_Ext_BarAbstract {', ['className' => 'BarAbstract', 'namespace' => 'Tx_Ext', 'separator' => '_', 'full' => 'Tx_Ext_BarAbstract']],
+            'without namespace' => ['class TxExtBar {', ['className' => 'TxExtBar', 'namespace' => '', 'separator' => '', 'full' => 'TxExtBar']],
+        ];
     }
 
     /**

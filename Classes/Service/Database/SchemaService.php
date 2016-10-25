@@ -49,17 +49,17 @@ class SchemaService implements SingletonInterface
      *
      * @var array
      */
-    protected $schemaUpdateTypesStatementTypesMapping = array(
-        SchemaUpdateType::FIELD_ADD => array('add' => self::STATEMENT_GROUP_SAFE),
-        SchemaUpdateType::FIELD_CHANGE => array('change' => self::STATEMENT_GROUP_SAFE),
-        SchemaUpdateType::FIELD_PREFIX => array('change' => self::STATEMENT_GROUP_DESTRUCTIVE),
-        SchemaUpdateType::FIELD_DROP => array('drop' => self::STATEMENT_GROUP_DESTRUCTIVE),
-        SchemaUpdateType::TABLE_ADD => array('create_table' => self::STATEMENT_GROUP_SAFE),
-        SchemaUpdateType::TABLE_CHANGE => array('change_table' => self::STATEMENT_GROUP_SAFE),
-        SchemaUpdateType::TABLE_CLEAR => array('clear_table' => self::STATEMENT_GROUP_DESTRUCTIVE),
-        SchemaUpdateType::TABLE_PREFIX => array('change_table' => self::STATEMENT_GROUP_DESTRUCTIVE),
-        SchemaUpdateType::TABLE_DROP => array('drop_table' => self::STATEMENT_GROUP_DESTRUCTIVE),
-    );
+    protected $schemaUpdateTypesStatementTypesMapping = [
+        SchemaUpdateType::FIELD_ADD => ['add' => self::STATEMENT_GROUP_SAFE],
+        SchemaUpdateType::FIELD_CHANGE => ['change' => self::STATEMENT_GROUP_SAFE],
+        SchemaUpdateType::FIELD_PREFIX => ['change' => self::STATEMENT_GROUP_DESTRUCTIVE],
+        SchemaUpdateType::FIELD_DROP => ['drop' => self::STATEMENT_GROUP_DESTRUCTIVE],
+        SchemaUpdateType::TABLE_ADD => ['create_table' => self::STATEMENT_GROUP_SAFE],
+        SchemaUpdateType::TABLE_CHANGE => ['change_table' => self::STATEMENT_GROUP_SAFE],
+        SchemaUpdateType::TABLE_CLEAR => ['clear_table' => self::STATEMENT_GROUP_DESTRUCTIVE],
+        SchemaUpdateType::TABLE_PREFIX => ['change_table' => self::STATEMENT_GROUP_DESTRUCTIVE],
+        SchemaUpdateType::TABLE_DROP => ['drop_table' => self::STATEMENT_GROUP_DESTRUCTIVE],
+    ];
 
     /**
      * Perform necessary database schema migrations
@@ -75,10 +75,10 @@ class SchemaService implements SingletonInterface
         $addCreateChange = $this->schemaMigrationService->getDatabaseExtra($expectedSchema, $currentSchema);
         $dropRename = $this->schemaMigrationService->getDatabaseExtra($currentSchema, $expectedSchema);
 
-        $updateStatements = array(
+        $updateStatements = [
             self::STATEMENT_GROUP_SAFE => $this->schemaMigrationService->getUpdateSuggestions($addCreateChange),
             self::STATEMENT_GROUP_DESTRUCTIVE => $this->schemaMigrationService->getUpdateSuggestions($dropRename, 'remove'),
-        );
+        ];
 
         $updateResult = new SchemaUpdateResult();
 
