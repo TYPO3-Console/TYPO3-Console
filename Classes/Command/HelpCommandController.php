@@ -56,7 +56,7 @@ class HelpCommandController extends CommandController
      */
     public function helpCommand($commandIdentifier = null)
     {
-        $this->outputLine('<info>TYPO3 Console</info> version <comment>%s</comment>', array($this->version));
+        $this->outputLine('<info>TYPO3 Console</info> version <comment>%s</comment>', [$this->version]);
         $this->outputLine();
 
         if ($commandIdentifier === null) {
@@ -85,7 +85,7 @@ class HelpCommandController extends CommandController
 
         foreach ($this->commands as $shortCommandIdentifier => $command) {
             $description = $this->wordWrap($command->getShortDescription(), 43);
-            $this->outputLine('%-2s<info>%-40s</info> %s', array(' ', $shortCommandIdentifier, $description));
+            $this->outputLine('%-2s<info>%-40s</info> %s', [' ', $shortCommandIdentifier, $description]);
         }
 
         $this->outputLine();
@@ -123,9 +123,9 @@ class HelpCommandController extends CommandController
                 $argumentDescription = $commandArgumentDefinition->getDescription();
                 $argumentDescription = $this->wordWrap($argumentDescription, 23);
                 if ($commandArgumentDefinition->isRequired()) {
-                    $argumentDescriptions[] = vsprintf('  <info>%-20s</info> %s', array($commandArgumentDefinition->getDashedName(), $argumentDescription));
+                    $argumentDescriptions[] = vsprintf('  <info>%-20s</info> %s', [$commandArgumentDefinition->getDashedName(), $argumentDescription]);
                 } else {
-                    $optionDescriptions[] = vsprintf('  <info>%-20s</info> %s', array($commandArgumentDefinition->getDashedName(), $argumentDescription));
+                    $optionDescriptions[] = vsprintf('  <info>%-20s</info> %s', [$commandArgumentDefinition->getDashedName(), $argumentDescription]);
                 }
             }
         }
@@ -148,7 +148,7 @@ class HelpCommandController extends CommandController
             $this->outputLine('<comment>Help:</comment>');
             $descriptionLines = explode(chr(10), $command->getDescription());
             foreach ($descriptionLines as $descriptionLine) {
-                $this->outputLine('%-2s%s', array(' ', $descriptionLine));
+                $this->outputLine('%-2s%s', [' ', $descriptionLine]);
             }
         }
         $relatedCommandIdentifiers = $command->getRelatedCommandIdentifiers();
@@ -157,7 +157,7 @@ class HelpCommandController extends CommandController
             $this->outputLine('<comment>Related Commands:</comment>');
             foreach ($relatedCommandIdentifiers as $commandIdentifier) {
                 $command = $this->commandManager->getCommandByIdentifier($commandIdentifier);
-                $this->outputLine('%-2s%s (%s)', array(' ', $this->commandManager->getShortestIdentifierForCommand($command), $command->getShortDescription()));
+                $this->outputLine('%-2s%s (%s)', [' ', $this->commandManager->getShortestIdentifierForCommand($command), $command->getShortDescription()]);
             }
         }
         $this->outputLine();
@@ -172,13 +172,13 @@ class HelpCommandController extends CommandController
      */
     public function errorCommand(\TYPO3\CMS\Extbase\Mvc\Exception\CommandException $exception)
     {
-        $this->outputLine('<info>TYPO3 Console</info> version <comment>%s</comment>', array(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getExtensionVersion('typo3_console')));
+        $this->outputLine('<info>TYPO3 Console</info> version <comment>%s</comment>', [\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getExtensionVersion('typo3_console')]);
         $this->outputLine();
-        $this->outputLine('<error>%s</error>', array($exception->getMessage()));
+        $this->outputLine('<error>%s</error>', [$exception->getMessage()]);
         if ($exception instanceof \TYPO3\CMS\Extbase\Mvc\Exception\AmbiguousCommandIdentifierException) {
             $this->outputLine('Please specify the complete command identifier. Matched commands:');
             foreach ($exception->getMatchingCommands() as $matchingCommand) {
-                $this->outputLine('    %s', array($matchingCommand->getCommandIdentifier()));
+                $this->outputLine('    %s', [$matchingCommand->getCommandIdentifier()]);
             }
         }
         $this->outputLine('');
@@ -260,8 +260,8 @@ SWITCHCASE;
             }
 
             $switchContent .= str_replace(
-                array('%%COMMAND%%', '%%COMMAND_OPTIONS%%'),
-                array($command, implode(' ', $options)),
+                ['%%COMMAND%%', '%%COMMAND_OPTIONS%%'],
+                [$command, implode(' ', $options)],
                 $switchCaseTemplate
             ) . "\n        ";
         }
@@ -270,7 +270,7 @@ SWITCHCASE;
         // dump
         $template = file_get_contents(__DIR__ . '/../../Resources/Private/AutocompleteTemplates/cached.' . $shell . '.tpl');
         $script = 'typo3cms';
-        $tools = array($script);
+        $tools = [$script];
 
         if ($aliases) {
             $aliases = array_filter(preg_split('/\s+/', implode(' ', $aliases)));
@@ -292,8 +292,8 @@ SWITCHCASE;
         }
 
         $this->output->output(str_replace(
-            array('%%SCRIPT%%', '%%COMMANDS%%', '%%SHARED_OPTIONS%%', '%%SWITCH_CONTENT%%', '%%TOOLS%%'),
-            array($script, implode(' ', $commands), '', $switchContent, implode("\n", $tools)),
+            ['%%SCRIPT%%', '%%COMMANDS%%', '%%SHARED_OPTIONS%%', '%%SWITCH_CONTENT%%', '%%TOOLS%%'],
+            [$script, implode(' ', $commands), '', $switchContent, implode("\n", $tools)],
             $template
         ));
     }

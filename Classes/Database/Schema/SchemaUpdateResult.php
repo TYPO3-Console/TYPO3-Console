@@ -21,12 +21,12 @@ class SchemaUpdateResult
     /**
      * @var array $performedUpdates
      */
-    protected $performedUpdates = array();
+    protected $performedUpdates = [];
 
     /**
      * @var array $errors
      */
-    protected $errors = array();
+    protected $errors = [];
 
     /**
      * Returns the list of performed updates, grouped by schema update type

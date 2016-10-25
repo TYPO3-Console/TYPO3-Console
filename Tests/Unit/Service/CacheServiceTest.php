@@ -56,18 +56,18 @@ class CacheServiceTest extends UnitTestCase
     public function cacheGroupsAreRetrievedCorrectlyFromConfiguration()
     {
         $this->setCacheConfiguration(
-            array(
-                'cache_foo' => array('groups' => array('first', 'second')),
-                'cache_bar' => array('groups' => array('third', 'second')),
-                'cache_baz' => array('groups' => array('first', 'third')),
-            )
+            [
+                'cache_foo' => ['groups' => ['first', 'second']],
+                'cache_bar' => ['groups' => ['third', 'second']],
+                'cache_baz' => ['groups' => ['first', 'third']],
+            ]
         );
 
-        $expectedResult = array(
+        $expectedResult = [
             'first',
             'second',
             'third',
-        );
+        ];
 
         $this->assertSame($expectedResult, $this->subject->getValidCacheGroups());
     }
@@ -79,13 +79,13 @@ class CacheServiceTest extends UnitTestCase
     public function flushByGroupThrowsExceptionForInvalidGroups()
     {
         $this->setCacheConfiguration(
-            array(
-                'cache_foo' => array('groups' => array('first', 'second')),
-                'cache_bar' => array('groups' => array('third', 'second')),
-                'cache_baz' => array('groups' => array('first', 'third')),
-            )
+            [
+                'cache_foo' => ['groups' => ['first', 'second']],
+                'cache_bar' => ['groups' => ['third', 'second']],
+                'cache_baz' => ['groups' => ['first', 'third']],
+            ]
         );
 
-        $this->subject->flushGroups(array('not', 'first'));
+        $this->subject->flushGroups(['not', 'first']);
     }
 }

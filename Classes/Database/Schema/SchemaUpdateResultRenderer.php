@@ -24,7 +24,7 @@ class SchemaUpdateResultRenderer
      *
      * @var array
      */
-    protected $schemaUpdateTypeLabels = array(
+    protected $schemaUpdateTypeLabels = [
         SchemaUpdateType::FIELD_ADD => 'Add fields',
         SchemaUpdateType::FIELD_CHANGE => 'Change fields',
         SchemaUpdateType::FIELD_PREFIX => 'Prefix fields',
@@ -34,7 +34,7 @@ class SchemaUpdateResultRenderer
         SchemaUpdateType::TABLE_CLEAR => 'Clear tables',
         SchemaUpdateType::TABLE_PREFIX => 'Prefix tables',
         SchemaUpdateType::TABLE_DROP => 'Drop tables',
-    );
+    ];
 
     /**
      * Renders a table for a schema update result
@@ -66,7 +66,7 @@ class SchemaUpdateResultRenderer
                 $output->outputLine(sprintf('<error>Errors during "%s" schema update:</error>', $this->schemaUpdateTypeLabels[(string)$type]));
 
                 foreach ($errors as $error) {
-                    $output->outputFormatted('<error>' . $error . '</error>', array(), 2);
+                    $output->outputFormatted('<error>' . $error . '</error>', [], 2);
                 }
             }
         }

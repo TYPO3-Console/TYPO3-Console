@@ -174,18 +174,18 @@ class XsdGenerator
      */
     protected function getClassNamesInPaths(array $paths)
     {
-        $viewHelperClassFiles = array();
+        $viewHelperClassFiles = [];
         foreach ($paths as $path) {
             $viewHelperClassFiles = array_merge(
                 $viewHelperClassFiles,
                 GeneralUtility::getAllFilesAndFoldersInPath(
-                    array(),
+                    [],
                     $path,
                     'php'
                 )
             );
         }
-        $affectedViewHelperClassNames = array();
+        $affectedViewHelperClassNames = [];
         foreach ($viewHelperClassFiles as $filePathAndFilename) {
             try {
                 $potentialViewHelperClassName = $this->getClassNameFromFile($filePathAndFilename);

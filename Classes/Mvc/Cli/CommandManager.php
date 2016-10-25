@@ -23,7 +23,7 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
     /**
      * @var array
      */
-    protected $commandControllers = array();
+    protected $commandControllers = [];
 
     /**
      * @var bool

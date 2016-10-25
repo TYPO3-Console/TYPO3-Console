@@ -57,13 +57,13 @@ class PersistenceIntegrityService
      */
     protected function checkOrUpdateReferenceIndex($dryRun, PersistenceContext $persistenceContext, ReferenceIndexIntegrityDelegateInterface $delegate = null)
     {
-        $processedTables = array();
+        $processedTables = [];
         $errorCount = 0;
         $recordCount = 0;
 
         $existingTableNames = $persistenceContext->getDatabaseConnection()->admin_get_tables();
 
-        $this->callDelegateForEvent($delegate, 'willStartOperation', array($this->countRowsOfAllRegisteredTables($persistenceContext, $existingTableNames)));
+        $this->callDelegateForEvent($delegate, 'willStartOperation', [$this->countRowsOfAllRegisteredTables($persistenceContext, $existingTableNames)]);
 
         // Traverse all tables:
         foreach (array_keys($persistenceContext->getPersistenceConfiguration()) as $tableName) {
@@ -72,17 +72,17 @@ class PersistenceIntegrityService
             if (!empty($existingTableNames[$tableName])) {
                 $records = $persistenceContext->getDatabaseConnection()->exec_SELECTgetRows($selectFields, $tableName, '1=1');
             } else {
-                $this->delegateLog($delegate, 'warning', 'Table "%s" exists in $TCA but does not exist in the database. You should run the Database Analyzer in the Install Tool to fix this.', array($tableName));
+                $this->delegateLog($delegate, 'warning', 'Table "%s" exists in $TCA but does not exist in the database. You should run the Database Analyzer in the Install Tool to fix this.', [$tableName]);
                 continue;
             }
             if (!is_array($records)) {
-                $this->delegateLog($delegate, 'error', 'Table "%s" exists in $TCA but fetching records from database failed. Check the Database Analyzer in Install Tool for missing fields.', array($tableName));
+                $this->delegateLog($delegate, 'error', 'Table "%s" exists in $TCA but fetching records from database failed. Check the Database Analyzer in Install Tool for missing fields.', [$tableName]);
                 continue;
             }
             $processedTables[] = $tableName;
-            $uidList = array(0);
+            $uidList = [0];
             foreach ($records as $record) {
-                $this->callDelegateForEvent($delegate, 'willUpdateRecord', array($tableName, $record));
+                $this->callDelegateForEvent($delegate, 'willUpdateRecord', [$tableName, $record]);
 
                 /** @var $refIndexObj ReferenceIndex */
                 $refIndexObj = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Database\ReferenceIndex::class);
@@ -135,7 +135,7 @@ class PersistenceIntegrityService
 
         $this->callDelegateForEvent($delegate, 'operationHasEnded');
 
-        return array($errorCount, $recordCount, $processedTables);
+        return [$errorCount, $recordCount, $processedTables];
     }
 
     /**
@@ -143,12 +143,12 @@ class PersistenceIntegrityService
      * @param string $eventName
      * @param array $arguments
      */
-    protected function callDelegateForEvent($delegate, $eventName, $arguments = array())
+    protected function callDelegateForEvent($delegate, $eventName, $arguments = [])
     {
         if ($delegate === null) {
             return;
         }
-        call_user_func_array(array($delegate, $eventName), $arguments);
+        call_user_func_array([$delegate, $eventName], $arguments);
     }
 
     /**
@@ -157,7 +157,7 @@ class PersistenceIntegrityService
      * @param string $message
      * @param array $data
      */
-    protected function delegateLog($delegate, $severity, $message, $data = array())
+    protected function delegateLog($delegate, $severity, $message, $data = [])
     {
         if ($delegate === null) {
             return;

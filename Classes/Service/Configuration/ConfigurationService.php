@@ -41,7 +41,7 @@ class ConfigurationService implements SingletonInterface
      * @param ConfigurationManager $configurationManager
      * @param array $activeConfiguration
      */
-    public function __construct(ConfigurationManager $configurationManager = null, array $activeConfiguration = array())
+    public function __construct(ConfigurationManager $configurationManager = null, array $activeConfiguration = [])
     {
         $this->configurationManager = $configurationManager ?: GeneralUtility::makeInstance(ConfigurationManager::class);
         $this->activeConfiguration = $activeConfiguration ?: $GLOBALS['TYPO3_CONF_VARS'];
@@ -128,7 +128,7 @@ class ConfigurationService implements SingletonInterface
      */
     public function removeLocal($path)
     {
-        return $this->configurationManager->removeLocalConfigurationKeysByPath(array($path));
+        return $this->configurationManager->removeLocalConfigurationKeysByPath([$path]);
     }
 
     /**
