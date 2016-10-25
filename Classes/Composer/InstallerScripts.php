@@ -27,18 +27,12 @@ class InstallerScripts
      * Called from composer
      *
      * @param ScriptEvent $event
-     * @param bool $calledFromPlugin
      * @return void
      * @throws \RuntimeException
      * @internal
      */
-    public static function setupConsole(ScriptEvent $event, $calledFromPlugin = false)
+    public static function setupConsole(ScriptEvent $event)
     {
-        if (!$calledFromPlugin) {
-            // @deprecated will be removed with 4.0
-            $event->getIO()->writeError('<warning>Usage of Helhum\Typo3Console\Composer\InstallerScripts::setupConsole is deprecated. Please remove this section from your root composer.json</warning>');
-            return;
-        }
         if ($event->getComposer()->getPackage()->getName() === 'helhum/typo3-console') {
             return;
         }
