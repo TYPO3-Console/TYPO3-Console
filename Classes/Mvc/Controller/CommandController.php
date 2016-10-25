@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Mvc\Controller;
 
 /*
@@ -31,7 +32,7 @@ use TYPO3\CMS\Extbase\Mvc\RequestInterface;
 use TYPO3\CMS\Extbase\Mvc\ResponseInterface;
 
 /**
- * A controller which processes requests from the command line
+ * A controller which processes requests from the command line.
  *
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
@@ -58,16 +59,17 @@ abstract class CommandController implements CommandControllerInterface
     protected $output;
 
     /**
-     * Name of the command method
+     * Name of the command method.
      *
      * @var string
      */
     protected $commandMethodName = '';
 
     /**
-     * Whether the command needs admin access to perform its job
+     * Whether the command needs admin access to perform its job.
      *
      * @var bool
+     *
      * @api
      */
     protected $requestAdminPermissions = false;
@@ -90,6 +92,7 @@ abstract class CommandController implements CommandControllerInterface
 
     /**
      * @param \TYPO3\CMS\Extbase\Object\ObjectManagerInterface $objectManager
+     *
      * @return void
      */
     public function injectObjectManager(\TYPO3\CMS\Extbase\Object\ObjectManagerInterface $objectManager)
@@ -104,7 +107,9 @@ abstract class CommandController implements CommandControllerInterface
      * Checks if the current request type is supported by the controller.
      *
      * @param \TYPO3\CMS\Extbase\Mvc\RequestInterface $request The current request
+     *
      * @return bool true if this request type is supported, otherwise false
+     *
      * @api
      */
     public function canProcessRequest(\TYPO3\CMS\Extbase\Mvc\RequestInterface $request)
@@ -115,10 +120,13 @@ abstract class CommandController implements CommandControllerInterface
     /**
      * Processes a command line request.
      *
-     * @param RequestInterface $request The request object
+     * @param RequestInterface  $request  The request object
      * @param ResponseInterface $response The response, modified by this handler
-     * @return void
+     *
      * @throws UnsupportedRequestTypeException if the controller doesn't support the current request type
+     *
+     * @return void
+     *
      * @api
      */
     public function processRequest(RequestInterface $request, ResponseInterface $response)
@@ -138,19 +146,21 @@ abstract class CommandController implements CommandControllerInterface
     }
 
     /**
-     * Resolves and checks the current command method name
+     * Resolves and checks the current command method name.
      *
      * Note: The resulting command method name might not have the correct case, which isn't a problem because PHP is case insensitive regarding method names.
      *
-     * @return string Method name of the current command
      * @throws NoSuchCommandException
+     *
+     * @return string Method name of the current command
      */
     protected function resolveCommandMethodName()
     {
-        $commandMethodName = $this->request->getControllerCommandName() . 'Command';
-        if (!is_callable(array($this, $commandMethodName))) {
+        $commandMethodName = $this->request->getControllerCommandName().'Command';
+        if (!is_callable([$this, $commandMethodName])) {
             throw new NoSuchCommandException(sprintf('A command method "%s()" does not exist in controller "%s".', $commandMethodName, get_class($this)), 1300902143);
         }
+
         return $commandMethodName;
     }
 
@@ -158,8 +168,9 @@ abstract class CommandController implements CommandControllerInterface
      * Initializes the arguments array of this controller by creating an empty argument object for each of the
      * method arguments found in the designated command method.
      *
-     * @return void
      * @throws InvalidArgumentTypeException
+     *
+     * @return void
      */
     protected function initializeCommandMethodArguments()
     {
@@ -215,11 +226,13 @@ abstract class CommandController implements CommandControllerInterface
      *
      * @param string $commandName
      * @param string $controllerObjectName
-     * @param array $arguments
-     * @return void
+     * @param array  $arguments
+     *
      * @throws StopActionException
+     *
+     * @return void
      */
-    protected function forward($commandName, $controllerObjectName = null, array $arguments = array())
+    protected function forward($commandName, $controllerObjectName = null, array $arguments = [])
     {
         $this->request->setDispatched(false);
         $this->request->setControllerCommandName($commandName);
@@ -243,13 +256,13 @@ abstract class CommandController implements CommandControllerInterface
      */
     protected function callCommandMethod()
     {
-        $preparedArguments = array();
+        $preparedArguments = [];
         /** @var Argument $argument */
         foreach ($this->arguments as $argument) {
             $preparedArguments[] = $argument->getValue();
         }
         $originalRole = $this->ensureAdminRoleIfRequested();
-        $commandResult = call_user_func_array(array($this, $this->commandMethodName), $preparedArguments);
+        $commandResult = call_user_func_array([$this, $this->commandMethodName], $preparedArguments);
         $this->restoreUserRole($originalRole);
         if (is_string($commandResult) && $commandResult !== '') {
             $this->response->appendContent($commandResult);
@@ -260,24 +273,25 @@ abstract class CommandController implements CommandControllerInterface
 
     /**
      * Set admin permissions for currently authenticated user if requested
-     * and returns the original state or NULL
+     * and returns the original state or NULL.
      *
-     * @return NULL|int
+     * @return null|int
      */
     protected function ensureAdminRoleIfRequested()
     {
         if (!$this->requestAdminPermissions || !$this->userAuthentication || !isset($this->userAuthentication->user['admin'])) {
-            return null;
+            return;
         }
         $originalRole = $this->userAuthentication->user['admin'];
         $this->userAuthentication->user['admin'] = 1;
+
         return $originalRole;
     }
 
     /**
-     * Restores the original user role
+     * Restores the original user role.
      *
-     * @param NULL|int $originalRole
+     * @param null|int $originalRole
      */
     protected function restoreUserRole($originalRole)
     {
@@ -288,46 +302,55 @@ abstract class CommandController implements CommandControllerInterface
 
     /**
      * Outputs specified text to the console window
-     * You can specify arguments that will be passed to the text via sprintf
+     * You can specify arguments that will be passed to the text via sprintf.
+     *
      * @see http://www.php.net/sprintf
      *
-     * @param string $text Text to output
-     * @param array $arguments Optional arguments to use for sprintf
+     * @param string $text      Text to output
+     * @param array  $arguments Optional arguments to use for sprintf
+     *
      * @return void
+     *
      * @api
      */
-    protected function output($text, array $arguments = array())
+    protected function output($text, array $arguments = [])
     {
         $this->output->output($text, $arguments);
     }
 
     /**
-     * Outputs specified text to the console window and appends a line break
+     * Outputs specified text to the console window and appends a line break.
      *
-     * @param string $text Text to output
-     * @param array $arguments Optional arguments to use for sprintf
+     * @param string $text      Text to output
+     * @param array  $arguments Optional arguments to use for sprintf
+     *
      * @return void
+     *
      * @see output()
      * @see outputLines()
+     *
      * @api
      */
-    protected function outputLine($text = '', array $arguments = array())
+    protected function outputLine($text = '', array $arguments = [])
     {
         $this->output->outputLine($text, $arguments);
     }
 
     /**
      * Formats the given text to fit into $this->output->getMaximumLineLength() and outputs it to the
-     * console window
+     * console window.
      *
-     * @param string $text Text to output
-     * @param array $arguments Optional arguments to use for sprintf
-     * @param int $leftPadding The number of spaces to use for indentation
+     * @param string $text        Text to output
+     * @param array  $arguments   Optional arguments to use for sprintf
+     * @param int    $leftPadding The number of spaces to use for indentation
+     *
      * @return void
+     *
      * @see outputLine()
+     *
      * @api
      */
-    protected function outputFormatted($text = '', array $arguments = array(), $leftPadding = 0)
+    protected function outputFormatted($text = '', array $arguments = [], $leftPadding = 0)
     {
         $this->output->outputFormatted($text, $arguments, $leftPadding);
     }
@@ -339,13 +362,15 @@ abstract class CommandController implements CommandControllerInterface
      * shutdown (such as the persistence framework), you must use quit() instead of exit().
      *
      * @param int $exitCode Exit code to return on exit (see http://www.php.net/exit)
+     *
      * @throws StopActionException
+     *
      * @return void
      */
     protected function quit($exitCode = 0)
     {
         $this->response->setExitCode($exitCode);
-        throw new StopActionException;
+        throw new StopActionException();
     }
 
     /**
@@ -353,6 +378,7 @@ abstract class CommandController implements CommandControllerInterface
      * Should be used for commands that flush code caches.
      *
      * @param int $exitCode Exit code to return on exit
+     *
      * @return void
      */
     protected function sendAndExit($exitCode = 0)
@@ -362,13 +388,14 @@ abstract class CommandController implements CommandControllerInterface
     }
 
     /**
-     * Creates a logger which outputs to the console
+     * Creates a logger which outputs to the console.
      *
-     * @param int $minimumLevel Minimum log level that should trigger output
-     * @param array $options Additional options for the console writer
+     * @param int   $minimumLevel Minimum log level that should trigger output
+     * @param array $options      Additional options for the console writer
+     *
      * @return LoggerInterface
      */
-    protected function createDefaultLogger($minimumLevel = LogLevel::DEBUG, $options = array())
+    protected function createDefaultLogger($minimumLevel = LogLevel::DEBUG, $options = [])
     {
         $options['output'] = $this->output->getSymfonyConsoleOutput();
         $logger = new Logger(get_class($this));

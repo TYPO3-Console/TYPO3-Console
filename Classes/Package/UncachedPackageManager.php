@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Package;
 
 /*
@@ -18,7 +19,7 @@ use TYPO3\CMS\Core\Core\ClassLoadingInformation;
 use TYPO3\CMS\Core\Package\PackageManager;
 
 /**
- * Class UncachedPackageManager
+ * Class UncachedPackageManager.
  */
 class UncachedPackageManager extends PackageManager
 {
@@ -40,7 +41,7 @@ class UncachedPackageManager extends PackageManager
     public function init()
     {
         $this->packageStatesFileExists = @file_exists($this->packageStatesPathAndFilename);
-        $this->hasExtension = @file_exists(PATH_site . 'typo3conf/ext/typo3_console/ext_emconf.php');
+        $this->hasExtension = @file_exists(PATH_site.'typo3conf/ext/typo3_console/ext_emconf.php');
         $this->loadPackageStates();
         $this->makeConsolePackageProtected();
         $this->initializePackageObjects();
@@ -51,11 +52,11 @@ class UncachedPackageManager extends PackageManager
 
     protected function loadPackageStates()
     {
-        $this->packageStatesConfiguration = $this->packageStatesFileExists ? include($this->packageStatesPathAndFilename) : array();
+        $this->packageStatesConfiguration = $this->packageStatesFileExists ? include($this->packageStatesPathAndFilename) : [];
         if (!isset($this->packageStatesConfiguration['version']) || $this->packageStatesConfiguration['version'] < 4) {
-            $this->packageStatesConfiguration = array();
+            $this->packageStatesConfiguration = [];
         }
-        if ($this->packageStatesConfiguration === array()) {
+        if ($this->packageStatesConfiguration === []) {
             $this->scanAvailablePackages();
         } else {
             $this->registerPackagesFromConfiguration($this->packageStatesConfiguration['packages']);
@@ -64,7 +65,7 @@ class UncachedPackageManager extends PackageManager
 
     /**
      * Only save a new PackageSates file if there is only one,
-     * to prevent saving one before TYPO3 is properly installed
+     * to prevent saving one before TYPO3 is properly installed.
      */
     protected function sortAndSavePackageStates()
     {
@@ -82,8 +83,9 @@ class UncachedPackageManager extends PackageManager
     protected function sortActivePackagesByDependencies()
     {
         if (!$this->forceSavePackageStates) {
-            return array();
+            return [];
         }
+
         return parent::sortActivePackagesByDependencies();
     }
 
@@ -114,7 +116,7 @@ class UncachedPackageManager extends PackageManager
     }
 
     /**
-     * Workaround for non composer mode
+     * Workaround for non composer mode.
      *
      * Force loading of the console in case no package states file is there
      * This is needed for installation or package states file generation commands
@@ -127,7 +129,7 @@ class UncachedPackageManager extends PackageManager
     }
 
     /**
-     * Workaround for non composer mode
+     * Workaround for non composer mode.
      *
      * @deprecated since 8.0 will be removed once 7.6 compatiblity is removed
      */
@@ -140,7 +142,7 @@ class UncachedPackageManager extends PackageManager
     }
 
     /**
-     * Workaround for non composer mode
+     * Workaround for non composer mode.
      *
      * Make sure the extension is active
      */

@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Service;
 
 /*
@@ -14,7 +15,7 @@ namespace Helhum\Typo3Console\Service;
  */
 
 /**
- * A service exception
+ * A service exception.
  */
 class Exception extends \Helhum\Typo3Console\Exception
 {

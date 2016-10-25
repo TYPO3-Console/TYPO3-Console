@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Command;
 
 /*
@@ -19,14 +20,14 @@ use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Extbase\Mvc\Cli\Command;
 
 /**
- * A Command Controller which provides help for available commands
+ * A Command Controller which provides help for available commands.
  *
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
 class HelpCommandController extends CommandController
 {
     /**
-     * Current version number
+     * Current version number.
      *
      * @var string
      */
@@ -44,7 +45,7 @@ class HelpCommandController extends CommandController
     protected $commands = [];
 
     /**
-     * Help
+     * Help.
      *
      * Display help for a command
      *
@@ -52,11 +53,12 @@ class HelpCommandController extends CommandController
      * ./typo3cms help <command identifier>
      *
      * @param string $commandIdentifier Identifier of a command for more details
+     *
      * @return void
      */
     public function helpCommand($commandIdentifier = null)
     {
-        $this->outputLine('<info>TYPO3 Console</info> version <comment>%s</comment>', array($this->version));
+        $this->outputLine('<info>TYPO3 Console</info> version <comment>%s</comment>', [$this->version]);
         $this->outputLine();
 
         if ($commandIdentifier === null) {
@@ -66,6 +68,7 @@ class HelpCommandController extends CommandController
                 $command = $this->commandManager->getCommandByIdentifier($commandIdentifier);
             } catch (\TYPO3\CMS\Extbase\Mvc\Exception\CommandException $exception) {
                 $this->outputLine($exception->getMessage());
+
                 return;
             }
             $this->displayHelpForCommand($command);
@@ -85,7 +88,7 @@ class HelpCommandController extends CommandController
 
         foreach ($this->commands as $shortCommandIdentifier => $command) {
             $description = $this->wordWrap($command->getShortDescription(), 43);
-            $this->outputLine('%-2s<info>%-40s</info> %s', array(' ', $shortCommandIdentifier, $description));
+            $this->outputLine('%-2s<info>%-40s</info> %s', [' ', $shortCommandIdentifier, $description]);
         }
 
         $this->outputLine();
@@ -94,9 +97,10 @@ class HelpCommandController extends CommandController
     }
 
     /**
-     * Display help text for a single command
+     * Display help text for a single command.
      *
      * @param \TYPO3\CMS\Extbase\Mvc\Cli\Command $command
+     *
      * @return void
      */
     protected function displayHelpForCommand(\TYPO3\CMS\Extbase\Mvc\Cli\Command $command)
@@ -112,10 +116,10 @@ class HelpCommandController extends CommandController
                 $usage .= sprintf(' <%s>', strtolower(preg_replace('/([A-Z])/', ' $1', $commandArgumentDefinition->getName())));
             }
         }
-        $usage = $this->commandManager->getShortestIdentifierForCommand($command) . ($hasOptions ? ' [<options>]' : '') . $usage;
+        $usage = $this->commandManager->getShortestIdentifierForCommand($command).($hasOptions ? ' [<options>]' : '').$usage;
         $this->outputLine();
         $this->outputLine('<comment>Usage:</comment>');
-        $this->outputLine('  ' . $usage);
+        $this->outputLine('  '.$usage);
         $argumentDescriptions = [];
         $optionDescriptions = [];
         if ($command->hasArguments()) {
@@ -123,9 +127,9 @@ class HelpCommandController extends CommandController
                 $argumentDescription = $commandArgumentDefinition->getDescription();
                 $argumentDescription = $this->wordWrap($argumentDescription, 23);
                 if ($commandArgumentDefinition->isRequired()) {
-                    $argumentDescriptions[] = vsprintf('  <info>%-20s</info> %s', array($commandArgumentDefinition->getDashedName(), $argumentDescription));
+                    $argumentDescriptions[] = vsprintf('  <info>%-20s</info> %s', [$commandArgumentDefinition->getDashedName(), $argumentDescription]);
                 } else {
-                    $optionDescriptions[] = vsprintf('  <info>%-20s</info> %s', array($commandArgumentDefinition->getDashedName(), $argumentDescription));
+                    $optionDescriptions[] = vsprintf('  <info>%-20s</info> %s', [$commandArgumentDefinition->getDashedName(), $argumentDescription]);
                 }
             }
         }
@@ -148,7 +152,7 @@ class HelpCommandController extends CommandController
             $this->outputLine('<comment>Help:</comment>');
             $descriptionLines = explode(chr(10), $command->getDescription());
             foreach ($descriptionLines as $descriptionLine) {
-                $this->outputLine('%-2s%s', array(' ', $descriptionLine));
+                $this->outputLine('%-2s%s', [' ', $descriptionLine]);
             }
         }
         $relatedCommandIdentifiers = $command->getRelatedCommandIdentifiers();
@@ -157,28 +161,30 @@ class HelpCommandController extends CommandController
             $this->outputLine('<comment>Related Commands:</comment>');
             foreach ($relatedCommandIdentifiers as $commandIdentifier) {
                 $command = $this->commandManager->getCommandByIdentifier($commandIdentifier);
-                $this->outputLine('%-2s%s (%s)', array(' ', $this->commandManager->getShortestIdentifierForCommand($command), $command->getShortDescription()));
+                $this->outputLine('%-2s%s (%s)', [' ', $this->commandManager->getShortestIdentifierForCommand($command), $command->getShortDescription()]);
             }
         }
         $this->outputLine();
     }
 
     /**
-     * Displays an error message
+     * Displays an error message.
      *
      * @internal
+     *
      * @param \TYPO3\CMS\Extbase\Mvc\Exception\CommandException $exception
+     *
      * @return void
      */
     public function errorCommand(\TYPO3\CMS\Extbase\Mvc\Exception\CommandException $exception)
     {
-        $this->outputLine('<info>TYPO3 Console</info> version <comment>%s</comment>', array(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getExtensionVersion('typo3_console')));
+        $this->outputLine('<info>TYPO3 Console</info> version <comment>%s</comment>', [\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getExtensionVersion('typo3_console')]);
         $this->outputLine();
-        $this->outputLine('<error>%s</error>', array($exception->getMessage()));
+        $this->outputLine('<error>%s</error>', [$exception->getMessage()]);
         if ($exception instanceof \TYPO3\CMS\Extbase\Mvc\Exception\AmbiguousCommandIdentifierException) {
             $this->outputLine('Please specify the complete command identifier. Matched commands:');
             foreach ($exception->getMatchingCommands() as $matchingCommand) {
-                $this->outputLine('    %s', array($matchingCommand->getCommandIdentifier()));
+                $this->outputLine('    %s', [$matchingCommand->getCommandIdentifier()]);
             }
         }
         $this->outputLine('');
@@ -187,14 +193,15 @@ class HelpCommandController extends CommandController
     }
 
     /**
-     * Generate shell auto complete script
+     * Generate shell auto complete script.
      *
      * Inspired by and copied code from https://github.com/bamarni/symfony-console-autocomplete
      * See https://github.com/bamarni/symfony-console-autocomplete/blob/master/README.md
      * for a description how to install the script in your system.
      *
-     * @param string $shell "bash" or "zsh"
-     * @param array $aliases Aliases for the typo3cms command
+     * @param string $shell   "bash" or "zsh"
+     * @param array  $aliases Aliases for the typo3cms command
+     *
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
      */
     public function autoCompleteCommand($shell = 'bash', array $aliases = [])
@@ -242,12 +249,12 @@ SWITCHCASE;
 
         $switchContent = '';
         $zsh_describe = function ($value, $description = null) {
-            $value = '"' . str_replace(':', '\\:', $value);
+            $value = '"'.str_replace(':', '\\:', $value);
             if (!empty($description)) {
-                $value .= ':' . escapeshellcmd($description);
+                $value .= ':'.escapeshellcmd($description);
             }
 
-            return $value . '"';
+            return $value.'"';
         };
         foreach ($commandsOptions as $command => $options) {
             if (empty($options)) {
@@ -260,17 +267,17 @@ SWITCHCASE;
             }
 
             $switchContent .= str_replace(
-                array('%%COMMAND%%', '%%COMMAND_OPTIONS%%'),
-                array($command, implode(' ', $options)),
+                ['%%COMMAND%%', '%%COMMAND_OPTIONS%%'],
+                [$command, implode(' ', $options)],
                 $switchCaseTemplate
-            ) . "\n        ";
+            )."\n        ";
         }
         $switchContent = rtrim($switchContent, ' ');
 
         // dump
-        $template = file_get_contents(__DIR__ . '/../../Resources/Private/AutocompleteTemplates/cached.' . $shell . '.tpl');
+        $template = file_get_contents(__DIR__.'/../../Resources/Private/AutocompleteTemplates/cached.'.$shell.'.tpl');
         $script = 'typo3cms';
-        $tools = array($script);
+        $tools = [$script];
 
         if ($aliases) {
             $aliases = array_filter(preg_split('/\s+/', implode(' ', $aliases)));
@@ -292,8 +299,8 @@ SWITCHCASE;
         }
 
         $this->output->output(str_replace(
-            array('%%SCRIPT%%', '%%COMMANDS%%', '%%SHARED_OPTIONS%%', '%%SWITCH_CONTENT%%', '%%TOOLS%%'),
-            array($script, implode(' ', $commands), '', $switchContent, implode("\n", $tools)),
+            ['%%SCRIPT%%', '%%COMMANDS%%', '%%SHARED_OPTIONS%%', '%%SWITCH_CONTENT%%', '%%TOOLS%%'],
+            [$script, implode(' ', $commands), '', $switchContent, implode("\n", $tools)],
             $template
         ));
     }
@@ -329,12 +336,14 @@ SWITCHCASE;
 
     /**
      * @param string $stringToWrap
-     * @param int $indent
+     * @param int    $indent
+     *
      * @return string
      */
     protected function wordWrap($stringToWrap, $indent)
     {
         $formatter = $this->output->getSymfonyConsoleOutput()->getFormatter();
-        return wordwrap($formatter->format($stringToWrap), $this->output->getMaximumLineLength() - $indent, PHP_EOL . str_repeat(' ', $indent), true);
+
+        return wordwrap($formatter->format($stringToWrap), $this->output->getMaximumLineLength() - $indent, PHP_EOL.str_repeat(' ', $indent), true);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Install;
 
 /*
@@ -29,7 +30,7 @@ use TYPO3\CMS\Install\Status\WarningStatus;
 
 /**
  * This class acts as facade for the install tool step actions.
- * It glues together the execution of these actions with the user interaction on the command line
+ * It glues together the execution of these actions with the user interaction on the command line.
  */
 class CliSetupRequestHandler
 {
@@ -62,13 +63,13 @@ class CliSetupRequestHandler
     /**
      * @var array List of necessary installation steps. Order is important!
      */
-    protected $installationActions = array(
+    protected $installationActions = [
         'environmentAndFolders',
         'databaseConnect',
         'databaseSelect',
         'databaseData',
         'defaultConfiguration',
-    );
+    ];
 
     /**
      * @var ConsoleOutput
@@ -78,7 +79,7 @@ class CliSetupRequestHandler
     /**
      * @var array
      */
-    protected $givenRequestArguments = array();
+    protected $givenRequestArguments = [];
 
     /**
      * @var bool
@@ -86,7 +87,7 @@ class CliSetupRequestHandler
     protected $interactiveSetup = true;
 
     /**
-     * Creates a new output object during object creation
+     * Creates a new output object during object creation.
      */
     public function initializeObject()
     {
@@ -96,7 +97,7 @@ class CliSetupRequestHandler
     }
 
     /**
-     * @param bool $interactiveSetup
+     * @param bool  $interactiveSetup
      * @param array $givenRequestArguments
      */
     public function setup($interactiveSetup, array $givenRequestArguments)
@@ -104,7 +105,7 @@ class CliSetupRequestHandler
         $this->interactiveSetup = $interactiveSetup;
         $this->givenRequestArguments = $givenRequestArguments;
 
-        $firstInstallPath = PATH_site . 'FIRST_INSTALL';
+        $firstInstallPath = PATH_site.'FIRST_INSTALL';
         if (!file_exists($firstInstallPath)) {
             touch($firstInstallPath);
         }
@@ -115,12 +116,12 @@ class CliSetupRequestHandler
     }
 
     /**
-     * Executes the given action and outputs the result messages
+     * Executes the given action and outputs the result messages.
      *
      * @param string $actionName
-     * @param array $arguments
+     * @param array  $arguments
      */
-    public function executeActionWithArguments($actionName, array $arguments = array())
+    public function executeActionWithArguments($actionName, array $arguments = [])
     {
         // TODO: provide pre- and post-execute signals?
         $messages = $this->executeAction($this->createActionWithNameAndArguments($actionName, $arguments));
@@ -128,43 +129,45 @@ class CliSetupRequestHandler
         if ($messages === [] && $actionName === 'databaseData') {
             /** @var DatabaseConnection $db */
             $db = $GLOBALS['TYPO3_DB'];
-            $db->exec_INSERTquery('be_users', array('username' => '_cli_lowlevel'));
+            $db->exec_INSERTquery('be_users', ['username' => '_cli_lowlevel']);
         }
         $this->output->outputLine(serialize($messages));
     }
 
     /**
-     * Checks if the given action needs to be executed or not
+     * Checks if the given action needs to be executed or not.
      *
      * @param string $actionName
      */
     public function callNeedsExecution($actionName)
     {
         $needsExecution = $this->actionNeedsExecution($this->createActionWithNameAndArguments($actionName));
-        $this->output->outputLine((string)$needsExecution);
+        $this->output->outputLine((string) $needsExecution);
     }
 
     /**
      * @param string $actionName
-     * @param array $arguments
+     * @param array  $arguments
+     *
      * @return StepInterface|ActionInterface
      */
-    protected function createActionWithNameAndArguments($actionName, array $arguments = array())
+    protected function createActionWithNameAndArguments($actionName, array $arguments = [])
     {
         $classPrefix = 'TYPO3\\CMS\\Install\\Controller\\Action\\Step\\';
-        $className = $classPrefix . ucfirst($actionName);
+        $className = $classPrefix.ucfirst($actionName);
 
         /** @var StepInterface|ActionInterface $action */
         $action = $this->objectManager->get($className);
         $action->setController('step');
         $action->setAction($actionName);
-        $action->setPostValues(array('values' => $arguments));
+        $action->setPostValues(['values' => $arguments]);
 
         return $action;
     }
 
     /**
      * @param StepInterface $action
+     *
      * @return StatusInterface[]
      */
     protected function executeAction(StepInterface $action)
@@ -172,18 +175,19 @@ class CliSetupRequestHandler
         try {
             $needsExecution = $action->needsExecution();
         } catch (\TYPO3\CMS\Install\Controller\Exception\RedirectException $e) {
-            return array(new RedirectStatus());
+            return [new RedirectStatus()];
         }
 
         if ($needsExecution) {
             return $action->execute();
         } else {
-            return array();
+            return [];
         }
     }
 
     /**
      * @param StepInterface $action
+     *
      * @return bool
      */
     protected function actionNeedsExecution(StepInterface $action)
@@ -193,11 +197,13 @@ class CliSetupRequestHandler
         } catch (\TYPO3\CMS\Install\Controller\Exception\RedirectException $e) {
             return true;
         }
+
         return $needsExecution;
     }
 
     /**
      * @param string $actionName
+     *
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\AmbiguousCommandIdentifierException
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentTypeException
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException
@@ -208,8 +214,8 @@ class CliSetupRequestHandler
     {
         $this->executeSilentConfigurationUpgradesIfNeeded();
 
-        $arguments = $this->getCommandMethodArguments($actionName . 'Command');
-        $command = $this->commandManager->getCommandByIdentifier('install:' . strtolower($actionName));
+        $arguments = $this->getCommandMethodArguments($actionName.'Command');
+        $command = $this->commandManager->getCommandByIdentifier('install:'.strtolower($actionName));
 
         $loopCounter = 0;
 
@@ -218,11 +224,12 @@ class CliSetupRequestHandler
             $this->output->outputLine();
             $this->output->outputLine(sprintf('%s:', $command->getShortDescription()));
 
-            if (!$this->dispatcher->executeCommand('install:' . strtolower($actionName) . 'needsexecution')) {
+            if (!$this->dispatcher->executeCommand('install:'.strtolower($actionName).'needsexecution')) {
                 $this->output->outputLine('<info>No execution needed, skipped step!</info>');
+
                 return;
             }
-            $actionArguments = array();
+            $actionArguments = [];
             /** @var CommandArgumentDefinition $argumentDefinition */
             foreach ($command->getArgumentDefinitions() as $argumentDefinition) {
                 $isPasswordArgument = strpos(strtolower($argumentDefinition->getName()), 'password') !== false;
@@ -249,7 +256,7 @@ class CliSetupRequestHandler
                                 )
                             );
                         } elseif (is_bool($argument->getValue())) {
-                            $argumentValue = (int)$this->output->askConfirmation(
+                            $argumentValue = (int) $this->output->askConfirmation(
                                 sprintf(
                                     '<comment>%s (%s):</comment> ',
                                     $argumentDefinition->getDescription(),
@@ -272,19 +279,19 @@ class CliSetupRequestHandler
             }
 
             do {
-                $messages = @unserialize($this->dispatcher->executeCommand('install:' . strtolower($actionName), $actionArguments));
+                $messages = @unserialize($this->dispatcher->executeCommand('install:'.strtolower($actionName), $actionArguments));
             } while (!empty($messages[0]) && $messages[0] instanceof RedirectStatus);
 
-            $stillNeedsExecution = (bool)$this->dispatcher->executeCommand('install:' . strtolower($actionName) . 'needsexecution');
+            $stillNeedsExecution = (bool) $this->dispatcher->executeCommand('install:'.strtolower($actionName).'needsexecution');
             if ($stillNeedsExecution) {
                 if (empty($messages)) {
                     $warning = new WarningStatus();
                     $warning->setTitle('Action was not executed successfully!');
                     $warning->setMessage(
                         'Please check if your input values are correct and you have all needed permissions!'
-                        . PHP_EOL . '(Could it be that you selected "use existing database", but the chosen database is not empty?)'
+                        .PHP_EOL.'(Could it be that you selected "use existing database", but the chosen database is not empty?)'
                     );
-                    $messages = array($warning);
+                    $messages = [$warning];
                 }
                 $this->outputMessages($messages);
             } else {
@@ -292,7 +299,7 @@ class CliSetupRequestHandler
             }
 
             if ($loopCounter > 10) {
-                throw new \RuntimeException('Tried to dispatch "' . $actionName . '" ' . $loopCounter . ' times.', 1405269518);
+                throw new \RuntimeException('Tried to dispatch "'.$actionName.'" '.$loopCounter.' times.', 1405269518);
             }
         } while ($stillNeedsExecution);
     }
@@ -307,8 +314,10 @@ class CliSetupRequestHandler
      * method arguments found in the designated command method.
      *
      * @param string $commandMethodName
-     * @return Arguments
+     *
      * @throws InvalidArgumentTypeException
+     *
+     * @return Arguments
      */
     protected function getCommandMethodArguments($commandMethodName)
     {
@@ -334,12 +343,13 @@ class CliSetupRequestHandler
     /**
      * Call silent upgrade class, redirect to self if configuration was changed.
      *
-     * @return void
      * @throws RedirectException
+     *
+     * @return void
      */
     protected function executeSilentConfigurationUpgradesIfNeeded()
     {
-        if (!file_exists(PATH_site . 'typo3conf/LocalConfiguration.php')) {
+        if (!file_exists(PATH_site.'typo3conf/LocalConfiguration.php')) {
             return;
         }
 
@@ -364,7 +374,7 @@ class CliSetupRequestHandler
     }
 
     /**
-     * Fetch the new configuration and expose it to the global array
+     * Fetch the new configuration and expose it to the global array.
      */
     protected function reloadConfiguration()
     {
@@ -377,7 +387,7 @@ class CliSetupRequestHandler
     /**
      * @param StatusInterface[] $messages
      */
-    protected function outputMessages(array $messages = array())
+    protected function outputMessages(array $messages = [])
     {
         $this->output->outputLine();
         foreach ($messages as $statusMessage) {
@@ -390,17 +400,17 @@ class CliSetupRequestHandler
      */
     protected function outputStatusMessage(StatusInterface $statusMessage)
     {
-        $subject = strtoupper($statusMessage->getSeverity()) . ': ' . $statusMessage->getTitle();
+        $subject = strtoupper($statusMessage->getSeverity()).': '.$statusMessage->getTitle();
         switch ($statusMessage->getSeverity()) {
             case 'error':
             case 'warning':
-                $subject = sprintf('<%1$s>' . $subject . '</%1$s>', $statusMessage->getSeverity());
+                $subject = sprintf('<%1$s>'.$subject.'</%1$s>', $statusMessage->getSeverity());
             break;
             default:
         }
         $this->output->outputLine($subject);
         foreach (explode("\n", wordwrap($statusMessage->getMessage())) as $line) {
-            $this->output->outputLine(sprintf('<%1$s>' . $line . '</%1$s>', $statusMessage->getSeverity()));
+            $this->output->outputLine(sprintf('<%1$s>'.$line.'</%1$s>', $statusMessage->getSeverity()));
         }
     }
 }

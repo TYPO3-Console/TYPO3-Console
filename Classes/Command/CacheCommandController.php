@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Command;
 
 /*
@@ -19,7 +20,7 @@ use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 
 /**
- * CommandController for flushing caches
+ * CommandController for flushing caches.
  */
 class CacheCommandController extends CommandController
 {
@@ -30,7 +31,7 @@ class CacheCommandController extends CommandController
     protected $cacheService;
 
     /**
-     * Flush all caches
+     * Flush all caches.
      *
      * Flushes TYPO3 core caches first and after that, flushes caches from extensions.
      *
@@ -52,7 +53,7 @@ class CacheCommandController extends CommandController
     }
 
     /**
-     * Flush all caches in specified groups
+     * Flush all caches in specified groups.
      *
      * Flushes all caches in specified groups.
      * Valid group names are by default:
@@ -70,7 +71,7 @@ class CacheCommandController extends CommandController
     {
         try {
             $this->cacheService->flushGroups($groups);
-            $this->outputLine('Flushed all caches for group(s): "' . implode('","', $groups) . '"');
+            $this->outputLine('Flushed all caches for group(s): "'.implode('","', $groups).'"');
         } catch (NoSuchCacheGroupException $e) {
             $this->outputLine($e->getMessage());
             $this->sendAndExit(1);
@@ -78,13 +79,13 @@ class CacheCommandController extends CommandController
     }
 
     /**
-     * Flush cache by tags
+     * Flush cache by tags.
      *
      * Flushes caches by tags, optionally only caches in specified groups.
      *
      * <b>Example:</b> <code>./typo3cms cache:flushtags news_123 pages,all</code>
      *
-     * @param array $tags Array of tags (specified as comma separated values) to flush.
+     * @param array $tags   Array of tags (specified as comma separated values) to flush.
      * @param array $groups Optional array of groups (specified as comma separated values) for which to flush tags. If no group is specified, caches of all groups are flushed.
      */
     public function flushTagsCommand(array $tags, array $groups = null)
@@ -92,9 +93,9 @@ class CacheCommandController extends CommandController
         try {
             $this->cacheService->flushByTagsAndGroups($tags, $groups);
             if ($groups === null) {
-                $this->outputLine('Flushed caches by tags "' . implode('","', $tags) . '"');
+                $this->outputLine('Flushed caches by tags "'.implode('","', $tags).'"');
             } else {
-                $this->outputLine('Flushed caches by tags "' . implode('","', $tags) . '" in groups: "' . implode('","', $groups) . '"');
+                $this->outputLine('Flushed caches by tags "'.implode('","', $tags).'" in groups: "'.implode('","', $groups).'"');
             }
         } catch (NoSuchCacheGroupException $e) {
             $this->outputLine($e->getMessage());
@@ -103,7 +104,7 @@ class CacheCommandController extends CommandController
     }
 
     /**
-     * List cache groups
+     * List cache groups.
      *
      * Lists all registered cache groups.
      */
@@ -117,10 +118,10 @@ class CacheCommandController extends CommandController
                 $this->outputLine('No cache group is registered.');
                 break;
             case 1:
-                $this->outputLine('The following cache group is registered: "' . implode('", "', $groups) . '".');
+                $this->outputLine('The following cache group is registered: "'.implode('", "', $groups).'".');
                 break;
             default:
-                $this->outputLine('The following cache groups are registered: "' . implode('", "', $groups) . '".');
+                $this->outputLine('The following cache groups are registered: "'.implode('", "', $groups).'".');
                 break;
         }
     }

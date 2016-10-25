@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Mvc\Cli;
 
 /*
@@ -26,7 +27,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
 /**
- * A wrapper for Symfony ConsoleOutput and related helpers
+ * A wrapper for Symfony ConsoleOutput and related helpers.
  */
 class ConsoleOutput
 {
@@ -56,21 +57,21 @@ class ConsoleOutput
     protected $table;
 
     /**
-     * Creates and initializes the Symfony I/O instances
+     * Creates and initializes the Symfony I/O instances.
      */
     public function __construct()
     {
         $this->output = new SymfonyConsoleOutput();
-        $this->output->getFormatter()->setStyle('b', new OutputFormatterStyle(null, null, array('bold')));
+        $this->output->getFormatter()->setStyle('b', new OutputFormatterStyle(null, null, ['bold']));
         $this->output->getFormatter()->setStyle('i', new OutputFormatterStyle('black', 'white'));
-        $this->output->getFormatter()->setStyle('u', new OutputFormatterStyle(null, null, array('underscore')));
-        $this->output->getFormatter()->setStyle('em', new OutputFormatterStyle(null, null, array('reverse')));
-        $this->output->getFormatter()->setStyle('strike', new OutputFormatterStyle(null, null, array('conceal')));
+        $this->output->getFormatter()->setStyle('u', new OutputFormatterStyle(null, null, ['underscore']));
+        $this->output->getFormatter()->setStyle('em', new OutputFormatterStyle(null, null, ['reverse']));
+        $this->output->getFormatter()->setStyle('strike', new OutputFormatterStyle(null, null, ['conceal']));
         $this->output->getFormatter()->setStyle('success', new OutputFormatterStyle('green'));
         $this->output->getFormatter()->setStyle('warning', new OutputFormatterStyle('black', 'yellow'));
         $this->output->getFormatter()->setStyle('ins', new OutputFormatterStyle('green'));
         $this->output->getFormatter()->setStyle('del', new OutputFormatterStyle('red'));
-        $this->output->getFormatter()->setStyle('code', new OutputFormatterStyle(null, null, array('bold')));
+        $this->output->getFormatter()->setStyle('code', new OutputFormatterStyle(null, null, ['bold']));
     }
 
     /**
@@ -93,56 +94,62 @@ class ConsoleOutput
 
     /**
      * Outputs specified text to the console window
-     * You can specify arguments that will be passed to the text via sprintf
+     * You can specify arguments that will be passed to the text via sprintf.
+     *
      * @see http://www.php.net/sprintf
      *
-     * @param string $text Text to output
-     * @param array $arguments Optional arguments to use for sprintf
+     * @param string $text      Text to output
+     * @param array  $arguments Optional arguments to use for sprintf
+     *
      * @return void
      */
-    public function output($text, array $arguments = array())
+    public function output($text, array $arguments = [])
     {
-        if ($arguments !== array()) {
+        if ($arguments !== []) {
             $text = vsprintf($text, $arguments);
         }
         $this->output->write($text);
     }
 
     /**
-     * Outputs specified text to the console window and appends a line break
+     * Outputs specified text to the console window and appends a line break.
      *
-     * @param string $text Text to output
-     * @param array $arguments Optional arguments to use for sprintf
+     * @param string $text      Text to output
+     * @param array  $arguments Optional arguments to use for sprintf
+     *
      * @return void
+     *
      * @see output()
      * @see outputLines()
      */
-    public function outputLine($text = '', array $arguments = array())
+    public function outputLine($text = '', array $arguments = [])
     {
-        $this->output($text . PHP_EOL, $arguments);
+        $this->output($text.PHP_EOL, $arguments);
     }
 
     /**
      * Formats the given text to fit into the maximum line length and outputs it to the
-     * console window
+     * console window.
      *
-     * @param string $text Text to output
-     * @param array $arguments Optional arguments to use for sprintf
-     * @param int $leftPadding The number of spaces to use for indentation
+     * @param string $text        Text to output
+     * @param array  $arguments   Optional arguments to use for sprintf
+     * @param int    $leftPadding The number of spaces to use for indentation
+     *
      * @return void
+     *
      * @see outputLine()
      */
-    public function outputFormatted($text = '', array $arguments = array(), $leftPadding = 0)
+    public function outputFormatted($text = '', array $arguments = [], $leftPadding = 0)
     {
         $lines = explode(PHP_EOL, $text);
         foreach ($lines as $line) {
-            $formattedText = str_repeat(' ', $leftPadding) . wordwrap($line, $this->getMaximumLineLength() - $leftPadding, PHP_EOL . str_repeat(' ', $leftPadding), true);
+            $formattedText = str_repeat(' ', $leftPadding).wordwrap($line, $this->getMaximumLineLength() - $leftPadding, PHP_EOL.str_repeat(' ', $leftPadding), true);
             $this->outputLine($formattedText, $arguments);
         }
     }
 
     /**
-     * Renders a table like output of the given $rows
+     * Renders a table like output of the given $rows.
      *
      * @param array $rows
      * @param array $headers
@@ -158,15 +165,17 @@ class ConsoleOutput
     }
 
     /**
-     * Asks the user to select a value
+     * Asks the user to select a value.
      *
-     * @param string|array $question The question to ask. If an array each array item is turned into one line of a multi-line question
-     * @param array $choices List of choices to pick from
-     * @param bool $default The default answer if the user enters nothing
-     * @param bool $multiSelect If true the result will be an array with the selected options. Multiple options can be given separated by commas
-     * @param bool|int $attempts Max number of times to ask before giving up (false by default, which means infinite)
-     * @return int|string|array The selected value or values (the key of the choices array)
+     * @param string|array $question    The question to ask. If an array each array item is turned into one line of a multi-line question
+     * @param array        $choices     List of choices to pick from
+     * @param bool         $default     The default answer if the user enters nothing
+     * @param bool         $multiSelect If true the result will be an array with the selected options. Multiple options can be given separated by commas
+     * @param bool|int     $attempts    Max number of times to ask before giving up (false by default, which means infinite)
+     *
      * @throws \InvalidArgumentException
+     *
+     * @return int|string|array The selected value or values (the key of the choices array)
      */
     public function select($question, $choices, $default = null, $multiSelect = false, $attempts = false)
     {
@@ -179,13 +188,15 @@ class ConsoleOutput
     }
 
     /**
-     * Asks a question to the user
+     * Asks a question to the user.
      *
-     * @param string|array $question The question to ask. If an array each array item is turned into one line of a multi-line question
-     * @param string $default The default answer if none is given by the user
-     * @param array $autocomplete List of values to autocomplete. This only works if "stty" is installed
-     * @return string The user answer
+     * @param string|array $question     The question to ask. If an array each array item is turned into one line of a multi-line question
+     * @param string       $default      The default answer if none is given by the user
+     * @param array        $autocomplete List of values to autocomplete. This only works if "stty" is installed
+     *
      * @throws \RuntimeException If there is no data to read in the input stream
+     *
+     * @return string The user answer
      */
     public function ask($question, $default = null, array $autocomplete = null)
     {
@@ -201,7 +212,8 @@ class ConsoleOutput
      * The question will be asked until the user answers by nothing, yes, or no.
      *
      * @param string|array $question The question to ask. If an array each array item is turned into one line of a multi-line question
-     * @param bool $default The default answer if the user enters nothing
+     * @param bool         $default  The default answer if the user enters nothing
+     *
      * @return bool true if the user has confirmed, false otherwise
      */
     public function askConfirmation($question, $default = true)
@@ -212,12 +224,14 @@ class ConsoleOutput
     }
 
     /**
-     * Asks a question to the user, the response is hidden
+     * Asks a question to the user, the response is hidden.
      *
      * @param string|array $question The question. If an array each array item is turned into one line of a multi-line question
-     * @param bool $fallback In case the response can not be hidden, whether to fallback on non-hidden question or not
-     * @return string The answer
+     * @param bool         $fallback In case the response can not be hidden, whether to fallback on non-hidden question or not
+     *
      * @throws \RuntimeException In case the fallback is deactivated and the response can not be hidden
+     *
+     * @return string The answer
      */
     public function askHiddenResponse($question, $fallback = true)
     {
@@ -229,19 +243,21 @@ class ConsoleOutput
     }
 
     /**
-     * Asks for a value and validates the response
+     * Asks for a value and validates the response.
      *
      * The validator receives the data to validate. It must return the
      * validated data when the data is valid and throw an exception
      * otherwise.
      *
-     * @param string|array $question The question to ask. If an array each array item is turned into one line of a multi-line question
-     * @param callable $validator A PHP callback that gets a value and is expected to return the (transformed) value or throw an exception if it wasn't valid
-     * @param int|bool $attempts Max number of times to ask before giving up (false by default, which means infinite)
-     * @param string $default The default answer if none is given by the user
-     * @param array $autocomplete List of values to autocomplete. This only works if "stty" is installed
-     * @return mixed
+     * @param string|array $question     The question to ask. If an array each array item is turned into one line of a multi-line question
+     * @param callable     $validator    A PHP callback that gets a value and is expected to return the (transformed) value or throw an exception if it wasn't valid
+     * @param int|bool     $attempts     Max number of times to ask before giving up (false by default, which means infinite)
+     * @param string       $default      The default answer if none is given by the user
+     * @param array        $autocomplete List of values to autocomplete. This only works if "stty" is installed
+     *
      * @throws \Exception When any of the validators return an error
+     *
+     * @return mixed
      */
     public function askAndValidate($question, $validator, $attempts = false, $default = null, array $autocomplete = null)
     {
@@ -254,19 +270,21 @@ class ConsoleOutput
     }
 
     /**
-     * Asks for a value, hide and validates the response
+     * Asks for a value, hide and validates the response.
      *
      * The validator receives the data to validate. It must return the
      * validated data when the data is valid and throw an exception
      * otherwise.
      *
-     * @param string|array $question The question to ask. If an array each array item is turned into one line of a multi-line question
-     * @param callable $validator A PHP callback that gets a value and is expected to return the (transformed) value or throw an exception if it wasn't valid
-     * @param int|bool $attempts Max number of times to ask before giving up (false by default, which means infinite)
-     * @param bool $fallback In case the response can not be hidden, whether to fallback on non-hidden question or not
-     * @return string The response
-     * @throws \Exception When any of the validators return an error
+     * @param string|array $question  The question to ask. If an array each array item is turned into one line of a multi-line question
+     * @param callable     $validator A PHP callback that gets a value and is expected to return the (transformed) value or throw an exception if it wasn't valid
+     * @param int|bool     $attempts  Max number of times to ask before giving up (false by default, which means infinite)
+     * @param bool         $fallback  In case the response can not be hidden, whether to fallback on non-hidden question or not
+     *
+     * @throws \Exception        When any of the validators return an error
      * @throws \RuntimeException In case the fallback is deactivated and the response can not be hidden
+     *
+     * @return string The response
      */
     public function askHiddenResponseAndValidate($question, $validator, $attempts = false, $fallback = true)
     {
@@ -280,9 +298,10 @@ class ConsoleOutput
     }
 
     /**
-     * Starts the progress output
+     * Starts the progress output.
      *
      * @param int $max Maximum steps. If NULL an indeterminate progress bar is rendered
+     *
      * @return void
      */
     public function progressStart($max = null)
@@ -291,11 +310,13 @@ class ConsoleOutput
     }
 
     /**
-     * Advances the progress output X steps
+     * Advances the progress output X steps.
      *
      * @param int $step Number of steps to advance
-     * @return void
+     *
      * @throws \LogicException
+     *
+     * @return void
      */
     public function progressAdvance($step = 1)
     {
@@ -303,11 +324,13 @@ class ConsoleOutput
     }
 
     /**
-     * Sets the current progress
+     * Sets the current progress.
      *
      * @param int $current The current progress
-     * @return void
+     *
      * @throws \LogicException
+     *
+     * @return void
      */
     public function progressSet($current)
     {
@@ -315,7 +338,7 @@ class ConsoleOutput
     }
 
     /**
-     * Finishes the progress output
+     * Finishes the progress output.
      *
      * @return void
      */
@@ -325,8 +348,9 @@ class ConsoleOutput
     }
 
     /**
-     * @return ArgvInput
      * @throws \RuntimeException
+     *
+     * @return ArgvInput
      */
     protected function getInput()
     {
@@ -341,7 +365,7 @@ class ConsoleOutput
     }
 
     /**
-     * Returns or initializes the symfony/console QuestionHelper
+     * Returns or initializes the symfony/console QuestionHelper.
      *
      * @return QuestionHelper
      */
@@ -349,14 +373,15 @@ class ConsoleOutput
     {
         if ($this->questionHelper === null) {
             $this->questionHelper = new QuestionHelper();
-            $helperSet = new HelperSet(array(new FormatterHelper()));
+            $helperSet = new HelperSet([new FormatterHelper()]);
             $this->questionHelper->setHelperSet($helperSet);
         }
+
         return $this->questionHelper;
     }
 
     /**
-     * Returns or initializes the symfony/console ProgressBar
+     * Returns or initializes the symfony/console ProgressBar.
      *
      * @return ProgressBar
      */
@@ -365,11 +390,12 @@ class ConsoleOutput
         if ($this->progressBar === null) {
             $this->progressBar = new ProgressBar($this->output);
         }
+
         return $this->progressBar;
     }
 
     /**
-     * Returns or initializes the symfony/console Table
+     * Returns or initializes the symfony/console Table.
      *
      * @return Table
      */
@@ -378,6 +404,7 @@ class ConsoleOutput
         if ($this->table === null) {
             $this->table = new Table($this->output);
         }
+
         return $this->table;
     }
 }

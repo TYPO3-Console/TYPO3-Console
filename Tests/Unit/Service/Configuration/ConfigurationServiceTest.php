@@ -8,7 +8,6 @@
  *
  * The GNU General Public License can be found at
  * http://www.gnu.org/copyleft/gpl.html.
- *
  */
 namespace Helhum\Typo3Console\Tests\Unit\Service\Configuration;
 
@@ -29,7 +28,7 @@ use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
- * Class ConfigurationServiceTest
+ * Class ConfigurationServiceTest.
  */
 class ConfigurationServiceTest extends UnitTestCase
 {
@@ -46,34 +45,34 @@ class ConfigurationServiceTest extends UnitTestCase
     /**
      * @var array
      */
-    protected $activeConfiguration = array(
-        'main' => array(
+    protected $activeConfiguration = [
+        'main' => [
             'default' => 'value',
-            'bla' => 'blupp',
-            'baz' => 'bah',
-            'foo' => 'bar'
-        )
-    );
+            'bla'     => 'blupp',
+            'baz'     => 'bah',
+            'foo'     => 'bar',
+        ],
+    ];
 
     public function setup()
     {
         $this->configurationManager = $this->getMock(ConfigurationManager::class);
         $this->configurationManager->expects($this->any())
             ->method('getLocalConfiguration')
-            ->willReturn(array(
-                'main' => array(
-                    'bla' => 'blupp',
+            ->willReturn([
+                'main' => [
+                    'bla'  => 'blupp',
                     'bazz' => 'buh',
-                    'foo' => 'baz'
-                )
-            ));
+                    'foo'  => 'baz',
+                ],
+            ]);
         $this->configurationManager->expects($this->any())
             ->method('getDefaultConfiguration')
-            ->willReturn(array(
-                'main' => array(
+            ->willReturn([
+                'main' => [
                     'default' => 'value',
-                )
-            ));
+                ],
+            ]);
         $this->subject = new ConfigurationService($this->configurationManager, $this->activeConfiguration);
     }
 
@@ -101,12 +100,12 @@ class ConfigurationServiceTest extends UnitTestCase
     public function getActiveWillReturnActiveConfiguration()
     {
         $this->assertSame(
-            array(
+            [
                 'default' => 'value',
-                'bla' => 'blupp',
-                'bazz' => 'buh',
-                'foo' => 'baz'
-            ),
+                'bla'     => 'blupp',
+                'bazz'    => 'buh',
+                'foo'     => 'baz',
+            ],
             $this->subject->getLocal('main')
         );
     }
@@ -117,12 +116,12 @@ class ConfigurationServiceTest extends UnitTestCase
     public function getLocalWillReturnMergedDefaultConfiguration()
     {
         $this->assertSame(
-            array(
+            [
                 'default' => 'value',
-                'bla' => 'blupp',
-                'baz' => 'bah',
-                'foo' => 'bar'
-            ),
+                'bla'     => 'blupp',
+                'baz'     => 'bah',
+                'foo'     => 'bar',
+            ],
             $this->subject->getActive('main')
         );
     }

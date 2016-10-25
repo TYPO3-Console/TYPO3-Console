@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Mvc\Cli;
 
 /*
@@ -16,19 +17,21 @@ namespace Helhum\Typo3Console\Mvc\Cli;
 use Symfony\Component\Process\ProcessBuilder;
 
 /**
- * Class CommandDispatcher
+ * Class CommandDispatcher.
  */
 class CommandDispatcher
 {
     /**
      * @param string $commandIdentifier
-     * @param array $arguments
-     * @return string Json encoded output of the executed command
+     * @param array  $arguments
+     *
      * @throws \Exception
+     *
+     * @return string Json encoded output of the executed command
      */
-    public function executeCommand($commandIdentifier, $arguments = array())
+    public function executeCommand($commandIdentifier, $arguments = [])
     {
-        $commandLine = isset($_SERVER['argv']) ? $_SERVER['argv'] : array();
+        $commandLine = isset($_SERVER['argv']) ? $_SERVER['argv'] : [];
 
         $processBuilder = new ProcessBuilder();
         $processBuilder->setPrefix(PHP_BINARY);
@@ -38,7 +41,7 @@ class CommandDispatcher
         foreach ($arguments as $argumentName => $argumentValue) {
             $dashedName = ucfirst($argumentName);
             $dashedName = preg_replace('/([A-Z][a-z0-9]+)/', '$1-', $dashedName);
-            $dashedName = '--' . strtolower(substr($dashedName, 0, -1));
+            $dashedName = '--'.strtolower(substr($dashedName, 0, -1));
             $processBuilder->add($dashedName);
             $processBuilder->add($argumentValue);
         }
@@ -50,7 +53,7 @@ class CommandDispatcher
 
         if ($exitCode > 0) {
             throw new \ErrorException(sprintf(
-                'Executing %s failed with message:' . LF . LF . '"%s"' . LF . LF . 'and error:' . LF . LF . '"%s"' . LF,
+                'Executing %s failed with message:'.LF.LF.'"%s"'.LF.LF.'and error:'.LF.LF.'"%s"'.LF,
                 $commandIdentifier,
                 $output,
                 $errorOutput

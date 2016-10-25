@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\ViewHelpers\Format;
 
 /*
@@ -31,11 +32,13 @@ class UnderlineViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewH
 {
     /**
      * @param string $withCharacter The padding string
+     *
      * @return string The formatted value
      */
     public function render($withCharacter = '-')
     {
         $string = $this->renderChildren();
-        return $string . chr(10) . str_repeat($withCharacter, strlen($string));
+
+        return $string.chr(10).str_repeat($withCharacter, strlen($string));
     }
 }

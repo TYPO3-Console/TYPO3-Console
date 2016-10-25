@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Command;
 
 /*
@@ -16,7 +17,7 @@ namespace Helhum\Typo3Console\Command;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 
 /**
- * Class SchedulerCommandController
+ * Class SchedulerCommandController.
  */
 class SchedulerCommandController extends CommandController
 {
@@ -27,14 +28,14 @@ class SchedulerCommandController extends CommandController
     protected $scheduler;
 
     /**
-     * Run scheduler
+     * Run scheduler.
      *
      * Executes tasks that are registered in the scheduler module.
      *
      * <b>Example:</b> <code>./typo3cms scheduler:run 42 --force</code>
      *
-     * @param int $taskId Uid of the task that should be executed (instead of all scheduled tasks)
-     * @param bool $force The execution can be forced with this flag. The task will then be executed even if it is not scheduled for execution yet. Only works, when a task is specified.
+     * @param int  $taskId Uid of the task that should be executed (instead of all scheduled tasks)
+     * @param bool $force  The execution can be forced with this flag. The task will then be executed even if it is not scheduled for execution yet. Only works, when a task is specified.
      */
     public function runCommand($taskId = null, $force = false)
     {
@@ -54,7 +55,7 @@ class SchedulerCommandController extends CommandController
     }
 
     /**
-     * Execute all scheduled tasks
+     * Execute all scheduled tasks.
      */
     protected function executeScheduledTasks()
     {
@@ -85,9 +86,9 @@ class SchedulerCommandController extends CommandController
     }
 
     /**
-     * Execute a single task
+     * Execute a single task.
      *
-     * @param int $taskId
+     * @param int  $taskId
      * @param bool $forceExecution
      */
     protected function executeSingleTask($taskId, $forceExecution)
@@ -96,7 +97,7 @@ class SchedulerCommandController extends CommandController
         if ($forceExecution) {
             $task = $this->scheduler->fetchTask($taskId);
         } else {
-            $whereClause = 'uid = ' . (int)$taskId . ' AND nextexecution != 0 AND nextexecution <= ' . (int)$GLOBALS['EXEC_TIME'];
+            $whereClause = 'uid = '.(int) $taskId.' AND nextexecution != 0 AND nextexecution <= '.(int) $GLOBALS['EXEC_TIME'];
             list($task) = $this->scheduler->fetchTasksWithCondition($whereClause);
         }
         if ($this->scheduler->isValidTaskObject($task)) {

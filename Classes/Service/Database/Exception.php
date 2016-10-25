@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Service\Database;
 
 /*
@@ -14,7 +15,7 @@ namespace Helhum\Typo3Console\Service\Database;
  */
 
 /**
- * Base class for database exceptions
+ * Base class for database exceptions.
  */
 class Exception extends \Helhum\Typo3Console\Service\Exception
 {

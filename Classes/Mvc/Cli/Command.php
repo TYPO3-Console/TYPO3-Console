@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Mvc\Cli;
 
 /*
@@ -14,7 +15,7 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 /**
- * Represents a Command
+ * Represents a Command.
  */
 class Command
 {
@@ -39,7 +40,7 @@ class Command
     protected $commandMethodReflection;
 
     /**
-     * Name of the extension to which this command belongs
+     * Name of the extension to which this command belongs.
      *
      * @var string
      */
@@ -59,10 +60,11 @@ class Command
     }
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param string $controllerClassName Class name of the controller providing the command
+     * @param string $controllerClassName   Class name of the controller providing the command
      * @param string $controllerCommandName Command name, i.e. the method name of the command, without the "Command" suffix
+     *
      * @throws \InvalidArgumentException
      */
     public function __construct($controllerClassName, $controllerCommandName)
@@ -72,19 +74,19 @@ class Command
         $delimiter = strpos($controllerClassName, '\\') !== false ? '\\' : '_';
         $classNameParts = explode($delimiter, $controllerClassName);
         if (isset($classNameParts[0]) && $classNameParts[0] === 'TYPO3' && isset($classNameParts[1]) && $classNameParts[1] === 'CMS') {
-            $classNameParts[0] .= '\\' . $classNameParts[1];
+            $classNameParts[0] .= '\\'.$classNameParts[1];
             unset($classNameParts[1]);
             $classNameParts = array_values($classNameParts);
         }
         if (count($classNameParts) !== 4 || strpos($classNameParts[3], 'CommandController') === false) {
             throw new \InvalidArgumentException(
-                'Invalid controller class name "' . $controllerClassName . '". Class name must have exactly 4 parts and must end with "CommandController" (e.g. Vendor\ExtensionName\Command\MySimpleCommandController).',
+                'Invalid controller class name "'.$controllerClassName.'". Class name must have exactly 4 parts and must end with "CommandController" (e.g. Vendor\ExtensionName\Command\MySimpleCommandController).',
                 1305100019
             );
         }
         $this->extensionName = $classNameParts[1];
         $extensionKey = \TYPO3\CMS\Core\Utility\GeneralUtility::camelCaseToLowerCaseUnderscored($this->extensionName);
-        $this->commandIdentifier = strtolower($extensionKey . ':' . substr($classNameParts[3], 0, -17) . ':' . $controllerCommandName);
+        $this->commandIdentifier = strtolower($extensionKey.':'.substr($classNameParts[3], 0, -17).':'.$controllerCommandName);
     }
 
     /**
@@ -104,7 +106,7 @@ class Command
     }
 
     /**
-     * Returns the command identifier for this command
+     * Returns the command identifier for this command.
      *
      * @return string The command identifier for this command, following the pattern extensionname:controllername:commandname
      */
@@ -114,7 +116,7 @@ class Command
     }
 
     /**
-     * Returns the name of the extension to which this command belongs
+     * Returns the name of the extension to which this command belongs.
      *
      * @return string
      */
@@ -124,20 +126,21 @@ class Command
     }
 
     /**
-     * Returns a short description of this command
+     * Returns a short description of this command.
      *
      * @return string A short description
      */
     public function getShortDescription()
     {
         $lines = explode(LF, $this->getCommandMethodReflection()->getDescription());
+
         return !empty($lines) ? trim($lines[0]) : '<no description available>';
     }
 
     /**
      * Returns a longer description of this command
      * This is the complete method description except for the first line which can be retrieved via getShortDescription()
-     * If The command description only consists of one line, an empty string is returned
+     * If The command description only consists of one line, an empty string is returned.
      *
      * @return string A longer description of this command
      */
@@ -145,18 +148,19 @@ class Command
     {
         $lines = explode(LF, $this->getCommandMethodReflection()->getDescription());
         array_shift($lines);
-        $descriptionLines = array();
+        $descriptionLines = [];
         foreach ($lines as $line) {
             $trimmedLine = trim($line);
-            if ($descriptionLines !== array() || $trimmedLine !== '') {
+            if ($descriptionLines !== [] || $trimmedLine !== '') {
                 $descriptionLines[] = $trimmedLine;
             }
         }
+
         return implode(LF, $descriptionLines);
     }
 
     /**
-     * Returns TRUE if this command expects required and/or optional arguments, otherwise FALSE
+     * Returns TRUE if this command expects required and/or optional arguments, otherwise FALSE.
      *
      * @return bool
      */
@@ -168,19 +172,19 @@ class Command
     /**
      * Returns an array of \TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition that contains
      * information about required/optional arguments of this command.
-     * If the command does not expect any arguments, an empty array is returned
+     * If the command does not expect any arguments, an empty array is returned.
      *
      * @return \TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition[]
      */
     public function getArgumentDefinitions()
     {
         if (!$this->hasArguments()) {
-            return array();
+            return [];
         }
-        $commandArgumentDefinitions = array();
+        $commandArgumentDefinitions = [];
         $commandMethodReflection = $this->getCommandMethodReflection();
         $annotations = $commandMethodReflection->getTagsValues();
-        $commandParameters = $this->reflectionService->getMethodParameters($this->controllerClassName, $this->controllerCommandName . 'Command');
+        $commandParameters = $this->reflectionService->getMethodParameters($this->controllerClassName, $this->controllerCommandName.'Command');
         $i = 0;
         foreach ($commandParameters as $commandParameterName => $commandParameterDefinition) {
             $explodedAnnotation = preg_split('/\s+/', $annotations['param'][$i], 3);
@@ -189,6 +193,7 @@ class Command
             $commandArgumentDefinitions[] = new \TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition($commandParameterName, $required, $description);
             $i++;
         }
+
         return $commandArgumentDefinitions;
     }
 
@@ -236,14 +241,15 @@ class Command
     {
         $commandMethodReflection = $this->getCommandMethodReflection();
         if (!$commandMethodReflection->isTaggedWith('see')) {
-            return array();
+            return [];
         }
-        $relatedCommandIdentifiers = array();
+        $relatedCommandIdentifiers = [];
         foreach ($commandMethodReflection->getTagValues('see') as $tagValue) {
             if (preg_match('/^[\\w\\d\\.]+:[\\w\\d]+:[\\w\\d]+$/', $tagValue) === 1) {
                 $relatedCommandIdentifiers[] = $tagValue;
             }
         }
+
         return $relatedCommandIdentifiers;
     }
 
@@ -253,8 +259,9 @@ class Command
     protected function getCommandMethodReflection()
     {
         if ($this->commandMethodReflection === null) {
-            $this->commandMethodReflection = new \TYPO3\CMS\Extbase\Reflection\MethodReflection($this->controllerClassName, $this->controllerCommandName . 'Command');
+            $this->commandMethodReflection = new \TYPO3\CMS\Extbase\Reflection\MethodReflection($this->controllerClassName, $this->controllerCommandName.'Command');
         }
+
         return $this->commandMethodReflection;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Service;
 
 /*
@@ -43,17 +44,20 @@ class XsdGenerator
      * It will generate an XSD file for all view helpers in this namespace.
      *
      * @param string $viewHelperNamespace Namespace identifier to generate the XSD for, without leading Backslash.
-     * @param string $xsdNamespace $xsdNamespace unique target namespace used in the XSD schema (for example "http://yourdomain.org/ns/viewhelpers")
-     * @return string XML Schema definition
+     * @param string $xsdNamespace        $xsdNamespace unique target namespace used in the XSD schema (for example "http://yourdomain.org/ns/viewhelpers")
+     *
      * @throws Exception
+     *
+     * @return string XML Schema definition
      */
     public function generateXsd($viewHelperNamespace, $xsdNamespace)
     {
-        $viewHelperNamespace = rtrim($viewHelperNamespace, '_\\') . $this->getDelimiterFromNamespace($viewHelperNamespace);
+        $viewHelperNamespace = rtrim($viewHelperNamespace, '_\\').$this->getDelimiterFromNamespace($viewHelperNamespace);
         $classNames = $this->getClassNamesInNamespace($viewHelperNamespace);
         if (count($classNames) === 0) {
             throw new Exception(sprintf('No ViewHelpers found in namespace "%s"', $viewHelperNamespace), 1330029328);
         }
+
         return $this->generateXsdFromClassNames($classNames, $xsdNamespace);
     }
 
@@ -61,10 +65,12 @@ class XsdGenerator
      * Generate the XML Schema definition for a given namespace.
      * It will generate an XSD file for all view helpers in this namespace.
      *
-     * @param array $viewHelperPaths One or more paths to a view helper class files
-     * @param string $xsdNamespace $xsdNamespace unique target namespace used in the XSD schema (for example "http://yourdomain.org/ns/viewhelpers")
-     * @return string XML Schema definition
+     * @param array  $viewHelperPaths One or more paths to a view helper class files
+     * @param string $xsdNamespace    $xsdNamespace unique target namespace used in the XSD schema (for example "http://yourdomain.org/ns/viewhelpers")
+     *
      * @throws Exception
+     *
+     * @return string XML Schema definition
      */
     public function generateXsdFromClassFiles(array $viewHelperPaths, $xsdNamespace)
     {
@@ -72,6 +78,7 @@ class XsdGenerator
         if (count($classNames) === 0) {
             throw new Exception(sprintf('No ViewHelpers found in paths "%s"', implode(',', $viewHelperPaths)), 1464982249);
         }
+
         return $this->generateXsdFromClassNames($classNames, $xsdNamespace);
     }
 
@@ -79,10 +86,12 @@ class XsdGenerator
      * Generate the XML Schema definition for a given namespace.
      * It will generate an XSD file for all view helpers in this namespace.
      *
-     * @param array $classNames One or more view helper class names
+     * @param array  $classNames   One or more view helper class names
      * @param string $xsdNamespace $xsdNamespace unique target namespace used in the XSD schema (for example "http://yourdomain.org/ns/viewhelpers")
-     * @return string XML Schema definition
+     *
      * @throws Exception
+     *
+     * @return string XML Schema definition
      */
     protected function generateXsdFromClassNames(array $classNames, $xsdNamespace)
     {
@@ -90,19 +99,21 @@ class XsdGenerator
             throw new Exception(sprintf('No ViewHelper classes given'), 1464984856);
         }
         $xmlRootNode = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?>
-            <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="' . $xsdNamespace . '"></xsd:schema>');
+            <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="'.$xsdNamespace.'"></xsd:schema>');
 
         foreach ($classNames as $className) {
             $this->generateXmlForClassName($className, $xmlRootNode);
         }
+
         return $xmlRootNode->asXML();
     }
 
     /**
      * Generate the XML Schema for a given class name.
      *
-     * @param string $className Class name to generate the schema for.
+     * @param string            $className   Class name to generate the schema for.
      * @param \SimpleXMLElement $xmlRootNode XML root node where the xsd:element is appended.
+     *
      * @return void
      */
     protected function generateXmlForClassName($className, \SimpleXMLElement $xmlRootNode)
@@ -128,8 +139,9 @@ class XsdGenerator
      * Add attribute descriptions to a given tag.
      * Initializes the view helper and its arguments, and then reads out the list of arguments.
      *
-     * @param string $className Class name where to add the attribute descriptions
+     * @param string            $className  Class name where to add the attribute descriptions
      * @param \SimpleXMLElement $xsdElement XML element to add the attributes to.
+     *
      * @return void
      */
     protected function addAttributes($className, \SimpleXMLElement $xsdElement)
@@ -151,10 +163,11 @@ class XsdGenerator
     }
 
     /**
-     * Add documentation XSD to a given XML node
+     * Add documentation XSD to a given XML node.
      *
-     * @param string $documentation Documentation string to add.
+     * @param string            $documentation Documentation string to add.
      * @param \SimpleXMLElement $xsdParentNode Node to add the documentation to
+     *
      * @return void
      */
     protected function addDocumentation($documentation, \SimpleXMLElement $xsdParentNode)
@@ -167,25 +180,26 @@ class XsdGenerator
      * Get all class names inside this namespace and return them as array.
      * This has to be done by iterating over class files for TYPO3 CMS
      * as the Extbase Reflection Service cannot return all implementations
-     * of Fluid AbstractViewHelpers
+     * of Fluid AbstractViewHelpers.
      *
      * @param array $paths
+     *
      * @return array Array of all class names inside a given namespace.
      */
     protected function getClassNamesInPaths(array $paths)
     {
-        $viewHelperClassFiles = array();
+        $viewHelperClassFiles = [];
         foreach ($paths as $path) {
             $viewHelperClassFiles = array_merge(
                 $viewHelperClassFiles,
                 GeneralUtility::getAllFilesAndFoldersInPath(
-                    array(),
+                    [],
                     $path,
                     'php'
                 )
             );
         }
-        $affectedViewHelperClassNames = array();
+        $affectedViewHelperClassNames = [];
         foreach ($viewHelperClassFiles as $filePathAndFilename) {
             try {
                 $potentialViewHelperClassName = $this->getClassNameFromFile($filePathAndFilename);
@@ -210,6 +224,7 @@ class XsdGenerator
             }
         }
         sort($affectedViewHelperClassNames);
+
         return $affectedViewHelperClassNames;
     }
 
@@ -217,23 +232,26 @@ class XsdGenerator
      * Get all class names inside this namespace and return them as array.
      * This has to be done by iterating over class files for TYPO3 CMS
      * as the Extbase Reflection Service cannot return all implementations
-     * of Fluid AbstractViewHelpers
+     * of Fluid AbstractViewHelpers.
      *
      * @param string $namespace
+     *
      * @return array Array of all class names inside a given namespace.
      */
     protected function getClassNamesInNamespace($namespace)
     {
         $packageKey = $this->getPackageKeyFromNamespace($namespace);
-        $viewHelperClassFilePaths[] = $this->packageManager->getPackage($packageKey)->getPackagePath() . 'Classes/ViewHelpers/';
+        $viewHelperClassFilePaths[] = $this->packageManager->getPackage($packageKey)->getPackagePath().'Classes/ViewHelpers/';
         if ($packageKey === 'fluid') {
-            $viewHelperClassFilePaths[] = realpath(PATH_site . 'typo3/') . '/../vendor/typo3fluid/fluid/src/ViewHelpers/';
+            $viewHelperClassFilePaths[] = realpath(PATH_site.'typo3/').'/../vendor/typo3fluid/fluid/src/ViewHelpers/';
         }
+
         return $this->getClassNamesInPaths($viewHelperClassFilePaths);
     }
 
     /**
      * @param string $namespace
+     *
      * @return string
      */
     protected function getPackageKeyFromNamespace($namespace)
@@ -251,6 +269,7 @@ class XsdGenerator
 
     /**
      * @param string $filePath
+     *
      * @return string
      */
     protected function getClassNameFromFile($filePath)
@@ -263,6 +282,7 @@ class XsdGenerator
 
     /**
      * @param string $namespace
+     *
      * @return string
      */
     protected function getDelimiterFromNamespace($namespace)
@@ -290,6 +310,7 @@ class XsdGenerator
      * namespace prefix TYPO3\CMS\Fluid\ViewHelpers\, this method returns "form.select".
      *
      * @param string $className Class name
+     *
      * @return string Tag name
      */
     protected function getTagNameForClass($className)
@@ -297,6 +318,7 @@ class XsdGenerator
         /// Strip namespace from the beginning and "ViewHelper" from the end of the class name
         $strippedClassName = substr($className, strpos($className, 'ViewHelpers') + 12, -10);
         $classNameParts = explode('\\', $strippedClassName);
+
         return implode(
             '.',
             array_map(
@@ -311,9 +333,10 @@ class XsdGenerator
     /**
      * Add a child node to $parentXmlNode, and wrap the contents inside a CDATA section.
      *
-     * @param \SimpleXMLElement $parentXmlNode Parent XML Node to add the child to
-     * @param string $childNodeName Name of the child node
-     * @param string $childNodeValue Value of the child node. Will be placed inside CDATA.
+     * @param \SimpleXMLElement $parentXmlNode  Parent XML Node to add the child to
+     * @param string            $childNodeName  Name of the child node
+     * @param string            $childNodeValue Value of the child node. Will be placed inside CDATA.
+     *
      * @return \SimpleXMLElement the new element
      */
     protected function addChildWithCData(\SimpleXMLElement $parentXmlNode, $childNodeName, $childNodeValue)
@@ -325,6 +348,7 @@ class XsdGenerator
         $childNode->appendChild($domDocument->createCDATASection($childNodeValue));
         $childNodeTarget = $parentDomNode->ownerDocument->importNode($childNode, true);
         $parentDomNode->appendChild($childNodeTarget);
+
         return simplexml_import_dom($childNodeTarget);
     }
 }

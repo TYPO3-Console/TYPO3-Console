@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Command;
 
 /*
@@ -18,12 +19,12 @@ use Symfony\Component\Process\PhpProcess;
 use TYPO3\CMS\Core\Tests\Functional\Framework\Frontend\Response;
 
 /**
- * Class SchedulerCommandController
+ * Class SchedulerCommandController.
  */
 class FrontendCommandController extends CommandController
 {
     /**
-     * Submit frontend request
+     * Submit frontend request.
      *
      * Submits a frontend request to TYPO3 on the specified URL.
      *
@@ -32,13 +33,13 @@ class FrontendCommandController extends CommandController
     public function requestCommand($requestUrl)
     {
         // TODO: this needs heavy cleanup!
-        $template = file_get_contents(__DIR__ . '/../../Resources/Private/Templates/request.tpl');
-        $arguments = array(
+        $template = file_get_contents(__DIR__.'/../../Resources/Private/Templates/request.tpl');
+        $arguments = [
             'documentRoot' => PATH_site,
-            'requestUrl' => $this->makeAbsolute($requestUrl),
-        );
+            'requestUrl'   => $this->makeAbsolute($requestUrl),
+        ];
         // No other solution atm than to fake a CLI request type
-        $code = str_replace(array('{originalRoot}', '{arguments}'), array(PATH_site, var_export($arguments, true)), $template);
+        $code = str_replace(['{originalRoot}', '{arguments}'], [PATH_site, var_export($arguments, true)], $template);
         $process = new PhpProcess($code);
         $process->mustRun();
         $rawResponse = json_decode($process->getOutput());
@@ -57,6 +58,7 @@ class FrontendCommandController extends CommandController
      * correctly configures the environment for trusted host pattern.
      *
      * @param string $url
+     *
      * @return string
      */
     protected function makeAbsolute($url)
@@ -69,6 +71,7 @@ class FrontendCommandController extends CommandController
         if (!isset($parsedUrl['host'])) {
             $finalUrl .= 'localhost';
         }
-        return $finalUrl . '/' . ltrim($url, '/');
+
+        return $finalUrl.'/'.ltrim($url, '/');
     }
 }

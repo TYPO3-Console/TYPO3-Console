@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Service\Database;
 
 /*
@@ -18,17 +19,17 @@ use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use TYPO3\CMS\Core\SingletonInterface;
 
 /**
- * Service for database schema migrations
+ * Service for database schema migrations.
  */
 class SchemaService implements SingletonInterface
 {
     /**
-     * Group of safe statements
+     * Group of safe statements.
      */
     const STATEMENT_GROUP_SAFE = 'add_create_change';
 
     /**
-     * Group of destructive statements
+     * Group of destructive statements.
      */
     const STATEMENT_GROUP_DESTRUCTIVE = 'drop_rename';
 
@@ -45,26 +46,27 @@ class SchemaService implements SingletonInterface
     protected $expectedSchemaService;
 
     /**
-     * Mapping of schema update types to internal statement types
+     * Mapping of schema update types to internal statement types.
      *
      * @var array
      */
-    protected $schemaUpdateTypesStatementTypesMapping = array(
-        SchemaUpdateType::FIELD_ADD => array('add' => self::STATEMENT_GROUP_SAFE),
-        SchemaUpdateType::FIELD_CHANGE => array('change' => self::STATEMENT_GROUP_SAFE),
-        SchemaUpdateType::FIELD_PREFIX => array('change' => self::STATEMENT_GROUP_DESTRUCTIVE),
-        SchemaUpdateType::FIELD_DROP => array('drop' => self::STATEMENT_GROUP_DESTRUCTIVE),
-        SchemaUpdateType::TABLE_ADD => array('create_table' => self::STATEMENT_GROUP_SAFE),
-        SchemaUpdateType::TABLE_CHANGE => array('change_table' => self::STATEMENT_GROUP_SAFE),
-        SchemaUpdateType::TABLE_CLEAR => array('clear_table' => self::STATEMENT_GROUP_DESTRUCTIVE),
-        SchemaUpdateType::TABLE_PREFIX => array('change_table' => self::STATEMENT_GROUP_DESTRUCTIVE),
-        SchemaUpdateType::TABLE_DROP => array('drop_table' => self::STATEMENT_GROUP_DESTRUCTIVE),
-    );
+    protected $schemaUpdateTypesStatementTypesMapping = [
+        SchemaUpdateType::FIELD_ADD    => ['add' => self::STATEMENT_GROUP_SAFE],
+        SchemaUpdateType::FIELD_CHANGE => ['change' => self::STATEMENT_GROUP_SAFE],
+        SchemaUpdateType::FIELD_PREFIX => ['change' => self::STATEMENT_GROUP_DESTRUCTIVE],
+        SchemaUpdateType::FIELD_DROP   => ['drop' => self::STATEMENT_GROUP_DESTRUCTIVE],
+        SchemaUpdateType::TABLE_ADD    => ['create_table' => self::STATEMENT_GROUP_SAFE],
+        SchemaUpdateType::TABLE_CHANGE => ['change_table' => self::STATEMENT_GROUP_SAFE],
+        SchemaUpdateType::TABLE_CLEAR  => ['clear_table' => self::STATEMENT_GROUP_DESTRUCTIVE],
+        SchemaUpdateType::TABLE_PREFIX => ['change_table' => self::STATEMENT_GROUP_DESTRUCTIVE],
+        SchemaUpdateType::TABLE_DROP   => ['drop_table' => self::STATEMENT_GROUP_DESTRUCTIVE],
+    ];
 
     /**
-     * Perform necessary database schema migrations
+     * Perform necessary database schema migrations.
      *
      * @param SchemaUpdateType[] $schemaUpdateTypes List of permitted schema update types
+     *
      * @return SchemaUpdateResult Result of the schema update
      */
     public function updateSchema(array $schemaUpdateTypes)
@@ -75,10 +77,10 @@ class SchemaService implements SingletonInterface
         $addCreateChange = $this->schemaMigrationService->getDatabaseExtra($expectedSchema, $currentSchema);
         $dropRename = $this->schemaMigrationService->getDatabaseExtra($currentSchema, $expectedSchema);
 
-        $updateStatements = array(
-            self::STATEMENT_GROUP_SAFE => $this->schemaMigrationService->getUpdateSuggestions($addCreateChange),
+        $updateStatements = [
+            self::STATEMENT_GROUP_SAFE        => $this->schemaMigrationService->getUpdateSuggestions($addCreateChange),
             self::STATEMENT_GROUP_DESTRUCTIVE => $this->schemaMigrationService->getUpdateSuggestions($dropRename, 'remove'),
-        );
+        ];
 
         $updateResult = new SchemaUpdateResult();
 
@@ -107,13 +109,14 @@ class SchemaService implements SingletonInterface
     }
 
     /**
-     * Map schema update type to a list of internal statement types
+     * Map schema update type to a list of internal statement types.
      *
      * @param SchemaUpdateType $schemaUpdateType Schema update types
+     *
      * @return array
      */
     protected function getStatementTypes(SchemaUpdateType $schemaUpdateType)
     {
-        return $this->schemaUpdateTypesStatementTypesMapping[(string)$schemaUpdateType];
+        return $this->schemaUpdateTypesStatementTypesMapping[(string) $schemaUpdateType];
     }
 }

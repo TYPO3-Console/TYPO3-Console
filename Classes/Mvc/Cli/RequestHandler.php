@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Mvc\Cli;
 
 /*
@@ -52,7 +53,7 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
     protected $bootstrap;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param Bootstrap $bootstrap
      */
@@ -62,7 +63,7 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
     }
 
     /**
-     * Handles the request
+     * Handles the request.
      *
      * @return \TYPO3\CMS\Extbase\Mvc\ResponseInterface
      */
@@ -77,7 +78,7 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
         $commandLine = $_SERVER['argv'];
         $callingScript = array_shift($commandLine);
         if ($callingScript !== $_SERVER['_']) {
-            $callingScript = $_SERVER['_'] . ' ' . $callingScript;
+            $callingScript = $_SERVER['_'].' '.$callingScript;
         }
 
         $this->boot($_SERVER['argv'][1]);
@@ -112,7 +113,7 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
 
     protected function getCommandConfigurationFiles()
     {
-        $commandConfigurationFiles['typo3_console'] = __DIR__ . '/../../../Configuration/Console/Commands.php';
+        $commandConfigurationFiles['typo3_console'] = __DIR__.'/../../../Configuration/Console/Commands.php';
         /** @var PackageManager $packageManager */
         $packageManager = $this->bootstrap->getEarlyInstance(PackageManager::class);
         foreach ($packageManager->getActivePackages() as $package) {
@@ -120,18 +121,20 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
                 // happens in non composer mode when we have an extension
                 continue;
             }
-            $possibleCommandsFileName = $package->getPackagePath() . '/Configuration/Console/Commands.php';
+            $possibleCommandsFileName = $package->getPackagePath().'/Configuration/Console/Commands.php';
             if (!file_exists($possibleCommandsFileName)) {
                 continue;
             }
             $commandConfigurationFiles[$package->getPackageKey()] = $possibleCommandsFileName;
         }
+
         return $commandConfigurationFiles;
     }
 
     /**
-     * @param mixed $commandConfiguration
+     * @param mixed  $commandConfiguration
      * @param string $packageKey
+     *
      * @throws \RuntimeException
      */
     protected function ensureValidCommandsConfiguration($commandConfiguration, $packageKey)
@@ -146,7 +149,7 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
             || !isset($commandConfiguration['bootingSteps'])
             || !is_array($commandConfiguration['bootingSteps'])
         ) {
-            throw new \RuntimeException($packageKey . ' defines invalid commands in Configuration/Console/Commands.php', 1461186959);
+            throw new \RuntimeException($packageKey.' defines invalid commands in Configuration/Console/Commands.php', 1461186959);
         }
     }
 
@@ -171,6 +174,7 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
      * Checks if the request handler can handle the current request.
      *
      * @return bool true if it can handle the request, otherwise false
+     *
      * @api
      */
     public function canHandleRequest()
@@ -181,6 +185,7 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
     /**
      * @param $commandConfiguration
      * @param $packageKey
+     *
      * @throws \RuntimeException
      */
     protected function registerCommandsFromConfiguration($commandConfiguration, $packageKey)
@@ -194,7 +199,7 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
             $this->bootstrap->setRunLevelForCommand($commandIdentifier, $runLevel);
         }
         foreach ($commandConfiguration['bootingSteps'] as $commandIdentifier => $bootingSteps) {
-            foreach ((array)$bootingSteps as $bootingStep) {
+            foreach ((array) $bootingSteps as $bootingStep) {
                 $this->bootstrap->addBootingStepForCommand($commandIdentifier, $bootingStep);
             }
         }

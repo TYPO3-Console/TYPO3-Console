@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Service\Configuration;
 
 /*
@@ -14,7 +15,7 @@ namespace Helhum\Typo3Console\Service\Configuration;
  */
 
 /**
- * Configuration value was not found
+ * Configuration value was not found.
  */
 class ConfigurationValueNotFoundException extends \Exception
 {

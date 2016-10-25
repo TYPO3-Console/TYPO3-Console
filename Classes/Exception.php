@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console;
 
 /*
@@ -14,7 +15,7 @@ namespace Helhum\Typo3Console;
  */
 
 /**
- * A generic exception
+ * A generic exception.
  */
 class Exception extends \Exception
 {

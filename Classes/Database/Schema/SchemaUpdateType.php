@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Database\Schema;
 
 /*
@@ -17,7 +18,7 @@ use TYPO3\CMS\Core\Type\Enumeration;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 
 /**
- * List of database schema update types
+ * List of database schema update types.
  */
 class SchemaUpdateType extends Enumeration
 {
@@ -27,66 +28,68 @@ class SchemaUpdateType extends Enumeration
     protected $value;
 
     /**
-     * Add a field
+     * Add a field.
      */
     const FIELD_ADD = 'field.add';
 
     /**
-     * Change a field
+     * Change a field.
      */
     const FIELD_CHANGE = 'field.change';
 
     /**
-    * Prefix a field
-    */
+     * Prefix a field.
+     */
     const FIELD_PREFIX = 'field.prefix';
 
     /**
-     * Drop a field
+     * Drop a field.
      */
     const FIELD_DROP = 'field.drop';
 
     /**
-     * Add a table
+     * Add a table.
      */
     const TABLE_ADD = 'table.add';
 
     /**
-     * Change a table
+     * Change a table.
      */
     const TABLE_CHANGE = 'table.change';
 
     /**
-    * Prefix a table
-    */
+     * Prefix a table.
+     */
     const TABLE_PREFIX = 'table.prefix';
 
     /**
-     * Drop a table
+     * Drop a table.
      */
     const TABLE_DROP = 'table.drop';
 
     /**
-     * Truncate a table
+     * Truncate a table.
      */
     const TABLE_CLEAR = 'table.clear';
 
     /**
-     * Expands wildcards in schema update types, e.g. field.* or *.change
+     * Expands wildcards in schema update types, e.g. field.* or *.change.
      *
      * @param array $schemaUpdateTypes List of schema update types
-     * @return SchemaUpdateType[]
+     *
      * @throws InvalidEnumerationValueException If an invalid schema update type was passed
+     *
+     * @return SchemaUpdateType[]
      */
     public static function expandSchemaUpdateTypes(array $schemaUpdateTypes)
     {
-        $expandedSchemaUpdateTypes = array();
-        $schemaUpdateTypeConstants = array_values(SchemaUpdateType::getConstants());
+        $expandedSchemaUpdateTypes = [];
+        $schemaUpdateTypeConstants = array_values(self::getConstants());
 
         // Collect total list of types by expanding wildcards
         foreach ($schemaUpdateTypes as $schemaUpdateType) {
             if (strpos($schemaUpdateType, '*') !== false) {
-                $matchPattern = '/' . str_replace('\\*', '.+', preg_quote($schemaUpdateType, '/')) . '/';
+                $matchPattern = '/'.str_replace('\\*', '.+', preg_quote($schemaUpdateType, '/')).'/';
                 $matchingSchemaUpdateTypes = preg_grep($matchPattern, $schemaUpdateTypeConstants);
                 $expandedSchemaUpdateTypes = array_merge($expandedSchemaUpdateTypes, $matchingSchemaUpdateTypes);
             } else {
@@ -97,7 +100,7 @@ class SchemaUpdateType extends Enumeration
         // Cast to enumeration objects to ensure valid values
         foreach ($expandedSchemaUpdateTypes as &$schemaUpdateType) {
             try {
-                $schemaUpdateType = SchemaUpdateType::cast($schemaUpdateType);
+                $schemaUpdateType = self::cast($schemaUpdateType);
             } catch (InvalidEnumerationValueException $e) {
                 throw new InvalidEnumerationValueException(sprintf(
                     'Invalid schema update type "%s", must be one of: "%s"',
@@ -106,6 +109,7 @@ class SchemaUpdateType extends Enumeration
                 ), 1439460396);
             }
         }
+
         return $expandedSchemaUpdateTypes;
     }
 }

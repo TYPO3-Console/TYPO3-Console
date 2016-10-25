@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Service\Configuration\ConsoleRenderer;
 
 /*
@@ -16,7 +17,7 @@ namespace Helhum\Typo3Console\Service\Configuration\ConsoleRenderer;
 use cogpowered\FineDiff\Render\Renderer;
 
 /**
- * Renderer for the diff package, optimized for console output
+ * Renderer for the diff package, optimized for console output.
  */
 class DiffConsoleRenderer extends Renderer
 {
@@ -27,12 +28,13 @@ class DiffConsoleRenderer extends Renderer
         } elseif ($opcode === 'd') {
             $deletion = substr($from, $from_offset, $from_len);
             $deletion = preg_replace('/^(.)/m', '-$1 ', $deletion);
-            $output = '<del>' . $deletion . '</del>';
+            $output = '<del>'.$deletion.'</del>';
         } else {/* if ( $opcode === 'i' ) */
             $addition = substr($from, $from_offset, $from_len);
             $addition = preg_replace('/^(.)/m', '+$1 ', $addition);
-            $output = '<ins>' . $addition . '</ins>';
+            $output = '<ins>'.$addition.'</ins>';
         }
+
         return $output;
     }
 }

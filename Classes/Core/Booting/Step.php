@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Core\Booting;
 
 /*
@@ -16,7 +17,7 @@ namespace Helhum\Typo3Console\Core\Booting;
 use TYPO3\CMS\Core\Core\Bootstrap;
 
 /**
- * A Step within a Sequence
+ * A Step within a Sequence.
  *
  * @api
  */
@@ -28,13 +29,13 @@ class Step
     protected $identifier;
 
     /**
-     * @var Callable
+     * @var callable
      */
     protected $callback;
 
     /**
      * @param string $identifier
-     * @param mixed $callback
+     * @param mixed  $callback
      */
     public function __construct($identifier, $callback)
     {
@@ -43,9 +44,10 @@ class Step
     }
 
     /**
-     * Invokes / executes this step
+     * Invokes / executes this step.
      *
      * @param Bootstrap $bootstrap
+     *
      * @return void
      */
     public function __invoke(Bootstrap $bootstrap)

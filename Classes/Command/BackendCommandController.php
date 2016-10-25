@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Command;
 
 /*
@@ -21,45 +22,47 @@ use Helhum\Typo3Console\Mvc\Controller\CommandController;
 class BackendCommandController extends CommandController
 {
     /**
-     * Lock backend
+     * Lock backend.
      *
      * Deny backend access for <b>every</b> user (including admins).
      *
      * @param string $redirectUrl URL to redirect to when the backend is accessed
+     *
      * @see typo3_console:backend:unlock
      */
     public function lockCommand($redirectUrl = null)
     {
-        if (@is_file(PATH_typo3conf . 'LOCK_BACKEND')) {
+        if (@is_file(PATH_typo3conf.'LOCK_BACKEND')) {
             $this->outputLine('<warning>Backend is already locked!</warning>');
             $this->sendAndExit(1);
         }
-        \TYPO3\CMS\Core\Utility\GeneralUtility::writeFile(PATH_typo3conf . 'LOCK_BACKEND', (string)$redirectUrl);
-        if (!@is_file(PATH_typo3conf . 'LOCK_BACKEND')) {
+        \TYPO3\CMS\Core\Utility\GeneralUtility::writeFile(PATH_typo3conf.'LOCK_BACKEND', (string) $redirectUrl);
+        if (!@is_file(PATH_typo3conf.'LOCK_BACKEND')) {
             $this->outputLine('<error>Could not create lock file \'typo3conf/LOCK_BACKEND\'!</error>');
             $this->sendAndExit(2);
         } else {
             $this->outputLine('<info>Backend has been locked. Access is denied for every user until it is unlocked again.</info>');
             if ($redirectUrl !== null) {
-                $this->outputLine('Any access to the backend will be redirected to: \'' . $redirectUrl . '\'');
+                $this->outputLine('Any access to the backend will be redirected to: \''.$redirectUrl.'\'');
             }
         }
     }
 
     /**
-     * Unlock backend
+     * Unlock backend.
      *
      * Allow backend access again (e.g. after having been locked with backend:lock command).
+     *
      * @see typo3_console:backend:lock
      */
     public function unlockCommand()
     {
-        if (!@is_file(PATH_typo3conf . 'LOCK_BACKEND')) {
+        if (!@is_file(PATH_typo3conf.'LOCK_BACKEND')) {
             $this->outputLine('<warning>Backend is already unlocked!</warning>');
             $this->sendAndExit(1);
         }
-        unlink(PATH_typo3conf . 'LOCK_BACKEND');
-        if (@is_file(PATH_typo3conf . 'LOCK_BACKEND')) {
+        unlink(PATH_typo3conf.'LOCK_BACKEND');
+        if (@is_file(PATH_typo3conf.'LOCK_BACKEND')) {
             $this->outputLine('<error>Could not remove lock file \'typo3conf/LOCK_BACKEND\'!</error>');
             $this->sendAndExit(2);
         } else {
@@ -77,7 +80,7 @@ class BackendCommandController extends CommandController
     protected $configurationService;
 
     /**
-     * Lock backend for editors
+     * Lock backend for editors.
      *
      * Deny backend access, but only for editors.
      * Admins will still be able to log in and work with the backend.
@@ -87,7 +90,7 @@ class BackendCommandController extends CommandController
     public function lockForEditorsCommand()
     {
         $this->ensureConfigValueModifiable();
-        $lockedForEditors =  $this->configurationService->getLocal('BE/adminOnly') !== self::LOCK_TYPE_UNLOCKED;
+        $lockedForEditors = $this->configurationService->getLocal('BE/adminOnly') !== self::LOCK_TYPE_UNLOCKED;
         if (!$lockedForEditors) {
             $this->configurationService->setLocal('BE/adminOnly', self::LOCK_TYPE_ADMIN);
             $this->outputLine('<info>Locked backend for editor access!</info>');
@@ -98,7 +101,7 @@ class BackendCommandController extends CommandController
     }
 
     /**
-     * Unlock backend for editors
+     * Unlock backend for editors.
      *
      * Allow backend access for editors again (e.g. after having been locked with backend:lockforeditors command).
      *
