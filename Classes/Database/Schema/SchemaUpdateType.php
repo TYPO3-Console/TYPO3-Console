@@ -15,7 +15,6 @@ namespace Helhum\Typo3Console\Database\Schema;
 
 use TYPO3\CMS\Core\Type\Enumeration;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * List of database schema update types
