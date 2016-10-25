@@ -15,7 +15,6 @@ namespace Helhum\Typo3Console\Install;
 
 use Helhum\Typo3Console\Install\Status\RedirectStatus;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
-use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition;
 use TYPO3\CMS\Extbase\Mvc\Controller\Argument;
@@ -122,14 +121,7 @@ class CliSetupRequestHandler
      */
     public function executeActionWithArguments($actionName, array $arguments = [])
     {
-        // TODO: provide pre- and post-execute signals?
         $messages = $this->executeAction($this->createActionWithNameAndArguments($actionName, $arguments));
-        // TODO: ultimately get rid of that!
-        if ($messages === [] && $actionName === 'databaseData') {
-            /** @var DatabaseConnection $db */
-            $db = $GLOBALS['TYPO3_DB'];
-            $db->exec_INSERTquery('be_users', ['username' => '_cli_lowlevel']);
-        }
         $this->output->outputLine(serialize($messages));
     }
 

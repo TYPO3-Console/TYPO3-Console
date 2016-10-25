@@ -16,10 +16,13 @@ namespace Helhum\Typo3Console\Core\Booting;
 use Helhum\Typo3Console\Core\Cache\FakeDatabaseBackend;
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Helhum\Typo3Console\Error\ErrorHandler;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Cache\Backend\NullBackend;
 use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
 use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class Scripts
@@ -159,7 +162,7 @@ class Scripts
     public static function initializeAuthenticatedOperations(ConsoleBootstrap $bootstrap)
     {
         $bootstrap->initializeBackendUser();
-        self::loadCommandLineBackendUser('_CLI_lowlevel');
+        self::loadCommandLineBackendUser();
         /** @var $backendUser \TYPO3\CMS\Core\Authentication\BackendUserAuthentication */
         $backendUser = $GLOBALS['BE_USER'];
         $backendUser->backendCheckLogin();
@@ -168,25 +171,35 @@ class Scripts
     }
 
     /**
-     * If the backend script is in CLI mode, it will try to load a backend user named by the CLI module name (in lowercase)
+     * If the backend script is in CLI mode, it will try to load a backend user named _cli_lowlevel
      *
-     * @param string $commandLineName the name of the module registered inside $TYPO3_CONF_VARS[SC_OPTIONS][GLOBAL][cliKeys] as second parameter
      * @throws \RuntimeException if a non-admin Backend user could not be loaded
      */
-    protected static function loadCommandLineBackendUser($commandLineName)
+    protected static function loadCommandLineBackendUser()
     {
-        if ($GLOBALS['BE_USER']->user['uid']) {
+        /** @var BackendUserAuthentication $beUser */
+        $beUser = $GLOBALS['BE_USER'];
+        if ($beUser->user['uid']) {
             throw new \RuntimeException('Another user was already loaded which is impossible in CLI mode!', 3);
         }
-        if (!\TYPO3\CMS\Core\Utility\StringUtility::beginsWith($commandLineName, '_CLI_')) {
-            throw new \RuntimeException('Module name, "' . $commandLineName . '", was not prefixed with "_CLI_"', 3);
+        $userName = '_cli_lowlevel';
+        $beUser->setBeUserByName($userName);
+        if (!$beUser->user['uid']) {
+            /** @var DatabaseConnection $db */
+            $db = $GLOBALS['TYPO3_DB'];
+            $db->exec_INSERTquery(
+                'be_users',
+                [
+                    'username' => $userName,
+                    'password' => GeneralUtility::getRandomHexString(48)
+                ]
+            );
+            $beUser->setBeUserByName($userName);
         }
-        $userName = strtolower($commandLineName);
-        $GLOBALS['BE_USER']->setBeUserByName($userName);
         if (!$GLOBALS['BE_USER']->user['uid']) {
-            throw new \RuntimeException('No backend user named "' . $userName . '" was found!', 3);
+            throw new \RuntimeException('No backend user named "' . $userName . '" was found or could not be created! Please create it manually!', 3);
         }
-        if ($GLOBALS['BE_USER']->isAdmin()) {
+        if ($beUser->isAdmin()) {
             throw new \RuntimeException('CLI backend user "' . $userName . '" was ADMIN which is not allowed!', 3);
         }
     }
