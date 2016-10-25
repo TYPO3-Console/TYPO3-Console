@@ -13,7 +13,6 @@ namespace Helhum\Typo3Console\Hook;
  *
  */
 
-use Helhum\Typo3Console\Composer\InstallerScripts;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -25,6 +24,10 @@ use TYPO3\CMS\Saltedpasswords\Utility\SaltedPasswordsUtility;
  */
 class ExtensionInstallation
 {
+    const BINARY_PATH = 'typo3conf/ext/typo3_console/Scripts/';
+    const COPY_FAILED_MESSAGE_TITLE = 'Could not copy %s script to TYPO3 root directory (%s)!';
+    const COPY_FAILED_MESSAGE = 'Check the permissions of your root directory. Is there a file or directory named %s inside this directory?';
+    const COPY_SUCCESS_MESSAGE = 'Successfully copied the %s script to TYPO3 root directory. Let\'s dance!';
     const EXTKEY = 'typo3_console';
     const EM_FLASH_MESSAGE_QUEUE_ID = 'extbase.flashmessages.tx_extensionmanager_tools_extensionmanagerextensionmanager';
 
@@ -39,11 +42,11 @@ class ExtensionInstallation
             return;
         }
         $scriptName = TYPO3_OS === 'WIN' ? 'typo3cms.bat' : 'typo3cms';
-        $success = InstallerScripts::safeCopy(PATH_site . InstallerScripts::BINARY_PATH . $scriptName, PATH_site . $scriptName);
+        $success = $this->safeCopy(PATH_site . self::BINARY_PATH . $scriptName, PATH_site . $scriptName);
         if (!$success) {
-            self::addFlashMessage(sprintf(InstallerScripts::COPY_FAILED_MESSAGE, $scriptName), sprintf(InstallerScripts::COPY_FAILED_MESSAGE_TITLE, $scriptName, PATH_site), AbstractMessage::WARNING);
+            self::addFlashMessage(sprintf(self::COPY_FAILED_MESSAGE, $scriptName), sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName, PATH_site), AbstractMessage::WARNING);
         } else {
-            self::addFlashMessage(sprintf(InstallerScripts::COPY_SUCCESS_MESSAGE, $scriptName));
+            self::addFlashMessage(sprintf(self::COPY_SUCCESS_MESSAGE, $scriptName));
         }
         $this->createCliBeUser();
     }
@@ -126,5 +129,65 @@ class ExtensionInstallation
     protected function getDatabaseConnection()
     {
         return $GLOBALS['TYPO3_DB'];
+    }
+
+    /**
+     * Copy typo3cms command to root directory taking several possible situations into account
+     *
+     * @param string $fullSourcePath Path to the script that should be copied (depending on OS)
+     * @param string $fullTargetPath Target path to which the script should be copied to
+     * @param string $relativeWebDir Relative path to the web directory (which equals the TYPO3 root directory currently)
+     * @return bool
+     * @internal
+     */
+    private function safeCopy($fullSourcePath, $fullTargetPath, $relativeWebDir = '')
+    {
+        if (file_exists($fullTargetPath)) {
+            if (!is_file($fullTargetPath)) {
+                // Seems to be a directory: ignore
+                return false;
+            }
+            if (md5_file($fullTargetPath) === md5_file($fullSourcePath)) {
+                // File is there: gladly ignore
+                return true;
+            }
+            if (!self::isTypo3CmsBinary($fullTargetPath)) {
+                // File is there but does not seem to be a previous version of our script: better ignore
+                return false;
+            }
+        }
+        $success = @copy($fullSourcePath, $fullTargetPath);
+        if ($success && !$this->isWindowsOs()) {
+            $success = @chmod($fullTargetPath, 0755);
+        }
+        if ($success) {
+            $success = @file_put_contents(
+                $fullTargetPath,
+                str_replace(
+                    '{$relative-web-dir}',
+                    $relativeWebDir,
+                    file_get_contents($fullTargetPath)
+                )
+            );
+        }
+        return $success;
+    }
+
+    protected static function isTypo3CmsBinary($fullTargetPath)
+    {
+        return strpos(file_get_contents($fullTargetPath), 'typo3cms.php') !== false;
+    }
+
+    /**
+     * Returns true if PHP runs on Windows OS
+     *
+     * @return bool
+     */
+    private function isWindowsOs()
+    {
+        if (DIRECTORY_SEPARATOR === '\\') {
+            return true;
+        }
+        return false;
     }
 }
