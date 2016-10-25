@@ -89,7 +89,7 @@ class CacheService implements SingletonInterface
      * Besides that, this DataHandler API is probably something to be removed in TYPO3,
      * so we deprecate and mark this method as internal at the same time.
      *
-     * @deprecated
+     * @deprecated Will be removed once DataHandler cache flush methods are removed in supported TYPO3 versions
      * @internal
      */
     public function flushCachesWithDataHandler()
