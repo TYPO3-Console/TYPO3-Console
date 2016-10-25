@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Core;
 
 /*
@@ -24,19 +25,19 @@ use TYPO3\CMS\Core\Utility;
 use TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface;
 
 /**
- * Class ConsoleBootstrap
+ * Class ConsoleBootstrap.
  */
 class ConsoleBootstrap extends Bootstrap
 {
     /**
      * @var array
      */
-    public $commands = array();
+    public $commands = [];
 
     /**
      * @var RequestHandlerInterface[]
      */
-    protected $requestHandlers = array();
+    protected $requestHandlers = [];
 
     /**
      * @var RunLevel
@@ -44,7 +45,7 @@ class ConsoleBootstrap extends Bootstrap
     protected $runLevel;
 
     /**
-     * @var string $context Application context
+     * @var string Application context
      */
     public function __construct($context)
     {
@@ -54,7 +55,7 @@ class ConsoleBootstrap extends Bootstrap
     }
 
     /**
-     * Override parent to calrify return type
+     * Override parent to calrify return type.
      *
      * @return ConsoleBootstrap
      */
@@ -66,26 +67,29 @@ class ConsoleBootstrap extends Bootstrap
     /**
      * Bootstraps the minimal infrastructure, resolves a fitting request handler and
      * then passes control over to that request handler.
+     *
      * @return ConsoleBootstrap
      */
 
     /**
-     * @param \Composer\Autoload\ClassLoader|NULL $classLoader
-     * @return $this
+     * @param \Composer\Autoload\ClassLoader|null $classLoader
+     *
      * @throws \TYPO3\CMS\Core\Error\Exception
+     *
+     * @return $this
      */
     public function run($classLoader = null)
     {
         $this->initializeClassLoader($classLoader);
         // @deprecated in TYPO3 8. Condition will be removed when TYPO3 7.6 support is removed
-        if (is_callable(array($this, 'setRequestType'))) {
+        if (is_callable([$this, 'setRequestType'])) {
             $this->defineTypo3RequestTypes();
             $this->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
         }
         $this->baseSetup();
         $this->requireLibraries();
         // @deprecated in TYPO3 8 will be removed when TYPO3 7.6 support is removed
-        if (!is_callable(array($this, 'setRequestType'))) {
+        if (!is_callable([$this, 'setRequestType'])) {
             $this->defineTypo3RequestTypes();
         }
         $this->requestId = uniqid('console_request_', true);
@@ -94,18 +98,19 @@ class ConsoleBootstrap extends Bootstrap
         $this->runLevel = new RunLevel();
         $this->setEarlyInstance(\Helhum\Typo3Console\Core\Booting\RunLevel::class, $this->runLevel);
         $exceptionHandler = new ExceptionHandler();
-        set_exception_handler(array($exceptionHandler, 'handleException'));
+        set_exception_handler([$exceptionHandler, 'handleException']);
 
         $this->initializeCommandManager();
         $this->registerRequestHandler(new RequestHandler($this));
 
         $requestHandler = $this->resolveCliRequestHandler();
         $requestHandler->handleRequest();
+
         return $this;
     }
 
     /**
-     * TODO: Add other API that does not depend on bootstrap
+     * TODO: Add other API that does not depend on bootstrap.
      *
      * @param string $runLevel
      */
@@ -116,9 +121,10 @@ class ConsoleBootstrap extends Bootstrap
     }
 
     /**
-     * Builds the sequence for the given run level
+     * Builds the sequence for the given run level.
      *
      * @param $commandIdentifier
+     *
      * @return Sequence
      */
     public function buildBootingSequenceForCommand($commandIdentifier)
@@ -127,10 +133,11 @@ class ConsoleBootstrap extends Bootstrap
     }
 
     /**
-     * Sets a run level for a specific command
+     * Sets a run level for a specific command.
      *
      * @param $commandIdentifier
      * @param $runLevel
+     *
      * @api
      */
     public function setRunLevelForCommand($commandIdentifier, $runLevel)
@@ -139,7 +146,7 @@ class ConsoleBootstrap extends Bootstrap
     }
 
     /**
-     * Adds a step to the resolved booting sequence
+     * Adds a step to the resolved booting sequence.
      *
      * @param string $commandIdentifier
      * @param string $stepIdentifier
@@ -150,12 +157,12 @@ class ConsoleBootstrap extends Bootstrap
     }
 
     /**
-     * Checks PHP sapi type and sets required PHP options
+     * Checks PHP sapi type and sets required PHP options.
      */
     protected function ensureRequiredEnvironment()
     {
         if (PHP_SAPI !== 'cli') {
-            echo 'The command line must be executed with a cli PHP binary! The current PHP sapi type is "' . PHP_SAPI . '".' . PHP_EOL;
+            echo 'The command line must be executed with a cli PHP binary! The current PHP sapi type is "'.PHP_SAPI.'".'.PHP_EOL;
             exit(1);
         }
         ini_set('memory_limit', -1);
@@ -169,7 +176,9 @@ class ConsoleBootstrap extends Bootstrap
      * when the bootstrap's run() method is called.
      *
      * @param RequestHandlerInterface $requestHandler
+     *
      * @return void
+     *
      * @api
      */
     public function registerRequestHandler(RequestHandlerInterface $requestHandler)
@@ -178,9 +187,10 @@ class ConsoleBootstrap extends Bootstrap
     }
 
     /**
-     * Returns the command manager which can be used to register commands during package management initialisation
+     * Returns the command manager which can be used to register commands during package management initialisation.
      *
      * @return CommandManager
+     *
      * @api
      */
     public function getCommandManager()
@@ -191,12 +201,13 @@ class ConsoleBootstrap extends Bootstrap
     /**
      * Iterates over the registered request handlers and determines which one fits best.
      *
-     * @return RequestHandlerInterface A request handler
      * @throws \RuntimeException
+     *
+     * @return RequestHandlerInterface A request handler
      */
     public function resolveCliRequestHandler()
     {
-        $suitableRequestHandlers = array();
+        $suitableRequestHandlers = [];
         foreach ($this->requestHandlers as $requestHandler) {
             if ($requestHandler->canHandleRequest() > 0) {
                 $priority = $requestHandler->getPriority();
@@ -210,6 +221,7 @@ class ConsoleBootstrap extends Bootstrap
             throw new \RuntimeException('No request handler found that can handle that request.', 1417863426);
         }
         ksort($suitableRequestHandlers);
+
         return array_pop($suitableRequestHandlers);
     }
 
@@ -226,6 +238,7 @@ class ConsoleBootstrap extends Bootstrap
 
     /**
      * @param string $pathPart
+     *
      * @return void
      */
     public function baseSetup($pathPart = '')
@@ -240,11 +253,11 @@ class ConsoleBootstrap extends Bootstrap
     }
 
     /**
-     * Require libraries, in case TYPO3 is in non composer mode
+     * Require libraries, in case TYPO3 is in non composer mode.
      */
     protected function requireLibraries()
     {
-        @include 'phar://' . __DIR__ . '/../../Libraries/symfony-process.phar/vendor/autoload.php';
+        @include 'phar://'.__DIR__.'/../../Libraries/symfony-process.phar/vendor/autoload.php';
     }
 
     /**
@@ -252,6 +265,7 @@ class ConsoleBootstrap extends Bootstrap
      * provided by the packages.
      *
      * @param string $packageManagerClassName Define an alternative package manager implementation (usually for the installer)
+     *
      * @return void
      */
     public function initializePackageManagement($packageManagerClassName = \Helhum\Typo3Console\Package\UncachedPackageManager::class)
@@ -259,7 +273,7 @@ class ConsoleBootstrap extends Bootstrap
         // Make sure the package manager class is available
         // the extension might not be active yet, but will be activated in this class
         if (!self::usesComposerClassLoading() && !class_exists(\Helhum\Typo3Console\Package\UncachedPackageManager::class)) {
-            require __DIR__ . '/../Package/UncachedPackageManager.php';
+            require __DIR__.'/../Package/UncachedPackageManager.php';
         }
         $packageManager = new \Helhum\Typo3Console\Package\UncachedPackageManager();
         $this->setEarlyInstance(\TYPO3\CMS\Core\Package\PackageManager::class, $packageManager);
@@ -280,10 +294,10 @@ class ConsoleBootstrap extends Bootstrap
         $packageManager = $this->getEarlyInstance(\TYPO3\CMS\Core\Package\PackageManager::class);
         if ($packageManager->isPackageActive('dbal')) {
             $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
-            $cacheConfigurations['dbal'] = array(
+            $cacheConfigurations['dbal'] = [
                 'backend' => \TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend::class,
-                'groups' => array()
-            );
+                'groups'  => [],
+            ];
         }
     }
 
@@ -297,7 +311,7 @@ class ConsoleBootstrap extends Bootstrap
     public function initializeDatabaseConnection()
     {
         // @deprecated can be removed if TYPO3 7 support is removed
-        if (is_callable(array($this, 'defineDatabaseConstants'))) {
+        if (is_callable([$this, 'defineDatabaseConstants'])) {
             $this->defineDatabaseConstants();
         }
         $this->initializeTypo3DbGlobal();
@@ -309,9 +323,10 @@ class ConsoleBootstrap extends Bootstrap
     }
 
     /**
-     * Sets up additional configuration applied in all scopes
+     * Sets up additional configuration applied in all scopes.
      *
      * @return Bootstrap
+     *
      * @internal This is not a public API method, do not use in own extensions
      */
     public function applyAdditionalConfigurationSettings()
@@ -319,6 +334,7 @@ class ConsoleBootstrap extends Bootstrap
         $this->setFinalCachingFrameworkCacheConfiguration()
             ->defineLoggingAndExceptionConstants()
             ->unsetReservedGlobalVariables();
+
         return $this;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Command\Delegation;
 
 /*
@@ -20,20 +21,20 @@ use TYPO3\CMS\Core\Log\LogLevel;
 use TYPO3\CMS\Core\Log\Writer\NullWriter;
 
 /**
- * Class ReferenceIndexUpdateDelegate
+ * Class ReferenceIndexUpdateDelegate.
  */
 class ReferenceIndexUpdateDelegate implements ReferenceIndexIntegrityDelegateInterface
 {
     /**
      * @var array
      */
-    protected $subscribers = array();
+    protected $subscribers = [];
 
     /**
      * @param string $name
-     * @param array $arguments
+     * @param array  $arguments
      */
-    public function emitEvent($name, $arguments = array())
+    public function emitEvent($name, $arguments = [])
     {
         if (empty($this->subscribers[$name])) {
             return;
@@ -45,13 +46,13 @@ class ReferenceIndexUpdateDelegate implements ReferenceIndexIntegrityDelegateInt
     }
 
     /**
-     * @param string $name
+     * @param string   $name
      * @param Callback $subscriber
      */
     public function subscribeEvent($name, $subscriber)
     {
         if (!isset($this->subscribers[$name])) {
-            $this->subscribers[$name] = array();
+            $this->subscribers[$name] = [];
         }
 
         $this->subscribers[$name][] = $subscriber;
@@ -72,21 +73,23 @@ class ReferenceIndexUpdateDelegate implements ReferenceIndexIntegrityDelegateInt
 
     /**
      * @param int $unitsOfWorkCount
+     *
      * @return void
      */
     public function willStartOperation($unitsOfWorkCount)
     {
-        $this->emitEvent('willStartOperation', array($unitsOfWorkCount));
+        $this->emitEvent('willStartOperation', [$unitsOfWorkCount]);
     }
 
     /**
      * @param string $tableName
-     * @param array $record
+     * @param array  $record
+     *
      * @return void
      */
     public function willUpdateRecord($tableName, array $record)
     {
-        $this->emitEvent('willUpdateRecord', array($tableName, $record));
+        $this->emitEvent('willUpdateRecord', [$tableName, $record]);
     }
 
     /**
@@ -112,6 +115,7 @@ class ReferenceIndexUpdateDelegate implements ReferenceIndexIntegrityDelegateInt
     {
         $logger = new Logger(__CLASS__);
         $logger->addWriter(LogLevel::EMERGENCY, new NullWriter());
+
         return $logger;
     }
 }

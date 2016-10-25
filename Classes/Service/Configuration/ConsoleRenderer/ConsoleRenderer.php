@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Service\Configuration\ConsoleRenderer;
 
 /*
@@ -28,8 +29,8 @@ class ConsoleRenderer
     {
         $diff = new Diff(new Paragraph(), new DiffConsoleRenderer());
 
-        $result = '<del>-- LocalConfiguration.php</del>' . PHP_EOL;
-        $result .= '<ins>++ AdditionalConfiguration.php</ins>' . PHP_EOL;
+        $result = '<del>-- LocalConfiguration.php</del>'.PHP_EOL;
+        $result .= '<ins>++ AdditionalConfiguration.php</ins>'.PHP_EOL;
 
         $result .= $diff->render($this->getConfigurationAsString($localConfig), $this->getConfigurationAsString($activeConfig));
 
@@ -38,6 +39,6 @@ class ConsoleRenderer
 
     protected function getConfigurationAsString($config)
     {
-        return ArrayUtility::arrayExport(array($config));
+        return ArrayUtility::arrayExport([$config]);
     }
 }

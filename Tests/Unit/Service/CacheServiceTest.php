@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Tests\Unit\Service;
 
 /*
@@ -19,7 +20,7 @@ use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
- * Class CacheServiceTest
+ * Class CacheServiceTest.
  */
 class CacheServiceTest extends UnitTestCase
 {
@@ -36,7 +37,7 @@ class CacheServiceTest extends UnitTestCase
     }
 
     /**
-     * Initializes configuration mock and sets the given configuration to the subject
+     * Initializes configuration mock and sets the given configuration to the subject.
      *
      * @param array $mockedConfiguration
      */
@@ -56,18 +57,18 @@ class CacheServiceTest extends UnitTestCase
     public function cacheGroupsAreRetrievedCorrectlyFromConfiguration()
     {
         $this->setCacheConfiguration(
-            array(
-                'cache_foo' => array('groups' => array('first', 'second')),
-                'cache_bar' => array('groups' => array('third', 'second')),
-                'cache_baz' => array('groups' => array('first', 'third')),
-            )
+            [
+                'cache_foo' => ['groups' => ['first', 'second']],
+                'cache_bar' => ['groups' => ['third', 'second']],
+                'cache_baz' => ['groups' => ['first', 'third']],
+            ]
         );
 
-        $expectedResult = array(
+        $expectedResult = [
             'first',
             'second',
             'third',
-        );
+        ];
 
         $this->assertSame($expectedResult, $this->subject->getValidCacheGroups());
     }
@@ -79,13 +80,13 @@ class CacheServiceTest extends UnitTestCase
     public function flushByGroupThrowsExceptionForInvalidGroups()
     {
         $this->setCacheConfiguration(
-            array(
-                'cache_foo' => array('groups' => array('first', 'second')),
-                'cache_bar' => array('groups' => array('third', 'second')),
-                'cache_baz' => array('groups' => array('first', 'third')),
-            )
+            [
+                'cache_foo' => ['groups' => ['first', 'second']],
+                'cache_bar' => ['groups' => ['third', 'second']],
+                'cache_baz' => ['groups' => ['first', 'third']],
+            ]
         );
 
-        $this->subject->flushGroups(array('not', 'first'));
+        $this->subject->flushGroups(['not', 'first']);
     }
 }

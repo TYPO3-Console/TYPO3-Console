@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Core\Cache;
 
 /*
@@ -21,8 +22,7 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
  * A caching backend which forgets everything immediately,
- * but pretends to be a database backend
- *
+ * but pretends to be a database backend.
  */
 class FakeDatabaseBackend extends AbstractBackend implements PhpCapableBackendInterface, TaggableBackendInterface
 {
@@ -37,37 +37,42 @@ class FakeDatabaseBackend extends AbstractBackend implements PhpCapableBackendIn
     protected $tagsTable;
 
     /**
-     * Set cache frontend instance and calculate data and tags table name
+     * Set cache frontend instance and calculate data and tags table name.
      *
      * @param FrontendInterface $cache The frontend for this backend
+     *
      * @return void
+     *
      * @api
      */
     public function setCache(FrontendInterface $cache)
     {
         parent::setCache($cache);
-        $this->cacheTable = 'cf_' . $this->cacheIdentifier;
-        $this->tagsTable = 'cf_' . $this->cacheIdentifier . '_tags';
+        $this->cacheTable = 'cf_'.$this->cacheIdentifier;
+        $this->tagsTable = 'cf_'.$this->cacheIdentifier.'_tags';
     }
 
     /**
-     * Acts as if it would save data
+     * Acts as if it would save data.
      *
      * @param string $entryIdentifier ignored
-     * @param string $data ignored
-     * @param array $tags ignored
-     * @param int $lifetime ignored
+     * @param string $data            ignored
+     * @param array  $tags            ignored
+     * @param int    $lifetime        ignored
+     *
      * @return void
+     *
      * @api
      */
-    public function set($entryIdentifier, $data, array $tags = array(), $lifetime = null)
+    public function set($entryIdentifier, $data, array $tags = [], $lifetime = null)
     {
     }
 
     /**
-     * Acts as if it would enable data compression
+     * Acts as if it would enable data compression.
      *
      * @param bool $compression ignored
+     *
      * @return void
      */
     public function setCompression($compression)
@@ -75,10 +80,12 @@ class FakeDatabaseBackend extends AbstractBackend implements PhpCapableBackendIn
     }
 
     /**
-     * Returns False
+     * Returns False.
      *
      * @param string $entryIdentifier ignored
+     *
      * @return bool FALSE
+     *
      * @api
      */
     public function get($entryIdentifier)
@@ -87,10 +94,12 @@ class FakeDatabaseBackend extends AbstractBackend implements PhpCapableBackendIn
     }
 
     /**
-     * Returns False
+     * Returns False.
      *
      * @param string $entryIdentifier ignored
+     *
      * @return bool FALSE
+     *
      * @api
      */
     public function has($entryIdentifier)
@@ -99,10 +108,12 @@ class FakeDatabaseBackend extends AbstractBackend implements PhpCapableBackendIn
     }
 
     /**
-     * Does nothing
+     * Does nothing.
      *
      * @param string $entryIdentifier ignored
+     *
      * @return bool FALSE
+     *
      * @api
      */
     public function remove($entryIdentifier)
@@ -111,21 +122,24 @@ class FakeDatabaseBackend extends AbstractBackend implements PhpCapableBackendIn
     }
 
     /**
-     * Returns an empty array
+     * Returns an empty array.
      *
      * @param string $tag ignored
+     *
      * @return array An empty array
+     *
      * @api
      */
     public function findIdentifiersByTag($tag)
     {
-        return array();
+        return [];
     }
 
     /**
-     * Does nothing
+     * Does nothing.
      *
      * @return void
+     *
      * @api
      */
     public function flush()
@@ -133,10 +147,12 @@ class FakeDatabaseBackend extends AbstractBackend implements PhpCapableBackendIn
     }
 
     /**
-     * Does nothing
+     * Does nothing.
      *
      * @param string $tag ignored
+     *
      * @return void
+     *
      * @api
      */
     public function flushByTag($tag)
@@ -144,9 +160,10 @@ class FakeDatabaseBackend extends AbstractBackend implements PhpCapableBackendIn
     }
 
     /**
-     * Does nothing
+     * Does nothing.
      *
      * @return void
+     *
      * @api
      */
     public function collectGarbage()
@@ -154,10 +171,12 @@ class FakeDatabaseBackend extends AbstractBackend implements PhpCapableBackendIn
     }
 
     /**
-     * Does nothing
+     * Does nothing.
      *
      * @param string $identifier An identifier which describes the cache entry to load
+     *
      * @return void
+     *
      * @api
      */
     public function requireOnce($identifier)
@@ -174,15 +193,16 @@ class FakeDatabaseBackend extends AbstractBackend implements PhpCapableBackendIn
     public function getTableDefinitions()
     {
         $cacheTableSql = file_get_contents(
-            ExtensionManagementUtility::extPath('core') .
+            ExtensionManagementUtility::extPath('core').
             'Resources/Private/Sql/Cache/Backend/Typo3DatabaseBackendCache.sql'
         );
-        $requiredTableStructures = str_replace('###CACHE_TABLE###', $this->cacheTable, $cacheTableSql) . LF . LF;
+        $requiredTableStructures = str_replace('###CACHE_TABLE###', $this->cacheTable, $cacheTableSql).LF.LF;
         $tagsTableSql = file_get_contents(
-            ExtensionManagementUtility::extPath('core') .
+            ExtensionManagementUtility::extPath('core').
             'Resources/Private/Sql/Cache/Backend/Typo3DatabaseBackendTags.sql'
         );
-        $requiredTableStructures .= str_replace('###TAGS_TABLE###', $this->tagsTable, $tagsTableSql) . LF;
+        $requiredTableStructures .= str_replace('###TAGS_TABLE###', $this->tagsTable, $tagsTableSql).LF;
+
         return $requiredTableStructures;
     }
 }

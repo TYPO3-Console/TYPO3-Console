@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Service\Configuration;
 
 /*
@@ -19,7 +20,7 @@ use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * Class ConfigurationService
+ * Class ConfigurationService.
  */
 class ConfigurationService implements SingletonInterface
 {
@@ -39,9 +40,9 @@ class ConfigurationService implements SingletonInterface
      * ConfigurationService constructor.
      *
      * @param ConfigurationManager $configurationManager
-     * @param array $activeConfiguration
+     * @param array                $activeConfiguration
      */
-    public function __construct(ConfigurationManager $configurationManager = null, array $activeConfiguration = array())
+    public function __construct(ConfigurationManager $configurationManager = null, array $activeConfiguration = [])
     {
         $this->configurationManager = $configurationManager ?: GeneralUtility::makeInstance(ConfigurationManager::class);
         $this->activeConfiguration = $activeConfiguration ?: $GLOBALS['TYPO3_CONF_VARS'];
@@ -49,6 +50,7 @@ class ConfigurationService implements SingletonInterface
 
     /**
      * @param string $path
+     *
      * @return bool
      */
     public function hasLocal($path)
@@ -58,6 +60,7 @@ class ConfigurationService implements SingletonInterface
 
     /**
      * @param string $path
+     *
      * @return bool
      */
     public function hasActive($path)
@@ -67,8 +70,10 @@ class ConfigurationService implements SingletonInterface
 
     /**
      * @param string $path
-     * @return mixed
+     *
      * @throws ConfigurationValueNotFoundException
+     *
+     * @return mixed
      */
     public function getLocal($path)
     {
@@ -77,8 +82,10 @@ class ConfigurationService implements SingletonInterface
 
     /**
      * @param string $path
-     * @return mixed
+     *
      * @throws ConfigurationValueNotFoundException
+     *
+     * @return mixed
      */
     public function getActive($path)
     {
@@ -87,7 +94,8 @@ class ConfigurationService implements SingletonInterface
 
     /**
      * @param string $path
-     * @param array $config
+     * @param array  $config
+     *
      * @return bool
      */
     protected function has($path, array $config)
@@ -98,16 +106,20 @@ class ConfigurationService implements SingletonInterface
             if ($e->getCode() !== self::EXCEPTION_CODE_ARRAY_KEY_NOT_FOUND) {
                 throw $e;
             }
+
             return false;
         }
+
         return true;
     }
 
     /**
      * @param string $path
-     * @param array $config
-     * @return mixed
+     * @param array  $config
+     *
      * @throws ConfigurationValueNotFoundException
+     *
+     * @return mixed
      */
     protected function get($path, array $config)
     {
@@ -119,21 +131,24 @@ class ConfigurationService implements SingletonInterface
             }
             throw new ConfigurationValueNotFoundException('No value found for this key!', 1461607530);
         }
+
         return $value;
     }
 
     /**
      * @param string $path
+     *
      * @return bool
      */
     public function removeLocal($path)
     {
-        return $this->configurationManager->removeLocalConfigurationKeysByPath(array($path));
+        return $this->configurationManager->removeLocalConfigurationKeysByPath([$path]);
     }
 
     /**
      * @param string $path
-     * @param mixed $value
+     * @param mixed  $value
+     *
      * @return bool
      */
     public function setLocal($path, $value)
@@ -145,14 +160,16 @@ class ConfigurationService implements SingletonInterface
             return false;
         }
         $this->configurationManager->setLocalConfigurationValueByPath($path, $value);
+
         return true;
     }
 
     /**
      * Returns true if the value is stored in the LocalConfiguration.php file and
-     * is NOT overridden later (e.g. in AdditionalConfiguration.php)
+     * is NOT overridden later (e.g. in AdditionalConfiguration.php).
      *
      * @param string $path
+     *
      * @return bool
      */
     public function localIsActive($path)
@@ -160,6 +177,7 @@ class ConfigurationService implements SingletonInterface
         if ($this->hasLocal($path)) {
             return $this->hasActive($path) && $this->getLocal($path) === $this->getActive($path);
         }
+
         return !$this->hasActive($path);
     }
 
@@ -170,6 +188,7 @@ class ConfigurationService implements SingletonInterface
     {
         $mergedConfig = $this->configurationManager->getDefaultConfiguration();
         ArrayUtility::mergeRecursiveWithOverrule($mergedConfig, $this->configurationManager->getLocalConfiguration());
+
         return $mergedConfig;
     }
 }

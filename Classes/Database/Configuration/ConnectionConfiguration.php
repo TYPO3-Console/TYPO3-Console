@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Database\Configuration;
 
 /*
@@ -14,12 +15,12 @@ namespace Helhum\Typo3Console\Database\Configuration;
  */
 
 /**
- * Class ConnectionConfiguration
+ * Class ConnectionConfiguration.
  */
 class ConnectionConfiguration
 {
     /**
-     * Returns a normalized DB configuration array
+     * Returns a normalized DB configuration array.
      *
      * @return array
      */
@@ -30,12 +31,12 @@ class ConnectionConfiguration
             $dbConfig = $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default'];
         } else {
             // @deprecated with 8 will be removed when 7 Support is dropped
-            $dbConfig = array(
-                'dbname' => TYPO3_db,
-                'host' => TYPO3_db_host,
-                'user' => TYPO3_db_username,
+            $dbConfig = [
+                'dbname'   => TYPO3_db,
+                'host'     => TYPO3_db_host,
+                'user'     => TYPO3_db_username,
                 'password' => TYPO3_db_password,
-            );
+            ];
             if (isset($GLOBALS['TYPO3_CONF_VARS']['DB']['port'])) {
                 $dbConfig['port'] = $GLOBALS['TYPO3_CONF_VARS']['DB']['port'];
             }
@@ -43,6 +44,7 @@ class ConnectionConfiguration
                 $dbConfig['unix_socket'] = $GLOBALS['TYPO3_CONF_VARS']['DB']['socket'];
             }
         }
+
         return $dbConfig;
     }
 }

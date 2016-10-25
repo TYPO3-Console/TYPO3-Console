@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Core\Booting;
 
 /*
@@ -31,7 +32,7 @@ class Sequence
     /**
      * @var array
      */
-    protected $steps = array();
+    protected $steps = [];
 
     /**
      * @param string $identifier
@@ -46,8 +47,9 @@ class Sequence
      * by $previousStepIdentifier. If no previous step is specified, the new step
      * is added to the list of steps executed right at the start of the sequence.
      *
-     * @param \Helhum\Typo3Console\Core\Booting\Step $step The new step to add
-     * @param string $previousStepIdentifier The preceding step
+     * @param \Helhum\Typo3Console\Core\Booting\Step $step                   The new step to add
+     * @param string                                 $previousStepIdentifier The preceding step
+     *
      * @return void
      */
     public function addStep(Step $step, $previousStepIdentifier = 'start')
@@ -56,11 +58,13 @@ class Sequence
     }
 
     /**
-     * Removes all occurrences of the specified step from this sequence
+     * Removes all occurrences of the specified step from this sequence.
      *
      * @param string $stepIdentifier
-     * @return void
+     *
      * @throws \TYPO3\Flow\Exception
+     *
+     * @return void
      */
     public function removeStep($stepIdentifier)
     {
@@ -70,7 +74,7 @@ class Sequence
             foreach ($steps as $index => $step) {
                 if ($step->getIdentifier() === $stepIdentifier) {
                     unset($this->steps[$previousStepIdentifier][$index]);
-                    $removedOccurrences ++;
+                    $removedOccurrences++;
                 }
             }
         }
@@ -80,9 +84,10 @@ class Sequence
     }
 
     /**
-     * Executes all steps of this sequence
+     * Executes all steps of this sequence.
      *
      * @param ConsoleBootstrap $bootstrap
+     *
      * @return void
      */
     public function invoke(ConsoleBootstrap $bootstrap)
@@ -98,8 +103,9 @@ class Sequence
      * Invokes a single step of this sequence and also invokes all steps registered
      * to be executed after the given step.
      *
-     * @param \Helhum\Typo3Console\Core\Booting\Step $step The step to invoke
-     * @param ConsoleBootstrap $bootstrap
+     * @param \Helhum\Typo3Console\Core\Booting\Step $step      The step to invoke
+     * @param ConsoleBootstrap                       $bootstrap
+     *
      * @return void
      */
     protected function invokeStep(Step $step, ConsoleBootstrap $bootstrap)

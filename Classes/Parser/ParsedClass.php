@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Parser;
 
 /*
@@ -14,7 +15,7 @@ namespace Helhum\Typo3Console\Parser;
  */
 
 /**
- * Class ParsedClass
+ * Class ParsedClass.
  */
 class ParsedClass
 {
@@ -128,6 +129,6 @@ class ParsedClass
      */
     public function getFullyQualifiedClassName()
     {
-        return $this->namespace . $this->namespaceSeparator . $this->className;
+        return $this->namespace.$this->namespaceSeparator.$this->className;
     }
 }

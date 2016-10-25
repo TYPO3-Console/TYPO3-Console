@@ -1,28 +1,25 @@
 <?php
-$EM_CONF[$_EXTKEY] = array(
-  'title' => 'TYPO3 Console',
-  'description' => 'A reliable and powerful command line interface for TYPO3 CMS',
-  'category' => 'cli',
-  'state' => 'stable',
-  'uploadfolder' => 0,
-  'createDirs' => '',
-  'modify_tables' => '',
+
+$EM_CONF[$_EXTKEY] = [
+  'title'            => 'TYPO3 Console',
+  'description'      => 'A reliable and powerful command line interface for TYPO3 CMS',
+  'category'         => 'cli',
+  'state'            => 'stable',
+  'uploadfolder'     => 0,
+  'createDirs'       => '',
+  'modify_tables'    => '',
   'clearCacheOnLoad' => 0,
-  'author' => 'Helmut Hummel',
-  'author_email' => 'info@helhum.io',
-  'author_company' => 'helhum.io',
-  'version' => '3.5.0',
-  'constraints' =>
-  array(
-    'depends' =>
-    array(
+  'author'           => 'Helmut Hummel',
+  'author_email'     => 'info@helhum.io',
+  'author_company'   => 'helhum.io',
+  'version'          => '3.5.0',
+  'constraints'      => [
+    'depends' => [
       'typo3' => '7.6.0-8.4.99',
-    ),
-    'conflicts' =>
-    array(
-    ),
-    'suggests' =>
-    array(
-    ),
-  ),
-);
+    ],
+    'conflicts' => [
+    ],
+    'suggests' => [
+    ],
+  ],
+];

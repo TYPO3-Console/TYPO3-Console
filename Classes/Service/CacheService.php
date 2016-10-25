@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Service;
 
 /*
@@ -23,7 +24,7 @@ use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * Cache Service handles all cache clearing related tasks
+ * Cache Service handles all cache clearing related tasks.
  */
 class CacheService implements SingletonInterface
 {
@@ -43,11 +44,11 @@ class CacheService implements SingletonInterface
     protected $databaseConnection;
 
     /**
-     * Builds the dependencies correctly
+     * Builds the dependencies correctly.
      *
-     * @param CacheManager $cacheManager
+     * @param CacheManager         $cacheManager
      * @param ConfigurationService $configurationService
-     * @param DatabaseConnection $databaseConnection
+     * @param DatabaseConnection   $databaseConnection
      */
     public function __construct(
         CacheManager $cacheManager,
@@ -60,7 +61,7 @@ class CacheService implements SingletonInterface
     }
 
     /**
-     * Flushes all caches
+     * Flushes all caches.
      *
      * @param bool $force
      */
@@ -90,6 +91,7 @@ class CacheService implements SingletonInterface
      * so we deprecate and mark this method as internal at the same time.
      *
      * @deprecated
+     *
      * @internal
      */
     public function flushCachesWithDataHandler()
@@ -101,6 +103,7 @@ class CacheService implements SingletonInterface
      * Flushes all caches in specified groups.
      *
      * @param array $groups
+     *
      * @throws NoSuchCacheGroupException
      */
     public function flushGroups(array $groups)
@@ -114,7 +117,7 @@ class CacheService implements SingletonInterface
     /**
      * Flushes caches by given tags, optionally only in a specified (single) group.
      *
-     * @param array $tags
+     * @param array  $tags
      * @param string $group
      */
     public function flushByTags(array $tags, $group = null)
@@ -151,17 +154,19 @@ class CacheService implements SingletonInterface
      */
     public function getValidCacheGroups()
     {
-        $validGroups = array();
+        $validGroups = [];
         foreach ($this->configurationService->getActive('SYS/caching/cacheConfigurations') as $cacheConfiguration) {
             if (isset($cacheConfiguration['groups']) && is_array($cacheConfiguration['groups'])) {
                 $validGroups = array_merge($validGroups, $cacheConfiguration['groups']);
             }
         }
+
         return array_unique($validGroups);
     }
 
     /**
      * @param array $groups
+     *
      * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
      */
     protected function ensureCacheGroupsExist($groups)
@@ -170,21 +175,21 @@ class CacheService implements SingletonInterface
         $sanitizedGroups = array_intersect($groups, $validGroups);
         if (count($sanitizedGroups) !== count($groups)) {
             $invalidGroups = array_diff($groups, $sanitizedGroups);
-            throw new NoSuchCacheGroupException('Invalid cache groups "' . implode(', ', $invalidGroups) . '"', 1399630162);
+            throw new NoSuchCacheGroupException('Invalid cache groups "'.implode(', ', $invalidGroups).'"', 1399630162);
         }
     }
 
     /**
-     * Recursively delete cache directory and truncate all DB tables prefixed with 'cf_'
+     * Recursively delete cache directory and truncate all DB tables prefixed with 'cf_'.
      */
     protected function forceFlushCoreFileAndDatabaseCaches()
     {
         // @deprecated Will be removed once TYPO3 7.6 support is removed
-        if (is_dir(PATH_site . 'typo3temp/Cache')) {
-            GeneralUtility::rmdir(PATH_site . 'typo3temp/Cache', true);
+        if (is_dir(PATH_site.'typo3temp/Cache')) {
+            GeneralUtility::rmdir(PATH_site.'typo3temp/Cache', true);
         }
         // Delete typo3temp/Cache
-        GeneralUtility::rmdir(PATH_site . 'typo3temp/var/Cache', true);
+        GeneralUtility::rmdir(PATH_site.'typo3temp/var/Cache', true);
         // Get all table names starting with 'cf_' and truncate them
         $tables = $this->databaseConnection->admin_get_tables();
         foreach ($tables as $table) {
@@ -196,8 +201,10 @@ class CacheService implements SingletonInterface
     }
 
     /**
-     * Create a data handler instance from global state (with user being admin)
+     * Create a data handler instance from global state (with user being admin).
+     *
      * @internal
+     *
      * @return DataHandler
      */
     private static function createDataHandlerFromGlobals()
@@ -209,6 +216,7 @@ class CacheService implements SingletonInterface
         $user->admin = 1;
         $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
         $dataHandler->start([], [], $user);
+
         return $dataHandler;
     }
 }

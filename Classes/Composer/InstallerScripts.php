@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Composer;
 
 /*
@@ -19,7 +20,7 @@ use TYPO3\CMS\Composer\Plugin\Config as Typo3Config;
 use TYPO3\CMS\Composer\Plugin\Util\Filesystem;
 
 /**
- * Class for Composer and Extension Manager install scripts
+ * Class for Composer and Extension Manager install scripts.
  */
 class InstallerScripts
 {
@@ -29,12 +30,15 @@ class InstallerScripts
     const COPY_SUCCESS_MESSAGE = 'Successfully copied the %s script to TYPO3 root directory. Let\'s dance!';
 
     /**
-     * Called from composer
+     * Called from composer.
      *
      * @param ScriptEvent $event
-     * @param bool $calledFromPlugin
-     * @return void
+     * @param bool        $calledFromPlugin
+     *
      * @throws \RuntimeException
+     *
+     * @return void
+     *
      * @internal
      */
     public static function setupConsole(ScriptEvent $event, $calledFromPlugin = false)
@@ -42,6 +46,7 @@ class InstallerScripts
         if (!$calledFromPlugin) {
             // @deprecated will be removed with 4.0
             $event->getIO()->writeError('<warning>Usage of Helhum\Typo3Console\Composer\InstallerScripts::setupConsole is deprecated. Please remove this section from your root composer.json</warning>');
+
             return;
         }
         if ($event->getComposer()->getPackage()->getName() === 'helhum/typo3-console') {
@@ -68,7 +73,7 @@ class InstallerScripts
         $extensionDir = "$webDir/typo3conf/ext/typo3_console";
 
         if ($pluginConfig->get('install-extension-dummy')) {
-            $extResourcesDir = __DIR__ . '/../../Resources/Private/ExtensionArtifacts';
+            $extResourcesDir = __DIR__.'/../../Resources/Private/ExtensionArtifacts';
             $resources = [
                 'ext_icon.png',
                 'ext_emconf.php',
@@ -89,6 +94,7 @@ class InstallerScripts
 
     /**
      * @param ScriptEvent $event
+     *
      * @deprecated will be removed with 4.0
      */
     private static function installBinary(ScriptEvent $event)
@@ -105,16 +111,16 @@ class InstallerScripts
 
         // @deprecated. Use composer binary installer instead
         $event->getIO()->writeError('<warning>Usage of "./typo3cms" binary has been deprecated</warning>');
-        $event->getIO()->writeError('<warning>Please use ' . $binDir . '/typo3cms instead</warning>');
+        $event->getIO()->writeError('<warning>Please use '.$binDir.'/typo3cms instead</warning>');
         $event->getIO()->writeError('<warning>To get rid of this message, set "install-binary" option to false</warning>');
         $event->getIO()->writeError('<warning>in "extra -> helhum/typo3-console" section of root composer.json</warning>');
-        $pathToScriptsDirectory = __DIR__ . '/../../Scripts/';
+        $pathToScriptsDirectory = __DIR__.'/../../Scripts/';
         if (self::isWindowsOs()) {
             $scriptName = 'typo3cms.bat';
-            $success = self::safeCopy($pathToScriptsDirectory . $scriptName, $webDir . '/' . $scriptName);
+            $success = self::safeCopy($pathToScriptsDirectory.$scriptName, $webDir.'/'.$scriptName);
         } else {
             $scriptName = 'typo3cms';
-            $targetPath = $installDir . '/' . $scriptName;
+            $targetPath = $installDir.'/'.$scriptName;
             $success = true;
             if (file_exists($targetPath)) {
                 $success = false;
@@ -123,18 +129,20 @@ class InstallerScripts
                 }
             }
             if ($success) {
-                $filesystem->symlink($pathToScriptsDirectory . $scriptName, $targetPath, false);
+                $filesystem->symlink($pathToScriptsDirectory.$scriptName, $targetPath, false);
             }
         }
         if (!$success) {
-            $event->getIO()->writeError('<error>' . sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName, $installDir) . '</error>');
-            $event->getIO()->writeError('<error>' . sprintf(self::COPY_FAILED_MESSAGE, $scriptName) . '</error>');
+            $event->getIO()->writeError('<error>'.sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName, $installDir).'</error>');
+            $event->getIO()->writeError('<error>'.sprintf(self::COPY_FAILED_MESSAGE, $scriptName).'</error>');
         }
     }
 
     /**
      * @param ScriptEvent $event
+     *
      * @internal
+     *
      * @throws \RuntimeException
      */
     public static function setVersion(ScriptEvent $event)
@@ -143,29 +151,31 @@ class InstallerScripts
         if (!preg_match('/\d+\.\d+\.\d+/', $version)) {
             throw new \RuntimeException('No valid version number provided!', 1468672604);
         }
-        $docConfigFile = __DIR__ . '/../../Documentation/Settings.yml';
+        $docConfigFile = __DIR__.'/../../Documentation/Settings.yml';
         $content = file_get_contents($docConfigFile);
-        $content = preg_replace('/(version|release): \d+\.\d+\.\d+/', '$1: ' . $version, $content);
+        $content = preg_replace('/(version|release): \d+\.\d+\.\d+/', '$1: '.$version, $content);
         file_put_contents($docConfigFile, $content);
 
-        $extEmConfFile = __DIR__ . '/../../Resources/Private/ExtensionArtifacts/ext_emconf.php';
+        $extEmConfFile = __DIR__.'/../../Resources/Private/ExtensionArtifacts/ext_emconf.php';
         $content = file_get_contents($extEmConfFile);
-        $content = preg_replace('/(\'version\' => )\'\d+\.\d+\.\d+/', '$1\'' . $version, $content);
+        $content = preg_replace('/(\'version\' => )\'\d+\.\d+\.\d+/', '$1\''.$version, $content);
         file_put_contents($extEmConfFile, $content);
 
-        $helpCommandFile = __DIR__ . '/../Command/HelpCommandController.php';
+        $helpCommandFile = __DIR__.'/../Command/HelpCommandController.php';
         $content = file_get_contents($helpCommandFile);
-        $content = preg_replace('/(private \$version = )\'\d+\.\d+\.\d+/', '$1\'' . $version, $content);
+        $content = preg_replace('/(private \$version = )\'\d+\.\d+\.\d+/', '$1\''.$version, $content);
         file_put_contents($helpCommandFile, $content);
     }
 
     /**
-     * Copy typo3cms command to root directory taking several possible situations into account
+     * Copy typo3cms command to root directory taking several possible situations into account.
      *
      * @param string $fullSourcePath Path to the script that should be copied (depending on OS)
      * @param string $fullTargetPath Target path to which the script should be copied to
      * @param string $relativeWebDir Relative path to the web directory (which equals the TYPO3 root directory currently)
+     *
      * @return bool
+     *
      * @internal
      */
     public static function safeCopy($fullSourcePath, $fullTargetPath, $relativeWebDir = '')
@@ -198,6 +208,7 @@ class InstallerScripts
                 )
             );
         }
+
         return $success;
     }
 
@@ -207,7 +218,7 @@ class InstallerScripts
     }
 
     /**
-     * Returns true if PHP runs on Windows OS
+     * Returns true if PHP runs on Windows OS.
      *
      * @return bool
      */
@@ -216,12 +227,15 @@ class InstallerScripts
         if (DIRECTORY_SEPARATOR === '\\') {
             return true;
         }
+
         return false;
     }
 
     /**
      * @param Config $config
+     *
      * @return string
+     *
      * @deprecated will be removed with 4.0
      */
     protected static function getInstallDir(Config $config)
@@ -231,7 +245,9 @@ class InstallerScripts
 
     /**
      * @param Config $config
+     *
      * @return string
+     *
      * @deprecated will be removed with 4.0
      */
     protected static function getWebDir(Config $config)
@@ -241,7 +257,9 @@ class InstallerScripts
 
     /**
      * @param ScriptEvent $event
+     *
      * @return Config
+     *
      * @deprecated will be removed with 4.0
      */
     protected static function getConfig(ScriptEvent $event)

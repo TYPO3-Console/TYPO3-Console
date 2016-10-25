@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Core\Booting;
 
 /*
@@ -22,14 +23,14 @@ use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
- * Class Scripts
+ * Class Scripts.
  */
 class Scripts
 {
     /**
      * @var array
      */
-    protected static $earlyCachesConfiguration = array();
+    protected static $earlyCachesConfiguration = [];
 
     /**
      * @param ConsoleBootstrap $bootstrap
@@ -44,13 +45,13 @@ class Scripts
     {
         $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
         foreach (
-            array(
+            [
                 'extbase_object',
                 'extbase_reflection',
                 'extbase_typo3dbbackend_tablecolumns',
                 'extbase_typo3dbbackend_queries',
                 'extbase_datamapfactory_datamap',
-            ) as $id) {
+            ] as $id) {
             if (!isset($cacheConfigurations[$id])) {
                 continue;
             }
@@ -60,18 +61,18 @@ class Scripts
             } else {
                 $cacheConfigurations[$id]['backend'] = NullBackend::class;
             }
-            $cacheConfigurations[$id]['options'] = array();
+            $cacheConfigurations[$id]['options'] = [];
         }
     }
 
     public static function initializeErrorHandling()
     {
         $errorHandler = new ErrorHandler();
-        $errorHandler->setExceptionalErrors(array(E_WARNING, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_RECOVERABLE_ERROR));
-        set_error_handler(array($errorHandler, 'handleError'));
+        $errorHandler->setExceptionalErrors([E_WARNING, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_RECOVERABLE_ERROR]);
+        set_error_handler([$errorHandler, 'handleError']);
         ini_set('display_errors', 1);
-        if (((bool)ini_get('display_errors') && strtolower(ini_get('display_errors')) !== 'on' && strtolower(ini_get('display_errors')) !== '1') || !(bool)ini_get('display_errors')) {
-            echo 'WARNING: Fatal errors will be suppressed due to your PHP config. You should consider enabling display_errors in your php.ini file!' . chr(10);
+        if (((bool) ini_get('display_errors') && strtolower(ini_get('display_errors')) !== 'on' && strtolower(ini_get('display_errors')) !== '1') || !(bool) ini_get('display_errors')) {
+            echo 'WARNING: Fatal errors will be suppressed due to your PHP config. You should consider enabling display_errors in your php.ini file!'.chr(10);
         }
     }
 
@@ -82,10 +83,10 @@ class Scripts
     {
         $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
         foreach (
-            array(
+            [
                 'cache_core',
                 'dbal',
-            ) as $id) {
+            ] as $id) {
             if (isset($cacheConfigurations[$id])) {
                 self::$earlyCachesConfiguration[$id] = $cacheConfigurations[$id];
             }
@@ -110,7 +111,7 @@ class Scripts
         $reflectionObject = new \ReflectionObject($cacheManager);
         $property = $reflectionObject->getProperty('caches');
         $property->setAccessible(true);
-        $property->setValue($cacheManager, array());
+        $property->setValue($cacheManager, []);
     }
 
     /**
@@ -168,9 +169,10 @@ class Scripts
     }
 
     /**
-     * If the backend script is in CLI mode, it will try to load a backend user named by the CLI module name (in lowercase)
+     * If the backend script is in CLI mode, it will try to load a backend user named by the CLI module name (in lowercase).
      *
      * @param string $commandLineName the name of the module registered inside $TYPO3_CONF_VARS[SC_OPTIONS][GLOBAL][cliKeys] as second parameter
+     *
      * @throws \RuntimeException if a non-admin Backend user could not be loaded
      */
     protected static function loadCommandLineBackendUser($commandLineName)
@@ -179,15 +181,15 @@ class Scripts
             throw new \RuntimeException('Another user was already loaded which is impossible in CLI mode!', 3);
         }
         if (!\TYPO3\CMS\Core\Utility\StringUtility::beginsWith($commandLineName, '_CLI_')) {
-            throw new \RuntimeException('Module name, "' . $commandLineName . '", was not prefixed with "_CLI_"', 3);
+            throw new \RuntimeException('Module name, "'.$commandLineName.'", was not prefixed with "_CLI_"', 3);
         }
         $userName = strtolower($commandLineName);
         $GLOBALS['BE_USER']->setBeUserByName($userName);
         if (!$GLOBALS['BE_USER']->user['uid']) {
-            throw new \RuntimeException('No backend user named "' . $userName . '" was found!', 3);
+            throw new \RuntimeException('No backend user named "'.$userName.'" was found!', 3);
         }
         if ($GLOBALS['BE_USER']->isAdmin()) {
-            throw new \RuntimeException('CLI backend user "' . $userName . '" was ADMIN which is not allowed!', 3);
+            throw new \RuntimeException('CLI backend user "'.$userName.'" was ADMIN which is not allowed!', 3);
         }
     }
 
@@ -206,7 +208,7 @@ class Scripts
     }
 
     /**
-     * Tell Extbase, TYPO3 and PHP that we have another implementation
+     * Tell Extbase, TYPO3 and PHP that we have another implementation.
      */
     public static function overrideImplementation($originalClassName, $overrideClassName)
     {

@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Command;
 
 /*
@@ -20,7 +21,7 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
 /**
- * Database command controller
+ * Database command controller.
  */
 class DatabaseCommandController extends CommandController
 {
@@ -43,7 +44,7 @@ class DatabaseCommandController extends CommandController
     protected $connectionConfiguration;
 
     /**
-     * Update database schema
+     * Update database schema.
      *
      * Valid schema update types are:
      *
@@ -68,7 +69,8 @@ class DatabaseCommandController extends CommandController
      * <b>Example:</b> <code>./typo3cms database:updateschema "*.add,*.change"</code>
      *
      * @param array $schemaUpdateTypes List of schema update types
-     * @param bool $verbose If set, database queries performed are shown in output
+     * @param bool  $verbose           If set, database queries performed are shown in output
+     *
      * @throws \TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException
      */
     public function updateSchemaCommand(array $schemaUpdateTypes, $verbose = false)
@@ -91,7 +93,7 @@ class DatabaseCommandController extends CommandController
     }
 
     /**
-     * Import mysql from stdin
+     * Import mysql from stdin.
      *
      * This means that this can not only be used to pass insert statements,
      * it but works as well to pass SELECT statements to it.
@@ -108,6 +110,7 @@ class DatabaseCommandController extends CommandController
      * If this imposes a security risk for you, then refrain from using this command!
      *
      * @param bool $interactive Open an interactive mysql shell using the TYPO3 connection settings.
+     *
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
      */
     public function importCommand($interactive = false)
@@ -117,7 +120,7 @@ class DatabaseCommandController extends CommandController
             new ProcessBuilder()
         );
         $exitCode = $mysqlCommand->mysql(
-            array('--skip-column-names'),
+            ['--skip-column-names'],
             STDIN,
             $this->buildOutputClosure(),
             $interactive
@@ -126,7 +129,7 @@ class DatabaseCommandController extends CommandController
     }
 
     /**
-     * Export database to stdout
+     * Export database to stdout.
      *
      * Export the database (all tables) directly to stdout.
      * The mysqldump binary must be available in the path for this command to work.
@@ -144,7 +147,7 @@ class DatabaseCommandController extends CommandController
             new ProcessBuilder()
         );
         $exitCode = $mysqlCommand->mysqldump(
-            array(),
+            [],
             $this->buildOutputClosure()
         );
         $this->quit($exitCode);

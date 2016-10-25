@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Tests\Unit\Parser;
 
 /*
@@ -17,7 +18,7 @@ use Helhum\Typo3Console\Parser;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
- * Class PhpParserTest
+ * Class PhpParserTest.
  */
 class PhpParserTest extends UnitTestCase
 {
@@ -27,7 +28,7 @@ class PhpParserTest extends UnitTestCase
     public function parsingClassFileReturnsParsedClass()
     {
         $subject = new Parser\PhpParser();
-        $result = $subject->parseClassFile(__DIR__ . '/Fixtures/NamespacedClassFixture.php');
+        $result = $subject->parseClassFile(__DIR__.'/Fixtures/NamespacedClassFixture.php');
         $this->assertInstanceOf(\Helhum\Typo3Console\Parser\ParsedClass::class, $result);
     }
 
@@ -47,7 +48,7 @@ class PhpParserTest extends UnitTestCase
     public function parsedResultCorrectlySetsNamespaceOfParsedClass()
     {
         $subject = new Parser\PhpParser();
-        $result = $subject->parseClassFile(__DIR__ . '/Fixtures/NamespacedClassFixture.php');
+        $result = $subject->parseClassFile(__DIR__.'/Fixtures/NamespacedClassFixture.php');
         $this->assertSame('Helhum\\Typo3Console\\Tests\\Unit\\Parser\\Fixtures', $result->getNamespace());
     }
 
@@ -57,7 +58,7 @@ class PhpParserTest extends UnitTestCase
     public function parsedResultCorrectlySetsClassNameOfParsedClass()
     {
         $subject = new Parser\PhpParser();
-        $result = $subject->parseClassFile(__DIR__ . '/Fixtures/NamespacedClassFixture.php');
+        $result = $subject->parseClassFile(__DIR__.'/Fixtures/NamespacedClassFixture.php');
         $this->assertSame('NamespacedClassFixture', $result->getClassName());
     }
 
@@ -67,7 +68,7 @@ class PhpParserTest extends UnitTestCase
     public function parsedResultCorrectlyFindsInterfaceNameOfParsedClass()
     {
         $subject = new Parser\PhpParser();
-        $result = $subject->parseClassFile(__DIR__ . '/Fixtures/NamespacedInterfaceFixture.php');
+        $result = $subject->parseClassFile(__DIR__.'/Fixtures/NamespacedInterfaceFixture.php');
         $this->assertSame('NamespacedInterfaceFixture', $result->getClassName());
         $this->assertTrue($result->isInterface());
     }
@@ -78,7 +79,7 @@ class PhpParserTest extends UnitTestCase
     public function parsedResultCorrectlySetsNamespaceSeparatorOfParsedClass()
     {
         $subject = new Parser\PhpParser();
-        $result = $subject->parseClassFile(__DIR__ . '/Fixtures/NamespacedClassFixture.php');
+        $result = $subject->parseClassFile(__DIR__.'/Fixtures/NamespacedClassFixture.php');
         $this->assertSame('\\', $result->getNamespaceSeparator());
     }
 
@@ -88,7 +89,7 @@ class PhpParserTest extends UnitTestCase
     public function parsedResultCorrectlySetsFullyQualifiedClassNameOfParsedClass()
     {
         $subject = new Parser\PhpParser();
-        $result = $subject->parseClassFile(__DIR__ . '/Fixtures/NamespacedClassFixture.php');
+        $result = $subject->parseClassFile(__DIR__.'/Fixtures/NamespacedClassFixture.php');
         $this->assertSame(\Helhum\Typo3Console\Tests\Unit\Parser\Fixtures\NamespacedClassFixture::class, $result->getFullyQualifiedClassName());
     }
 
@@ -117,16 +118,16 @@ class PhpParserTest extends UnitTestCase
      */
     public function nonNamespacedClassesDataProvider()
     {
-        return array(
-            'normal class' => array('class Tx_Ext_Bar {', array('className' => 'Bar', 'namespace' => 'Tx_Ext', 'separator' => '_', 'full' => 'Tx_Ext_Bar')),
-            'abstract class' => array('abstract class Tx_Ext_BarAbstract {', array('className' => 'BarAbstract', 'namespace' => 'Tx_Ext', 'separator' => '_', 'full' => 'Tx_Ext_BarAbstract')),
-            'without namespace' => array('class TxExtBar {', array('className' => 'TxExtBar', 'namespace' => '', 'separator' => '', 'full' => 'TxExtBar')),
-        );
+        return [
+            'normal class'      => ['class Tx_Ext_Bar {', ['className' => 'Bar', 'namespace' => 'Tx_Ext', 'separator' => '_', 'full' => 'Tx_Ext_Bar']],
+            'abstract class'    => ['abstract class Tx_Ext_BarAbstract {', ['className' => 'BarAbstract', 'namespace' => 'Tx_Ext', 'separator' => '_', 'full' => 'Tx_Ext_BarAbstract']],
+            'without namespace' => ['class TxExtBar {', ['className' => 'TxExtBar', 'namespace' => '', 'separator' => '', 'full' => 'TxExtBar']],
+        ];
     }
 
     /**
      * @param string $classContent
-     * @param array $expectedResults
+     * @param array  $expectedResults
      * @test
      * @dataProvider nonNamespacedClassesDataProvider
      */
@@ -140,7 +141,7 @@ class PhpParserTest extends UnitTestCase
 
     /**
      * @param string $classContent
-     * @param array $expectedResults
+     * @param array  $expectedResults
      * @test
      * @dataProvider nonNamespacedClassesDataProvider
      */
@@ -154,7 +155,7 @@ class PhpParserTest extends UnitTestCase
 
     /**
      * @param string $classContent
-     * @param array $expectedResults
+     * @param array  $expectedResults
      * @test
      * @dataProvider nonNamespacedClassesDataProvider
      */
@@ -168,7 +169,7 @@ class PhpParserTest extends UnitTestCase
 
     /**
      * @param string $classContent
-     * @param array $expectedResults
+     * @param array  $expectedResults
      * @test
      * @dataProvider nonNamespacedClassesDataProvider
      */

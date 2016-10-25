@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Install;
 
 /*
@@ -17,13 +18,14 @@ use Helhum\Typo3Console\Package\UncachedPackageManager;
 use TYPO3\CMS\Core\Utility\PathUtility;
 
 /**
- * This class generates the PackageStates.php file from composer.json configuration
+ * This class generates the PackageStates.php file from composer.json configuration.
  */
 class PackageStatesGenerator
 {
     /**
      * @param UncachedPackageManager $packageManager
-     * @param bool $activateDefaultExtensions
+     * @param bool                   $activateDefaultExtensions
+     *
      * @throws \TYPO3\CMS\Core\Package\Exception\ProtectedPackageKeyException
      */
     public function generate(UncachedPackageManager $packageManager, $activateDefaultExtensions = false)
@@ -52,10 +54,11 @@ class PackageStatesGenerator
      */
     public function getFrameworkExtensionsFromConfiguration()
     {
-        $configuredExtensions = array();
+        $configuredExtensions = [];
         if (getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS')) {
             $configuredExtensions = array_flip(explode(',', getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS')));
         }
+
         return $configuredExtensions;
     }
 }

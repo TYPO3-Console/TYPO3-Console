@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Install\Status;
 
 /*
@@ -17,7 +18,7 @@ use TYPO3\CMS\Install\Status\AbstractStatus;
 use TYPO3\CMS\Install\Status\StatusInterface;
 
 /**
- * Redirect level status - Used in cli setup dispatcher
+ * Redirect level status - Used in cli setup dispatcher.
  */
 class RedirectStatus extends AbstractStatus implements StatusInterface
 {

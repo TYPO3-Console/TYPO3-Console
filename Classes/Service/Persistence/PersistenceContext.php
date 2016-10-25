@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Service\Persistence;
 
 /*
@@ -16,7 +17,7 @@ namespace Helhum\Typo3Console\Service\Persistence;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 
 /**
- * Class PersistenceContext
+ * Class PersistenceContext.
  */
 class PersistenceContext
 {
@@ -28,7 +29,7 @@ class PersistenceContext
     /**
      * @var array
      */
-    protected $persistenceConfiguration = array();
+    protected $persistenceConfiguration = [];
 
     public function __construct(DatabaseConnection $databaseConnection, array $persistenceConfiguration)
     {

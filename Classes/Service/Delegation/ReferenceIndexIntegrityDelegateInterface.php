@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Service\Delegation;
 
 /*
@@ -14,19 +15,21 @@ namespace Helhum\Typo3Console\Service\Delegation;
  */
 
 /**
- * Interface ReferenceIndexIntegrityDelegateInterface
+ * Interface ReferenceIndexIntegrityDelegateInterface.
  */
 interface ReferenceIndexIntegrityDelegateInterface
 {
     /**
      * @param int $unitsOfWorkCount
+     *
      * @return void
      */
     public function willStartOperation($unitsOfWorkCount);
 
     /**
      * @param string $tableName
-     * @param array $record
+     * @param array  $record
+     *
      * @return void
      */
     public function willUpdateRecord($tableName, array $record);

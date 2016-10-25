@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Log\Writer;
 
 /*
@@ -18,7 +19,7 @@ use TYPO3\CMS\Core\Log\LogLevel;
 use TYPO3\CMS\Core\Log\Writer\AbstractWriter;
 
 /**
- * Class ConsoleWriter
+ * Class ConsoleWriter.
  */
 class ConsoleWriter extends AbstractWriter
 {
@@ -32,16 +33,17 @@ class ConsoleWriter extends AbstractWriter
      */
     protected $messageWrap = '|';
 
-    protected $severityTagMapping = array(
+    protected $severityTagMapping = [
         LogLevel::EMERGENCY => '<error>|</error>',
-        LogLevel::ALERT => '<error>|</error>',
-        LogLevel::CRITICAL => '<error>|</error>',
-        LogLevel::ERROR => '<fg=red>|</fg=red>',
-        LogLevel::WARNING => '<fg=yellow;options=bold>|</fg=yellow;options=bold>',
-        LogLevel::NOTICE => '<fg=yellow>|</fg=yellow>',
-        LogLevel::INFO => '<info>|</info>',
-        LogLevel::DEBUG => '|'
-    );
+        LogLevel::ALERT     => '<error>|</error>',
+        LogLevel::CRITICAL  => '<error>|</error>',
+        LogLevel::ERROR     => '<fg=red>|</fg=red>',
+        LogLevel::WARNING   => '<fg=yellow;options=bold>|</fg=yellow;options=bold>',
+        LogLevel::NOTICE    => '<fg=yellow>|</fg=yellow>',
+        LogLevel::INFO      => '<info>|</info>',
+        LogLevel::DEBUG     => '|',
+    ];
+
     /**
      * @param OutputInterface $output
      */
@@ -59,11 +61,13 @@ class ConsoleWriter extends AbstractWriter
     }
 
     /**
-     * Writes the log record
+     * Writes the log record.
      *
      * @param \TYPO3\CMS\Core\Log\LogRecord $record Log record
-     * @return \TYPO3\CMS\Core\Log\Writer\WriterInterface $this
+     *
      * @throws \Exception
+     *
+     * @return \TYPO3\CMS\Core\Log\Writer\WriterInterface $this
      */
     public function writeLog(\TYPO3\CMS\Core\Log\LogRecord $record)
     {
@@ -77,6 +81,7 @@ class ConsoleWriter extends AbstractWriter
     {
         list($tagStart, $tagEnd) = explode('|', $this->severityTagMapping[$level]);
         list($wrapStart, $wrapEnd) = explode('|', $this->messageWrap);
-        return $tagStart . $wrapStart . $message . $wrapEnd . $tagEnd;
+
+        return $tagStart.$wrapStart.$message.$wrapEnd.$tagEnd;
     }
 }

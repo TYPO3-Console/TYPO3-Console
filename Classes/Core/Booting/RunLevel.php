@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Core\Booting;
 
 /*
@@ -14,7 +15,7 @@ namespace Helhum\Typo3Console\Core\Booting;
  */
 
 /**
- * Class RunLevel
+ * Class RunLevel.
  */
 class RunLevel
 {
@@ -26,16 +27,17 @@ class RunLevel
     /**
      * @var array
      */
-    protected $commandOptions = array();
+    protected $commandOptions = [];
 
     /**
      * @var array
      */
-    protected $executedSteps = array();
+    protected $executedSteps = [];
 
     /**
      * @param string $commandIdentifier
      * @param string $runLevel
+     *
      * @api
      */
     public function setRunLevelForCommand($commandIdentifier, $runLevel)
@@ -48,6 +50,7 @@ class RunLevel
     /**
      * @param $commandIdentifier
      * @param string $stepIdentifier
+     *
      * @internal
      */
     public function addBootingStepForCommand($commandIdentifier, $stepIdentifier)
@@ -60,6 +63,7 @@ class RunLevel
     /**
      * @param $commandIdentifier
      * @param string $stepIdentifier
+     *
      * @internal
      */
     public function removeBootingStepForCommand($commandIdentifier, $stepIdentifier)
@@ -71,7 +75,9 @@ class RunLevel
 
     /**
      * @param string $commandIdentifier
+     *
      * @return Sequence
+     *
      * @internal
      */
     public function buildSequenceForCommand($commandIdentifier)
@@ -84,26 +90,30 @@ class RunLevel
     }
 
     /**
-     * Builds the sequence for the given run level
+     * Builds the sequence for the given run level.
      *
      * @param string $runLevel
-     * @return Sequence
+     *
      * @throws \InvalidArgumentException
+     *
+     * @return Sequence
+     *
      * @internal
      */
     public function buildSequence($runLevel)
     {
-        if (is_callable(array($this, $runLevel))) {
+        if (is_callable([$this, $runLevel])) {
             return $this->{$runLevel}($runLevel);
         } else {
-            throw new \InvalidArgumentException('Invalid run level "' . $runLevel . '"', 1402075492);
+            throw new \InvalidArgumentException('Invalid run level "'.$runLevel.'"', 1402075492);
         }
     }
 
     /**
-     * Essential steps for a minimal usable system
+     * Essential steps for a minimal usable system.
      *
      * @param string $identifier
+     *
      * @return Sequence
      */
     protected function buildEssentialSequence($identifier)
@@ -118,7 +128,7 @@ class RunLevel
     }
 
     /**
-     * Minimal usable system with most core caches disabled
+     * Minimal usable system with most core caches disabled.
      *
      * @return Sequence
      */
@@ -134,16 +144,17 @@ class RunLevel
             // We should change that to include all ext_localconf of required exts in configuration step and reset this array key there then
             // OK, this does not work when there is a cached file... of course, but in compile time we do not have caches
             unset($GLOBALS['TYPO3_LOADED_EXT']['extbase']['ext_localconf.php']);
-            require PATH_site . 'typo3/sysext/extbase/ext_localconf.php';
+            require PATH_site.'typo3/sysext/extbase/ext_localconf.php';
         }));
 
         return $sequence;
     }
 
     /**
-     * System with complete configuration, but no database
+     * System with complete configuration, but no database.
      *
      * @param string $identifier
+     *
      * @return Sequence
      */
     protected function buildBasicRuntimeSequence($identifier = self::LEVEL_MINIMAL)
@@ -156,7 +167,7 @@ class RunLevel
     }
 
     /**
-     * Fully capable system with database, persistence configuration (TCA) and authentication available
+     * Fully capable system with database, persistence configuration (TCA) and authentication available.
      *
      * @return Sequence
      */
@@ -175,12 +186,14 @@ class RunLevel
 
     /**
      * @param Sequence $sequence
-     * @param string $stepIdentifier
+     * @param string   $stepIdentifier
      */
     protected function addStep($sequence, $stepIdentifier)
     {
         if (!empty($this->executedSteps[$stepIdentifier])) {
-            $sequence->addStep(new Step($stepIdentifier, function () {}));
+            $sequence->addStep(new Step($stepIdentifier, function () {
+            }));
+
             return;
         }
         $this->executedSteps[$stepIdentifier] = true;
@@ -188,44 +201,44 @@ class RunLevel
         switch ($stepIdentifier) {
             // Part of essential sequence
             case 'helhum.typo3console:coreconfiguration':
-                $sequence->addStep(new Step('helhum.typo3console:coreconfiguration', array(\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeConfigurationManagement')));
+                $sequence->addStep(new Step('helhum.typo3console:coreconfiguration', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeConfigurationManagement']));
                 break;
             case 'helhum.typo3console:providecleanclassimplementations':
-                $sequence->addStep(new Step('helhum.typo3console:providecleanclassimplementations', array(\Helhum\Typo3Console\Core\Booting\Scripts::class, 'provideCleanClassImplementations'), 'helhum.typo3console:coreconfiguration'));
+                $sequence->addStep(new Step('helhum.typo3console:providecleanclassimplementations', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'provideCleanClassImplementations'], 'helhum.typo3console:coreconfiguration'));
                 break;
             case 'helhum.typo3console:caching':
-                $sequence->addStep(new Step('helhum.typo3console:caching', array(\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeCachingFramework')));
+                $sequence->addStep(new Step('helhum.typo3console:caching', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeCachingFramework']));
                 break;
             case 'helhum.typo3console:errorhandling':
-                $sequence->addStep(new Step('helhum.typo3console:errorhandling', array(\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeErrorHandling')));
+                $sequence->addStep(new Step('helhum.typo3console:errorhandling', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeErrorHandling']));
                 break;
 
             // Part of compiletime sequence
             case 'helhum.typo3console:disablecorecaches':
-                $sequence->addStep(new Step('helhum.typo3console:disablecorecaches', array(\Helhum\Typo3Console\Core\Booting\Scripts::class, 'disableCoreCaches')), 'helhum.typo3console:coreconfiguration');
+                $sequence->addStep(new Step('helhum.typo3console:disablecorecaches', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'disableCoreCaches']), 'helhum.typo3console:coreconfiguration');
                 break;
 
             // Part of basic runtime
             case 'helhum.typo3console:extensionconfiguration':
-                $sequence->addStep(new Step('helhum.typo3console:extensionconfiguration', array(\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeExtensionConfiguration')));
+                $sequence->addStep(new Step('helhum.typo3console:extensionconfiguration', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeExtensionConfiguration']));
                 break;
 
             // Part of full runtime
             case 'helhum.typo3console:enablecorecaches':
-                $sequence->addStep(new Step('helhum.typo3console:enablecorecaches', array(\Helhum\Typo3Console\Core\Booting\Scripts::class, 'reEnableOriginalCoreCaches')), 'helhum.typo3console:database');
+                $sequence->addStep(new Step('helhum.typo3console:enablecorecaches', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'reEnableOriginalCoreCaches']), 'helhum.typo3console:database');
                 break;
             case 'helhum.typo3console:database':
-                $sequence->addStep(new Step('helhum.typo3console:database', array(\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeDatabaseConnection')), 'helhum.typo3console:errorhandling');
+                $sequence->addStep(new Step('helhum.typo3console:database', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeDatabaseConnection']), 'helhum.typo3console:errorhandling');
                 break;
             case 'helhum.typo3console:persistence':
-                $sequence->addStep(new Step('helhum.typo3console:persistence', array(\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializePersistence')), 'helhum.typo3console:extensionconfiguration');
+                $sequence->addStep(new Step('helhum.typo3console:persistence', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializePersistence']), 'helhum.typo3console:extensionconfiguration');
                 break;
             case 'helhum.typo3console:authentication':
-                $sequence->addStep(new Step('helhum.typo3console:authentication', array(\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeAuthenticatedOperations')), 'helhum.typo3console:extensionconfiguration');
+                $sequence->addStep(new Step('helhum.typo3console:authentication', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeAuthenticatedOperations']), 'helhum.typo3console:extensionconfiguration');
                 break;
 
             default:
-                throw new \InvalidArgumentException('ERROR: cannot find step for identifier "' . $stepIdentifier . '"', 1402075819);
+                throw new \InvalidArgumentException('ERROR: cannot find step for identifier "'.$stepIdentifier.'"', 1402075819);
         }
     }
 
@@ -233,7 +246,9 @@ class RunLevel
 
     /**
      * @param string $commandIdentifier
+     *
      * @return string
+     *
      * @internal
      */
     public function getRunlevelForCommand($commandIdentifier)
@@ -242,17 +257,18 @@ class RunLevel
             return $this->getMaximumAvailableRunLevel();
         }
         $options = $this->getOptionsForCommand($commandIdentifier);
+
         return isset($options['runLevel']) ? $options['runLevel'] : self::LEVEL_FULL;
     }
 
     /**
-     * Check if we have all mandatory files to assume we have a fully configured / installed TYPO3
+     * Check if we have all mandatory files to assume we have a fully configured / installed TYPO3.
      *
      * @return bool
      */
     public function getMaximumAvailableRunLevel()
     {
-        if (!file_exists(PATH_site . 'typo3conf/PackageStates.php') || !file_exists(PATH_site . 'typo3conf/LocalConfiguration.php')) {
+        if (!file_exists(PATH_site.'typo3conf/PackageStates.php') || !file_exists(PATH_site.'typo3conf/LocalConfiguration.php')) {
             return self::LEVEL_COMPILE;
         }
 
@@ -261,6 +277,7 @@ class RunLevel
 
     /**
      * @param string $commandIdentifier
+     *
      * @return bool
      */
     public function isCommandAvailable($commandIdentifier)
@@ -269,7 +286,7 @@ class RunLevel
         $availableRunlevel = $this->getMaximumAvailableRunLevel();
         $isAvailable = true;
         if ($availableRunlevel === self::LEVEL_COMPILE) {
-            if (in_array($expectedRunLevel, array(self::LEVEL_FULL, self::LEVEL_MINIMAL), true)) {
+            if (in_array($expectedRunLevel, [self::LEVEL_FULL, self::LEVEL_MINIMAL], true)) {
                 $isAvailable = false;
             } elseif ($commandIdentifier === 'cache:flush') {
                 // @TODO: find a nicer way to hide this command when TYPO3 is not installed yet
@@ -282,8 +299,10 @@ class RunLevel
 
     /**
      * @param Sequence $sequence
-     * @param string $commandIdentifier
+     * @param string   $commandIdentifier
+     *
      * @return string
+     *
      * @internal
      */
     protected function addStepsForCommand($sequence, $commandIdentifier)
@@ -298,8 +317,10 @@ class RunLevel
 
     /**
      * @param Sequence $sequence
-     * @param string $commandIdentifier
+     * @param string   $commandIdentifier
+     *
      * @return string
+     *
      * @internal
      */
     protected function removeStepsForCommand($sequence, $commandIdentifier)
@@ -314,13 +335,14 @@ class RunLevel
 
     /**
      * @param $commandIdentifier
+     *
      * @return mixed
      */
     protected function getOptionsForCommand($commandIdentifier)
     {
         $commandIdentifierParts = explode(':', $commandIdentifier);
         if (count($commandIdentifierParts) < 2 || count($commandIdentifierParts) > 3) {
-            return null;
+            return;
         }
         if (isset($this->commandOptions[$commandIdentifier])) {
             return $this->commandOptions[$commandIdentifier];
@@ -343,7 +365,5 @@ class RunLevel
                 return $this->commandOptions[$fullControllerIdentifier];
             }
         }
-
-        return null;
     }
 }

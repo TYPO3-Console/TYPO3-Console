@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\ViewHelpers\Format;
 
 /*
@@ -31,12 +32,14 @@ class IndentViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelp
 {
     /**
      * @param string $indent String used to indent
-     * @param bool $inline If TRUE, the first line will not be indented
+     * @param bool   $inline If TRUE, the first line will not be indented
+     *
      * @return string The formatted value
      */
     public function render($indent = "\t", $inline = false)
     {
         $string = $this->renderChildren();
-        return ($inline === false ? $indent : '') . str_replace("\n", "\n" . $indent, $string);
+
+        return ($inline === false ? $indent : '').str_replace("\n", "\n".$indent, $string);
     }
 }

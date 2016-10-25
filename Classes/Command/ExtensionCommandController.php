@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Command;
 
 /*
@@ -18,7 +19,7 @@ use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\ClassLoadingInformation;
 
 /**
- * CommandController for working with extension management through CLI
+ * CommandController for working with extension management through CLI.
  */
 class ExtensionCommandController extends CommandController
 {
@@ -46,12 +47,13 @@ class ExtensionCommandController extends CommandController
     protected $packageManager;
 
     /**
-     * Activate extension(s)
+     * Activate extension(s).
      *
      * Activates one or more extensions by key.
      * Marks extensions as active, sets them up and clears caches for every activated extension.
      *
      * @param array $extensionKeys Extension keys to activate. Separate multiple extension keys with comma.
+     *
      * @throws \TYPO3\CMS\Extensionmanager\Exception\ExtensionManagerException
      */
     public function activateCommand(array $extensionKeys)
@@ -69,12 +71,13 @@ class ExtensionCommandController extends CommandController
     }
 
     /**
-     * Deactivate extension(s)
+     * Deactivate extension(s).
      *
      * Deactivates one or more extensions by key.
      * Marks extensions as inactive in the system and clears caches for every deactivated extension.
      *
      * @param array $extensionKeys Extension keys to deactivate. Separate multiple extension keys with comma.
+     *
      * @throws \TYPO3\CMS\Extensionmanager\Exception\ExtensionManagerException
      */
     public function deactivateCommand(array $extensionKeys)
@@ -91,7 +94,7 @@ class ExtensionCommandController extends CommandController
     }
 
     /**
-     * Set up extension(s)
+     * Set up extension(s).
      *
      * Sets up one or more extensions by key.
      * Set up means:
@@ -116,7 +119,7 @@ class ExtensionCommandController extends CommandController
     }
 
     /**
-     * Set up all active extensions
+     * Set up all active extensions.
      *
      * Sets up all extensions that are marked as active in the system.
      *
@@ -140,7 +143,7 @@ class ExtensionCommandController extends CommandController
     }
 
     /**
-     * Dump class auto-load
+     * Dump class auto-load.
      *
      * Updates class loading information in non composer managed TYPO3 installations.
      *
@@ -161,11 +164,11 @@ class ExtensionCommandController extends CommandController
     }
 
     /**
-     * List extensions that are available in the system
+     * List extensions that are available in the system.
      *
-     * @param bool $active Only show active extensions
+     * @param bool $active   Only show active extensions
      * @param bool $inactive Only show inactive extensions
-     * @param bool $raw Enable machine readable output (just extension keys separated by line feed)
+     * @param bool $raw      Enable machine readable output (just extension keys separated by line feed)
      */
     public function listCommand($active = false, $inactive = false, $raw = false)
     {
@@ -183,7 +186,7 @@ class ExtensionCommandController extends CommandController
             $metaData = $package->getPackageMetaData();
             $extensionInformation[] = [
                 'package_key' => $package->getPackageKey(),
-                'version' => $metaData->getVersion(),
+                'version'     => $metaData->getVersion(),
                 'description' => $metaData->getDescription(),
             ];
         }
@@ -198,7 +201,7 @@ class ExtensionCommandController extends CommandController
     }
 
     /**
-     * Emits packages may have changed signal
+     * Emits packages may have changed signal.
      */
     protected function emitPackagesMayHaveChangedSignal()
     {
@@ -206,13 +209,15 @@ class ExtensionCommandController extends CommandController
     }
 
     /**
-     * Dump class auto-load (DEPRECATED)
+     * Dump class auto-load (DEPRECATED).
      *
      * Updates class loading information.
      * Use <code>extension:dumpautoload</code> instead!
      *
      * @return void
+     *
      * @internal
+     *
      * @deprecated use dumpautoload instead
      * @see extensionmanager:extension:dumpautoload
      */
@@ -223,14 +228,17 @@ class ExtensionCommandController extends CommandController
     }
 
     /**
-     * Install extension (DEPRECATED)
+     * Install extension (DEPRECATED).
      *
      * Installs an extension by key
      * Use "activate" command instead!
      *
      * @param string $extensionKey The "extension_key" format of extension key to be installed
+     *
      * @return void
+     *
      * @internal
+     *
      * @deprecated use activate instead
      * @see extensionmanager:extension:activate
      */
@@ -241,14 +249,17 @@ class ExtensionCommandController extends CommandController
     }
 
     /**
-     * Uninstall extension (DEPRECATED)
+     * Uninstall extension (DEPRECATED).
      *
      * Uninstalls an extension by key
      * Use "deactivate" command instead!
      *
      * @param string $extensionKey The "extension_key" format of extension key to be uninstalled
+     *
      * @return void
+     *
      * @internal
+     *
      * @deprecated use deactivate instead
      * @see extensionmanager:extension:deactivate
      */

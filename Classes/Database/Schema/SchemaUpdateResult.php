@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Database\Schema;
 
 /*
@@ -14,22 +15,22 @@ namespace Helhum\Typo3Console\Database\Schema;
  */
 
 /**
- * Represents a database schema update result
+ * Represents a database schema update result.
  */
 class SchemaUpdateResult
 {
     /**
-     * @var array $performedUpdates
+     * @var array
      */
-    protected $performedUpdates = array();
+    protected $performedUpdates = [];
 
     /**
-     * @var array $errors
+     * @var array
      */
-    protected $errors = array();
+    protected $errors = [];
 
     /**
-     * Returns the list of performed updates, grouped by schema update type
+     * Returns the list of performed updates, grouped by schema update type.
      *
      * @return array
      */
@@ -39,7 +40,7 @@ class SchemaUpdateResult
     }
 
     /**
-     * Returns the list of performed update types including the count
+     * Returns the list of performed update types including the count.
      *
      * @return array
      */
@@ -49,11 +50,12 @@ class SchemaUpdateResult
         foreach ($this->performedUpdates as $type => $performedUpdates) {
             $typesCount[$type] = count($performedUpdates);
         }
+
         return $typesCount;
     }
 
     /**
-     * Returns true if updates were performed, false otherwise
+     * Returns true if updates were performed, false otherwise.
      *
      * @return bool
      */
@@ -63,14 +65,14 @@ class SchemaUpdateResult
     }
 
     /**
-     * Adds to the number of updates performed for a schema update type
+     * Adds to the number of updates performed for a schema update type.
      *
      * @param SchemaUpdateType $schemaUpdateType Schema update type
-     * @param array $updates Updates performed
+     * @param array            $updates          Updates performed
      */
     public function addPerformedUpdates(SchemaUpdateType $schemaUpdateType, array $updates)
     {
-        $this->performedUpdates[(string)$schemaUpdateType] = array_merge((array)$this->performedUpdates[(string)$schemaUpdateType], $updates);
+        $this->performedUpdates[(string) $schemaUpdateType] = array_merge((array) $this->performedUpdates[(string) $schemaUpdateType], $updates);
     }
 
     /**
@@ -82,18 +84,18 @@ class SchemaUpdateResult
     }
 
     /**
-     * Adds to the list of errors occurred for a schema update type
+     * Adds to the list of errors occurred for a schema update type.
      *
      * @param SchemaUpdateType $schemaUpdateType Schema update type
-     * @param array $errors List of error messages
+     * @param array            $errors           List of error messages
      */
     public function addErrors(SchemaUpdateType $schemaUpdateType, array $errors)
     {
-        $this->errors[(string)$schemaUpdateType] = array_merge((array)$this->errors[(string)$schemaUpdateType], $errors);
+        $this->errors[(string) $schemaUpdateType] = array_merge((array) $this->errors[(string) $schemaUpdateType], $errors);
     }
 
     /**
-     * Returns true if errors did occur during schema update, false otherwise
+     * Returns true if errors did occur during schema update, false otherwise.
      *
      * @return bool
      */

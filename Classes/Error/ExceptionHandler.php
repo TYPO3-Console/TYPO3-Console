@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Error;
 
 /*
@@ -16,7 +17,7 @@ namespace Helhum\Typo3Console\Error;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
- * Class ExceptionHandler
+ * Class ExceptionHandler.
  */
 class ExceptionHandler
 {
@@ -37,6 +38,7 @@ class ExceptionHandler
      * Formats and echoes the exception for the command line.
      *
      * @param \Exception|\Throwable $exception The exception object
+     *
      * @return void
      */
     public function handleException($exception)
@@ -74,7 +76,7 @@ class ExceptionHandler
      */
     protected function outputException($exception)
     {
-        $exceptionCodeNumber = ($exception->getCode() > 0) ? '#' . $exception->getCode() . ': ' : '';
+        $exceptionCodeNumber = ($exception->getCode() > 0) ? '#'.$exception->getCode().': ' : '';
 
         $title = sprintf('[ %s ]', get_class($exception));
         $exceptionTitle = sprintf('%s%s', $exceptionCodeNumber, $exception->getMessage());
@@ -100,16 +102,16 @@ class ExceptionHandler
         $this->output->writeln('<comment>Exception trace:</comment>');
         $backtraceSteps = $exception->getTrace();
         foreach ($backtraceSteps as $index => $step) {
-            $traceLine = '#' . $index . ' ';
+            $traceLine = '#'.$index.' ';
             if (isset($backtraceSteps[$index]['class'])) {
                 $traceLine .= $backtraceSteps[$index]['class'];
             }
             if (isset($backtraceSteps[$index]['function'])) {
-                $traceLine .= (isset($backtraceSteps[$index]['class']) ? '::' : '') . $backtraceSteps[$index]['function'] . '()';
+                $traceLine .= (isset($backtraceSteps[$index]['class']) ? '::' : '').$backtraceSteps[$index]['function'].'()';
             }
             $this->output->writeln(sprintf('<info>%s</info>', $traceLine));
             if (isset($backtraceSteps[$index]['file'])) {
-                $this->output->writeln('   ' . $this->getPossibleShortenedFileName($backtraceSteps[$index]['file']) . (isset($backtraceSteps[$index]['line']) ? ':' . $backtraceSteps[$index]['line'] : ''));
+                $this->output->writeln('   '.$this->getPossibleShortenedFileName($backtraceSteps[$index]['file']).(isset($backtraceSteps[$index]['line']) ? ':'.$backtraceSteps[$index]['line'] : ''));
             }
         }
     }
@@ -118,18 +120,20 @@ class ExceptionHandler
      * Right pad message.
      *
      * @param string $message
-     * @param int $maxLength
+     * @param int    $maxLength
+     *
      * @return string
      */
     protected function padMessage($message, $maxLength)
     {
-        return '<error> ' . $message . str_pad('', $maxLength - strlen($message), ' ') . ' </error>';
+        return '<error> '.$message.str_pad('', $maxLength - strlen($message), ' ').' </error>';
     }
 
     /**
      * Shorten file name if inside extension or core extension.
      *
      * @param string $fileName
+     *
      * @return string
      */
     protected function getPossibleShortenedFileName($fileName)
@@ -137,6 +141,7 @@ class ExceptionHandler
         $pathPosition = strpos($fileName, 'typo3conf/ext/');
         $pathAndFilename = ($pathPosition !== false) ? substr($fileName, $pathPosition) : $fileName;
         $pathPosition = strpos($pathAndFilename, 'typo3/sysext/');
+
         return ($pathPosition !== false) ? substr($pathAndFilename, $pathPosition) : $pathAndFilename;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Error;
 
 /*
@@ -14,20 +15,20 @@ namespace Helhum\Typo3Console\Error;
  */
 
 /**
- * Global error handler for Flow
- *
+ * Global error handler for Flow.
  */
 class ErrorHandler
 {
     /**
      * @var array
      */
-    protected $exceptionalErrors = array();
+    protected $exceptionalErrors = [];
 
     /**
      * Defines which error levels result should result in an exception thrown.
      *
      * @param array $exceptionalErrors An array of E_* error levels
+     *
      * @return void
      */
     public function setExceptionalErrors(array $exceptionalErrors)
@@ -41,12 +42,14 @@ class ErrorHandler
      * If error reporting is disabled, either in the php.ini or temporarily through
      * the shut-up operator "@", no exception will be thrown.
      *
-     * @param int $errorLevel The error level - one of the E_* constants
+     * @param int    $errorLevel   The error level - one of the E_* constants
      * @param string $errorMessage The error message
-     * @param string $errorFile Name of the file the error occurred in
-     * @param int $errorLine Line number where the error occurred
-     * @return void
+     * @param string $errorFile    Name of the file the error occurred in
+     * @param int    $errorLine    Line number where the error occurred
+     *
      * @throws \TYPO3\CMS\Core\Error\Exception with the data passed to this method
+     *
+     * @return void
      */
     public function handleError($errorLevel, $errorMessage, $errorFile, $errorLine)
     {
@@ -54,18 +57,18 @@ class ErrorHandler
             return;
         }
 
-        $errorLevels = array(
+        $errorLevels = [
             E_WARNING            => 'Warning',
             E_NOTICE             => 'Notice',
             E_USER_ERROR         => 'User Error',
             E_USER_WARNING       => 'User Warning',
             E_USER_NOTICE        => 'User Notice',
             E_STRICT             => 'Runtime Notice',
-            E_RECOVERABLE_ERROR  => 'Catchable Fatal Error'
-        );
+            E_RECOVERABLE_ERROR  => 'Catchable Fatal Error',
+        ];
 
-        if (in_array($errorLevel, (array)$this->exceptionalErrors, true)) {
-            throw new \TYPO3\CMS\Core\Error\Exception($errorLevels[$errorLevel] . ': ' . $errorMessage . ' in ' . $errorFile . ' line ' . $errorLine, 1);
+        if (in_array($errorLevel, (array) $this->exceptionalErrors, true)) {
+            throw new \TYPO3\CMS\Core\Error\Exception($errorLevels[$errorLevel].': '.$errorMessage.' in '.$errorFile.' line '.$errorLine, 1);
         }
     }
 }

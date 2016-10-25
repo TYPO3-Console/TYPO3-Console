@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Mvc\Cli;
 
 /*
@@ -16,14 +17,14 @@ namespace Helhum\Typo3Console\Mvc\Cli;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * Class CommandManager
+ * Class CommandManager.
  */
 class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
 {
     /**
      * @var array
      */
-    protected $commandControllers = array();
+    protected $commandControllers = [];
 
     /**
      * @var bool
@@ -40,7 +41,7 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
     }
 
     /**
-     * Set the dependency
+     * Set the dependency.
      */
     protected function initialize()
     {
@@ -51,6 +52,7 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
 
     /**
      * @param string $commandIdentifier
+     *
      * @return \TYPO3\CMS\Extbase\Mvc\Cli\Command
      */
     public function getCommandByIdentifier($commandIdentifier)
@@ -58,11 +60,12 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
         if ($commandIdentifier === 'autocomplete') {
             $commandIdentifier = 'extbase:help:autocomplete';
         }
+
         return parent::getCommandByIdentifier($commandIdentifier);
     }
 
     /**
-     * Make sure the object manager is set
+     * Make sure the object manager is set.
      *
      * @return \TYPO3\CMS\Extbase\Mvc\Cli\Command[]
      */
@@ -70,7 +73,7 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
     {
         $this->initialize();
         if ($this->availableCommands === null) {
-            $commandControllerRegistry = & $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'];
+            $commandControllerRegistry = &$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'];
             if (!empty($commandControllerRegistry) && is_array($commandControllerRegistry)) {
                 $commandControllerRegistry = array_merge($commandControllerRegistry, $this->commandControllers);
             } else {
@@ -78,6 +81,7 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
             }
             $this->availableCommands = parent::getAvailableCommands();
         }
+
         return $this->availableCommands;
     }
 
@@ -89,7 +93,7 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
         if (!isset($this->commandControllers[$commandControllerClassName])) {
             $this->commandControllers[$commandControllerClassName] = $commandControllerClassName;
         } else {
-            echo 'WARNING: command controller already registered!' . PHP_EOL;
+            echo 'WARNING: command controller already registered!'.PHP_EOL;
         }
     }
 }
