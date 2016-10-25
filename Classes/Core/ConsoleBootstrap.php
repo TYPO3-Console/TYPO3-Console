@@ -31,12 +31,12 @@ class ConsoleBootstrap extends Bootstrap
     /**
      * @var array
      */
-    public $commands = array();
+    public $commands = [];
 
     /**
      * @var RequestHandlerInterface[]
      */
-    protected $requestHandlers = array();
+    protected $requestHandlers = [];
 
     /**
      * @var RunLevel
@@ -78,14 +78,14 @@ class ConsoleBootstrap extends Bootstrap
     {
         $this->initializeClassLoader($classLoader);
         // @deprecated in TYPO3 8. Condition will be removed when TYPO3 7.6 support is removed
-        if (is_callable(array($this, 'setRequestType'))) {
+        if (is_callable([$this, 'setRequestType'])) {
             $this->defineTypo3RequestTypes();
             $this->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
         }
         $this->baseSetup();
         $this->requireLibraries();
         // @deprecated in TYPO3 8 will be removed when TYPO3 7.6 support is removed
-        if (!is_callable(array($this, 'setRequestType'))) {
+        if (!is_callable([$this, 'setRequestType'])) {
             $this->defineTypo3RequestTypes();
         }
         $this->requestId = uniqid('console_request_', true);
@@ -94,7 +94,7 @@ class ConsoleBootstrap extends Bootstrap
         $this->runLevel = new RunLevel();
         $this->setEarlyInstance(\Helhum\Typo3Console\Core\Booting\RunLevel::class, $this->runLevel);
         $exceptionHandler = new ExceptionHandler();
-        set_exception_handler(array($exceptionHandler, 'handleException'));
+        set_exception_handler([$exceptionHandler, 'handleException']);
 
         $this->initializeCommandManager();
         $this->registerRequestHandler(new RequestHandler($this));
@@ -196,7 +196,7 @@ class ConsoleBootstrap extends Bootstrap
      */
     public function resolveCliRequestHandler()
     {
-        $suitableRequestHandlers = array();
+        $suitableRequestHandlers = [];
         foreach ($this->requestHandlers as $requestHandler) {
             if ($requestHandler->canHandleRequest() > 0) {
                 $priority = $requestHandler->getPriority();
@@ -280,10 +280,10 @@ class ConsoleBootstrap extends Bootstrap
         $packageManager = $this->getEarlyInstance(\TYPO3\CMS\Core\Package\PackageManager::class);
         if ($packageManager->isPackageActive('dbal')) {
             $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
-            $cacheConfigurations['dbal'] = array(
+            $cacheConfigurations['dbal'] = [
                 'backend' => \TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend::class,
-                'groups' => array()
-            );
+                'groups' => []
+            ];
         }
     }
 
@@ -297,7 +297,7 @@ class ConsoleBootstrap extends Bootstrap
     public function initializeDatabaseConnection()
     {
         // @deprecated can be removed if TYPO3 7 support is removed
-        if (is_callable(array($this, 'defineDatabaseConstants'))) {
+        if (is_callable([$this, 'defineDatabaseConstants'])) {
             $this->defineDatabaseConstants();
         }
         $this->initializeTypo3DbGlobal();

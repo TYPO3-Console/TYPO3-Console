@@ -26,9 +26,9 @@ class CommandDispatcher
      * @return string Json encoded output of the executed command
      * @throws \Exception
      */
-    public function executeCommand($commandIdentifier, $arguments = array())
+    public function executeCommand($commandIdentifier, $arguments = [])
     {
-        $commandLine = isset($_SERVER['argv']) ? $_SERVER['argv'] : array();
+        $commandLine = isset($_SERVER['argv']) ? $_SERVER['argv'] : [];
 
         $processBuilder = new ProcessBuilder();
         $processBuilder->setPrefix(PHP_BINARY);

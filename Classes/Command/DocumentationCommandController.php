@@ -48,8 +48,8 @@ class DocumentationCommandController extends CommandController implements Single
         if ($xsdNamespace === null) {
             $phpNamespace = rtrim($phpNamespace, '_\\');
             if (strpos($phpNamespace, '\\') === false) {
-                $search = array('Tx_', '_');
-                $replace = array('', '/');
+                $search = ['Tx_', '_'];
+                $replace = ['', '/'];
             } else {
                 $search = '\\';
                 $replace = '/';
@@ -61,7 +61,7 @@ class DocumentationCommandController extends CommandController implements Single
             $xsdSchema = $this->xsdGenerator->generateXsd($phpNamespace, $xsdNamespace);
         } catch (Service\Exception $exception) {
             $this->outputLine('An error occurred while trying to generate the XSD schema:');
-            $this->outputLine('%s', array($exception->getMessage()));
+            $this->outputLine('%s', [$exception->getMessage()]);
             $this->sendAndExit(1);
         }
         if ($targetFile === null) {

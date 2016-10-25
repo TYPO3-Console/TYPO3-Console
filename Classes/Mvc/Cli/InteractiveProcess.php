@@ -21,12 +21,12 @@ class InteractiveProcess
     public function run($command)
     {
         $returnValue = 1;
-        $pipes = array( );
-        $descriptors = array(
-            array('file', 'php://stdin', 'r'),   // stdin is a file that the child will read from
-            array('file', 'php://stdout', 'w'),  // stdout is a file that the child will write to
-            array('pipe', 'w')                   // stderr is a file that the child will write to
-        );
+        $pipes = [ ];
+        $descriptors = [
+            ['file', 'php://stdin', 'r'],   // stdin is a file that the child will read from
+            ['file', 'php://stdout', 'w'],  // stdout is a file that the child will write to
+            ['pipe', 'w']                   // stderr is a file that the child will write to
+        ];
 
         $process = @proc_open($command, $descriptors, $pipes);
 

@@ -185,7 +185,7 @@ class InstallCommandController extends CommandController
      */
     public function databaseConnectCommand($databaseUserName = '', $databaseUserPassword = '', $databaseHostName = 'localhost', $databasePort = '3306', $databaseSocket = '')
     {
-        $this->cliSetupRequestHandler->executeActionWithArguments('databaseConnect', array('host' => $databaseHostName, 'port' => $databasePort, 'username' => $databaseUserName, 'password' => $databaseUserPassword, 'socket' => $databaseSocket));
+        $this->cliSetupRequestHandler->executeActionWithArguments('databaseConnect', ['host' => $databaseHostName, 'port' => $databasePort, 'username' => $databaseUserName, 'password' => $databaseUserPassword, 'socket' => $databaseSocket]);
     }
 
     /**
@@ -208,7 +208,7 @@ class InstallCommandController extends CommandController
     public function databaseSelectCommand($useExistingDatabase = false, $databaseName = 'required')
     {
         $selectType = $useExistingDatabase ? 'existing' : 'new';
-        $this->cliSetupRequestHandler->executeActionWithArguments('databaseSelect', array('type' => $selectType, $selectType => $databaseName));
+        $this->cliSetupRequestHandler->executeActionWithArguments('databaseSelect', ['type' => $selectType, $selectType => $databaseName]);
     }
 
     /**
@@ -231,7 +231,7 @@ class InstallCommandController extends CommandController
      */
     public function databaseDataCommand($adminUserName, $adminPassword, $siteName = 'New TYPO3 Console site')
     {
-        $this->cliSetupRequestHandler->executeActionWithArguments('databaseData', array('username' => $adminUserName, 'password' => $adminPassword, 'sitename' => $siteName));
+        $this->cliSetupRequestHandler->executeActionWithArguments('databaseData', ['username' => $adminUserName, 'password' => $adminPassword, 'sitename' => $siteName]);
     }
 
     /**

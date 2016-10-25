@@ -27,13 +27,13 @@ class ReferenceIndexUpdateDelegate implements ReferenceIndexIntegrityDelegateInt
     /**
      * @var array
      */
-    protected $subscribers = array();
+    protected $subscribers = [];
 
     /**
      * @param string $name
      * @param array $arguments
      */
-    public function emitEvent($name, $arguments = array())
+    public function emitEvent($name, $arguments = [])
     {
         if (empty($this->subscribers[$name])) {
             return;
@@ -51,7 +51,7 @@ class ReferenceIndexUpdateDelegate implements ReferenceIndexIntegrityDelegateInt
     public function subscribeEvent($name, $subscriber)
     {
         if (!isset($this->subscribers[$name])) {
-            $this->subscribers[$name] = array();
+            $this->subscribers[$name] = [];
         }
 
         $this->subscribers[$name][] = $subscriber;
@@ -76,7 +76,7 @@ class ReferenceIndexUpdateDelegate implements ReferenceIndexIntegrityDelegateInt
      */
     public function willStartOperation($unitsOfWorkCount)
     {
-        $this->emitEvent('willStartOperation', array($unitsOfWorkCount));
+        $this->emitEvent('willStartOperation', [$unitsOfWorkCount]);
     }
 
     /**
@@ -86,7 +86,7 @@ class ReferenceIndexUpdateDelegate implements ReferenceIndexIntegrityDelegateInt
      */
     public function willUpdateRecord($tableName, array $record)
     {
-        $this->emitEvent('willUpdateRecord', array($tableName, $record));
+        $this->emitEvent('willUpdateRecord', [$tableName, $record]);
     }
 
     /**

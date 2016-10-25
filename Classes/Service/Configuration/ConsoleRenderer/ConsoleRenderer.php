@@ -38,6 +38,6 @@ class ConsoleRenderer
 
     protected function getConfigurationAsString($config)
     {
-        return ArrayUtility::arrayExport(array($config));
+        return ArrayUtility::arrayExport([$config]);
     }
 }

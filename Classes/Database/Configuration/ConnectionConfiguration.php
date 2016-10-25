@@ -30,12 +30,12 @@ class ConnectionConfiguration
             $dbConfig = $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default'];
         } else {
             // @deprecated with 8 will be removed when 7 Support is dropped
-            $dbConfig = array(
+            $dbConfig = [
                 'dbname' => TYPO3_db,
                 'host' => TYPO3_db_host,
                 'user' => TYPO3_db_username,
                 'password' => TYPO3_db_password,
-            );
+            ];
             if (isset($GLOBALS['TYPO3_CONF_VARS']['DB']['port'])) {
                 $dbConfig['port'] = $GLOBALS['TYPO3_CONF_VARS']['DB']['port'];
             }

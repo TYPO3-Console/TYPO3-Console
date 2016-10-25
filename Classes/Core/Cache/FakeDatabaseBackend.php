@@ -60,7 +60,7 @@ class FakeDatabaseBackend extends AbstractBackend implements PhpCapableBackendIn
      * @return void
      * @api
      */
-    public function set($entryIdentifier, $data, array $tags = array(), $lifetime = null)
+    public function set($entryIdentifier, $data, array $tags = [], $lifetime = null)
     {
     }
 
@@ -119,7 +119,7 @@ class FakeDatabaseBackend extends AbstractBackend implements PhpCapableBackendIn
      */
     public function findIdentifiersByTag($tag)
     {
-        return array();
+        return [];
     }
 
     /**

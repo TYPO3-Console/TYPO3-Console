@@ -30,7 +30,7 @@ class MysqlCommand
     /**
      * @var array
      */
-    protected $dbConfig = array();
+    protected $dbConfig = [];
 
     /**
      * MysqlCommand constructor.
@@ -51,7 +51,7 @@ class MysqlCommand
      * @param bool $interactive
      * @return int
      */
-    public function mysql(array $additionalArguments = array(), $inputStream = STDIN, $outputCallback = null, $interactive = false)
+    public function mysql(array $additionalArguments = [], $inputStream = STDIN, $outputCallback = null, $interactive = false)
     {
         $this->processBuilder->setPrefix('mysql');
         $this->processBuilder->setArguments(array_merge($this->buildConnectionArguments(), $additionalArguments));
@@ -71,7 +71,7 @@ class MysqlCommand
      * @param null $outputCallback
      * @return int
      */
-    public function mysqldump(array $additionalArguments = array(), $outputCallback = null)
+    public function mysqldump(array $additionalArguments = [], $outputCallback = null)
     {
         $this->processBuilder->setPrefix('mysqldump');
         $this->processBuilder->setArguments(array_merge($this->buildConnectionArguments(), $additionalArguments));

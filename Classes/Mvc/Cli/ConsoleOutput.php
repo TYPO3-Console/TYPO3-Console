@@ -61,16 +61,16 @@ class ConsoleOutput
     public function __construct()
     {
         $this->output = new SymfonyConsoleOutput();
-        $this->output->getFormatter()->setStyle('b', new OutputFormatterStyle(null, null, array('bold')));
+        $this->output->getFormatter()->setStyle('b', new OutputFormatterStyle(null, null, ['bold']));
         $this->output->getFormatter()->setStyle('i', new OutputFormatterStyle('black', 'white'));
-        $this->output->getFormatter()->setStyle('u', new OutputFormatterStyle(null, null, array('underscore')));
-        $this->output->getFormatter()->setStyle('em', new OutputFormatterStyle(null, null, array('reverse')));
-        $this->output->getFormatter()->setStyle('strike', new OutputFormatterStyle(null, null, array('conceal')));
+        $this->output->getFormatter()->setStyle('u', new OutputFormatterStyle(null, null, ['underscore']));
+        $this->output->getFormatter()->setStyle('em', new OutputFormatterStyle(null, null, ['reverse']));
+        $this->output->getFormatter()->setStyle('strike', new OutputFormatterStyle(null, null, ['conceal']));
         $this->output->getFormatter()->setStyle('success', new OutputFormatterStyle('green'));
         $this->output->getFormatter()->setStyle('warning', new OutputFormatterStyle('black', 'yellow'));
         $this->output->getFormatter()->setStyle('ins', new OutputFormatterStyle('green'));
         $this->output->getFormatter()->setStyle('del', new OutputFormatterStyle('red'));
-        $this->output->getFormatter()->setStyle('code', new OutputFormatterStyle(null, null, array('bold')));
+        $this->output->getFormatter()->setStyle('code', new OutputFormatterStyle(null, null, ['bold']));
     }
 
     /**
@@ -100,9 +100,9 @@ class ConsoleOutput
      * @param array $arguments Optional arguments to use for sprintf
      * @return void
      */
-    public function output($text, array $arguments = array())
+    public function output($text, array $arguments = [])
     {
-        if ($arguments !== array()) {
+        if ($arguments !== []) {
             $text = vsprintf($text, $arguments);
         }
         $this->output->write($text);
@@ -117,7 +117,7 @@ class ConsoleOutput
      * @see output()
      * @see outputLines()
      */
-    public function outputLine($text = '', array $arguments = array())
+    public function outputLine($text = '', array $arguments = [])
     {
         $this->output($text . PHP_EOL, $arguments);
     }
@@ -132,7 +132,7 @@ class ConsoleOutput
      * @return void
      * @see outputLine()
      */
-    public function outputFormatted($text = '', array $arguments = array(), $leftPadding = 0)
+    public function outputFormatted($text = '', array $arguments = [], $leftPadding = 0)
     {
         $lines = explode(PHP_EOL, $text);
         foreach ($lines as $line) {
@@ -349,7 +349,7 @@ class ConsoleOutput
     {
         if ($this->questionHelper === null) {
             $this->questionHelper = new QuestionHelper();
-            $helperSet = new HelperSet(array(new FormatterHelper()));
+            $helperSet = new HelperSet([new FormatterHelper()]);
             $this->questionHelper->setHelperSet($helperSet);
         }
         return $this->questionHelper;

@@ -117,7 +117,7 @@ class DatabaseCommandController extends CommandController
             new ProcessBuilder()
         );
         $exitCode = $mysqlCommand->mysql(
-            array('--skip-column-names'),
+            ['--skip-column-names'],
             STDIN,
             $this->buildOutputClosure(),
             $interactive
@@ -144,7 +144,7 @@ class DatabaseCommandController extends CommandController
             new ProcessBuilder()
         );
         $exitCode = $mysqlCommand->mysqldump(
-            array(),
+            [],
             $this->buildOutputClosure()
         );
         $this->quit($exitCode);

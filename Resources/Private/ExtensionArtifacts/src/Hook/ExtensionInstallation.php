@@ -57,17 +57,17 @@ class ExtensionInstallation
         $user = $db->exec_SELECTgetSingleRow('*', 'be_users', $where);
         if ($user) {
             if ($user['deleted'] || $user['disable']) {
-                $data = array(
-                    'be_users' => array(
-                        $user['uid'] => array(
+                $data = [
+                    'be_users' => [
+                        $user['uid'] => [
                             'deleted' => 0,
                             'disable' => 0
-                        )
-                    )
-                );
+                        ]
+                    ]
+                ];
                 $dataHandler = GeneralUtility::makeInstance(\TYPO3\CMS\Core\DataHandling\DataHandler::class);
                 $dataHandler->stripslashes_values = false;
-                $dataHandler->start($data, array());
+                $dataHandler->start($data, []);
                 $dataHandler->process_datamap();
             }
         } else {
@@ -77,18 +77,18 @@ class ExtensionInstallation
                 $objInstanceSaltedPW = SaltFactory::getSaltingInstance();
                 $password = $objInstanceSaltedPW->getHashedPassword($password);
             }
-            $data = array(
-                'be_users' => array(
-                    'NEW' => array(
+            $data = [
+                'be_users' => [
+                    'NEW' => [
                         'username' => '_cli_lowlevel',
                         'password' => $password,
                         'pid' => 0
-                    )
-                )
-            );
+                    ]
+                ]
+            ];
             $dataHandler = GeneralUtility::makeInstance(\TYPO3\CMS\Core\DataHandling\DataHandler::class);
             $dataHandler->stripslashes_values = false;
-            $dataHandler->start($data, array());
+            $dataHandler->start($data, []);
             $dataHandler->process_datamap();
             // Check if a new uid was indeed generated (i.e. a new record was created)
             // (counting DataHandler errors doesn't work as some failures don't report errors)

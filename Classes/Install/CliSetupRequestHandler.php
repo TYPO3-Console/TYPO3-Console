@@ -62,13 +62,13 @@ class CliSetupRequestHandler
     /**
      * @var array List of necessary installation steps. Order is important!
      */
-    protected $installationActions = array(
+    protected $installationActions = [
         'environmentAndFolders',
         'databaseConnect',
         'databaseSelect',
         'databaseData',
         'defaultConfiguration',
-    );
+    ];
 
     /**
      * @var ConsoleOutput
@@ -78,7 +78,7 @@ class CliSetupRequestHandler
     /**
      * @var array
      */
-    protected $givenRequestArguments = array();
+    protected $givenRequestArguments = [];
 
     /**
      * @var bool
@@ -120,7 +120,7 @@ class CliSetupRequestHandler
      * @param string $actionName
      * @param array $arguments
      */
-    public function executeActionWithArguments($actionName, array $arguments = array())
+    public function executeActionWithArguments($actionName, array $arguments = [])
     {
         // TODO: provide pre- and post-execute signals?
         $messages = $this->executeAction($this->createActionWithNameAndArguments($actionName, $arguments));
@@ -128,7 +128,7 @@ class CliSetupRequestHandler
         if ($messages === [] && $actionName === 'databaseData') {
             /** @var DatabaseConnection $db */
             $db = $GLOBALS['TYPO3_DB'];
-            $db->exec_INSERTquery('be_users', array('username' => '_cli_lowlevel'));
+            $db->exec_INSERTquery('be_users', ['username' => '_cli_lowlevel']);
         }
         $this->output->outputLine(serialize($messages));
     }
@@ -149,7 +149,7 @@ class CliSetupRequestHandler
      * @param array $arguments
      * @return StepInterface|ActionInterface
      */
-    protected function createActionWithNameAndArguments($actionName, array $arguments = array())
+    protected function createActionWithNameAndArguments($actionName, array $arguments = [])
     {
         $classPrefix = 'TYPO3\\CMS\\Install\\Controller\\Action\\Step\\';
         $className = $classPrefix . ucfirst($actionName);
@@ -158,7 +158,7 @@ class CliSetupRequestHandler
         $action = $this->objectManager->get($className);
         $action->setController('step');
         $action->setAction($actionName);
-        $action->setPostValues(array('values' => $arguments));
+        $action->setPostValues(['values' => $arguments]);
 
         return $action;
     }
@@ -172,13 +172,13 @@ class CliSetupRequestHandler
         try {
             $needsExecution = $action->needsExecution();
         } catch (\TYPO3\CMS\Install\Controller\Exception\RedirectException $e) {
-            return array(new RedirectStatus());
+            return [new RedirectStatus()];
         }
 
         if ($needsExecution) {
             return $action->execute();
         } else {
-            return array();
+            return [];
         }
     }
 
@@ -222,7 +222,7 @@ class CliSetupRequestHandler
                 $this->output->outputLine('<info>No execution needed, skipped step!</info>');
                 return;
             }
-            $actionArguments = array();
+            $actionArguments = [];
             /** @var CommandArgumentDefinition $argumentDefinition */
             foreach ($command->getArgumentDefinitions() as $argumentDefinition) {
                 $isPasswordArgument = strpos(strtolower($argumentDefinition->getName()), 'password') !== false;
@@ -284,7 +284,7 @@ class CliSetupRequestHandler
                         'Please check if your input values are correct and you have all needed permissions!'
                         . PHP_EOL . '(Could it be that you selected "use existing database", but the chosen database is not empty?)'
                     );
-                    $messages = array($warning);
+                    $messages = [$warning];
                 }
                 $this->outputMessages($messages);
             } else {
@@ -377,7 +377,7 @@ class CliSetupRequestHandler
     /**
      * @param StatusInterface[] $messages
      */
-    protected function outputMessages(array $messages = array())
+    protected function outputMessages(array $messages = [])
     {
         $this->output->outputLine();
         foreach ($messages as $statusMessage) {

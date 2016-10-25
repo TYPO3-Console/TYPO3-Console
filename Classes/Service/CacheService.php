@@ -151,7 +151,7 @@ class CacheService implements SingletonInterface
      */
     public function getValidCacheGroups()
     {
-        $validGroups = array();
+        $validGroups = [];
         foreach ($this->configurationService->getActive('SYS/caching/cacheConfigurations') as $cacheConfiguration) {
             if (isset($cacheConfiguration['groups']) && is_array($cacheConfiguration['groups'])) {
                 $validGroups = array_merge($validGroups, $cacheConfiguration['groups']);
