@@ -41,30 +41,30 @@ $finder = Symfony\CS\Finder\DefaultFinder::create()
 return Symfony\CS\Config\Config::create()
     ->level(Symfony\CS\FixerInterface::PSR2_LEVEL)
     ->fixers([
-        'remove_leading_slash_use',
-        'single_array_no_trailing_comma',
-        'spaces_before_semicolon',
-        'unused_use',
+        'remove_leading_slash_use', // no_leading_import_slash
+        'single_array_no_trailing_comma', // no_trailing_comma_in_singleline_array
+        'spaces_before_semicolon', // no_singleline_whitespace_before_semicolons
+        'unused_use', // no_unused_imports
         'concat_with_spaces',
-        'whitespacy_lines',
-        'ordered_use',
+        'whitespacy_lines', // no_whitespace_in_blank_line
+        'ordered_use', // ordered_imports
         'single_quote',
-        'duplicate_semicolon',
-        'extra_empty_lines',
+        'duplicate_semicolon', // no_empty_statement
+        'extra_empty_lines', // no_extra_consecutive_blank_lines
         'phpdoc_no_package',
         'phpdoc_scalar',
-        'no_empty_lines_after_phpdocs',
+        'no_empty_lines_after_phpdocs', // no_blank_lines_after_phpdoc
         'short_array_syntax',
-        'array_element_white_space_after_comma',
+        'array_element_white_space_after_comma', // whitespace_after_comma_in_array
         'function_typehint_space',
         'hash_to_slash_comment',
-        'join_function',
+        'join_function', // no_alias_functions
         'lowercase_cast',
-        'namespace_no_leading_whitespace',
+        'namespace_no_leading_whitespace', // no_leading_namespace_whitespace
         'native_function_casing',
         'no_empty_statement',
         'self_accessor',
-        'short_bool_cast',
-        'unneeded_control_parentheses'
+        'short_bool_cast', // no_short_bool_cast
+        'unneeded_control_parentheses' // no_unneeded_control_parentheses
     ])
     ->finder($finder);
