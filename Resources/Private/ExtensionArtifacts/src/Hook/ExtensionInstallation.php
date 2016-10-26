@@ -16,8 +16,6 @@ namespace Helhum\Typo3Console\Hook;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Saltedpasswords\Salt\SaltFactory;
-use TYPO3\CMS\Saltedpasswords\Utility\SaltedPasswordsUtility;
 
 /**
  * Hook
@@ -47,58 +45,6 @@ class ExtensionInstallation
             self::addFlashMessage(sprintf(self::COPY_FAILED_MESSAGE, $scriptName), sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName, PATH_site), AbstractMessage::WARNING);
         } else {
             self::addFlashMessage(sprintf(self::COPY_SUCCESS_MESSAGE, $scriptName));
-        }
-        $this->createCliBeUser();
-    }
-
-    protected function createCliBeUser()
-    {
-        $db = $this->getDatabaseConnection();
-
-        $where = 'username = ' . $db->fullQuoteStr('_cli_lowlevel', 'be_users') . ' AND admin = 0 AND deleted = 0';
-
-        $user = $db->exec_SELECTgetSingleRow('*', 'be_users', $where);
-        if ($user) {
-            if ($user['deleted'] || $user['disable']) {
-                $data = [
-                    'be_users' => [
-                        $user['uid'] => [
-                            'deleted' => 0,
-                            'disable' => 0
-                        ]
-                    ]
-                ];
-                $dataHandler = GeneralUtility::makeInstance(\TYPO3\CMS\Core\DataHandling\DataHandler::class);
-                $dataHandler->stripslashes_values = false;
-                $dataHandler->start($data, []);
-                $dataHandler->process_datamap();
-            }
-        } else {
-            // Prepare necessary data for _cli_lowlevel user creation
-            $password = GeneralUtility::getRandomHexString(48);
-            if (SaltedPasswordsUtility::isUsageEnabled()) {
-                $objInstanceSaltedPW = SaltFactory::getSaltingInstance();
-                $password = $objInstanceSaltedPW->getHashedPassword($password);
-            }
-            $data = [
-                'be_users' => [
-                    'NEW' => [
-                        'username' => '_cli_lowlevel',
-                        'password' => $password,
-                        'pid' => 0
-                    ]
-                ]
-            ];
-            $dataHandler = GeneralUtility::makeInstance(\TYPO3\CMS\Core\DataHandling\DataHandler::class);
-            $dataHandler->stripslashes_values = false;
-            $dataHandler->start($data, []);
-            $dataHandler->process_datamap();
-            // Check if a new uid was indeed generated (i.e. a new record was created)
-            // (counting DataHandler errors doesn't work as some failures don't report errors)
-            $numberOfNewIDs = count($dataHandler->substNEWwithIDs);
-            if ((int)$numberOfNewIDs !== 1) {
-                $this->addFlashMessage('Failed to create _cli_lowlevel BE user.', 'BE user creation failed', AbstractMessage::WARNING);
-            }
         }
     }
 

@@ -233,7 +233,6 @@ class ConsoleBootstrap extends Bootstrap
         define('TYPO3_MODE', 'BE');
         // @deprecated to define this constant. Can be removed when TYPO3 7 support is removed
         define('TYPO3_cliMode', true);
-        $GLOBALS['MCONF']['name'] = '_CLI_lowlevel';
         parent::baseSetup($pathPart);
         // I want to see deprecation messages
         error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
