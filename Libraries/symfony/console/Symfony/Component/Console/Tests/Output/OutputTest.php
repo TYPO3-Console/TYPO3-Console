@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Console\Tests\Output;
 
-use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Output\Output;
 
 class OutputTest extends \PHPUnit_Framework_TestCase
 {
@@ -76,7 +76,7 @@ class OutputTest extends \PHPUnit_Framework_TestCase
     public function testWriteAnArrayOfMessages()
     {
         $output = new TestOutput();
-        $output->writeln(array('foo', 'bar'));
+        $output->writeln(['foo', 'bar']);
         $this->assertEquals("foo\nbar\n", $output->output, '->writeln() can take an array of messages to output');
     }
 
@@ -92,10 +92,10 @@ class OutputTest extends \PHPUnit_Framework_TestCase
 
     public function provideWriteArguments()
     {
-        return array(
-            array('<info>foo</info>', Output::OUTPUT_RAW, "<info>foo</info>\n"),
-            array('<info>foo</info>', Output::OUTPUT_PLAIN, "foo\n"),
-        );
+        return [
+            ['<info>foo</info>', Output::OUTPUT_RAW, "<info>foo</info>\n"],
+            ['<info>foo</info>', Output::OUTPUT_PLAIN, "foo\n"],
+        ];
     }
 
     public function testWriteWithDecorationTurnedOff()
@@ -108,7 +108,7 @@ class OutputTest extends \PHPUnit_Framework_TestCase
 
     public function testWriteDecoratedMessage()
     {
-        $fooStyle = new OutputFormatterStyle('yellow', 'red', array('blink'));
+        $fooStyle = new OutputFormatterStyle('yellow', 'red', ['blink']);
         $output = new TestOutput();
         $output->getFormatter()->setStyle('FOO', $fooStyle);
         $output->setDecorated(true);

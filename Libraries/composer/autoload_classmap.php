@@ -5,5 +5,5 @@
 $vendorDir = dirname(dirname(__FILE__));
 $baseDir = $vendorDir;
 
-return array(
-);
+return [
+];

@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Service\Database\Schema;
 
 /***************************************************************
@@ -30,57 +31,57 @@ namespace Helhum\Typo3Console\Service\Database\Schema;
 use TYPO3\CMS\Core\Type\Enumeration;
 
 /**
- * List of database schema update types
+ * List of database schema update types.
  */
-class SchemaUpdateType extends Enumeration {
+class SchemaUpdateType extends Enumeration
+{
+    /**
+     * @var int
+     */
+    protected $value;
 
-	/**
-	 * @var int
-	 */
-	protected $value;
+    /**
+     * Add a field.
+     */
+    const FIELD_ADD = 'field.add';
 
-	/**
-	 * Add a field
-	 */
-	const FIELD_ADD = 'field.add';
+    /**
+     * Change a field.
+     */
+    const FIELD_CHANGE = 'field.change';
 
-	/**
-	 * Change a field
-	 */
-	const FIELD_CHANGE = 'field.change';
+    /**
+     * Prefix a field.
+     */
+    const FIELD_PREFIX = 'field.prefix';
 
-	/**
-	 * Prefix a field
-	 */
-	const FIELD_PREFIX = 'field.prefix';
+    /**
+     * Drop a field.
+     */
+    const FIELD_DROP = 'field.drop';
 
-	/**
-	 * Drop a field
-	 */
-	const FIELD_DROP = 'field.drop';
+    /**
+     * Add a table.
+     */
+    const TABLE_ADD = 'table.add';
 
-	/**
-	 * Add a table
-	 */
-	const TABLE_ADD = 'table.add';
+    /**
+     * Change a table.
+     */
+    const TABLE_CHANGE = 'table.change';
 
-	/**
-	 * Change a table
-	 */
-	const TABLE_CHANGE = 'table.change';
+    /**
+     * Prefix a table.
+     */
+    const TABLE_PREFIX = 'table.prefix';
 
-	/**
-	 * Prefix a table
-	 */
-	const TABLE_PREFIX = 'table.prefix';
+    /**
+     * Drop a table.
+     */
+    const TABLE_DROP = 'table.drop';
 
-	/**
-	 * Drop a table
-	 */
-	const TABLE_DROP = 'table.drop';
-
-	/**
-	 * Truncate a table
-	 */
-	const TABLE_CLEAR = 'table.clear';
+    /**
+     * Truncate a table.
+     */
+    const TABLE_CLEAR = 'table.clear';
 }

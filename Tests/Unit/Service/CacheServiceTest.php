@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Tests\Unit\Service;
 
 /***************************************************************
@@ -30,67 +31,71 @@ namespace Helhum\Typo3Console\Tests\Unit\Service;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
- * Class CacheServiceTest
+ * Class CacheServiceTest.
  */
-class CacheServiceTest extends UnitTestCase {
+class CacheServiceTest extends UnitTestCase
+{
+    /**
+     * @var \Helhum\Typo3Console\Service\CacheService|\PHPUnit_Framework_MockObject_MockObject|\TYPO3\CMS\Core\Tests\AccessibleObjectInterface
+     */
+    protected $subject;
 
-	/**
-	 * @var \Helhum\Typo3Console\Service\CacheService|\PHPUnit_Framework_MockObject_MockObject|\TYPO3\CMS\Core\Tests\AccessibleObjectInterface
-	 */
-	protected $subject;
+    public function setup()
+    {
+        $this->subject = $this->getAccessibleMock('Helhum\\Typo3Console\\Service\\CacheService', ['getLogger']);
+    }
 
-	public function setup() {
-		$this->subject = $this->getAccessibleMock('Helhum\\Typo3Console\\Service\\CacheService', array('getLogger'));
-	}
+    /**
+     * Initializes configuration mock and sets the given configuration to the subject.
+     *
+     * @param array $mockedConfiguration
+     */
+    protected function setCacheConfiguration($mockedConfiguration)
+    {
+        $configurationManagerMock = $this->getMock('TYPO3\\CMS\\Core\\Configuration\\ConfigurationManager');
+        $configurationManagerMock
+            ->expects($this->atLeastOnce())
+            ->method('getConfigurationValueByPath')
+            ->will($this->returnValue($mockedConfiguration));
+        $this->subject->_set('configurationManager', $configurationManagerMock);
+    }
 
-	/**
-	 * Initializes configuration mock and sets the given configuration to the subject
-	 *
-	 * @param array $mockedConfiguration
-	 */
-	protected function setCacheConfiguration($mockedConfiguration) {
-		$configurationManagerMock = $this->getMock('TYPO3\\CMS\\Core\\Configuration\\ConfigurationManager');
-		$configurationManagerMock
-			->expects($this->atLeastOnce())
-			->method('getConfigurationValueByPath')
-			->will($this->returnValue($mockedConfiguration));
-		$this->subject->_set('configurationManager', $configurationManagerMock);
-	}
+    /**
+     * @test
+     */
+    public function cacheGroupsAreRetrievedCorrectlyFromConfiguration()
+    {
+        $this->setCacheConfiguration(
+            [
+                'cache_foo' => ['groups' => ['first', 'second']],
+                'cache_bar' => ['groups' => ['third', 'second']],
+                'cache_baz' => ['groups' => ['first', 'third']],
+            ]
+        );
 
-	/**
-	 * @test
-	 */
-	public function cacheGroupsAreRetrievedCorrectlyFromConfiguration() {
-		$this->setCacheConfiguration(
-			array(
-				'cache_foo' => array('groups' => array('first', 'second')),
-				'cache_bar' => array('groups' => array('third', 'second')),
-				'cache_baz' => array('groups' => array('first', 'third')),
-			)
-		);
+        $expectedResult = [
+            'first',
+            'second',
+            'third',
+        ];
 
-		$expectedResult = array(
-			'first',
-			'second',
-			'third',
-		);
+        $this->assertSame($expectedResult, $this->subject->getValidCacheGroups());
+    }
 
-		$this->assertSame($expectedResult, $this->subject->getValidCacheGroups());
-	}
+    /**
+     * @test
+     * @expectedException \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
+     */
+    public function flushByGroupThrowsExceptionForInvalidGroups()
+    {
+        $this->setCacheConfiguration(
+            [
+                'cache_foo' => ['groups' => ['first', 'second']],
+                'cache_bar' => ['groups' => ['third', 'second']],
+                'cache_baz' => ['groups' => ['first', 'third']],
+            ]
+        );
 
-	/**
-	 * @test
-	 * @expectedException \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
-	 */
-	public function flushByGroupThrowsExceptionForInvalidGroups() {
-		$this->setCacheConfiguration(
-			array(
-				'cache_foo' => array('groups' => array('first', 'second')),
-				'cache_bar' => array('groups' => array('third', 'second')),
-				'cache_baz' => array('groups' => array('first', 'third')),
-			)
-		);
-
-		$this->subject->flushGroups(array('not', 'first'));
-	}
-} 
+        $this->subject->flushGroups(['not', 'first']);
+    }
+}

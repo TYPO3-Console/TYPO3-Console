@@ -26,10 +26,12 @@ class CommandTesterTest extends \PHPUnit_Framework_TestCase
         $this->command = new Command('foo');
         $this->command->addArgument('command');
         $this->command->addArgument('foo');
-        $this->command->setCode(function ($input, $output) { $output->writeln('foo'); });
+        $this->command->setCode(function ($input, $output) {
+            $output->writeln('foo');
+        });
 
         $this->tester = new CommandTester($this->command);
-        $this->tester->execute(array('foo' => 'bar'), array('interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE));
+        $this->tester->execute(['foo' => 'bar'], ['interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE]);
     }
 
     protected function tearDown()
@@ -72,13 +74,15 @@ class CommandTesterTest extends \PHPUnit_Framework_TestCase
         $application->setAutoExit(false);
 
         $command = new Command('foo');
-        $command->setCode(function ($input, $output) { $output->writeln('foo'); });
+        $command->setCode(function ($input, $output) {
+            $output->writeln('foo');
+        });
 
         $application->add($command);
 
         $tester = new CommandTester($application->find('foo'));
 
         // check that there is no need to pass the command name here
-        $this->assertEquals(0, $tester->execute(array()));
+        $this->assertEquals(0, $tester->execute([]));
     }
 }

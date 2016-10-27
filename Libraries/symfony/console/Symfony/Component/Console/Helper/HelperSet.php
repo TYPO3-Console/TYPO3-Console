@@ -20,7 +20,7 @@ use Symfony\Component\Console\Command\Command;
  */
 class HelperSet implements \IteratorAggregate
 {
-    private $helpers = array();
+    private $helpers = [];
     private $command;
 
     /**
@@ -28,7 +28,7 @@ class HelperSet implements \IteratorAggregate
      *
      * @param Helper[] $helpers An array of helper.
      */
-    public function __construct(array $helpers = array())
+    public function __construct(array $helpers = [])
     {
         foreach ($helpers as $alias => $helper) {
             $this->set($helper, is_int($alias) ? null : $alias);
@@ -56,7 +56,7 @@ class HelperSet implements \IteratorAggregate
      *
      * @param string $name The helper name
      *
-     * @return bool    true if the helper is defined, false otherwise
+     * @return bool true if the helper is defined, false otherwise
      */
     public function has($name)
     {
@@ -68,9 +68,9 @@ class HelperSet implements \IteratorAggregate
      *
      * @param string $name The helper name
      *
-     * @return HelperInterface The helper instance
-     *
      * @throws \InvalidArgumentException if the helper is not defined
+     *
+     * @return HelperInterface The helper instance
      */
     public function get($name)
     {

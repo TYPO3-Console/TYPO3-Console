@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Service\Database\Schema;
 
 /***************************************************************
@@ -28,84 +29,92 @@ namespace Helhum\Typo3Console\Service\Database\Schema;
  ***************************************************************/
 
 /**
- * Represents a database schema update result
+ * Represents a database schema update result.
  */
-class SchemaUpdateResult {
-
-  /**
-   * @var array $performedUpdates
+class SchemaUpdateResult
+{
+    /**
+   * @var array
    */
-  protected $performedUpdates = array();
+  protected $performedUpdates = [];
 
   /**
-   * Returns the list of performed updates, grouped by schema update type
+   * Returns the list of performed updates, grouped by schema update type.
    *
    * @return array
    */
-  public function getPerformedUpdates() {
-    return $this->performedUpdates;
+  public function getPerformedUpdates()
+  {
+      return $this->performedUpdates;
   }
 
-  /**
-    * Returns the list of performed update types including the count
+   /**
+    * Returns the list of performed update types including the count.
     *
     * @return array
     */
-   public function getPerformedUpdateTypes() {
-     $typesCount = array();
-     foreach ($this->performedUpdates as $type => $performedUpdates) {
-       $typesCount[$type] = count($performedUpdates);
-     }
-     return $typesCount;
+   public function getPerformedUpdateTypes()
+   {
+       $typesCount = [];
+       foreach ($this->performedUpdates as $type => $performedUpdates) {
+           $typesCount[$type] = count($performedUpdates);
+       }
+
+       return $typesCount;
    }
 
   /**
-   * Returns TRUE if updates where performed, FALSE otherwise
+   * Returns TRUE if updates where performed, FALSE otherwise.
    *
-   * @return boolean
+   * @return bool
    */
-  public function hasPerformedUpdates() {
-    return count($this->performedUpdates) > 0;
+  public function hasPerformedUpdates()
+  {
+      return count($this->performedUpdates) > 0;
   }
 
   /**
-   * Adds to the number of updates performed for a schema update type
+   * Adds to the number of updates performed for a schema update type.
    *
    * @param SchemaUpdateType $schemaUpdateType Schema update type
    * @param array $updates Updates performed
    */
-  public function addPerformedUpdates(SchemaUpdateType $schemaUpdateType, array $updates) {
-    $this->performedUpdates[(string)$schemaUpdateType] = array_merge((array)$this->performedUpdates[(string)$schemaUpdateType], $updates);
+  public function addPerformedUpdates(SchemaUpdateType $schemaUpdateType, array $updates)
+  {
+      $this->performedUpdates[(string) $schemaUpdateType] = array_merge((array) $this->performedUpdates[(string) $schemaUpdateType], $updates);
   }
 
   /**
-   * @var array $errors
+   * @var array
    */
-  protected $errors = array();
+  protected $errors = [];
 
   /**
    * @return array
    */
-  public function getErrors() {
-    return $this->errors;
+  public function getErrors()
+  {
+      return $this->errors;
   }
 
   /**
-   * Adds to the list of errors occurred for a schema update type
+   * Adds to the list of errors occurred for a schema update type.
    *
    * @param SchemaUpdateType $schemaUpdateType Schema update type
    * @param array $errors List of error messages
    */
-  public function addErrors(SchemaUpdateType $schemaUpdateType, array $errors) {
-    $this->errors[(string)$schemaUpdateType] = array_merge((array)$this->errors[(string)$schemaUpdateType], $errors);
+  public function addErrors(SchemaUpdateType $schemaUpdateType, array $errors)
+  {
+      $this->errors[(string) $schemaUpdateType] = array_merge((array) $this->errors[(string) $schemaUpdateType], $errors);
   }
 
   /**
-   * Returns TRUE if errors did occur during schema update, FALSE otherwise
+   * Returns TRUE if errors did occur during schema update, FALSE otherwise.
    *
-   * @return boolean
+   * @return bool
    */
-  public function hasErrors() {
-    return count($this->errors);
+  public function hasErrors()
+  {
+      return count($this->errors);
   }
 }

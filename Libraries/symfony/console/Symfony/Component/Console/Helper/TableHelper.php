@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Console\Helper;
 
-use Symfony\Component\Console\Output\OutputInterface;
 use InvalidArgumentException;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Provides helpers to display table output.
@@ -30,14 +30,14 @@ class TableHelper extends Helper
      *
      * @var array
      */
-    private $headers = array();
+    private $headers = [];
 
     /**
      * Table rows.
      *
      * @var array
      */
-    private $rows = array();
+    private $rows = [];
 
     // Rendering options
     private $paddingChar;
@@ -55,7 +55,7 @@ class TableHelper extends Helper
      *
      * @var array
      */
-    private $columnWidths = array();
+    private $columnWidths = [];
 
     /**
      * Number of columns cache.
@@ -94,8 +94,7 @@ class TableHelper extends Helper
                     ->setCellRowFormat('%s')
                     ->setCellRowContentFormat(' %s ')
                     ->setBorderFormat('%s')
-                    ->setPadType(STR_PAD_RIGHT)
-                ;
+                    ->setPadType(STR_PAD_RIGHT);
                 break;
 
             case self::LAYOUT_COMPACT:
@@ -108,8 +107,7 @@ class TableHelper extends Helper
                     ->setCellRowFormat('%s')
                     ->setCellRowContentFormat('%s')
                     ->setBorderFormat('%s')
-                    ->setPadType(STR_PAD_RIGHT)
-                ;
+                    ->setPadType(STR_PAD_RIGHT);
                 break;
 
             case self::LAYOUT_DEFAULT:
@@ -122,14 +120,13 @@ class TableHelper extends Helper
                     ->setCellRowFormat('%s')
                     ->setCellRowContentFormat(' %s ')
                     ->setBorderFormat('%s')
-                    ->setPadType(STR_PAD_RIGHT)
-                ;
+                    ->setPadType(STR_PAD_RIGHT);
                 break;
 
             default:
                 throw new InvalidArgumentException(sprintf('Invalid table layout "%s".', $layout));
                 break;
-        };
+        }
 
         return $this;
     }
@@ -143,7 +140,7 @@ class TableHelper extends Helper
 
     public function setRows(array $rows)
     {
-        $this->rows = array();
+        $this->rows = [];
 
         return $this->addRows($rows);
     }
@@ -179,7 +176,7 @@ class TableHelper extends Helper
                 if (isset($this->rows[$nextRowKey])) {
                     $this->rows[$nextRowKey][$key] = $line;
                 } else {
-                    $this->rows[$nextRowKey] = array($key => $line);
+                    $this->rows[$nextRowKey] = [$key => $line];
                 }
             }
         }
@@ -313,7 +310,7 @@ class TableHelper extends Helper
     /**
      * Sets cell padding type.
      *
-     * @param int     $padType STR_PAD_*
+     * @param int $padType STR_PAD_*
      *
      * @return TableHelper
      */
@@ -413,9 +410,9 @@ class TableHelper extends Helper
     /**
      * Renders table cell with padding.
      *
-     * @param array   $row
-     * @param int     $column
-     * @param string  $cellFormat
+     * @param array  $row
+     * @param int    $column
+     * @param string $cellFormat
      */
     private function renderCell(array $row, $column, $cellFormat)
     {
@@ -445,7 +442,7 @@ class TableHelper extends Helper
             return $this->numberOfColumns;
         }
 
-        $columns = array(0);
+        $columns = [0];
         $columns[] = count($this->headers);
         foreach ($this->rows as $row) {
             $columns[] = count($row);
@@ -457,7 +454,7 @@ class TableHelper extends Helper
     /**
      * Gets column width.
      *
-     * @param int     $column
+     * @param int $column
      *
      * @return int
      */
@@ -467,7 +464,7 @@ class TableHelper extends Helper
             return $this->columnWidths[$column];
         }
 
-        $lengths = array(0);
+        $lengths = [0];
         $lengths[] = $this->getCellWidth($this->headers, $column);
         foreach ($this->rows as $row) {
             $lengths[] = $this->getCellWidth($row, $column);
@@ -479,8 +476,8 @@ class TableHelper extends Helper
     /**
      * Gets cell width.
      *
-     * @param array   $row
-     * @param int     $column
+     * @param array $row
+     * @param int   $column
      *
      * @return int
      */
@@ -494,7 +491,7 @@ class TableHelper extends Helper
      */
     private function cleanup()
     {
-        $this->columnWidths = array();
+        $this->columnWidths = [];
         $this->numberOfColumns = null;
     }
 

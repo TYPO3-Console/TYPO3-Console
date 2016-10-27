@@ -5,7 +5,7 @@
 $vendorDir = dirname(dirname(__FILE__));
 $baseDir = $vendorDir;
 
-return array(
-    'Symfony\\Component\\Process\\' => array($vendorDir . '/symfony/process'),
-    'Symfony\\Component\\Console\\' => array($vendorDir . '/symfony/console'),
-);
+return [
+    'Symfony\\Component\\Process\\' => [$vendorDir.'/symfony/process'],
+    'Symfony\\Component\\Console\\' => [$vendorDir.'/symfony/console'],
+];

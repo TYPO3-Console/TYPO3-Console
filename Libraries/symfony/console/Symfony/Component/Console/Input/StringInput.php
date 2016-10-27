@@ -39,7 +39,7 @@ class StringInput extends ArgvInput
      */
     public function __construct($input, InputDefinition $definition = null)
     {
-        parent::__construct(array(), null);
+        parent::__construct([], null);
 
         $this->setTokens($this->tokenize($input));
 
@@ -53,19 +53,19 @@ class StringInput extends ArgvInput
      *
      * @param string $input The input to tokenize
      *
-     * @return array An array of tokens
-     *
      * @throws \InvalidArgumentException When unable to parse input (should never happen)
+     *
+     * @return array An array of tokens
      */
     private function tokenize($input)
     {
-        $tokens = array();
+        $tokens = [];
         $length = strlen($input);
         $cursor = 0;
         while ($cursor < $length) {
             if (preg_match('/\s+/A', $input, $match, null, $cursor)) {
             } elseif (preg_match('/([^="\'\s]+?)(=?)('.self::REGEX_QUOTED_STRING.'+)/A', $input, $match, null, $cursor)) {
-                $tokens[] = $match[1].$match[2].stripcslashes(str_replace(array('"\'', '\'"', '\'\'', '""'), '', substr($match[3], 1, strlen($match[3]) - 2)));
+                $tokens[] = $match[1].$match[2].stripcslashes(str_replace(['"\'', '\'"', '\'\'', '""'], '', substr($match[3], 1, strlen($match[3]) - 2)));
             } elseif (preg_match('/'.self::REGEX_QUOTED_STRING.'/A', $input, $match, null, $cursor)) {
                 $tokens[] = stripcslashes(substr($match[0], 1, strlen($match[0]) - 2));
             } elseif (preg_match('/'.self::REGEX_STRING.'/A', $input, $match, null, $cursor)) {

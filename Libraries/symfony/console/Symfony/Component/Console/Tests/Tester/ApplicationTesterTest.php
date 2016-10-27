@@ -26,11 +26,12 @@ class ApplicationTesterTest extends \PHPUnit_Framework_TestCase
         $this->application->setAutoExit(false);
         $this->application->register('foo')
             ->addArgument('foo')
-            ->setCode(function ($input, $output) { $output->writeln('foo'); })
-        ;
+            ->setCode(function ($input, $output) {
+                $output->writeln('foo');
+            });
 
         $this->tester = new ApplicationTester($this->application);
-        $this->tester->run(array('command' => 'foo', 'foo' => 'bar'), array('interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE));
+        $this->tester->run(['command' => 'foo', 'foo' => 'bar'], ['interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE]);
     }
 
     protected function tearDown()

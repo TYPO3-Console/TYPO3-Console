@@ -19,14 +19,14 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 class ProcessFailedExceptionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * tests ProcessFailedException throws exception if the process was successful
+     * tests ProcessFailedException throws exception if the process was successful.
      */
     public function testProcessFailedExceptionThrowsException()
     {
         $process = $this->getMock(
             'Symfony\Component\Process\Process',
-            array('isSuccessful'),
-            array('php')
+            ['isSuccessful'],
+            ['php']
         );
         $process->expects($this->once())
             ->method('isSuccessful')
@@ -42,20 +42,20 @@ class ProcessFailedExceptionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * tests ProcessFailedException uses information from process output
-     * to generate exception message
+     * to generate exception message.
      */
     public function testProcessFailedExceptionPopulatesInformationFromProcessOutput()
     {
         $cmd = 'php';
         $exitCode = 1;
         $exitText = 'General error';
-        $output = "Command output";
-        $errorOutput = "FATAL: Unexpected error";
+        $output = 'Command output';
+        $errorOutput = 'FATAL: Unexpected error';
 
         $process = $this->getMock(
             'Symfony\Component\Process\Process',
-            array('isSuccessful', 'getOutput', 'getErrorOutput', 'getExitCode', 'getExitCodeText', 'isOutputDisabled'),
-            array($cmd)
+            ['isSuccessful', 'getOutput', 'getErrorOutput', 'getExitCode', 'getExitCodeText', 'isOutputDisabled'],
+            [$cmd]
         );
         $process->expects($this->once())
             ->method('isSuccessful')
@@ -91,7 +91,7 @@ class ProcessFailedExceptionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Tests that ProcessFailedException does not extract information from
-     * process output if it was previously disabled
+     * process output if it was previously disabled.
      */
     public function testDisabledOutputInFailedExceptionDoesNotPopulateOutput()
     {
@@ -101,8 +101,8 @@ class ProcessFailedExceptionTest extends \PHPUnit_Framework_TestCase
 
         $process = $this->getMock(
             'Symfony\Component\Process\Process',
-            array('isSuccessful', 'isOutputDisabled', 'getExitCode', 'getExitCodeText', 'getOutput', 'getErrorOutput'),
-            array($cmd)
+            ['isSuccessful', 'isOutputDisabled', 'getExitCode', 'getExitCodeText', 'getOutput', 'getErrorOutput'],
+            [$cmd]
         );
         $process->expects($this->once())
             ->method('isSuccessful')

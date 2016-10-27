@@ -27,7 +27,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeInputArgument(InputArgument $argument, array $options = array())
+    protected function describeInputArgument(InputArgument $argument, array $options = [])
     {
         $this->write(
             '**'.$argument->getName().':**'."\n\n"
@@ -42,7 +42,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeInputOption(InputOption $option, array $options = array())
+    protected function describeInputOption(InputOption $option, array $options = [])
     {
         $this->write(
             '**'.$option->getName().':**'."\n\n"
@@ -59,7 +59,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeInputDefinition(InputDefinition $definition, array $options = array())
+    protected function describeInputDefinition(InputDefinition $definition, array $options = [])
     {
         if ($showArguments = count($definition->getArguments()) > 0) {
             $this->write('### Arguments:');
@@ -85,7 +85,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeCommand(Command $command, array $options = array())
+    protected function describeCommand(Command $command, array $options = [])
     {
         $command->getSynopsis();
         $command->mergeApplicationDefinition(false);
@@ -112,7 +112,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeApplication(Application $application, array $options = array())
+    protected function describeApplication(Application $application, array $options = [])
     {
         $describedNamespace = isset($options['namespace']) ? $options['namespace'] : null;
         $description = new ApplicationDescription($application, $describedNamespace);
@@ -128,7 +128,7 @@ class MarkdownDescriptor extends Descriptor
             $this->write("\n\n");
             $this->write(implode("\n", array_map(function ($commandName) {
                 return '* '.$commandName;
-            } , $namespace['commands'])));
+            }, $namespace['commands'])));
         }
 
         foreach ($description->getCommands() as $command) {

@@ -39,7 +39,7 @@ class PhpExecutableFinder
         }
 
         // PHP_BINARY return the current sapi executable
-        if (defined('PHP_BINARY') && PHP_BINARY && in_array(PHP_SAPI, array('cli', 'cli-server')) && is_file(PHP_BINARY)) {
+        if (defined('PHP_BINARY') && PHP_BINARY && in_array(PHP_SAPI, ['cli', 'cli-server']) && is_file(PHP_BINARY)) {
             return PHP_BINARY;
         }
 
@@ -57,7 +57,7 @@ class PhpExecutableFinder
             }
         }
 
-        $dirs = array(PHP_BINDIR);
+        $dirs = [PHP_BINDIR];
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             $dirs[] = 'C:\xampp\php\\';
         }

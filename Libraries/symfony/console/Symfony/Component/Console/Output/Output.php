@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Console\Output;
 
-use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 
 /**
  * Base class for output classes.
@@ -158,8 +158,8 @@ abstract class Output implements OutputInterface
     /**
      * Writes a message to the output.
      *
-     * @param string  $message A message to write to the output
-     * @param bool    $newline Whether to add a newline or not
+     * @param string $message A message to write to the output
+     * @param bool   $newline Whether to add a newline or not
      */
     abstract protected function doWrite($message, $newline);
 }

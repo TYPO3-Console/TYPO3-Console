@@ -23,7 +23,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 class ProcessUtils
 {
     /**
-     * This class should not be instantiated
+     * This class should not be instantiated.
      */
     private function __construct()
     {
@@ -48,7 +48,7 @@ class ProcessUtils
             }
 
             $escapedArgument = '';
-            $quote =  false;
+            $quote = false;
             foreach (preg_split('/(")/i', $argument, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE) as $part) {
                 if ('"' === $part) {
                     $escapedArgument .= '\\"';
@@ -75,14 +75,14 @@ class ProcessUtils
     }
 
     /**
-     * Validates and normalizes a Process input
+     * Validates and normalizes a Process input.
      *
      * @param string $caller The name of method call that validates the input
      * @param mixed  $input  The input to validate
      *
-     * @return string The validated input
-     *
      * @throws InvalidArgumentException In case the input is not valid
+     *
+     * @return string The validated input
      */
     public static function validateInput($caller, $input)
     {

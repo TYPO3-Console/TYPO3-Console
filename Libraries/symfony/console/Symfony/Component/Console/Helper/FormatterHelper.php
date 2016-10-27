@@ -48,14 +48,14 @@ class FormatterHelper extends Helper
         $messages = (array) $messages;
 
         $len = 0;
-        $lines = array();
+        $lines = [];
         foreach ($messages as $message) {
             $message = OutputFormatter::escape($message);
             $lines[] = sprintf($large ? '  %s  ' : ' %s ', $message);
             $len = max($this->strlen($message) + ($large ? 4 : 2), $len);
         }
 
-        $messages = $large ? array(str_repeat(' ', $len)) : array();
+        $messages = $large ? [str_repeat(' ', $len)] : [];
         foreach ($lines as $line) {
             $messages[] = $line.str_repeat(' ', $len - $this->strlen($line));
         }

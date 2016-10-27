@@ -25,32 +25,32 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-
 namespace Helhum\Typo3Console\Service\Delegation;
 
+interface ReferenceIndexIntegrityDelegateInterface
+{
+    /**
+     * @param int $unitsOfWorkCount
+     *
+     * @return void
+     */
+    public function willStartOperation($unitsOfWorkCount);
 
-interface ReferenceIndexIntegrityDelegateInterface {
+    /**
+     * @param string $tableName
+     * @param array  $record
+     *
+     * @return void
+     */
+    public function willUpdateRecord($tableName, array $record);
 
-	/**
-	 * @param int $unitsOfWorkCount
-	 * @return void
-	 */
-	public function willStartOperation($unitsOfWorkCount);
+    /**
+     * @return void
+     */
+    public function operationHasEnded();
 
-	/**
-	 * @param string $tableName
-	 * @param array $record
-	 * @return void
-	 */
-	public function willUpdateRecord($tableName, array $record);
-
-	/**
-	 * @return void
-	 */
-	public function operationHasEnded();
-
-	/**
-	 * @return \Psr\Log\LoggerInterface
-	 */
-	public function getLogger();
+    /**
+     * @return \Psr\Log\LoggerInterface
+     */
+    public function getLogger();
 }

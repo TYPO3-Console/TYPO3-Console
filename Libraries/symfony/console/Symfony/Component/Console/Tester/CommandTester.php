@@ -13,9 +13,9 @@ namespace Symfony\Component\Console\Tester;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 
 /**
  * Eases the testing of console commands.
@@ -51,9 +51,9 @@ class CommandTester
      * @param array $input   An array of arguments and options
      * @param array $options An array of options
      *
-     * @return int     The command exit code
+     * @return int The command exit code
      */
-    public function execute(array $input, array $options = array())
+    public function execute(array $input, array $options = [])
     {
         // set the command name automatically if the application requires
         // this argument and no command name was passed
@@ -83,7 +83,7 @@ class CommandTester
     /**
      * Gets the display returned by the last execution of the command.
      *
-     * @param bool    $normalize Whether to normalize end of lines to \n or not
+     * @param bool $normalize Whether to normalize end of lines to \n or not
      *
      * @return string The display
      */
@@ -123,7 +123,7 @@ class CommandTester
     /**
      * Gets the status code returned by the last execution of the application.
      *
-     * @return int     The status code
+     * @return int The status code
      */
     public function getStatusCode()
     {

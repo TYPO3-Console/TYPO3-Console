@@ -83,14 +83,15 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     }
 
     abstract protected function getDescriptor();
+
     abstract protected function getFormat();
 
     private function getDescriptionTestData(array $objects)
     {
-        $data = array();
+        $data = [];
         foreach ($objects as $name => $object) {
             $description = file_get_contents(sprintf('%s/../Fixtures/%s.%s', __DIR__, $name, $this->getFormat()));
-            $data[] = array($object, $description);
+            $data[] = [$object, $description];
         }
 
         return $data;
@@ -99,7 +100,7 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     private function assertDescription($expectedDescription, $describedObject)
     {
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
-        $this->getDescriptor()->describe($output, $describedObject, array('raw_output' => true));
+        $this->getDescriptor()->describe($output, $describedObject, ['raw_output' => true]);
         $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $output->fetch())));
     }
 }

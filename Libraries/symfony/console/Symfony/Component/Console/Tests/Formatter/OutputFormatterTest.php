@@ -19,16 +19,16 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
     public function testEmptyTag()
     {
         $formatter = new OutputFormatter(true);
-        $this->assertEquals("foo<>bar", $formatter->format('foo<>bar'));
+        $this->assertEquals('foo<>bar', $formatter->format('foo<>bar'));
     }
 
     public function testLGCharEscaping()
     {
         $formatter = new OutputFormatter(true);
 
-        $this->assertEquals("foo<bar", $formatter->format('foo\\<bar'));
-        $this->assertEquals("<info>some info</info>", $formatter->format('\\<info>some info\\</info>'));
-        $this->assertEquals("\\<info>some info\\</info>", OutputFormatter::escape('<info>some info</info>'));
+        $this->assertEquals('foo<bar', $formatter->format('foo\\<bar'));
+        $this->assertEquals('<info>some info</info>', $formatter->format('\\<info>some info\\</info>'));
+        $this->assertEquals('\\<info>some info\\</info>', OutputFormatter::escape('<info>some info</info>'));
 
         $this->assertEquals(
             "\033[33mSymfony\\Component\\Console does work very well!\033[0m",
@@ -157,7 +157,7 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
     public function testFormatLongString()
     {
         $formatter = new OutputFormatter(true);
-        $long = str_repeat("\\", 14000);
+        $long = str_repeat('\\', 14000);
         $this->assertEquals("\033[37;41msome error\033[0m".$long, $formatter->format('<error>some error</error>'.$long));
     }
 
@@ -171,16 +171,16 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($formatter->hasStyle('question'));
 
         $this->assertEquals(
-            "some error", $formatter->format('<error>some error</error>')
+            'some error', $formatter->format('<error>some error</error>')
         );
         $this->assertEquals(
-            "some info", $formatter->format('<info>some info</info>')
+            'some info', $formatter->format('<info>some info</info>')
         );
         $this->assertEquals(
-            "some comment", $formatter->format('<comment>some comment</comment>')
+            'some comment', $formatter->format('<comment>some comment</comment>')
         );
         $this->assertEquals(
-            "some question", $formatter->format('<question>some question</question>')
+            'some question', $formatter->format('<question>some question</question>')
         );
 
         $formatter->setDecorated(true);
@@ -207,7 +207,7 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
 \033[32m
 some text\033[0m
 EOF
-            , $formatter->format(<<<EOF
+            , $formatter->format(<<<'EOF'
 <info>
 some text</info>
 EOF
@@ -217,7 +217,7 @@ EOF
 \033[32msome text
 \033[0m
 EOF
-            , $formatter->format(<<<EOF
+            , $formatter->format(<<<'EOF'
 <info>some text
 </info>
 EOF
@@ -228,7 +228,7 @@ EOF
 some text
 \033[0m
 EOF
-            , $formatter->format(<<<EOF
+            , $formatter->format(<<<'EOF'
 <info>
 some text
 </info>
@@ -241,7 +241,7 @@ some text
 more text
 \033[0m
 EOF
-            , $formatter->format(<<<EOF
+            , $formatter->format(<<<'EOF'
 <info>
 some text
 more text

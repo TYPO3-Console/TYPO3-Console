@@ -42,7 +42,7 @@ class OutputFormatterStyleStack
      */
     public function reset()
     {
-        $this->styles = array();
+        $this->styles = [];
     }
 
     /**
@@ -60,9 +60,9 @@ class OutputFormatterStyleStack
      *
      * @param OutputFormatterStyleInterface|null $style
      *
-     * @return OutputFormatterStyleInterface
+     * @throws \InvalidArgumentException When style tags incorrectly nested
      *
-     * @throws \InvalidArgumentException  When style tags incorrectly nested
+     * @return OutputFormatterStyleInterface
      */
     public function pop(OutputFormatterStyleInterface $style = null)
     {
@@ -96,7 +96,7 @@ class OutputFormatterStyleStack
             return $this->emptyStyle;
         }
 
-        return $this->styles[count($this->styles)-1];
+        return $this->styles[count($this->styles) - 1];
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Parser;
 
 /***************************************************************
@@ -28,8 +29,8 @@ namespace Helhum\Typo3Console\Parser;
  ***************************************************************/
 
 /**
- * Class ParsingException
+ * Class ParsingException.
  */
-class ParsingException extends \TYPO3\CMS\Core\Error\Exception {
-
-} 
+class ParsingException extends \TYPO3\CMS\Core\Error\Exception
+{
+}

@@ -13,8 +13,8 @@ namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -35,14 +35,14 @@ class HelpCommand extends Command
 
         $this
             ->setName('help')
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'),
                 new InputOption('xml', null, InputOption::VALUE_NONE, 'To output help as XML'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output help in other formats', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command help'),
-            ))
+            ])
             ->setDescription('Displays help for a command')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays help for a given command:
 
   <info>php %command.full_name% list</info>
@@ -53,12 +53,11 @@ You can also output the help in other formats by using the <comment>--format</co
 
 To display the list of available commands, please use the <info>list</info> command.
 EOF
-            )
-        ;
+            );
     }
 
     /**
-     * Sets the command
+     * Sets the command.
      *
      * @param Command $command The command to set
      */
@@ -81,10 +80,10 @@ EOF
         }
 
         $helper = new DescriptorHelper();
-        $helper->describe($output, $this->command, array(
+        $helper->describe($output, $this->command, [
             'format' => $input->getOption('format'),
             'raw'    => $input->getOption('raw'),
-        ));
+        ]);
 
         $this->command = null;
     }

@@ -28,7 +28,7 @@ class DescriptorHelper extends Helper
     /**
      * @var DescriptorInterface[]
      */
-    private $descriptors = array();
+    private $descriptors = [];
 
     /**
      * Constructor.
@@ -36,11 +36,10 @@ class DescriptorHelper extends Helper
     public function __construct()
     {
         $this
-            ->register('txt',  new TextDescriptor())
-            ->register('xml',  new XmlDescriptor())
+            ->register('txt', new TextDescriptor())
+            ->register('xml', new XmlDescriptor())
             ->register('json', new JsonDescriptor())
-            ->register('md',   new MarkdownDescriptor())
-        ;
+            ->register('md', new MarkdownDescriptor());
     }
 
     /**
@@ -56,12 +55,12 @@ class DescriptorHelper extends Helper
      *
      * @throws \InvalidArgumentException
      */
-    public function describe(OutputInterface $output, $object, array $options = array())
+    public function describe(OutputInterface $output, $object, array $options = [])
     {
-        $options = array_merge(array(
+        $options = array_merge([
             'raw_text'  => false,
             'format'    => 'txt',
-        ), $options);
+        ], $options);
 
         if (!isset($this->descriptors[$options['format']])) {
             throw new \InvalidArgumentException(sprintf('Unsupported format "%s".', $options['format']));

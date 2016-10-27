@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Process\Tests;
 
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\LogicException;
-use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
+use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessPipes;
 
 /**
@@ -128,7 +128,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * tests results from sub processes
+     * tests results from sub processes.
      *
      * @dataProvider responsesCodeProvider
      */
@@ -141,13 +141,13 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * tests results from sub processes
+     * tests results from sub processes.
      *
      * @dataProvider pipesCodeProvider
      */
     public function testProcessPipes($code, $size)
     {
-        $expected = str_repeat(str_repeat('*', 1024), $size) . '!';
+        $expected = str_repeat(str_repeat('*', 1024), $size).'!';
         $expectedLength = (1024 * $size) + 1;
 
         $p = $this->getProcess(sprintf('php -r %s', escapeshellarg($code)));
@@ -185,11 +185,11 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function provideInvalidInputValues()
     {
-        return array(
-            array(array()),
-            array(new NonStringifiable()),
-            array(fopen('php://temporary', 'w')),
-        );
+        return [
+            [[]],
+            [new NonStringifiable()],
+            [fopen('php://temporary', 'w')],
+        ];
     }
 
     /**
@@ -204,31 +204,30 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function provideInputValues()
     {
-        return array(
-            array(null, null),
-            array('24.5', 24.5),
-            array('input data', 'input data'),
+        return [
+            [null, null],
+            ['24.5', 24.5],
+            ['input data', 'input data'],
             // to maintain BC, supposed to be removed in 3.0
-            array('stringifiable', new Stringifiable()),
-        );
+            ['stringifiable', new Stringifiable()],
+        ];
     }
 
     public function chainedCommandsOutputProvider()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            return array(
-                array("2 \r\n2\r\n", '&&', '2')
-            );
+            return [
+                ["2 \r\n2\r\n", '&&', '2'],
+            ];
         }
 
-        return array(
-            array("1\n1\n", ';', '1'),
-            array("2\n2\n", '&&', '2'),
-        );
+        return [
+            ["1\n1\n", ';', '1'],
+            ["2\n2\n", '&&', '2'],
+        ];
     }
 
     /**
-     *
      * @dataProvider chainedCommandsOutputProvider
      */
     public function testChainedCommandsOutput($expected, $operator, $input)
@@ -384,7 +383,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $process = $this->getProcess('echo foo');
 
         $this->assertSame($process, $process->mustRun());
-        $this->assertEquals("foo".PHP_EOL, $process->getOutput());
+        $this->assertEquals('foo'.PHP_EOL, $process->getOutput());
     }
 
     public function testSuccessfulMustRunHasCorrectExitCode()
@@ -419,7 +418,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $start = microtime(true);
         $process->start();
         $end = microtime(true);
-        $this->assertLessThan(0.2, $end-$start);
+        $this->assertLessThan(0.2, $end - $start);
         $process->wait();
     }
 
@@ -635,7 +634,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $process->run();
             $this->fail('A RuntimeException should have been raised');
         } catch (RuntimeException $e) {
-
         }
         $duration = microtime(true) - $start;
 
@@ -672,7 +670,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             }
             $this->fail('A RuntimeException should have been raised');
         } catch (RuntimeException $e) {
-
         }
         $duration = microtime(true) - $start;
 
@@ -728,7 +725,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $process->run();
             $this->fail('An exception should have been raised.');
         } catch (\Exception $e) {
-
         }
         $process->start();
         usleep(1000);
@@ -760,7 +756,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     {
         $this->verifyPosixIsEnabled();
 
-        $process = $this->getProcess('exec php -f ' . __DIR__ . '/SignalListener.php');
+        $process = $this->getProcess('exec php -f '.__DIR__.'/SignalListener.php');
         $process->start();
         usleep(500000);
         $process->signal(SIGUSR1);
@@ -807,18 +803,18 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     {
         $process = $this->getProcess('php -m');
         $this->setExpectedException('Symfony\Component\Process\Exception\LogicException', sprintf('Process must be started before calling %s.', $method));
-        call_user_func(array($process, $method));
+        call_user_func([$process, $method]);
     }
 
     public function provideMethodsThatNeedARunningProcess()
     {
-        return array(
-            array('getOutput'),
-            array('getIncrementalOutput'),
-            array('getErrorOutput'),
-            array('getIncrementalErrorOutput'),
-            array('wait'),
-        );
+        return [
+            ['getOutput'],
+            ['getIncrementalOutput'],
+            ['getErrorOutput'],
+            ['getIncrementalErrorOutput'],
+            ['wait'],
+        ];
     }
 
     /**
@@ -829,7 +825,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $process = $this->getProcess('php -r "sleep(1);"');
         $process->start();
         try {
-            call_user_func(array($process, $method));
+            call_user_func([$process, $method]);
             $process->stop(0);
             $this->fail('A LogicException must have been thrown');
         } catch (\Exception $e) {
@@ -841,12 +837,12 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function provideMethodsThatNeedATerminatedProcess()
     {
-        return array(
-            array('hasBeenSignaled'),
-            array('getTermSignal'),
-            array('hasBeenStopped'),
-            array('getStopSignal'),
-        );
+        return [
+            ['hasBeenSignaled'],
+            ['getTermSignal'],
+            ['hasBeenStopped'],
+            ['getStopSignal'],
+        ];
     }
 
     private function verifyPosixIsEnabled()
@@ -955,16 +951,17 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $p = $this->getProcess('php -r "usleep(500000);"');
         $p->disableOutput();
         $this->setExpectedException('Symfony\Component\Process\Exception\LogicException', 'Output has been disabled, enable it to allow the use of a callback.');
-        call_user_func(array($p, $startMethod), function () {});
+        call_user_func([$p, $startMethod], function () {
+        });
     }
 
     public function provideStartMethods()
     {
-        return array(
-            array('start'),
-            array('run'),
-            array('mustRun'),
-        );
+        return [
+            ['start'],
+            ['run'],
+            ['mustRun'],
+        ];
     }
 
     /**
@@ -976,47 +973,47 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $p->disableOutput();
         $p->start();
         $this->setExpectedException('Symfony\Component\Process\Exception\LogicException', 'Output has been disabled.');
-        call_user_func(array($p, $fetchMethod));
+        call_user_func([$p, $fetchMethod]);
     }
 
     public function provideOutputFetchingMethods()
     {
-        return array(
-            array('getOutput'),
-            array('getIncrementalOutput'),
-            array('getErrorOutput'),
-            array('getIncrementalErrorOutput'),
-        );
+        return [
+            ['getOutput'],
+            ['getIncrementalOutput'],
+            ['getErrorOutput'],
+            ['getIncrementalErrorOutput'],
+        ];
     }
 
     public function responsesCodeProvider()
     {
-        return array(
+        return [
             //expected output / getter / code to execute
             //array(1,'getExitCode','exit(1);'),
             //array(true,'isSuccessful','exit();'),
-            array('output', 'getOutput', 'echo \'output\';'),
-        );
+            ['output', 'getOutput', 'echo \'output\';'],
+        ];
     }
 
     public function pipesCodeProvider()
     {
-        $variations = array(
+        $variations = [
             'fwrite(STDOUT, $in = file_get_contents(\'php://stdin\')); fwrite(STDERR, $in);',
             'include \''.__DIR__.'/PipeStdinInStdoutStdErrStreamSelect.php\';',
-        );
+        ];
 
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             // Avoid XL buffers on Windows because of https://bugs.php.net/bug.php?id=65650
-            $sizes = array(1, 2, 4, 8);
+            $sizes = [1, 2, 4, 8];
         } else {
-            $sizes = array(1, 16, 64, 1024, 4096);
+            $sizes = [1, 16, 64, 1024, 4096];
         }
 
-        $codes = array();
+        $codes = [];
         foreach ($sizes as $size) {
             foreach ($variations as $code) {
-                $codes[] = array($code, $size);
+                $codes[] = [$code, $size];
             }
         }
 
@@ -1024,34 +1021,34 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * provides default method names for simple getter/setter
+     * provides default method names for simple getter/setter.
      */
     public function methodProvider()
     {
-        $defaults = array(
-            array('CommandLine'),
-            array('Timeout'),
-            array('WorkingDirectory'),
-            array('Env'),
-            array('Stdin'),
-            array('Input'),
-            array('Options')
-        );
+        $defaults = [
+            ['CommandLine'],
+            ['Timeout'],
+            ['WorkingDirectory'],
+            ['Env'],
+            ['Stdin'],
+            ['Input'],
+            ['Options'],
+        ];
 
         return $defaults;
     }
 
     /**
-     * @param string         $commandline
-     * @param null|string    $cwd
-     * @param null|array     $env
-     * @param null|string    $input
-     * @param int            $timeout
-     * @param array          $options
+     * @param string      $commandline
+     * @param null|string $cwd
+     * @param null|array  $env
+     * @param null|string $input
+     * @param int         $timeout
+     * @param array       $options
      *
      * @return Process
      */
-    abstract protected function getProcess($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = array());
+    abstract protected function getProcess($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = []);
 }
 
 class Stringifiable

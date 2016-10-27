@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Mvc\Cli;
 
 /***************************************************************
@@ -36,106 +37,111 @@ use TYPO3\Flow\Core\Bootstrap;
  *
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface {
+class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
+{
+    /**
+     * @var ObjectManager
+     */
+    protected $objectManager;
 
-	/**
-	 * @var ObjectManager
-	 */
-	protected $objectManager;
+    /**
+     * @var \TYPO3\CMS\Extbase\Mvc\Dispatcher
+     */
+    protected $dispatcher;
 
-	/**
-	 * @var \TYPO3\CMS\Extbase\Mvc\Dispatcher
-	 */
-	protected $dispatcher;
+    /**
+     * @var \TYPO3\CMS\Extbase\Mvc\Cli\Request
+     */
+    protected $request;
 
-	/**
-	 * @var \TYPO3\CMS\Extbase\Mvc\Cli\Request
-	 */
-	protected $request;
+    /**
+     * @var \TYPO3\CMS\Extbase\Mvc\Cli\Response
+     */
+    protected $response;
 
-	/**
-	 * @var \TYPO3\CMS\Extbase\Mvc\Cli\Response
-	 */
-	protected $response;
+    /**
+     * @var ConsoleBootstrap
+     */
+    protected $bootstrap;
 
-	/**
-	 * @var ConsoleBootstrap
-	 */
-	protected $bootstrap;
+    /**
+     * Constructor.
+     *
+     * @param Bootstrap $bootstrap
+     */
+    public function __construct(Bootstrap $bootstrap)
+    {
+        $this->bootstrap = $bootstrap;
+    }
 
-	/**
-	 * Constructor
-	 *
-	 * @param Bootstrap $bootstrap
-	 */
-	public function __construct(Bootstrap $bootstrap) {
-		$this->bootstrap = $bootstrap;
-	}
+    /**
+     * Handles the request.
+     *
+     * @return \TYPO3\CMS\Extbase\Mvc\ResponseInterface
+     */
+    public function handleRequest()
+    {
+        // help command by default
+        if ($_SERVER['argc'] === 1) {
+            $_SERVER['argc'] = 2;
+            $_SERVER['argv'][] = 'help';
+        }
 
-	/**
-	 * Handles the request
-	 *
-	 * @return \TYPO3\CMS\Extbase\Mvc\ResponseInterface
-	 */
-	public function handleRequest() {
-		// help command by default
-		if ($_SERVER['argc'] === 1) {
-			$_SERVER['argc'] = 2;
-			$_SERVER['argv'][] = 'help';
-		}
+        $commandLine = $_SERVER['argv'];
+        $callingScript = array_shift($commandLine);
+        if ($callingScript !== $_SERVER['_']) {
+            $callingScript = $_SERVER['_'].' '.$callingScript;
+        }
 
-		$commandLine = $_SERVER['argv'];
-		$callingScript = array_shift($commandLine);
-		if ($callingScript !== $_SERVER['_']) {
-			$callingScript = $_SERVER['_'] . ' ' . $callingScript;
-		}
+        $this->boot($_SERVER['argv'][1]);
+        $this->request = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Cli\\RequestBuilder')->build($commandLine, $callingScript);
+        $this->response = new \TYPO3\CMS\Extbase\Mvc\Cli\Response();
+        $this->dispatcher->dispatch($this->request, $this->response);
 
-		$this->boot($_SERVER['argv'][1]);
-		$this->request = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Cli\\RequestBuilder')->build($commandLine, $callingScript);
-		$this->response = new \TYPO3\CMS\Extbase\Mvc\Cli\Response();
-		$this->dispatcher->dispatch($this->request, $this->response);
+        $this->response->send();
+        $this->shutdown();
+    }
 
-		$this->response->send();
-		$this->shutdown();
-	}
+    /**
+     * @param string $commandIdentifier
+     */
+    protected function boot($commandIdentifier)
+    {
+        $sequence = $this->bootstrap->buildBootingSequenceForCommand($commandIdentifier);
+        $sequence->invoke($this->bootstrap);
 
-	/**
-	 * @param string $commandIdentifier
-	 */
-	protected function boot($commandIdentifier) {
-		$sequence = $this->bootstrap->buildBootingSequenceForCommand($commandIdentifier);
-		$sequence->invoke($this->bootstrap);
+        $this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+        $this->dispatcher = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Dispatcher');
+        Scripts::overrideImplementation('TYPO3\CMS\Extbase\Command\HelpCommandController', 'Helhum\Typo3Console\Command\HelpCommandController');
+    }
 
-		$this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-		$this->dispatcher = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Dispatcher');
-		Scripts::overrideImplementation('TYPO3\CMS\Extbase\Command\HelpCommandController', 'Helhum\Typo3Console\Command\HelpCommandController');
-	}
 
-	/**
-	 *
-	 */
-	protected function shutdown() {
-		$this->bootstrap->shutdown();
-		exit($this->response->getExitCode());
-	}
+    protected function shutdown()
+    {
+        $this->bootstrap->shutdown();
+        exit($this->response->getExitCode());
+    }
 
-	/**
-	 * Returns the priority - how eager the handler is to actually handle the
-	 * request.
-	 *
-	 * @return integer The priority of the request handler.
-	 */
-	public function getPriority() {
-		return 100;
-	}
+    /**
+     * Returns the priority - how eager the handler is to actually handle the
+     * request.
+     *
+     * @return int The priority of the request handler.
+     */
+    public function getPriority()
+    {
+        return 100;
+    }
 
-	/**
-	 * Checks if the request handler can handle the current request.
-	 *
-	 * @return boolean TRUE if it can handle the request, otherwise FALSE
-	 * @api
-	 */
-	public function canHandleRequest() {
-		return PHP_SAPI === 'cli' && isset($_SERVER['argc']) && isset($_SERVER['argv']);
-	}
+    /**
+     * Checks if the request handler can handle the current request.
+     *
+     * @return bool TRUE if it can handle the request, otherwise FALSE
+     *
+     * @api
+     */
+    public function canHandleRequest()
+    {
+        return PHP_SAPI === 'cli' && isset($_SERVER['argc']) && isset($_SERVER['argv']);
+    }
 }

@@ -13,8 +13,8 @@ namespace Symfony\Component\Console;
 
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Process\ProcessBuilder;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\ProcessBuilder;
 
 /**
  * A Shell wraps an Application to add shell capabilities to it.
@@ -59,7 +59,7 @@ class Shell
 
         if ($this->hasReadline) {
             readline_read_history($this->history);
-            readline_completion_function(array($this, 'autocompleter'));
+            readline_completion_function([$this, 'autocompleter']);
         }
 
         $this->output->writeln($this->getHeader());
@@ -67,7 +67,7 @@ class Shell
         if ($this->processIsolation) {
             $finder = new PhpExecutableFinder();
             $php = $finder->find();
-            $this->output->writeln(<<<EOF
+            $this->output->writeln(<<<'EOF'
 <info>Running with process isolation, you should consider this:</info>
   * each command is executed as separate process,
   * commands don't support interactivity, all params must be passed explicitly,
@@ -99,8 +99,7 @@ EOF
                     ->add($_SERVER['argv'][0])
                     ->add($command)
                     ->inheritEnvironmentVariables(true)
-                    ->getProcess()
-                ;
+                    ->getProcess();
 
                 $output = $this->output;
                 $process->run(function ($type, $data) use ($output) {
@@ -163,7 +162,7 @@ EOF;
      *
      * @param string $text The last segment of the entered text
      *
-     * @return bool|array    A list of guessed strings or true
+     * @return bool|array A list of guessed strings or true
      */
     private function autocompleter($text)
     {
@@ -186,7 +185,7 @@ EOF;
             return true;
         }
 
-        $list = array('--help');
+        $list = ['--help'];
         foreach ($command->getDefinition()->getOptions() as $option) {
             $list[] = '--'.$option->getName();
         }

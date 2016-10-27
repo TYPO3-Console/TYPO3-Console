@@ -27,7 +27,7 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeInputArgument(InputArgument $argument, array $options = array())
+    protected function describeInputArgument(InputArgument $argument, array $options = [])
     {
         if (null !== $argument->getDefault() && (!is_array($argument->getDefault()) || count($argument->getDefault()))) {
             $default = sprintf('<comment> (default: %s)</comment>', $this->formatDefaultValue($argument->getDefault()));
@@ -47,7 +47,7 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeInputOption(InputOption $option, array $options = array())
+    protected function describeInputOption(InputOption $option, array $options = [])
     {
         if ($option->acceptValue() && null !== $option->getDefault() && (!is_array($option->getDefault()) || count($option->getDefault()))) {
             $default = sprintf('<comment> (default: %s)</comment>', $this->formatDefaultValue($option->getDefault()));
@@ -70,7 +70,7 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeInputDefinition(InputDefinition $definition, array $options = array())
+    protected function describeInputDefinition(InputDefinition $definition, array $options = [])
     {
         $nameWidth = 0;
         foreach ($definition->getOptions() as $option) {
@@ -89,7 +89,7 @@ class TextDescriptor extends Descriptor
             $this->writeText('<comment>Arguments:</comment>', $options);
             $this->writeText("\n");
             foreach ($definition->getArguments() as $argument) {
-                $this->describeInputArgument($argument, array_merge($options, array('name_width' => $nameWidth)));
+                $this->describeInputArgument($argument, array_merge($options, ['name_width' => $nameWidth]));
                 $this->writeText("\n");
             }
         }
@@ -102,7 +102,7 @@ class TextDescriptor extends Descriptor
             $this->writeText('<comment>Options:</comment>', $options);
             $this->writeText("\n");
             foreach ($definition->getOptions() as $option) {
-                $this->describeInputOption($option, array_merge($options, array('name_width' => $nameWidth)));
+                $this->describeInputOption($option, array_merge($options, ['name_width' => $nameWidth]));
                 $this->writeText("\n");
             }
         }
@@ -111,7 +111,7 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeCommand(Command $command, array $options = array())
+    protected function describeCommand(Command $command, array $options = [])
     {
         $command->getSynopsis();
         $command->mergeApplicationDefinition(false);
@@ -144,7 +144,7 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeApplication(Application $application, array $options = array())
+    protected function describeApplication(Application $application, array $options = [])
     {
         $describedNamespace = isset($options['namespace']) ? $options['namespace'] : null;
         $description = new ApplicationDescription($application, $describedNamespace);
@@ -163,7 +163,7 @@ class TextDescriptor extends Descriptor
             $this->writeText("\n\n");
 
             if ($describedNamespace) {
-                $this->writeText(sprintf("<comment>Available commands for the \"%s\" namespace:</comment>", $describedNamespace), $options);
+                $this->writeText(sprintf('<comment>Available commands for the "%s" namespace:</comment>', $describedNamespace), $options);
             } else {
                 $this->writeText('<comment>Available commands:</comment>', $options);
             }
@@ -188,7 +188,7 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    private function writeText($content, array $options = array())
+    private function writeText($content, array $options = [])
     {
         $this->write(
             isset($options['raw_text']) && $options['raw_text'] ? strip_tags($content) : $content,

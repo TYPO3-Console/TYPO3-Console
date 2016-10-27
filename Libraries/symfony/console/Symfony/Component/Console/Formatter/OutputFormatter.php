@@ -21,7 +21,7 @@ namespace Symfony\Component\Console\Formatter;
 class OutputFormatter implements OutputFormatterInterface
 {
     private $decorated;
-    private $styles = array();
+    private $styles = [];
     private $styleStack;
 
     /**
@@ -39,12 +39,12 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Initializes console output formatter.
      *
-     * @param bool             $decorated Whether this formatter should actually decorate strings
+     * @param bool                            $decorated Whether this formatter should actually decorate strings
      * @param OutputFormatterStyleInterface[] $styles    Array of "name => FormatterStyle" instances
      *
      * @api
      */
-    public function __construct($decorated = false, array $styles = array())
+    public function __construct($decorated = false, array $styles = [])
     {
         $this->decorated = (bool) $decorated;
 
@@ -63,7 +63,7 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Sets the decorated flag.
      *
-     * @param bool    $decorated Whether to decorate the messages or not
+     * @param bool $decorated Whether to decorate the messages or not
      *
      * @api
      */
@@ -75,7 +75,7 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Gets the decorated flag.
      *
-     * @return bool    true if the output will decorate messages, false otherwise
+     * @return bool true if the output will decorate messages, false otherwise
      *
      * @api
      */
@@ -116,9 +116,9 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @param string $name
      *
-     * @return OutputFormatterStyleInterface
-     *
      * @throws \InvalidArgumentException When style isn't defined
+     *
+     * @return OutputFormatterStyleInterface
      *
      * @api
      */
@@ -194,7 +194,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @param string $string
      *
-     * @return OutputFormatterStyle|bool    false if string is not format string
+     * @return OutputFormatterStyle|bool false if string is not format string
      */
     private function createStyleFromString($string)
     {

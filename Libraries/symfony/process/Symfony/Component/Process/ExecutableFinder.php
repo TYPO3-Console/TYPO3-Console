@@ -19,7 +19,7 @@ namespace Symfony\Component\Process;
  */
 class ExecutableFinder
 {
-    private $suffixes = array('.exe', '.bat', '.cmd', '.com');
+    private $suffixes = ['.exe', '.bat', '.cmd', '.com'];
 
     /**
      * Replaces default suffixes of executable.
@@ -50,11 +50,11 @@ class ExecutableFinder
      *
      * @return string The executable path or default value
      */
-    public function find($name, $default = null, array $extraDirs = array())
+    public function find($name, $default = null, array $extraDirs = [])
     {
         if (ini_get('open_basedir')) {
             $searchPath = explode(PATH_SEPARATOR, ini_get('open_basedir'));
-            $dirs = array();
+            $dirs = [];
             foreach ($searchPath as $path) {
                 if (is_dir($path)) {
                     $dirs[] = $path;
@@ -72,7 +72,7 @@ class ExecutableFinder
             );
         }
 
-        $suffixes = array('');
+        $suffixes = [''];
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             $pathExt = getenv('PATHEXT');
             $suffixes = $pathExt ? explode(PATH_SEPARATOR, $pathExt) : $this->suffixes;
