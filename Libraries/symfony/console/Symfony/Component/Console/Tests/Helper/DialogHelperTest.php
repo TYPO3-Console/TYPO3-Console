@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Helper\DialogHelper;
-use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\StreamOutput;
 
 class DialogHelperTest extends \PHPUnit_Framework_TestCase
@@ -23,10 +23,10 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
     {
         $dialog = new DialogHelper();
 
-        $helperSet = new HelperSet(array(new FormatterHelper()));
+        $helperSet = new HelperSet([new FormatterHelper()]);
         $dialog->setHelperSet($helperSet);
 
-        $heroes = array('Superman', 'Batman', 'Spiderman');
+        $heroes = ['Superman', 'Batman', 'Spiderman'];
 
         $dialog->setInputStream($this->getInputStream("\n1\n  1  \nFabien\n1\nFabien\n1\n0,2\n 0 , 2  \n\n\n"));
         $this->assertEquals('2', $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, '2'));
@@ -44,11 +44,11 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('Value "Fabien" is invalid', $e->getMessage());
         }
 
-        $this->assertEquals(array('1'), $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!', true));
-        $this->assertEquals(array('0', '2'), $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!', true));
-        $this->assertEquals(array('0', '2'), $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!', true));
-        $this->assertEquals(array('0', '1'), $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, '0,1', false, 'Input "%s" is not a superhero!', true));
-        $this->assertEquals(array('0', '1'), $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, ' 0 , 1 ', false, 'Input "%s" is not a superhero!', true));
+        $this->assertEquals(['1'], $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!', true));
+        $this->assertEquals(['0', '2'], $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!', true));
+        $this->assertEquals(['0', '2'], $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!', true));
+        $this->assertEquals(['0', '1'], $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, '0,1', false, 'Input "%s" is not a superhero!', true));
+        $this->assertEquals(['0', '1'], $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, ' 0 , 1 ', false, 'Input "%s" is not a superhero!', true));
     }
 
     public function testAsk()
@@ -83,7 +83,7 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
         $dialog = new DialogHelper();
         $dialog->setInputStream($inputStream);
 
-        $bundles = array('AcmeDemoBundle', 'AsseticBundle', 'SecurityBundle', 'FooBundle');
+        $bundles = ['AcmeDemoBundle', 'AsseticBundle', 'SecurityBundle', 'FooBundle'];
 
         $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
         $this->assertEquals('AsseticBundleTest', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
@@ -131,13 +131,13 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
     public function testAskAndValidate()
     {
         $dialog = new DialogHelper();
-        $helperSet = new HelperSet(array(new FormatterHelper()));
+        $helperSet = new HelperSet([new FormatterHelper()]);
         $dialog->setHelperSet($helperSet);
 
-        $question ='What color was the white horse of Henry IV?';
+        $question = 'What color was the white horse of Henry IV?';
         $error = 'This is not a color!';
         $validator = function ($color) use ($error) {
-            if (!in_array($color, array('white', 'black'))) {
+            if (!in_array($color, ['white', 'black'])) {
                 throw new \InvalidArgumentException($error);
             }
 
@@ -161,7 +161,7 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
     {
         $dialog = new DialogHelper();
 
-        $input = new ArrayInput(array());
+        $input = new ArrayInput([]);
         $input->setInteractive(false);
 
         $dialog->setInput($input);
@@ -172,7 +172,7 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
     protected function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);
-        fputs($stream, $input);
+        fwrite($stream, $input);
         rewind($stream);
 
         return $stream;

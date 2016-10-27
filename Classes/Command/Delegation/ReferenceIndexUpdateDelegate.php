@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Command\Delegation;
 
 /***************************************************************
@@ -34,90 +35,101 @@ use TYPO3\CMS\Core\Log\LogLevel;
 use TYPO3\CMS\Core\Log\Writer\NullWriter;
 
 /**
- * Class ReferenceIndexUpdateDelegate
+ * Class ReferenceIndexUpdateDelegate.
  */
-class ReferenceIndexUpdateDelegate implements ReferenceIndexIntegrityDelegateInterface {
+class ReferenceIndexUpdateDelegate implements ReferenceIndexIntegrityDelegateInterface
+{
+    /**
+     * @var array
+     */
+    protected $subscribers = [];
 
-	/**
-	 * @var array
-	 */
-	protected $subscribers = array();
+    /**
+     * @param string $name
+     * @param array  $arguments
+     */
+    public function emitEvent($name, $arguments = [])
+    {
+        if (empty($this->subscribers[$name])) {
+            return;
+        }
 
-	/**
-	 * @param string $name
-	 * @param array $arguments
-	 */
-	public function emitEvent($name, $arguments = array()) {
-		if (empty($this->subscribers[$name])) {
-			return;
-		}
+        foreach ($this->subscribers[$name] as $subscriber) {
+            call_user_func_array($subscriber, $arguments);
+        }
+    }
 
-		foreach ($this->subscribers[$name] as $subscriber) {
-			call_user_func_array($subscriber, $arguments);
-		}
-	}
+    /**
+     * @param string   $name
+     * @param Callback $subscriber
+     */
+    public function subscribeEvent($name, $subscriber)
+    {
+        if (!isset($this->subscribers[$name])) {
+            $this->subscribers[$name] = [];
+        }
 
-	/**
-	 * @param string $name
-	 * @param Callback $subscriber
-	 */
-	public function subscribeEvent($name, $subscriber) {
-		if (!isset($this->subscribers[$name])) {
-			$this->subscribers[$name] = array();
-		}
+        $this->subscribers[$name][] = $subscriber;
+    }
 
-		$this->subscribers[$name][] = $subscriber;
-	}
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
 
-	/**
-	 * @var LoggerInterface
-	 */
-	protected $logger;
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function __construct(LoggerInterface $logger = null)
+    {
+        $this->logger = $logger ?: $this->createNullLogger();
+    }
 
-	/**
-	 * @param LoggerInterface $logger
-	 */
-	function __construct(LoggerInterface $logger = NULL) {
-		$this->logger = $logger ?: $this->createNullLogger();
-	}
+    /**
+     * @param int $unitsOfWorkCount
+     *
+     * @return void
+     */
+    public function willStartOperation($unitsOfWorkCount)
+    {
+        $this->emitEvent('willStartOperation', [$unitsOfWorkCount]);
+    }
 
-	/**
-	 * @param int $unitsOfWorkCount
-	 * @return void
-	 */
-	public function willStartOperation($unitsOfWorkCount) {
-		$this->emitEvent('willStartOperation', array($unitsOfWorkCount));
-	}
+    /**
+     * @param string $tableName
+     * @param array  $record
+     *
+     * @return void
+     */
+    public function willUpdateRecord($tableName, array $record)
+    {
+        $this->emitEvent('willUpdateRecord', [$tableName, $record]);
+    }
 
-	/**
-	 * @param string $tableName
-	 * @param array $record
-	 * @return void
-	 */
-	public function willUpdateRecord($tableName, array $record) {
-		$this->emitEvent('willUpdateRecord', array($tableName, $record));
-	}
+    /**
+     * @return void
+     */
+    public function operationHasEnded()
+    {
+        $this->emitEvent('operationHasEnded');
+    }
 
-	/**
-	 * @return void
-	 */
-	public function operationHasEnded() {
-		$this->emitEvent('operationHasEnded');
-	}
+    /**
+     * @return LoggerInterface
+     */
+    public function getLogger()
+    {
+        return $this->logger;
+    }
 
-	/**
-	 * @return LoggerInterface
-	 */
-	public function getLogger() {
-		return $this->logger;
-	}
+    /**
+     * @return LoggerInterface
+     */
+    protected function createNullLogger()
+    {
+        $logger = new Logger(__CLASS__);
+        $logger->addWriter(LogLevel::EMERGENCY, new NullWriter());
 
-	/**
-	 * @return LoggerInterface
-	 */
-	protected function createNullLogger() {
-		$logger = new Logger(__CLASS__);
-		$logger->addWriter(LogLevel::EMERGENCY, new NullWriter());
-		return $logger;
-	}
+        return $logger;
+    }
 }

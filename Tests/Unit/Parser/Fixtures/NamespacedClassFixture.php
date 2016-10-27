@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Tests\Unit\Parser\Fixtures;
 
 /***************************************************************
@@ -28,8 +29,8 @@ namespace Helhum\Typo3Console\Tests\Unit\Parser\Fixtures;
  ***************************************************************/
 
 /**
- * Class NamespacedClassFixture
+ * Class NamespacedClassFixture.
  */
-class NamespacedClassFixture {
-
+class NamespacedClassFixture
+{
 }

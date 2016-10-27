@@ -14,8 +14,7 @@ class FooCommand extends Command
         $this
             ->setName('foo:bar')
             ->setDescription('The foo:bar command')
-            ->setAliases(array('afoobar'))
-        ;
+            ->setAliases(['afoobar']);
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)

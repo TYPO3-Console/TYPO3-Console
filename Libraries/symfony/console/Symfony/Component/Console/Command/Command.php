@@ -11,16 +11,16 @@
 
 namespace Symfony\Component\Console\Command;
 
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
-use Symfony\Component\Console\Input\InputDefinition;
-use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Helper\HelperSet;
 
 /**
  * Base class for all commands.
@@ -33,7 +33,7 @@ class Command
 {
     private $application;
     private $name;
-    private $aliases = array();
+    private $aliases = [];
     private $definition;
     private $help;
     private $description;
@@ -128,7 +128,7 @@ class Command
     }
 
     /**
-     * Checks whether the command is enabled or not in the current environment
+     * Checks whether the command is enabled or not in the current environment.
      *
      * Override this to check for x or y and return false if the command can not
      * run properly under the current conditions.
@@ -158,9 +158,10 @@ class Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @return null|int     null or 0 if everything went fine, or an error code
-     *
      * @throws \LogicException When this abstract method is not implemented
+     *
+     * @return null|int null or 0 if everything went fine, or an error code
+     *
      * @see    setCode()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -201,9 +202,9 @@ class Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @return int     The command exit code
-     *
      * @throws \Exception
+     *
+     * @return int The command exit code
      *
      * @see setCode()
      * @see execute()
@@ -252,9 +253,9 @@ class Command
      *
      * @param callable $code A callable(InputInterface $input, OutputInterface $output)
      *
-     * @return Command The current instance
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return Command The current instance
      *
      * @see execute()
      *
@@ -276,7 +277,7 @@ class Command
      *
      * This method is not part of public API and should not be used directly.
      *
-     * @param bool    $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
+     * @param bool $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
      */
     public function mergeApplicationDefinition($mergeArgs = true)
     {
@@ -350,10 +351,10 @@ class Command
     /**
      * Adds an argument.
      *
-     * @param string  $name        The argument name
-     * @param int     $mode        The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
-     * @param string  $description A description text
-     * @param mixed   $default     The default value (for InputArgument::OPTIONAL mode only)
+     * @param string $name        The argument name
+     * @param int    $mode        The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
+     * @param string $description A description text
+     * @param mixed  $default     The default value (for InputArgument::OPTIONAL mode only)
      *
      * @return Command The current instance
      *
@@ -369,11 +370,11 @@ class Command
     /**
      * Adds an option.
      *
-     * @param string  $name        The option name
-     * @param string  $shortcut    The shortcut (can be null)
-     * @param int     $mode        The option mode: One of the InputOption::VALUE_* constants
-     * @param string  $description A description text
-     * @param mixed   $default     The default value (must be null for InputOption::VALUE_REQUIRED or InputOption::VALUE_NONE)
+     * @param string $name        The option name
+     * @param string $shortcut    The shortcut (can be null)
+     * @param int    $mode        The option mode: One of the InputOption::VALUE_* constants
+     * @param string $description A description text
+     * @param mixed  $default     The default value (must be null for InputOption::VALUE_REQUIRED or InputOption::VALUE_NONE)
      *
      * @return Command The current instance
      *
@@ -396,9 +397,9 @@ class Command
      *
      * @param string $name The command name
      *
-     * @return Command The current instance
-     *
      * @throws \InvalidArgumentException When the name is invalid
+     *
+     * @return Command The current instance
      *
      * @api
      */
@@ -483,20 +484,20 @@ class Command
      * Returns the processed help for the command replacing the %command.name% and
      * %command.full_name% patterns with the real values dynamically.
      *
-     * @return string  The processed help for the command
+     * @return string The processed help for the command
      */
     public function getProcessedHelp()
     {
         $name = $this->name;
 
-        $placeholders = array(
+        $placeholders = [
             '%command.name%',
-            '%command.full_name%'
-        );
-        $replacements = array(
+            '%command.full_name%',
+        ];
+        $replacements = [
             $name,
-            $_SERVER['PHP_SELF'].' '.$name
-        );
+            $_SERVER['PHP_SELF'].' '.$name,
+        ];
 
         return str_replace($placeholders, $replacements, $this->getHelp());
     }
@@ -506,9 +507,9 @@ class Command
      *
      * @param array $aliases An array of aliases for the command
      *
-     * @return Command The current instance
-     *
      * @throws \InvalidArgumentException When an alias is invalid
+     *
+     * @return Command The current instance
      *
      * @api
      */
@@ -554,9 +555,9 @@ class Command
      *
      * @param string $name The helper name
      *
-     * @return mixed The helper value
-     *
      * @throws \InvalidArgumentException if the helper is not defined
+     *
+     * @return mixed The helper value
      *
      * @api
      */
@@ -576,7 +577,7 @@ class Command
     {
         $descriptor = new TextDescriptor();
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
-        $descriptor->describe($output, $this, array('raw_output' => true));
+        $descriptor->describe($output, $this, ['raw_output' => true]);
 
         return $output->fetch();
     }
@@ -584,7 +585,7 @@ class Command
     /**
      * Returns an XML representation of the command.
      *
-     * @param bool    $asDom Whether to return a DOM or an XML string
+     * @param bool $asDom Whether to return a DOM or an XML string
      *
      * @return string|\DOMDocument An XML string representing the command
      *

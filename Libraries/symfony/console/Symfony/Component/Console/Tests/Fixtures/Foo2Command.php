@@ -11,8 +11,7 @@ class Foo2Command extends Command
         $this
             ->setName('foo1:bar')
             ->setDescription('The foo1:bar command')
-            ->setAliases(array('afoobar2'))
-        ;
+            ->setAliases(['afoobar2']);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

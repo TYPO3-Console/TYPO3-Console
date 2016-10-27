@@ -31,7 +31,7 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describe(OutputInterface $output, $object, array $options = array())
+    public function describe(OutputInterface $output, $object, array $options = [])
     {
         $this->output = $output;
 
@@ -59,8 +59,8 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * Writes content to output.
      *
-     * @param string  $content
-     * @param bool    $decorated
+     * @param string $content
+     * @param bool   $decorated
      */
     protected function write($content, $decorated = false)
     {
@@ -75,7 +75,7 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @return string|mixed
      */
-    abstract protected function describeInputArgument(InputArgument $argument, array $options = array());
+    abstract protected function describeInputArgument(InputArgument $argument, array $options = []);
 
     /**
      * Describes an InputOption instance.
@@ -85,7 +85,7 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @return string|mixed
      */
-    abstract protected function describeInputOption(InputOption $option, array $options = array());
+    abstract protected function describeInputOption(InputOption $option, array $options = []);
 
     /**
      * Describes an InputDefinition instance.
@@ -95,7 +95,7 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @return string|mixed
      */
-    abstract protected function describeInputDefinition(InputDefinition $definition, array $options = array());
+    abstract protected function describeInputDefinition(InputDefinition $definition, array $options = []);
 
     /**
      * Describes a Command instance.
@@ -105,7 +105,7 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @return string|mixed
      */
-    abstract protected function describeCommand(Command $command, array $options = array());
+    abstract protected function describeCommand(Command $command, array $options = []);
 
     /**
      * Describes an Application instance.
@@ -115,5 +115,5 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @return string|mixed
      */
-    abstract protected function describeApplication(Application $application, array $options = array());
+    abstract protected function describeApplication(Application $application, array $options = []);
 }

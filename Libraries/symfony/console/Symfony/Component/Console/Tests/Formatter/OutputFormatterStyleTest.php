@@ -17,10 +17,10 @@ class OutputFormatterStyleTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        $style = new OutputFormatterStyle('green', 'black', array('bold', 'underscore'));
+        $style = new OutputFormatterStyle('green', 'black', ['bold', 'underscore']);
         $this->assertEquals("\033[32;40;1;4mfoo\033[0m", $style->apply('foo'));
 
-        $style = new OutputFormatterStyle('red', null, array('blink'));
+        $style = new OutputFormatterStyle('red', null, ['blink']);
         $this->assertEquals("\033[31;5mfoo\033[0m", $style->apply('foo'));
 
         $style = new OutputFormatterStyle(null, 'white');
@@ -59,7 +59,7 @@ class OutputFormatterStyleTest extends \PHPUnit_Framework_TestCase
     {
         $style = new OutputFormatterStyle();
 
-        $style->setOptions(array('reverse', 'conceal'));
+        $style->setOptions(['reverse', 'conceal']);
         $this->assertEquals("\033[7;8mfoo\033[0m", $style->apply('foo'));
 
         $style->setOption('bold');
@@ -71,7 +71,7 @@ class OutputFormatterStyleTest extends \PHPUnit_Framework_TestCase
         $style->setOption('bold');
         $this->assertEquals("\033[8;1mfoo\033[0m", $style->apply('foo'));
 
-        $style->setOptions(array('bold'));
+        $style->setOptions(['bold']);
         $this->assertEquals("\033[1mfoo\033[0m", $style->apply('foo'));
 
         try {

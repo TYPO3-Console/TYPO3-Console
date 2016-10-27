@@ -24,7 +24,6 @@ class DescriptorCommand2 extends Command
             ->setDescription('command 2 description')
             ->setHelp('command 2 help')
             ->addArgument('argument_name', InputArgument::REQUIRED)
-            ->addOption('option_name', 'o', InputOption::VALUE_NONE)
-        ;
+            ->addOption('option_name', 'o', InputOption::VALUE_NONE);
     }
 }

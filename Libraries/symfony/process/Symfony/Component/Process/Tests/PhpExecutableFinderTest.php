@@ -19,7 +19,7 @@ use Symfony\Component\Process\PhpExecutableFinder;
 class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * tests find() with the env var PHP_PATH
+     * tests find() with the env var PHP_PATH.
      */
     public function testFindWithPhpPath()
     {
@@ -41,7 +41,7 @@ class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * tests find() with default executable
+     * tests find() with default executable.
      */
     public function testFindWithSuffix()
     {
@@ -58,7 +58,7 @@ class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
         //TODO maybe php executable is custom or even Windows
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             $this->assertTrue(is_executable($current));
-            $this->assertTrue((bool) preg_match('/'.addSlashes(DIRECTORY_SEPARATOR).'php\.(exe|bat|cmd|com)$/i', $current), '::find() returns the executable PHP with suffixes');
+            $this->assertTrue((bool) preg_match('/'.addslashes(DIRECTORY_SEPARATOR).'php\.(exe|bat|cmd|com)$/i', $current), '::find() returns the executable PHP with suffixes');
         }
     }
 }

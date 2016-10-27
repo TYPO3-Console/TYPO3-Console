@@ -31,15 +31,15 @@ class PhpProcess extends Process
     /**
      * Constructor.
      *
-     * @param string  $script  The PHP script to run (as a string)
-     * @param string  $cwd     The working directory
-     * @param array   $env     The environment variables
-     * @param int     $timeout The timeout in seconds
-     * @param array   $options An array of options for proc_open
+     * @param string $script  The PHP script to run (as a string)
+     * @param string $cwd     The working directory
+     * @param array  $env     The environment variables
+     * @param int    $timeout The timeout in seconds
+     * @param array  $options An array of options for proc_open
      *
      * @api
      */
-    public function __construct($script, $cwd = null, array $env = array(), $timeout = 60, array $options = array())
+    public function __construct($script, $cwd = null, array $env = [], $timeout = 60, array $options = [])
     {
         parent::__construct(null, $cwd, $env, $script, $timeout, $options);
 

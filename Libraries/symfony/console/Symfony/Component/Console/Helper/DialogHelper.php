@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Console\Helper;
 
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * The Dialog class provides helpers to interact with the user.
@@ -32,13 +32,13 @@ class DialogHelper extends InputAwareHelper
      * @param string|array    $question     The question to ask
      * @param array           $choices      List of choices to pick from
      * @param bool|string     $default      The default answer if the user enters nothing
-     * @param bool|int        $attempts Max number of times to ask before giving up (false by default, which means infinite)
+     * @param bool|int        $attempts     Max number of times to ask before giving up (false by default, which means infinite)
      * @param string          $errorMessage Message which will be shown if invalid value from choice list would be picked
      * @param bool            $multiselect  Select more than one value separated by comma
      *
-     * @return int|string|array     The selected value or values (the key of the choices array)
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return int|string|array The selected value or values (the key of the choices array)
      */
     public function select(OutputInterface $output, $question, $choices, $default = null, $attempts = false, $errorMessage = 'Value "%s" is invalid', $multiselect = false)
     {
@@ -53,19 +53,19 @@ class DialogHelper extends InputAwareHelper
 
         $result = $this->askAndValidate($output, '> ', function ($picked) use ($choices, $errorMessage, $multiselect) {
             // Collapse all spaces.
-            $selectedChoices = str_replace(" ", "", $picked);
+            $selectedChoices = str_replace(' ', '', $picked);
 
             if ($multiselect) {
                 // Check for a separated comma values
                 if (!preg_match('/^[a-zA-Z0-9_-]+(?:,[a-zA-Z0-9_-]+)*$/', $selectedChoices, $matches)) {
                     throw new \InvalidArgumentException(sprintf($errorMessage, $picked));
                 }
-                $selectedChoices = explode(",", $selectedChoices);
+                $selectedChoices = explode(',', $selectedChoices);
             } else {
-                $selectedChoices = array($picked);
+                $selectedChoices = [$picked];
             }
 
-            $multiselectChoices = array();
+            $multiselectChoices = [];
 
             foreach ($selectedChoices as $value) {
                 if (empty($choices[$value])) {
@@ -92,9 +92,9 @@ class DialogHelper extends InputAwareHelper
      * @param string          $default      The default answer if none is given by the user
      * @param array           $autocomplete List of values to autocomplete
      *
-     * @return string The user answer
-     *
      * @throws \RuntimeException If there is no data to read in the input stream
+     *
+     * @return string The user answer
      */
     public function ask(OutputInterface $output, $question, $default = null, array $autocomplete = null)
     {
@@ -229,12 +229,12 @@ class DialogHelper extends InputAwareHelper
      * @param string|array    $question The question to ask
      * @param bool            $default  The default answer if the user enters nothing
      *
-     * @return bool    true if the user has confirmed, false otherwise
+     * @return bool true if the user has confirmed, false otherwise
      */
     public function askConfirmation(OutputInterface $output, $question, $default = true)
     {
         $answer = 'z';
-        while ($answer && !in_array(strtolower($answer[0]), array('y', 'n'))) {
+        while ($answer && !in_array(strtolower($answer[0]), ['y', 'n'])) {
             $answer = $this->ask($output, $question);
         }
 
@@ -246,15 +246,15 @@ class DialogHelper extends InputAwareHelper
     }
 
     /**
-     * Asks a question to the user, the response is hidden
+     * Asks a question to the user, the response is hidden.
      *
      * @param OutputInterface $output   An Output instance
      * @param string|array    $question The question
      * @param bool            $fallback In case the response can not be hidden, whether to fallback on non-hidden question or not
      *
-     * @return string         The answer
-     *
      * @throws \RuntimeException In case the fallback is deactivated and the response can not be hidden
+     *
+     * @return string The answer
      */
     public function askHiddenResponse(OutputInterface $output, $question, $fallback = true)
     {
@@ -329,9 +329,9 @@ class DialogHelper extends InputAwareHelper
      * @param string          $default      The default answer if none is given by the user
      * @param array           $autocomplete List of values to autocomplete
      *
-     * @return mixed
-     *
      * @throws \Exception When any of the validators return an error
+     *
+     * @return mixed
      */
     public function askAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $default = null, array $autocomplete = null)
     {
@@ -357,11 +357,10 @@ class DialogHelper extends InputAwareHelper
      * @param int             $attempts  Max number of times to ask before giving up (false by default, which means infinite)
      * @param bool            $fallback  In case the response can not be hidden, whether to fallback on non-hidden question or not
      *
-     * @return string         The response
-     *
      * @throws \Exception        When any of the validators return an error
      * @throws \RuntimeException In case the fallback is deactivated and the response can not be hidden
      *
+     * @return string The response
      */
     public function askHiddenResponseAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $fallback = true)
     {
@@ -387,7 +386,7 @@ class DialogHelper extends InputAwareHelper
     }
 
     /**
-     * Returns the helper's input stream
+     * Returns the helper's input stream.
      *
      * @return string
      */
@@ -405,9 +404,9 @@ class DialogHelper extends InputAwareHelper
     }
 
     /**
-     * Return a valid Unix shell
+     * Return a valid Unix shell.
      *
-     * @return string|bool     The valid shell name, false in case no valid shell is found
+     * @return string|bool The valid shell name, false in case no valid shell is found
      */
     private function getShell()
     {
@@ -420,7 +419,7 @@ class DialogHelper extends InputAwareHelper
         if (file_exists('/usr/bin/env')) {
             // handle other OSs with bash/zsh/ksh/csh if available to hide the answer
             $test = "/usr/bin/env %s -c 'echo OK' 2> /dev/null";
-            foreach (array('bash', 'zsh', 'ksh', 'csh') as $sh) {
+            foreach (['bash', 'zsh', 'ksh', 'csh'] as $sh) {
                 if ('OK' === rtrim(shell_exec(sprintf($test, $sh)))) {
                     self::$shell = $sh;
                     break;
@@ -443,16 +442,16 @@ class DialogHelper extends InputAwareHelper
     }
 
     /**
-     * Validate an attempt
+     * Validate an attempt.
      *
-     * @param callable         $interviewer  A callable that will ask for a question and return the result
-     * @param OutputInterface  $output       An Output instance
-     * @param callable         $validator    A PHP callback
-     * @param int              $attempts     Max number of times to ask before giving up ; false will ask infinitely
-     *
-     * @return string   The validated response
+     * @param callable        $interviewer A callable that will ask for a question and return the result
+     * @param OutputInterface $output      An Output instance
+     * @param callable        $validator   A PHP callback
+     * @param int             $attempts    Max number of times to ask before giving up ; false will ask infinitely
      *
      * @throws \Exception In case the max number of attempts has been reached and no valid response has been given
+     *
+     * @return string The validated response
      */
     private function validateAttempts($interviewer, OutputInterface $output, $validator, $attempts)
     {

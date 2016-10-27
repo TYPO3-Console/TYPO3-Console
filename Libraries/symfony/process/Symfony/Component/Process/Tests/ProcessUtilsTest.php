@@ -26,23 +26,23 @@ class ProcessUtilsTest extends \PHPUnit_Framework_TestCase
     public function dataArguments()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            return array(
-                array('"\"php\" \"-v\""', '"php" "-v"'),
-                array('"foo bar"', 'foo bar'),
-                array('^%"path"^%', '%path%'),
-                array('"<|>\\" \\"\'f"', '<|>" "\'f'),
-                array('""', ''),
-                array('"with\trailingbs\\\\"', 'with\trailingbs\\'),
-            );
+            return [
+                ['"\"php\" \"-v\""', '"php" "-v"'],
+                ['"foo bar"', 'foo bar'],
+                ['^%"path"^%', '%path%'],
+                ['"<|>\\" \\"\'f"', '<|>" "\'f'],
+                ['""', ''],
+                ['"with\trailingbs\\\\"', 'with\trailingbs\\'],
+            ];
         }
 
-        return array(
-            array("'\"php\" \"-v\"'", '"php" "-v"'),
-            array("'foo bar'", 'foo bar'),
-            array("'%path%'", '%path%'),
-            array("'<|>\" \"'\\''f'", '<|>" "\'f'),
-            array("''", ''),
-            array("'with\\trailingbs\\'", 'with\trailingbs\\'),
-        );
+        return [
+            ["'\"php\" \"-v\"'", '"php" "-v"'],
+            ["'foo bar'", 'foo bar'],
+            ["'%path%'", '%path%'],
+            ["'<|>\" \"'\\''f'", '<|>" "\'f'],
+            ["''", ''],
+            ["'with\\trailingbs\\'", 'with\trailingbs\\'],
+        ];
     }
 }

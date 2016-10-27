@@ -50,7 +50,7 @@ class InputDefinition
      *
      * @api
      */
-    public function __construct(array $definition = array())
+    public function __construct(array $definition = [])
     {
         $this->setDefinition($definition);
     }
@@ -64,8 +64,8 @@ class InputDefinition
      */
     public function setDefinition(array $definition)
     {
-        $arguments = array();
-        $options = array();
+        $arguments = [];
+        $options = [];
         foreach ($definition as $item) {
             if ($item instanceof InputOption) {
                 $options[] = $item;
@@ -85,11 +85,11 @@ class InputDefinition
      *
      * @api
      */
-    public function setArguments($arguments = array())
+    public function setArguments($arguments = [])
     {
-        $this->arguments          = array();
-        $this->requiredCount      = 0;
-        $this->hasOptional        = false;
+        $this->arguments = [];
+        $this->requiredCount = 0;
+        $this->hasOptional = false;
         $this->hasAnArrayArgument = false;
         $this->addArguments($arguments);
     }
@@ -101,7 +101,7 @@ class InputDefinition
      *
      * @api
      */
-    public function addArguments($arguments = array())
+    public function addArguments($arguments = [])
     {
         if (null !== $arguments) {
             foreach ($arguments as $argument) {
@@ -149,11 +149,11 @@ class InputDefinition
     /**
      * Returns an InputArgument by name or by position.
      *
-     * @param string|int     $name The InputArgument name or position
-     *
-     * @return InputArgument An InputArgument object
+     * @param string|int $name The InputArgument name or position
      *
      * @throws \InvalidArgumentException When argument given doesn't exist
+     *
+     * @return InputArgument An InputArgument object
      *
      * @api
      */
@@ -171,9 +171,9 @@ class InputDefinition
     /**
      * Returns true if an InputArgument object exists by name or position.
      *
-     * @param string|int     $name The InputArgument name or position
+     * @param string|int $name The InputArgument name or position
      *
-     * @return bool    true if the InputArgument object exists, false otherwise
+     * @return bool true if the InputArgument object exists, false otherwise
      *
      * @api
      */
@@ -199,7 +199,7 @@ class InputDefinition
     /**
      * Returns the number of InputArguments.
      *
-     * @return int     The number of InputArguments
+     * @return int The number of InputArguments
      */
     public function getArgumentCount()
     {
@@ -209,7 +209,7 @@ class InputDefinition
     /**
      * Returns the number of required InputArguments.
      *
-     * @return int     The number of required InputArguments
+     * @return int The number of required InputArguments
      */
     public function getArgumentRequiredCount()
     {
@@ -223,7 +223,7 @@ class InputDefinition
      */
     public function getArgumentDefaults()
     {
-        $values = array();
+        $values = [];
         foreach ($this->arguments as $argument) {
             $values[$argument->getName()] = $argument->getDefault();
         }
@@ -238,10 +238,10 @@ class InputDefinition
      *
      * @api
      */
-    public function setOptions($options = array())
+    public function setOptions($options = [])
     {
-        $this->options = array();
-        $this->shortcuts = array();
+        $this->options = [];
+        $this->shortcuts = [];
         $this->addOptions($options);
     }
 
@@ -252,7 +252,7 @@ class InputDefinition
      *
      * @api
      */
-    public function addOptions($options = array())
+    public function addOptions($options = [])
     {
         foreach ($options as $option) {
             $this->addOption($option);
@@ -295,9 +295,9 @@ class InputDefinition
      *
      * @param string $name The InputOption name
      *
-     * @return InputOption A InputOption object
-     *
      * @throws \InvalidArgumentException When option given doesn't exist
+     *
+     * @return InputOption A InputOption object
      *
      * @api
      */
@@ -315,7 +315,7 @@ class InputDefinition
      *
      * @param string $name The InputOption name
      *
-     * @return bool    true if the InputOption object exists, false otherwise
+     * @return bool true if the InputOption object exists, false otherwise
      *
      * @api
      */
@@ -341,7 +341,7 @@ class InputDefinition
      *
      * @param string $name The InputOption shortcut
      *
-     * @return bool    true if the InputOption object exists, false otherwise
+     * @return bool true if the InputOption object exists, false otherwise
      */
     public function hasShortcut($name)
     {
@@ -367,7 +367,7 @@ class InputDefinition
      */
     public function getOptionDefaults()
     {
-        $values = array();
+        $values = [];
         foreach ($this->options as $option) {
             $values[$option->getName()] = $option->getDefault();
         }
@@ -380,9 +380,9 @@ class InputDefinition
      *
      * @param string $shortcut The shortcut
      *
-     * @return string The InputOption name
-     *
      * @throws \InvalidArgumentException When option given does not exist
+     *
+     * @return string The InputOption name
      */
     private function shortcutToName($shortcut)
     {
@@ -400,7 +400,7 @@ class InputDefinition
      */
     public function getSynopsis()
     {
-        $elements = array();
+        $elements = [];
         foreach ($this->getOptions() as $option) {
             $shortcut = $option->getShortcut() ? sprintf('-%s|', $option->getShortcut()) : '';
             $elements[] = sprintf('['.($option->isValueRequired() ? '%s--%s="..."' : ($option->isValueOptional() ? '%s--%s[="..."]' : '%s--%s')).']', $shortcut, $option->getName());
@@ -428,7 +428,7 @@ class InputDefinition
     {
         $descriptor = new TextDescriptor();
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
-        $descriptor->describe($output, $this, array('raw_output' => true));
+        $descriptor->describe($output, $this, ['raw_output' => true]);
 
         return $output->fetch();
     }
@@ -436,7 +436,7 @@ class InputDefinition
     /**
      * Returns an XML representation of the InputDefinition.
      *
-     * @param bool    $asDom Whether to return a DOM or an XML string
+     * @param bool $asDom Whether to return a DOM or an XML string
      *
      * @return string|\DOMDocument An XML string representing the InputDefinition
      *
