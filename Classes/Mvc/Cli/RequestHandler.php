@@ -115,7 +115,6 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
         Scripts::overrideImplementation('TYPO3\CMS\Extbase\Command\HelpCommandController', 'Helhum\Typo3Console\Command\HelpCommandController');
     }
 
-
     protected function shutdown()
     {
         $this->bootstrap->shutdown();
