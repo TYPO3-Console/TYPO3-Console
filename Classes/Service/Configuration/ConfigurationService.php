@@ -51,6 +51,15 @@ class ConfigurationService implements SingletonInterface
      * @param string $path
      * @return bool
      */
+    public function hasDefault($path)
+    {
+        return $this->has($path, $this->configurationManager->getDefaultConfiguration());
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
     public function hasLocal($path)
     {
         return $this->has($path, $this->getMergedConfiguration());
@@ -63,6 +72,16 @@ class ConfigurationService implements SingletonInterface
     public function hasActive($path)
     {
         return $this->has($path, $this->activeConfiguration);
+    }
+
+    /**
+     * @param string $path
+     * @return mixed
+     * @throws ConfigurationValueNotFoundException
+     */
+    public function getDefault($path)
+    {
+        return $this->get($path, $this->configurationManager->getDefaultConfiguration());
     }
 
     /**
@@ -132,20 +151,51 @@ class ConfigurationService implements SingletonInterface
     }
 
     /**
+     * Sets a value in LocalConfiguration.php
+     *
+     * But only if types are compatible and local config is active
+     *
      * @param string $path
      * @param mixed $value
      * @return bool
      */
     public function setLocal($path, $value)
     {
+        $targetType = $this->getType($path);
+        $actualType = gettype($value);
+        if ($actualType !== $targetType) {
+            if ($this->isTypeConvertible($targetType, $actualType)) {
+                switch ($targetType) {
+                    case 'integer':
+                        $value = (int)$value;
+                        break;
+                    case 'float':
+                    case 'double':
+                        $value = (float)$value;
+                        break;
+                    case 'boolean':
+                        $value = (bool)$value;
+                        break;
+                    case 'string':
+                        $value = (string)$value;
+                        break;
+                    default:
+                        // We don't know any type conversion, so we better exit
+                        return false;
+                }
+            } else {
+                // We cannot convert from or to non scalar types, so we better exit
+                return false;
+            }
+        }
+
         if (
             !$this->localIsActive($path)
             || !$this->hasLocal($path)
         ) {
             return false;
         }
-        $this->configurationManager->setLocalConfigurationValueByPath($path, $value);
-        return true;
+        return $this->configurationManager->setLocalConfigurationValueByPath($path, $value);
     }
 
     /**
@@ -161,6 +211,44 @@ class ConfigurationService implements SingletonInterface
             return $this->hasActive($path) && $this->getLocal($path) === $this->getActive($path);
         }
         return !$this->hasActive($path);
+    }
+
+    /**
+     * Returns the type of a value in given config path
+     *
+     * @param string $path
+     * @return string
+     */
+    private function getType($path)
+    {
+        $value = null;
+        if ($this->hasActive($path)) {
+            $value = $this->getActive($path);
+        }
+        if ($this->hasLocal($path)) {
+            $value = $this->getLocal($path);
+        }
+        if ($this->hasDefault($path)) {
+            $value = $this->getDefault($path);
+        }
+        return gettype($value);
+    }
+
+    /**
+     * Checks if target and actual type is scalar
+     *
+     * @param string $targetType
+     * @param string $actualType
+     * @return bool
+     */
+    private function isTypeConvertible($targetType, $actualType) {
+        if (in_array($targetType, ['array', 'object', 'resource'], true)) {
+            return false;
+        }
+        if (in_array($actualType, ['array', 'object', 'resource'], true)) {
+            return false;
+        }
+        return true;
     }
 
     /**
