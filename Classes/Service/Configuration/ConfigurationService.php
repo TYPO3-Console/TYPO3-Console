@@ -241,7 +241,8 @@ class ConfigurationService implements SingletonInterface
      * @param string $actualType
      * @return bool
      */
-    private function isTypeConvertible($targetType, $actualType) {
+    private function isTypeConvertible($targetType, $actualType)
+    {
         if (in_array($targetType, ['array', 'object', 'resource'], true)) {
             return false;
         }
