@@ -27,6 +27,7 @@ namespace Helhum\Typo3Console\Tests\Unit\Service\Configuration;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 
 /**
  * Class ConfigurationServiceTest
@@ -48,33 +49,66 @@ class ConfigurationServiceTest extends UnitTestCase
      */
     protected $activeConfiguration = [
         'main' => [
-            'default' => 'value',
-            'bla' => 'blupp',
             'baz' => 'bah',
             'foo' => 'bar'
         ]
     ];
 
+    /**
+     * @var array
+     */
+    protected $defaultConfiguration = [
+        'default' => [
+            'int' => 1,
+            'bool' => true,
+            'float' => 1.0,
+            'string' => '1',
+        ],
+        'main' => [
+            'default' => 'value',
+        ]
+    ];
+
+    /**
+     * @var array
+     */
+    protected $localConfiguration = [
+        'local' => [
+            'int' => 1,
+            'bool' => true,
+            'float' => 1.0,
+            'string' => '1',
+        ],
+        'main' => [
+            'bla' => 'blupp',
+            'bazz' => 'buh',
+            'foo' => 'baz'
+        ]
+    ];
+
     public function setup()
     {
-        $this->configurationManager = $this->getMock(ConfigurationManager::class);
+        $this->configurationManager = $this->getMockBuilder(ConfigurationManager::class)->getMock();
         $this->configurationManager->expects($this->any())
             ->method('getLocalConfiguration')
-            ->willReturn([
-                'main' => [
-                    'bla' => 'blupp',
-                    'bazz' => 'buh',
-                    'foo' => 'baz'
-                ]
-            ]);
+            ->willReturn($this->localConfiguration);
         $this->configurationManager->expects($this->any())
             ->method('getDefaultConfiguration')
-            ->willReturn([
-                'main' => [
-                    'default' => 'value',
-                ]
-            ]);
-        $this->subject = new ConfigurationService($this->configurationManager, $this->activeConfiguration);
+            ->willReturn($this->defaultConfiguration);
+
+        $localConfigurationReference = &$this->localConfiguration;
+        $this->configurationManager->expects($this->any())
+            ->method('setLocalConfigurationValueByPath')
+            ->willReturnCallback(
+                function ($path, $value) use (&$localConfigurationReference) {
+                    $localConfigurationReference = ArrayUtility::setValueByPath($localConfigurationReference, $path, $value);
+                    return true;
+                }
+            );
+
+        $activeConfiguration = array_replace_recursive($this->defaultConfiguration, $this->localConfiguration, $this->activeConfiguration);
+        unset($activeConfiguration['main']['bazz']);
+        $this->subject = new ConfigurationService($this->configurationManager, $activeConfiguration);
     }
 
     /**
@@ -104,10 +138,10 @@ class ConfigurationServiceTest extends UnitTestCase
             [
                 'default' => 'value',
                 'bla' => 'blupp',
-                'bazz' => 'buh',
-                'foo' => 'baz'
+                'foo' => 'bar',
+                'baz' => 'bah',
             ],
-            $this->subject->getLocal('main')
+            $this->subject->getActive('main')
         );
     }
 
@@ -120,10 +154,10 @@ class ConfigurationServiceTest extends UnitTestCase
             [
                 'default' => 'value',
                 'bla' => 'blupp',
-                'baz' => 'bah',
-                'foo' => 'bar'
+                'bazz' => 'buh',
+                'foo' => 'baz'
             ],
-            $this->subject->getActive('main')
+            $this->subject->getLocal('main')
         );
     }
 
@@ -133,5 +167,94 @@ class ConfigurationServiceTest extends UnitTestCase
     public function hasLocalChecksAgainstMergedDefaultConfiguration()
     {
         $this->assertTrue($this->subject->hasLocal('main/default'));
+    }
+
+    /**
+     * @test
+     */
+    public function setLocalSetsConfiguration()
+    {
+        $this->assertTrue($this->subject->setLocal('main/bla', 'ho'));
+        $this->assertSame('ho', $this->localConfiguration['main']['bla']);
+    }
+
+    /**
+     * @test
+     */
+    public function setLocalSetIntegerConfiguration()
+    {
+        $this->assertTrue($this->subject->setLocal('default/int', '42'));
+        $this->assertSame(42, $this->localConfiguration['default']['int']);
+    }
+
+    /**
+     * @test
+     */
+    public function setLocalSetStringConfiguration()
+    {
+        $this->assertTrue($this->subject->setLocal('default/string', '42'));
+        $this->assertSame('42', $this->localConfiguration['default']['string']);
+    }
+
+    /**
+     * @test
+     */
+    public function setLocalSetFloatConfiguration()
+    {
+        $this->assertTrue($this->subject->setLocal('default/float', '3.141592'));
+        $this->assertSame(3.141592, $this->localConfiguration['default']['float']);
+    }
+
+    /**
+     * @test
+     */
+    public function setLocalSetBooleanConfiguration()
+    {
+        $this->assertTrue($this->subject->setLocal('default/bool', '0'));
+        $this->assertFalse($this->localConfiguration['default']['bool']);
+    }
+
+    /**
+     * @test
+     */
+    public function setLocalSetIntegerConfigurationOnlyPresentInLocal()
+    {
+        $this->assertTrue($this->subject->setLocal('local/int', '42'));
+        $this->assertSame(42, $this->localConfiguration['local']['int']);
+    }
+
+    /**
+     * @test
+     */
+    public function setLocalSetStringConfigurationOnlyPresentInLocal()
+    {
+        $this->assertTrue($this->subject->setLocal('local/string', 42));
+        $this->assertSame('42', $this->localConfiguration['local']['string']);
+    }
+
+    /**
+     * @test
+     */
+    public function setLocalSetFloatConfigurationOnlyPresentInLocal()
+    {
+        $this->assertTrue($this->subject->setLocal('local/float', '3.141592'));
+        $this->assertSame(3.141592, $this->localConfiguration['local']['float']);
+    }
+
+    /**
+     * @test
+     */
+    public function setLocalSetBooleanConfigurationOnlyPresentInLocal()
+    {
+        $this->assertTrue($this->subject->setLocal('local/bool', '0'));
+        $this->assertFalse($this->localConfiguration['local']['bool']);
+    }
+
+    /**
+     * @test
+     */
+    public function setLocalCannotSetConfigurationIfTargetIsNotScalar()
+    {
+        $this->assertFalse($this->subject->setLocal('local', '0'));
     }
 }
