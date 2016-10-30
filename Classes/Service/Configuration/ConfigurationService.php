@@ -161,6 +161,39 @@ class ConfigurationService implements SingletonInterface
      */
     public function setLocal($path, $value)
     {
+        try {
+            $value = $this->convertToTargetType($path, $value);
+            return $this->configurationManager->setLocalConfigurationValueByPath($path, $value);
+        } catch (TypesAreNotConvertibleException $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Returns true if the value is stored in the LocalConfiguration.php file and
+     * is NOT overridden later (e.g. in AdditionalConfiguration.php)
+     *
+     * @param string $path
+     * @return bool
+     */
+    public function localIsActive($path)
+    {
+        if ($this->hasLocal($path)) {
+            return $this->hasActive($path) && $this->getLocal($path) === $this->getActive($path);
+        }
+        return !$this->hasActive($path);
+    }
+
+    /**
+     * Convert a value to the type belonging to the given path
+     *
+     * @param string $path
+     * @param string $value
+     * @return bool|float|int|string
+     * @throws TypesAreNotConvertibleException
+     */
+    public function convertToTargetType($path, $value)
+    {
         $targetType = $this->getType($path);
         $actualType = gettype($value);
         if ($actualType !== $targetType) {
@@ -179,38 +212,19 @@ class ConfigurationService implements SingletonInterface
                     case 'string':
                         $value = (string)$value;
                         break;
+                    case 'NULL':
+                        // Path has not been set before, so the new value defines the type
+                        break;
                     default:
                         // We don't know any type conversion, so we better exit
-                        return false;
+                        throw new TypesAreNotConvertibleException(sprintf('Unknown target type "%s"', $targetType), 1477778705);
                 }
             } else {
                 // We cannot convert from or to non scalar types, so we better exit
-                return false;
+                throw new TypesAreNotConvertibleException(sprintf('Cannot convert type from "%s" to "%s"', $actualType, $targetType), 1477778754);
             }
         }
-
-        if (
-            !$this->localIsActive($path)
-            || !$this->hasLocal($path)
-        ) {
-            return false;
-        }
-        return $this->configurationManager->setLocalConfigurationValueByPath($path, $value);
-    }
-
-    /**
-     * Returns true if the value is stored in the LocalConfiguration.php file and
-     * is NOT overridden later (e.g. in AdditionalConfiguration.php)
-     *
-     * @param string $path
-     * @return bool
-     */
-    public function localIsActive($path)
-    {
-        if ($this->hasLocal($path)) {
-            return $this->hasActive($path) && $this->getLocal($path) === $this->getActive($path);
-        }
-        return !$this->hasActive($path);
+        return $value;
     }
 
     /**
