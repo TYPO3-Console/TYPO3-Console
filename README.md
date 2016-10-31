@@ -1,4 +1,4 @@
-TYPO3 CMS Console
+TYPO3 Console
 =================
 
 [![Build Status](https://travis-ci.org/TYPO3-Console/typo3_console.svg?branch=master)](https://travis-ci.org/TYPO3-Console/typo3_console)
