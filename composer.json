@@ -67,7 +67,7 @@
         "bin-dir": ".Build/bin"
     },
     "bin": [
-        "Scripts/typo3cms"
+        "Scripts/typo3cms "
     ],
     "scripts": {
         "set-version": [
