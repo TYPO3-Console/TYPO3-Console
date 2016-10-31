@@ -72,8 +72,9 @@ class DatabaseCommandController extends CommandController
      *
      * @param array $schemaUpdateTypes List of schema update types
      * @param bool $verbose If set, database queries performed are shown in output
+     * @param bool $dryRun If set the updates are only collected and show, but not executed
      */
-    public function updateSchemaCommand(array $schemaUpdateTypes, $verbose = false)
+    public function updateSchemaCommand(array $schemaUpdateTypes, $verbose = false, $dryRun = false)
     {
         try {
             $schemaUpdateTypes = SchemaUpdateType::expandSchemaUpdateTypes($schemaUpdateTypes);
@@ -82,10 +83,10 @@ class DatabaseCommandController extends CommandController
             $this->sendAndExit(1);
         }
 
-        $result = $this->schemaService->updateSchema($schemaUpdateTypes);
+        $result = $this->schemaService->updateSchema($schemaUpdateTypes, $dryRun);
 
         if ($result->hasPerformedUpdates()) {
-            $this->output->outputLine('<info>The following schema updates were performed:</info>');
+            $this->output->outputLine('<info>The following database schema updates %s performed:</info>', [$dryRun ? 'should be' : 'were']);
             $this->schemaUpdateResultRenderer->render($result, $this->output, $verbose);
         } else {
             $this->output->outputLine('No schema updates matching the given types were performed');

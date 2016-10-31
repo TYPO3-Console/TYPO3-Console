@@ -39,9 +39,10 @@ class SchemaService implements SingletonInterface
      * Perform necessary database schema migrations
      *
      * @param SchemaUpdateType[] $schemaUpdateTypes List of permitted schema update types
+     * @param bool $dryRun If true, the database operations are not performed
      * @return SchemaUpdateResult Result of the schema update
      */
-    public function updateSchema(array $schemaUpdateTypes)
+    public function updateSchema(array $schemaUpdateTypes, $dryRun = false)
     {
         $expectedSchema = $this->expectedSchemaService->getExpectedDatabaseSchema();
         $currentSchema = $this->schemaMigrationService->getFieldDefinitions_database();
@@ -60,16 +61,19 @@ class SchemaService implements SingletonInterface
             foreach ($schemaUpdateType->getStatementTypes() as $statementType => $statementGroup) {
                 if (isset($updateStatements[$statementGroup][$statementType])) {
                     $statements = $updateStatements[$statementGroup][$statementType];
-                    $result = $this->schemaMigrationService->performUpdateQueries(
-                        $statements,
-                        // Generate a map of statements as keys and true as values
-                        array_combine(array_keys($statements), array_fill(0, count($statements), true))
-                    );
-
-                    if ($result === true) {
+                    if ($dryRun) {
                         $updateResult->addPerformedUpdates($schemaUpdateType, $statements);
-                    } elseif (is_array($result)) {
-                        $updateResult->addErrors($schemaUpdateType, $result);
+                    } else {
+                        $result = $this->schemaUpdate->migrate(
+                            $statements,
+                            // Generate a map of statements as keys and true as values
+                            array_combine(array_keys($statements), array_fill(0, count($statements), true))
+                        );
+                        if ($result === true) {
+                            $updateResult->addPerformedUpdates($schemaUpdateType, $statements);
+                        } else {
+                            $updateResult->addErrors($schemaUpdateType, $result);
+                        }
                     }
                 }
             }
