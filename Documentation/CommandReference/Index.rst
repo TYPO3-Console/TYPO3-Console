@@ -16,7 +16,7 @@ Command Reference
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2016-11-01 12:54:22
+The following reference was automatically generated from code on 2016-11-01 13:03:01
 
 
 .. _`Command Reference: typo3_console`:
@@ -496,6 +496,8 @@ Options
   List of schema update types (default: "safe")
 ``--verbose``
   If set, database queries performed are shown in output
+``--dry-run``
+  If set the updates are only collected and shown, but not executed
 
 
 
