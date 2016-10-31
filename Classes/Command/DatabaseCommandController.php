@@ -57,12 +57,14 @@ class DatabaseCommandController extends CommandController
      * - table.prefix
      * - table.drop
      * - table.clear
+     * - all.safe (includes all operations, which only add or change fields or tables)
+     * - all.destructive (includes all operations which rename or drop fields or tables)
      *
      * The list of schema update types supports wildcards to specify multiple types, e.g.:
      *
      * - "*" (all updates)
      * - "field.*" (all field updates)
-     * - "*.add,*.change" (all add/change updates)
+     * - "*.add,*.change" (all add/change updates, which is the same as "all.safe")
      *
      * To avoid shell matching all types with wildcards should be quoted.
      *

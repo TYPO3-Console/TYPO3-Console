@@ -22,15 +22,6 @@ use TYPO3\CMS\Core\SingletonInterface;
  */
 class SchemaService implements SingletonInterface
 {
-    /**
-     * Group of safe statements
-     */
-    const STATEMENT_GROUP_SAFE = 'add_create_change';
-
-    /**
-     * Group of destructive statements
-     */
-    const STATEMENT_GROUP_DESTRUCTIVE = 'drop_rename';
 
     /**
      * @var \TYPO3\CMS\Install\Service\SqlSchemaMigrationService
@@ -43,23 +34,6 @@ class SchemaService implements SingletonInterface
      * @inject
      */
     protected $expectedSchemaService;
-
-    /**
-     * Mapping of schema update types to internal statement types
-     *
-     * @var array
-     */
-    protected $schemaUpdateTypesStatementTypesMapping = [
-        SchemaUpdateType::FIELD_ADD => ['add' => self::STATEMENT_GROUP_SAFE],
-        SchemaUpdateType::FIELD_CHANGE => ['change' => self::STATEMENT_GROUP_SAFE],
-        SchemaUpdateType::FIELD_PREFIX => ['change' => self::STATEMENT_GROUP_DESTRUCTIVE],
-        SchemaUpdateType::FIELD_DROP => ['drop' => self::STATEMENT_GROUP_DESTRUCTIVE],
-        SchemaUpdateType::TABLE_ADD => ['create_table' => self::STATEMENT_GROUP_SAFE],
-        SchemaUpdateType::TABLE_CHANGE => ['change_table' => self::STATEMENT_GROUP_SAFE],
-        SchemaUpdateType::TABLE_CLEAR => ['clear_table' => self::STATEMENT_GROUP_DESTRUCTIVE],
-        SchemaUpdateType::TABLE_PREFIX => ['change_table' => self::STATEMENT_GROUP_DESTRUCTIVE],
-        SchemaUpdateType::TABLE_DROP => ['drop_table' => self::STATEMENT_GROUP_DESTRUCTIVE],
-    ];
 
     /**
      * Perform necessary database schema migrations
@@ -76,16 +50,14 @@ class SchemaService implements SingletonInterface
         $dropRename = $this->schemaMigrationService->getDatabaseExtra($currentSchema, $expectedSchema);
 
         $updateStatements = [
-            self::STATEMENT_GROUP_SAFE => $this->schemaMigrationService->getUpdateSuggestions($addCreateChange),
-            self::STATEMENT_GROUP_DESTRUCTIVE => $this->schemaMigrationService->getUpdateSuggestions($dropRename, 'remove'),
+            SchemaUpdateType::GROUP_SAFE => $this->schemaMigrationService->getUpdateSuggestions($addCreateChange),
+            SchemaUpdateType::GROUP_DESTRUCTIVE => $this->schemaMigrationService->getUpdateSuggestions($dropRename, 'remove'),
         ];
 
         $updateResult = new SchemaUpdateResult();
 
         foreach ($schemaUpdateTypes as $schemaUpdateType) {
-            $statementTypes = $this->getStatementTypes($schemaUpdateType);
-
-            foreach ($statementTypes as $statementType => $statementGroup) {
+            foreach ($schemaUpdateType->getStatementTypes() as $statementType => $statementGroup) {
                 if (isset($updateStatements[$statementGroup][$statementType])) {
                     $statements = $updateStatements[$statementGroup][$statementType];
                     $result = $this->schemaMigrationService->performUpdateQueries(
@@ -104,16 +76,5 @@ class SchemaService implements SingletonInterface
         }
 
         return $updateResult;
-    }
-
-    /**
-     * Map schema update type to a list of internal statement types
-     *
-     * @param SchemaUpdateType $schemaUpdateType Schema update types
-     * @return array
-     */
-    protected function getStatementTypes(SchemaUpdateType $schemaUpdateType)
-    {
-        return $this->schemaUpdateTypesStatementTypesMapping[(string)$schemaUpdateType];
     }
 }
