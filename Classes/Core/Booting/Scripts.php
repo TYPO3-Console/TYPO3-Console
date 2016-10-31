@@ -205,7 +205,7 @@ class Scripts
     }
 
     /**
-     * Provide cleaned implementation of TYPO3 CMS core classes.
+     * Provide cleaned implementation of TYPO3 core classes.
      * Can only be called *after* extension configuration is loaded (needs extbase configuration)!
      *
      * @param ConsoleBootstrap $bootstrap

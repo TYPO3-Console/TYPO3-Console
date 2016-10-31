@@ -165,7 +165,7 @@ class XsdGenerator
 
     /**
      * Get all class names inside this namespace and return them as array.
-     * This has to be done by iterating over class files for TYPO3 CMS
+     * This has to be done by iterating over class files for TYPO3
      * as the Extbase Reflection Service cannot return all implementations
      * of Fluid AbstractViewHelpers
      *
@@ -215,7 +215,7 @@ class XsdGenerator
 
     /**
      * Get all class names inside this namespace and return them as array.
-     * This has to be done by iterating over class files for TYPO3 CMS
+     * This has to be done by iterating over class files for TYPO3
      * as the Extbase Reflection Service cannot return all implementations
      * of Fluid AbstractViewHelpers
      *
