@@ -22,11 +22,6 @@ use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 class SchemaUpdateType extends Enumeration
 {
     /**
-     * @var int
-     */
-    protected $value;
-
-    /**
      * Add a field
      */
     const FIELD_ADD = 'field.add';
