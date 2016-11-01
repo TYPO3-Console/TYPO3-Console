@@ -24,7 +24,7 @@ use TYPO3\CMS\Composer\Plugin\Util\Filesystem;
 class InstallerScripts
 {
     /**
-     * Called from composer
+     * Called from Composer
      *
      * @param ScriptEvent $event
      * @return void

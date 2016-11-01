@@ -114,7 +114,7 @@ class UncachedPackageManager extends PackageManager
     }
 
     /**
-     * Workaround for non composer mode
+     * Workaround for non Composer mode
      *
      * Force loading of the console in case no package states file is there
      * This is needed for installation or package states file generation commands
@@ -127,7 +127,7 @@ class UncachedPackageManager extends PackageManager
     }
 
     /**
-     * Workaround for non composer mode
+     * Workaround for non Composer mode
      *
      * @deprecated since 8.0 will be removed once 7.6 compatiblity is removed
      */
@@ -140,7 +140,7 @@ class UncachedPackageManager extends PackageManager
     }
 
     /**
-     * Workaround for non composer mode
+     * Workaround for non Composer mode
      *
      * Make sure the extension is active
      */

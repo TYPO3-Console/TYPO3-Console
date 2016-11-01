@@ -117,7 +117,7 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
         $packageManager = $this->bootstrap->getEarlyInstance(PackageManager::class);
         foreach ($packageManager->getActivePackages() as $package) {
             if ($package->getPackageKey() === 'typo3_console') {
-                // happens in non composer mode when we have an extension
+                // happens in non Composer mode when we have an extension
                 continue;
             }
             $possibleCommandsFileName = $package->getPackagePath() . '/Configuration/Console/Commands.php';

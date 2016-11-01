@@ -44,7 +44,16 @@ just type:
 * Support for all other Extbase command controllers
 
 
-## Installation as extension from TYPO3 Extension Repository (TER) 
+## Installation
+
+### Installation using Composer
+
+The recommended way to install TYPO3 Console is by using [Composer](https://getcomposer.org).
+In your Composer based TYPO3 project root, just do `composer require helhum/typo3-console`.
+The `typo3cms` binary will be installed by Composer in the specified bin-dir (by default `vendor/bin`).
+TYPO3 Consile is a perfect companion for Composer based, enjoyable [TYPO3 projects](https://github.com/helhum/TYPO3-Distribution).
+
+### Installation as extension from TYPO3 Extension Repository (TER)
 
 Download and install the extension with the extension manager module.
 For the extension to work, it **must** be installed in the typo3conf/ext/ directory **not** in any other possible extension location.
@@ -52,14 +61,9 @@ This directory **must not** be a symlink to another location!
 The extension manager, will copy the `typo3cms` command line tool
 into the installation root directory during activation.
 
-### Composer Installation
-
-In your TYPO3 project root, just do `composer require helhum/typo3-console`.
-The `typo3cms` binary will be installed by composer in the specified bin-dir (by default `vendor/bin`).
-
 ## ToDo & Ideas
 
-Currently only a few commands are delivered with the extension, but those delivered are quite useful already. And if any other extension
-adds Extbase command controllers, they will also be usable with the typo3cms command.
+Look at the [Issues](https://github.com/TYPO3-Console/typo3_console/issues)
+for what has been planned to be implemented in the (near) future.
 
 * … Add ideas to the issues section of this repository where title is prepended with "idea:"

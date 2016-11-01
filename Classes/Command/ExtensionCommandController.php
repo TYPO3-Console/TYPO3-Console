@@ -142,7 +142,7 @@ class ExtensionCommandController extends CommandController
     /**
      * Dump class auto-load
      *
-     * Updates class loading information in non composer managed TYPO3 installations.
+     * Updates class loading information in non Composer managed TYPO3 installations.
      *
      * This command is only needed during development. The extension manager takes care
      * creating or updating this info properly during extension (de-)activation.
@@ -152,7 +152,7 @@ class ExtensionCommandController extends CommandController
     public function dumpAutoloadCommand()
     {
         if (Bootstrap::usesComposerClassLoading()) {
-            $this->output->outputLine('<error>Class loading information is managed by composer. Use "composer dump-autoload" command to update the information.</error>');
+            $this->output->outputLine('<error>Class loading information is managed by Composer. Use "composer dump-autoload" command to update the information.</error>');
             $this->quit(1);
         } else {
             ClassLoadingInformation::dumpClassLoadingInformation();
