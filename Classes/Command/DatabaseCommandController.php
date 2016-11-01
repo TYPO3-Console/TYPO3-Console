@@ -18,6 +18,7 @@ use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
+use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 
 /**
  * Database command controller
@@ -56,34 +57,36 @@ class DatabaseCommandController extends CommandController
      * - table.prefix
      * - table.drop
      * - table.clear
+     * - all.safe (includes all operations, which only add or change fields or tables)
+     * - all.destructive (includes all operations which rename or drop fields or tables)
      *
      * The list of schema update types supports wildcards to specify multiple types, e.g.:
      *
      * - "*" (all updates)
      * - "field.*" (all field updates)
-     * - "*.add,*.change" (all add/change updates)
+     * - "*.add,*.change" (all add/change updates, which is the same as "all.safe")
      *
      * To avoid shell matching all types with wildcards should be quoted.
      *
      * <b>Example:</b> <code>./typo3cms database:updateschema "*.add,*.change"</code>
      *
-     * @param array $schemaUpdateTypes List of schema update types
+     * @param array $schemaUpdateTypes List of schema update types (default is "all.safe")
      * @param bool $verbose If set, database queries performed are shown in output
-     * @throws \TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException
+     * @param bool $dryRun If set the updates are only collected and shown, but not executed
      */
-    public function updateSchemaCommand(array $schemaUpdateTypes, $verbose = false)
+    public function updateSchemaCommand(array $schemaUpdateTypes = ['all.safe'], $verbose = false, $dryRun = false)
     {
         try {
             $schemaUpdateTypes = SchemaUpdateType::expandSchemaUpdateTypes($schemaUpdateTypes);
-        } catch (\UnexpectedValueException $e) {
+        } catch (InvalidEnumerationValueException $e) {
             $this->outputLine(sprintf('<error>%s</error>', $e->getMessage()));
             $this->sendAndExit(1);
         }
 
-        $result = $this->schemaService->updateSchema($schemaUpdateTypes);
+        $result = $this->schemaService->updateSchema($schemaUpdateTypes, $dryRun);
 
         if ($result->hasPerformedUpdates()) {
-            $this->output->outputLine('<info>The following schema updates were performed:</info>');
+            $this->output->outputLine('<info>The following database schema updates %s performed:</info>', [$dryRun ? 'should be' : 'were']);
             $this->schemaUpdateResultRenderer->render($result, $this->output, $verbose);
         } else {
             $this->output->outputLine('No schema updates matching the given types were performed');

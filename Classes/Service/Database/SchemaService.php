@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Service\Database;
  *
  */
 
+use Helhum\Typo3Console\Database\Schema\SchemaUpdate;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateResult;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -23,97 +24,61 @@ use TYPO3\CMS\Core\SingletonInterface;
 class SchemaService implements SingletonInterface
 {
     /**
-     * Group of safe statements
+     * @var SchemaUpdate
      */
-    const STATEMENT_GROUP_SAFE = 'add_create_change';
+    private $schemaUpdate;
 
     /**
-     * Group of destructive statements
-     */
-    const STATEMENT_GROUP_DESTRUCTIVE = 'drop_rename';
-
-    /**
-     * @var \TYPO3\CMS\Install\Service\SqlSchemaMigrationService
-     * @inject
-     */
-    protected $schemaMigrationService;
-
-    /**
-     * @var \TYPO3\CMS\Install\Service\SqlExpectedSchemaService
-     * @inject
-     */
-    protected $expectedSchemaService;
-
-    /**
-     * Mapping of schema update types to internal statement types
+     * SchemaService constructor.
      *
-     * @var array
+     * @param SchemaUpdate $schemaUpdate
      */
-    protected $schemaUpdateTypesStatementTypesMapping = [
-        SchemaUpdateType::FIELD_ADD => ['add' => self::STATEMENT_GROUP_SAFE],
-        SchemaUpdateType::FIELD_CHANGE => ['change' => self::STATEMENT_GROUP_SAFE],
-        SchemaUpdateType::FIELD_PREFIX => ['change' => self::STATEMENT_GROUP_DESTRUCTIVE],
-        SchemaUpdateType::FIELD_DROP => ['drop' => self::STATEMENT_GROUP_DESTRUCTIVE],
-        SchemaUpdateType::TABLE_ADD => ['create_table' => self::STATEMENT_GROUP_SAFE],
-        SchemaUpdateType::TABLE_CHANGE => ['change_table' => self::STATEMENT_GROUP_SAFE],
-        SchemaUpdateType::TABLE_CLEAR => ['clear_table' => self::STATEMENT_GROUP_DESTRUCTIVE],
-        SchemaUpdateType::TABLE_PREFIX => ['change_table' => self::STATEMENT_GROUP_DESTRUCTIVE],
-        SchemaUpdateType::TABLE_DROP => ['drop_table' => self::STATEMENT_GROUP_DESTRUCTIVE],
-    ];
+    public function __construct(SchemaUpdate $schemaUpdate)
+    {
+        $this->schemaUpdate = $schemaUpdate;
+    }
 
     /**
      * Perform necessary database schema migrations
      *
      * @param SchemaUpdateType[] $schemaUpdateTypes List of permitted schema update types
+     * @param bool $dryRun If true, the database operations are not performed
      * @return SchemaUpdateResult Result of the schema update
      */
-    public function updateSchema(array $schemaUpdateTypes)
+    public function updateSchema(array $schemaUpdateTypes, $dryRun = false)
     {
-        $expectedSchema = $this->expectedSchemaService->getExpectedDatabaseSchema();
-        $currentSchema = $this->schemaMigrationService->getFieldDefinitions_database();
-
-        $addCreateChange = $this->schemaMigrationService->getDatabaseExtra($expectedSchema, $currentSchema);
-        $dropRename = $this->schemaMigrationService->getDatabaseExtra($currentSchema, $expectedSchema);
-
         $updateStatements = [
-            self::STATEMENT_GROUP_SAFE => $this->schemaMigrationService->getUpdateSuggestions($addCreateChange),
-            self::STATEMENT_GROUP_DESTRUCTIVE => $this->schemaMigrationService->getUpdateSuggestions($dropRename, 'remove'),
+            SchemaUpdateType::GROUP_SAFE => $this->schemaUpdate->getSafeUpdates(),
+            SchemaUpdateType::GROUP_DESTRUCTIVE => $this->schemaUpdate->getDestructiveUpdates(),
         ];
 
         $updateResult = new SchemaUpdateResult();
 
         foreach ($schemaUpdateTypes as $schemaUpdateType) {
-            $statementTypes = $this->getStatementTypes($schemaUpdateType);
-
-            foreach ($statementTypes as $statementType => $statementGroup) {
+            foreach ($schemaUpdateType->getStatementTypes() as $statementType => $statementGroup) {
                 if (isset($updateStatements[$statementGroup][$statementType])) {
                     $statements = $updateStatements[$statementGroup][$statementType];
-                    $result = $this->schemaMigrationService->performUpdateQueries(
-                        $statements,
-                        // Generate a map of statements as keys and true as values
-                        array_combine(array_keys($statements), array_fill(0, count($statements), true))
-                    );
-
-                    if ($result === true) {
+                    if (empty($statements)) {
+                        continue;
+                    }
+                    if ($dryRun) {
                         $updateResult->addPerformedUpdates($schemaUpdateType, $statements);
-                    } elseif (is_array($result)) {
-                        $updateResult->addErrors($schemaUpdateType, $result);
+                    } else {
+                        $result = $this->schemaUpdate->migrate(
+                            $statements,
+                            // Generate a map of statements as keys and true as values
+                            array_combine(array_keys($statements), array_fill(0, count($statements), true))
+                        );
+                        if (empty($result)) {
+                            $updateResult->addPerformedUpdates($schemaUpdateType, $statements);
+                        } else {
+                            $updateResult->addErrors($schemaUpdateType, $result);
+                        }
                     }
                 }
             }
         }
 
         return $updateResult;
-    }
-
-    /**
-     * Map schema update type to a list of internal statement types
-     *
-     * @param SchemaUpdateType $schemaUpdateType Schema update types
-     * @return array
-     */
-    protected function getStatementTypes(SchemaUpdateType $schemaUpdateType)
-    {
-        return $this->schemaUpdateTypesStatementTypesMapping[(string)$schemaUpdateType];
     }
 }
