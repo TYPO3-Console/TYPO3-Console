@@ -13,7 +13,10 @@ namespace Helhum\Typo3Console\Database\Schema;
  *
  */
 
+use TYPO3\CMS\Core\Database\Schema\SchemaMigrator;
+use TYPO3\CMS\Core\Database\Schema\SqlReader;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Service\SqlExpectedSchemaService;
 use TYPO3\CMS\Install\Service\SqlSchemaMigrationService;
 
@@ -22,44 +25,26 @@ use TYPO3\CMS\Install\Service\SqlSchemaMigrationService;
  */
 class SchemaUpdate implements SingletonInterface
 {
-    /**
-     * @var SqlSchemaMigrationService
-     */
-    private $schemaMigrationService;
-
-    /**
-     * @var SqlExpectedSchemaService
-     */
-    private $expectedSchemaService;
-
-    /**
-     * SchemaUpdate constructor.
-     *
-     * @param SqlSchemaMigrationService $schemaMigrationService
-     * @param SqlExpectedSchemaService $expectedSchemaService
-     */
-    public function __construct(SqlSchemaMigrationService $schemaMigrationService, SqlExpectedSchemaService $expectedSchemaService)
-    {
-        $this->schemaMigrationService = $schemaMigrationService;
-        $this->expectedSchemaService = $expectedSchemaService;
-    }
-
     public function getSafeUpdates()
     {
-        $expectedSchema = $this->expectedSchemaService->getExpectedDatabaseSchema();
-        $currentSchema = $this->schemaMigrationService->getFieldDefinitions_database();
-        $addCreateChange = $this->schemaMigrationService->getDatabaseExtra($expectedSchema, $currentSchema);
+        $sqlReader = GeneralUtility::makeInstance(SqlReader::class);
+        $sqlStatements = $sqlReader->getCreateTableStatementArray($sqlReader->getTablesDefinitionString());
+        $schemaMigrationService = GeneralUtility::makeInstance(SchemaMigrator::class);
 
-        return $this->schemaMigrationService->getUpdateSuggestions($addCreateChange);
+        $addCreateChange = $schemaMigrationService->getUpdateSuggestions($sqlStatements);
+        // Aggregate the per-connection statements into one flat array
+        return array_merge_recursive(...array_values($addCreateChange));
     }
 
     public function getDestructiveUpdates()
     {
-        $expectedSchema = $this->expectedSchemaService->getExpectedDatabaseSchema();
-        $currentSchema = $this->schemaMigrationService->getFieldDefinitions_database();
-        $dropRename = $this->schemaMigrationService->getDatabaseExtra($currentSchema, $expectedSchema);
-
-        return $this->schemaMigrationService->getUpdateSuggestions($dropRename, 'remove');
+        $sqlReader = GeneralUtility::makeInstance(SqlReader::class);
+        $sqlStatements = $sqlReader->getCreateTableStatementArray($sqlReader->getTablesDefinitionString());
+        $schemaMigrationService = GeneralUtility::makeInstance(SchemaMigrator::class);
+        // Difference from current to expected
+        $dropRename = $schemaMigrationService->getUpdateSuggestions($sqlStatements, true);
+        // Aggregate the per-connection statements into one flat array
+        return array_merge_recursive(...array_values($dropRename));
     }
 
     /**
@@ -69,11 +54,7 @@ class SchemaUpdate implements SingletonInterface
      */
     public function migrate(array $statements, array $selectedStatements)
     {
-        $result = $this->schemaMigrationService->performUpdateQueries($statements, $selectedStatements);
-        if ($result === true) {
-            return [];
-        } else {
-            return $result;
-        }
+        $schemaMigrator = GeneralUtility::makeInstance(SchemaMigrator::class);
+        return $schemaMigrator->migrate($statements, $selectedStatements);
     }
 }
