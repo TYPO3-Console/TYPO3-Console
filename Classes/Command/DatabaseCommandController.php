@@ -77,19 +77,24 @@ class DatabaseCommandController extends CommandController
     public function updateSchemaCommand(array $schemaUpdateTypes = ['safe'], $verbose = false, $dryRun = false)
     {
         try {
-            $schemaUpdateTypes = SchemaUpdateType::expandSchemaUpdateTypes($schemaUpdateTypes);
+            $expandedSchemaUpdateTypes = SchemaUpdateType::expandSchemaUpdateTypes($schemaUpdateTypes);
         } catch (InvalidEnumerationValueException $e) {
             $this->outputLine(sprintf('<error>%s</error>', $e->getMessage()));
             $this->sendAndExit(1);
         }
 
-        $result = $this->schemaService->updateSchema($schemaUpdateTypes, $dryRun);
+        $result = $this->schemaService->updateSchema($expandedSchemaUpdateTypes, $dryRun);
 
         if ($result->hasPerformedUpdates()) {
             $this->output->outputLine('<info>The following database schema updates %s performed:</info>', [$dryRun ? 'should be' : 'were']);
             $this->schemaUpdateResultRenderer->render($result, $this->output, $verbose);
         } else {
-            $this->output->outputLine('No schema updates matching the given types were performed');
+            $this->output->outputLine(
+                '<info>No schema updates %s performed for update type%s:%s</info>',
+                [$dryRun ? 'must be' : 'were',
+                count($expandedSchemaUpdateTypes) > 1 ? 's' : '',
+                PHP_EOL . implode(PHP_EOL, $expandedSchemaUpdateTypes)]
+            );
         }
     }
 
