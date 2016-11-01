@@ -74,7 +74,7 @@ class DatabaseCommandController extends CommandController
      * @param bool $verbose If set, database queries performed are shown in output
      * @param bool $dryRun If set the updates are only collected and show, but not executed
      */
-    public function updateSchemaCommand(array $schemaUpdateTypes, $verbose = false, $dryRun = false)
+    public function updateSchemaCommand(array $schemaUpdateTypes = ['all.safe'], $verbose = false, $dryRun = false)
     {
         try {
             $schemaUpdateTypes = SchemaUpdateType::expandSchemaUpdateTypes($schemaUpdateTypes);
