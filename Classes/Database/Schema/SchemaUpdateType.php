@@ -88,7 +88,7 @@ class SchemaUpdateType extends Enumeration
         self::FIELD_DROP => ['drop' => self::GROUP_DESTRUCTIVE],
         self::TABLE_ADD => ['create_table' => self::GROUP_SAFE],
         self::TABLE_CHANGE => ['change_table' => self::GROUP_SAFE],
-        self::TABLE_CLEAR => ['clear_table' => self::GROUP_DESTRUCTIVE],
+        self::TABLE_CLEAR => ['clear_table' => self::GROUP_SAFE],
         self::TABLE_PREFIX => ['change_table' => self::GROUP_DESTRUCTIVE],
         self::TABLE_DROP => ['drop_table' => self::GROUP_DESTRUCTIVE],
         self::GROUP_SAFE => [
