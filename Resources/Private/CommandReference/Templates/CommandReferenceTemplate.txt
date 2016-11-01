@@ -11,7 +11,7 @@
   This reference uses ``./typo3cms`` as the command to invoke. If you are on
   Windows, this will probably not work, there you need to use ``typo3cms.bat``
   instead.
-  In composer based installations, the ``typo3cms`` binary will be located
+  In Composer based installations, the ``typo3cms`` binary will be located
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 

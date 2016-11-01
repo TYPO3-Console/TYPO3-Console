@@ -12,7 +12,7 @@ Command Reference
   This reference uses ``./typo3cms`` as the command to invoke. If you are on
   Windows, this will probably not work, there you need to use ``typo3cms.bat``
   instead.
-  In composer based installations, the ``typo3cms`` binary will be located
+  In Composer based installations, the ``typo3cms`` binary will be located
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
@@ -587,7 +587,7 @@ Arguments
 
 **Dump class auto-load**
 
-Updates class loading information in non composer managed TYPO3 installations.
+Updates class loading information in non Composer managed TYPO3 installations.
 
 This command is only needed during development. The extension manager takes care
 creating or updating this info properly during extension (de-)activation.

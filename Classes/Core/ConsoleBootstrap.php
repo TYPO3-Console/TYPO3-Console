@@ -239,7 +239,7 @@ class ConsoleBootstrap extends Bootstrap
     }
 
     /**
-     * Require libraries, in case TYPO3 is in non composer mode
+     * Require libraries, in case TYPO3 is in non Composer mode
      */
     protected function requireLibraries()
     {
