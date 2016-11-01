@@ -16,7 +16,7 @@ Command Reference
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2016-10-17 12:08:09
+The following reference was automatically generated from code on 2016-11-01 12:48:56
 
 
 .. _`Command Reference: typo3_console`:
@@ -474,6 +474,8 @@ Valid schema update types are:
 - table.prefix
 - table.drop
 - table.clear
+- safe (includes all necessary operations, to add or change fields or tables)
+- destructive (includes all operations which rename or drop fields or tables)
 
 The list of schema update types supports wildcards to specify multiple types, e.g.:
 
