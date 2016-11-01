@@ -70,10 +70,10 @@ class DatabaseCommandController extends CommandController
      *
      * <b>Example:</b> <code>./typo3cms database:updateschema "*.add,*.change"</code>
      *
-     * @param array $schemaUpdateTypes List of schema update types
+     * @param array $schemaUpdateTypes List of schema update types (default: "safe")
      * @param bool $verbose If set, database queries performed are shown in output
      */
-    public function updateSchemaCommand(array $schemaUpdateTypes, $verbose = false)
+    public function updateSchemaCommand(array $schemaUpdateTypes = ['safe'], $verbose = false)
     {
         try {
             $schemaUpdateTypes = SchemaUpdateType::expandSchemaUpdateTypes($schemaUpdateTypes);

@@ -16,7 +16,7 @@ Command Reference
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2016-11-01 12:48:56
+The following reference was automatically generated from code on 2016-11-01 12:54:22
 
 
 .. _`Command Reference: typo3_console`:
@@ -487,17 +487,13 @@ To avoid shell matching all types with wildcards should be quoted.
 
 **Example:** ``./typo3cms database:updateschema "*.add,*.change"``
 
-Arguments
-^^^^^^^^^
-
-``--schema-update-types``
-  List of schema update types
-
 
 
 Options
 ^^^^^^^
 
+``--schema-update-types``
+  List of schema update types (default: "safe")
 ``--verbose``
   If set, database queries performed are shown in output
 
