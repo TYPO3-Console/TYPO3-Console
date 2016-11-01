@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Service\Database;
  *
  */
 
+use Helhum\Typo3Console\Database\Schema\SchemaUpdate;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateResult;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -22,18 +23,20 @@ use TYPO3\CMS\Core\SingletonInterface;
  */
 class SchemaService implements SingletonInterface
 {
+    /**
+     * @var SchemaUpdate
+     */
+    private $schemaUpdate;
 
     /**
-     * @var \TYPO3\CMS\Install\Service\SqlSchemaMigrationService
-     * @inject
+     * SchemaService constructor.
+     *
+     * @param SchemaUpdate $schemaUpdate
      */
-    protected $schemaMigrationService;
-
-    /**
-     * @var \TYPO3\CMS\Install\Service\SqlExpectedSchemaService
-     * @inject
-     */
-    protected $expectedSchemaService;
+    public function __construct(SchemaUpdate $schemaUpdate)
+    {
+        $this->schemaUpdate = $schemaUpdate;
+    }
 
     /**
      * Perform necessary database schema migrations
@@ -44,15 +47,9 @@ class SchemaService implements SingletonInterface
      */
     public function updateSchema(array $schemaUpdateTypes, $dryRun = false)
     {
-        $expectedSchema = $this->expectedSchemaService->getExpectedDatabaseSchema();
-        $currentSchema = $this->schemaMigrationService->getFieldDefinitions_database();
-
-        $addCreateChange = $this->schemaMigrationService->getDatabaseExtra($expectedSchema, $currentSchema);
-        $dropRename = $this->schemaMigrationService->getDatabaseExtra($currentSchema, $expectedSchema);
-
         $updateStatements = [
-            SchemaUpdateType::GROUP_SAFE => $this->schemaMigrationService->getUpdateSuggestions($addCreateChange),
-            SchemaUpdateType::GROUP_DESTRUCTIVE => $this->schemaMigrationService->getUpdateSuggestions($dropRename, 'remove'),
+            SchemaUpdateType::GROUP_SAFE => $this->schemaUpdate->getSafeUpdates(),
+            SchemaUpdateType::GROUP_DESTRUCTIVE => $this->schemaUpdate->getDestructiveUpdates(),
         ];
 
         $updateResult = new SchemaUpdateResult();
@@ -61,6 +58,9 @@ class SchemaService implements SingletonInterface
             foreach ($schemaUpdateType->getStatementTypes() as $statementType => $statementGroup) {
                 if (isset($updateStatements[$statementGroup][$statementType])) {
                     $statements = $updateStatements[$statementGroup][$statementType];
+                    if (empty($statements)) {
+                        continue;
+                    }
                     if ($dryRun) {
                         $updateResult->addPerformedUpdates($schemaUpdateType, $statements);
                     } else {
@@ -69,7 +69,7 @@ class SchemaService implements SingletonInterface
                             // Generate a map of statements as keys and true as values
                             array_combine(array_keys($statements), array_fill(0, count($statements), true))
                         );
-                        if ($result === true) {
+                        if (empty($result)) {
                             $updateResult->addPerformedUpdates($schemaUpdateType, $statements);
                         } else {
                             $updateResult->addErrors($schemaUpdateType, $result);
