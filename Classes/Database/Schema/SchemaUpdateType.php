@@ -166,7 +166,7 @@ class SchemaUpdateType extends Enumeration
                 $expandedSchemaUpdateTypes[] = $schemaUpdateType;
             }
         }
-
+        $expandedSchemaUpdateTypes = array_unique($expandedSchemaUpdateTypes);
         // Cast to enumeration objects to ensure valid values
         foreach ($expandedSchemaUpdateTypes as &$schemaUpdateType) {
             try {

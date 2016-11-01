@@ -28,7 +28,21 @@ class SchemaUpdateTypeTest extends UnitTestCase
     {
         return [
             'all' => [
-                '*',
+                ['*'],
+                [
+                    'field.add',
+                    'field.change',
+                    'field.prefix',
+                    'field.drop',
+                    'table.add',
+                    'table.change',
+                    'table.prefix',
+                    'table.drop',
+                    'table.clear',
+                ]
+            ],
+            'all double' => [
+                ['*', '*'],
                 [
                     'field.add',
                     'field.change',
@@ -42,7 +56,7 @@ class SchemaUpdateTypeTest extends UnitTestCase
                 ]
             ],
             'fields' => [
-                'field.*',
+                ['field.*'],
                 [
                     'field.add',
                     'field.change',
@@ -51,7 +65,7 @@ class SchemaUpdateTypeTest extends UnitTestCase
                 ]
             ],
             'tables' => [
-                'table.*',
+                ['table.*'],
                 [
                     'table.add',
                     'table.change',
@@ -61,41 +75,41 @@ class SchemaUpdateTypeTest extends UnitTestCase
                 ]
             ],
             'all add' => [
-                '*.add',
+                ['*.add'],
                 [
                     'field.add',
                     'table.add',
                 ]
             ],
             'all change' => [
-                '*.change',
+                ['*.change'],
                 [
                     'field.change',
                     'table.change',
                 ]
             ],
             'all prefix' => [
-                '*.prefix',
+                ['*.prefix'],
                 [
                     'field.prefix',
                     'table.prefix',
                 ]
             ],
             'all drop' => [
-                '*.drop',
+                ['*.drop'],
                 [
                     'field.drop',
                     'table.drop',
                 ]
             ],
             'all clear' => [
-                '*.clear',
+                ['*.clear'],
                 [
                     'table.clear',
                 ]
             ],
             'all safe' => [
-                'safe',
+                ['safe'],
                 [
                     'field.add',
                     'field.change',
@@ -105,7 +119,7 @@ class SchemaUpdateTypeTest extends UnitTestCase
                 ]
             ],
             'all destructive' => [
-                'destructive',
+                ['destructive'],
                 [
                     'field.prefix',
                     'field.drop',
@@ -119,12 +133,12 @@ class SchemaUpdateTypeTest extends UnitTestCase
     /**
      * @test
      * @dataProvider expandTypesExpandsCorrectlyDataProvider
-     * @param string $expandable
+     * @param string[] $expandables
      * @param string[] $expected
      */
-    public function expandTypesExpandsCorrectly($expandable, array $expected)
+    public function expandTypesExpandsCorrectly(array $expandables, array $expected)
     {
-        $updateTypes = array_map('strval', SchemaUpdateType::expandSchemaUpdateTypes([$expandable]));
+        $updateTypes = array_map('strval', SchemaUpdateType::expandSchemaUpdateTypes($expandables));
         $this->assertSame($expected, $updateTypes);
     }
     /**

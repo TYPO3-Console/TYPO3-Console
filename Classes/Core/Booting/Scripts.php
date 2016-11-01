@@ -212,6 +212,11 @@ class Scripts
      */
     public static function provideCleanClassImplementations(ConsoleBootstrap $bootstrap)
     {
+        if (!class_exists(\TYPO3\CMS\Core\Database\Schema\SqlReader::class)) {
+            // Register the legacy schema update in case new API does not exist
+            // @deprecated since TYPO3 8.x will be removed once TYPO3 7.6 support is removed
+            self::registerImplementation(\Helhum\Typo3Console\Database\Schema\SchemaUpdateInterface::class, \Helhum\Typo3Console\Database\Schema\LegacySchemaUpdate::class);
+        }
         self::overrideImplementation(\TYPO3\CMS\Extbase\Mvc\Cli\Command::class, \Helhum\Typo3Console\Mvc\Cli\Command::class);
         self::overrideImplementation(\TYPO3\CMS\Extbase\Command\HelpCommandController::class, \Helhum\Typo3Console\Command\HelpCommandController::class);
         self::overrideImplementation(\TYPO3\CMS\Extensionmanager\Command\ExtensionCommandController::class, \Helhum\Typo3Console\Command\ExtensionCommandController::class);
@@ -220,13 +225,27 @@ class Scripts
 
     /**
      * Tell Extbase, TYPO3 and PHP that we have another implementation
+     *
+     * @param string $originalClassName
+     * @param string $overrideClassName
      */
     public static function overrideImplementation($originalClassName, $overrideClassName)
     {
-        /** @var $extbaseObjectContainer \TYPO3\CMS\Extbase\Object\Container\Container */
-        $extbaseObjectContainer = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\Container\Container::class);
-        $extbaseObjectContainer->registerImplementation($originalClassName, $overrideClassName);
+        self::registerImplementation($originalClassName, $overrideClassName);
         $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][$originalClassName]['className'] = $overrideClassName;
         class_alias($overrideClassName, $originalClassName);
+    }
+
+    /**
+     * Tell Extbase about this implementation
+     *
+     * @param string $className
+     * @param string $alternativeClassName
+     */
+    private static function registerImplementation($className, $alternativeClassName)
+    {
+        /** @var $extbaseObjectContainer \TYPO3\CMS\Extbase\Object\Container\Container */
+        $extbaseObjectContainer = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\Container\Container::class);
+        $extbaseObjectContainer->registerImplementation($className, $alternativeClassName);
     }
 }
