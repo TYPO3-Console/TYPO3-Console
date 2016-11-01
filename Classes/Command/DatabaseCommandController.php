@@ -18,6 +18,7 @@ use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
+use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 
 /**
  * Database command controller
@@ -69,13 +70,12 @@ class DatabaseCommandController extends CommandController
      *
      * @param array $schemaUpdateTypes List of schema update types
      * @param bool $verbose If set, database queries performed are shown in output
-     * @throws \TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException
      */
     public function updateSchemaCommand(array $schemaUpdateTypes, $verbose = false)
     {
         try {
             $schemaUpdateTypes = SchemaUpdateType::expandSchemaUpdateTypes($schemaUpdateTypes);
-        } catch (\UnexpectedValueException $e) {
+        } catch (InvalidEnumerationValueException $e) {
             $this->outputLine(sprintf('<error>%s</error>', $e->getMessage()));
             $this->sendAndExit(1);
         }
