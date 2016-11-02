@@ -51,7 +51,7 @@ just type:
 The recommended way to install TYPO3 Console is by using [Composer](https://getcomposer.org).
 In your Composer based TYPO3 project root, just do `composer require helhum/typo3-console`.
 The `typo3cms` binary will be installed by Composer in the specified bin-dir (by default `vendor/bin`).
-TYPO3 Consile is a perfect companion for Composer based, enjoyable [TYPO3 projects](https://github.com/helhum/TYPO3-Distribution).
+TYPO3 Console is a perfect companion for Composer based, enjoyable [TYPO3 projects](https://github.com/helhum/TYPO3-Distribution).
 
 ### Installation as extension from TYPO3 Extension Repository (TER)
 
