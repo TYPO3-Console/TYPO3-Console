@@ -83,6 +83,6 @@ class SchemaUpdate implements SchemaUpdateInterface, SingletonInterface
      */
     public function migrate(array $statements, array $selectedStatements)
     {
-        return $this->schemaMigrator->migrate($statements, $selectedStatements);
+        return $this->schemaMigrator->migrate($this->sqlReader->getCreateTableStatementArray($this->sqlReader->getTablesDefinitionString()), $selectedStatements);
     }
 }
