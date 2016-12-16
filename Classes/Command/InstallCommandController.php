@@ -121,12 +121,13 @@ class InstallCommandController extends CommandController
     /**
      * Fix folder structure
      *
-     * Automatically create files and folders, required for a TYPO3 installation.
+     * Automatically create files and folders, required for a TYPO3 installation and available TYPO3 extensions.
      *
      * This command is great e.g. for creating the typo3temp folder structure during deployment
      *
      * @throws \TYPO3\CMS\Install\FolderStructure\Exception
      * @throws \TYPO3\CMS\Install\Status\Exception
+     * @throws \TYPO3\CMS\Extensionmanager\Exception\ExtensionManagerException
      */
     public function fixFolderStructureCommand()
     {
@@ -144,6 +145,16 @@ class InstallCommandController extends CommandController
             foreach ($fixedStatusObjects as $fixedStatusObject) {
                 $this->outputLine($fixedStatusObject->getTitle());
             }
+        }
+
+        /** @var $installUtility \TYPO3\CMS\Extensionmanager\Utility\InstallUtility */
+        $installUtility = $this->objectManager->get(\TYPO3\CMS\Extensionmanager\Utility\InstallUtility::class);
+        /** @var $fileHandlingUtility \TYPO3\CMS\Extensionmanager\Utility\FileHandlingUtility */
+        $fileHandlingUtility = $this->objectManager->get(\TYPO3\CMS\Extensionmanager\Utility\FileHandlingUtility::class);
+        foreach ($this->packageManager->getActivePackages() as $package) {
+            $this->outputLine('<info>Create extension directories from "ext_emconf.php" for "%s", if necessary</info>', [$package->getPackageKey()]);
+            $extension = $installUtility->enrichExtensionWithDetails($package->getPackageKey(), false);
+            $fileHandlingUtility->ensureConfiguredDirectoriesExist($extension);
         }
     }
 
@@ -273,6 +284,7 @@ class InstallCommandController extends CommandController
 
     /**
      * Check if default configuration needs to be written
+     *
      *
      * @internal
      */
