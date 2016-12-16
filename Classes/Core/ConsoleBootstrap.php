@@ -159,7 +159,9 @@ class ConsoleBootstrap extends Bootstrap
             exit(1);
         }
         ini_set('memory_limit', -1);
-        set_time_limit(0);
+        if (ini_get('max_execution_time') !== '0') {
+            ini_set('max_execution_time', 0);
+        }
     }
 
     /**
