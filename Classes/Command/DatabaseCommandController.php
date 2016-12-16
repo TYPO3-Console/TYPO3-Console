@@ -21,7 +21,6 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Database command controller

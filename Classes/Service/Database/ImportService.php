@@ -119,7 +119,7 @@ class ImportService implements SingletonInterface
      * @return void
      * @see outputLine()
      */
-    protected function outputFormatted($text = '', array $arguments = array(), $leftPadding = 0)
+    protected function outputFormatted($text = '', array $arguments = [], $leftPadding = 0)
     {
         if ($this->output instanceof ConsoleOutput) {
             $this->output->outputFormatted($text, $arguments, $leftPadding);
