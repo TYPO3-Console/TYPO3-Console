@@ -1,4 +1,5 @@
 <?php
+
 namespace Helhum\Typo3Console\Command;
 
 /*
@@ -41,23 +42,23 @@ class InstallCommandController extends CommandController
     protected $packageStatesGenerator;
 
     /**
-     * TYPO3 Setup
+     * TYPO3 Setup.
      *
      * Use as command line replacement for the web installation process.
      * Manually enter details on the command line or non interactive for automated setups.
      *
-     * @param bool $nonInteractive If specified, optional arguments are not requested, but default values are assumed.
-     * @param string $databaseUserName User name for database server
+     * @param bool   $nonInteractive       If specified, optional arguments are not requested, but default values are assumed.
+     * @param string $databaseUserName     User name for database server
      * @param string $databaseUserPassword User password for database server
-     * @param string $databaseHostName Host name of database server
-     * @param string $databasePort TCP Port of database server
-     * @param string $databaseSocket Unix Socket to connect to (if localhost is given as hostname and this is kept empty, a socket connection will be established)
-     * @param string $databaseName Name of the database
-     * @param bool $useExistingDatabase If set an empty database with the specified name will be used. Otherwise a database with the specified name is created.
-     * @param string $adminUserName User name of the administrative backend user account to be created
-     * @param string $adminPassword Password of the administrative backend user account to be created
-     * @param string $siteName Site Name
-     * @param string $siteSetupType Can be either <code>no</code> (which unsurprisingly does nothing at all), <code>site</code> (which creates an empty root page and setup) or <code>dist</code> (which loads a list of distributions you can install)
+     * @param string $databaseHostName     Host name of database server
+     * @param string $databasePort         TCP Port of database server
+     * @param string $databaseSocket       Unix Socket to connect to (if localhost is given as hostname and this is kept empty, a socket connection will be established)
+     * @param string $databaseName         Name of the database
+     * @param bool   $useExistingDatabase  If set an empty database with the specified name will be used. Otherwise a database with the specified name is created.
+     * @param string $adminUserName        User name of the administrative backend user account to be created
+     * @param string $adminPassword        Password of the administrative backend user account to be created
+     * @param string $siteName             Site Name
+     * @param string $siteSetupType        Can be either <code>no</code> (which unsurprisingly does nothing at all), <code>site</code> (which creates an empty root page and setup) or <code>dist</code> (which loads a list of distributions you can install)
      */
     public function setupCommand(
         $nonInteractive = false,
@@ -83,7 +84,7 @@ class InstallCommandController extends CommandController
     }
 
     /**
-     * Generate PackageStates.php file
+     * Generate PackageStates.php file.
      *
      * Generates and writes <code>typo3conf/PackageStates.php</code> file.
      * Goal is to not have this file in version control, but generate it on <code>composer install</code>.
@@ -96,8 +97,9 @@ class InstallCommandController extends CommandController
      *
      * <b>Example:</b> <code>TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS="info,info_pagetsconfig" ./typo3cms install:generatepackagestates</code>
      *
-     * @param bool $removeInactive Inactive extensions are <comment>removed</comment> from <code>typo3/sysext</code>. <comment>Handle with care!</comment>
+     * @param bool $removeInactive  Inactive extensions are <comment>removed</comment> from <code>typo3/sysext</code>. <comment>Handle with care!</comment>
      * @param bool $activateDefault If true, <code>typo3/cms</code> extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
+     *
      * @throws \TYPO3\CMS\Core\Package\Exception\InvalidPackageStateException
      * @throws \TYPO3\CMS\Core\Package\Exception\ProtectedPackageKeyException
      */
@@ -111,7 +113,7 @@ class InstallCommandController extends CommandController
                 if (empty($activePackages[$package->getPackageKey()])) {
                     $this->packageManager->unregisterPackage($package);
                     GeneralUtility::flushDirectory($package->getPackagePath());
-                    $this->outputLine('Removed Package: ' . $package->getPackageKey());
+                    $this->outputLine('Removed Package: '.$package->getPackageKey());
                 }
             }
             $this->packageManager->forceSortAndSavePackageStates();
@@ -119,7 +121,7 @@ class InstallCommandController extends CommandController
     }
 
     /**
-     * Fix folder structure
+     * Fix folder structure.
      *
      * Automatically create files and folders, required for a TYPO3 installation and available TYPO3 extensions.
      *
@@ -159,7 +161,7 @@ class InstallCommandController extends CommandController
     }
 
     /**
-     * Check environment / create folders
+     * Check environment / create folders.
      *
      * Check environment and create folder structure
      *
@@ -179,20 +181,21 @@ class InstallCommandController extends CommandController
     }
 
     /**
-     * Connect to database
+     * Connect to database.
      *
      * Database connection details
      *
-     * @param string $databaseUserName User name for database server
+     * @param string $databaseUserName     User name for database server
      * @param string $databaseUserPassword User password for database server
-     * @param string $databaseHostName Host name of database server
-     * @param string $databasePort TCP Port of database server
-     * @param string $databaseSocket Unix Socket to connect to
+     * @param string $databaseHostName     Host name of database server
+     * @param string $databasePort         TCP Port of database server
+     * @param string $databaseSocket       Unix Socket to connect to
+     *
      * @internal
      */
     public function databaseConnectCommand($databaseUserName = '', $databaseUserPassword = '', $databaseHostName = 'localhost', $databasePort = '3306', $databaseSocket = '')
     {
-        $this->cliSetupRequestHandler->executeActionWithArguments('databaseConnect', array('host' => $databaseHostName, 'port' => $databasePort, 'username' => $databaseUserName, 'password' => $databaseUserPassword, 'socket' => $databaseSocket));
+        $this->cliSetupRequestHandler->executeActionWithArguments('databaseConnect', ['host' => $databaseHostName, 'port' => $databasePort, 'username' => $databaseUserName, 'password' => $databaseUserPassword, 'socket' => $databaseSocket]);
     }
 
     /**
@@ -204,18 +207,19 @@ class InstallCommandController extends CommandController
     }
 
     /**
-     * Select database
+     * Select database.
      *
      * Select a database by name
      *
-     * @param bool $useExistingDatabase Use existing database (1), or create database (0)
-     * @param string $databaseName Name of the database
+     * @param bool   $useExistingDatabase Use existing database (1), or create database (0)
+     * @param string $databaseName        Name of the database
+     *
      * @internal
      */
     public function databaseSelectCommand($useExistingDatabase = false, $databaseName = 'required')
     {
         $selectType = $useExistingDatabase ? 'existing' : 'new';
-        $this->cliSetupRequestHandler->executeActionWithArguments('databaseSelect', array('type' => $selectType, $selectType => $databaseName));
+        $this->cliSetupRequestHandler->executeActionWithArguments('databaseSelect', ['type' => $selectType, $selectType => $databaseName]);
     }
 
     /**
@@ -227,22 +231,23 @@ class InstallCommandController extends CommandController
     }
 
     /**
-     * Add database data
+     * Add database data.
      *
      * Adds admin user and site name in database
      *
      * @param string $adminUserName Username of to be created administrative user account
      * @param string $adminPassword Password of to be created administrative user account
-     * @param string $siteName Site name
+     * @param string $siteName      Site name
+     *
      * @internal
      */
     public function databaseDataCommand($adminUserName, $adminPassword, $siteName = 'New TYPO3 Console site')
     {
-        $this->cliSetupRequestHandler->executeActionWithArguments('databaseData', array('username' => $adminUserName, 'password' => $adminPassword, 'sitename' => $siteName));
+        $this->cliSetupRequestHandler->executeActionWithArguments('databaseData', ['username' => $adminUserName, 'password' => $adminPassword, 'sitename' => $siteName]);
     }
 
     /**
-     * Check if database data command is needed
+     * Check if database data command is needed.
      *
      * @internal
      */
@@ -252,7 +257,7 @@ class InstallCommandController extends CommandController
     }
 
     /**
-     * Write default configuration
+     * Write default configuration.
      *
      * Writes default configuration for the TYPO3 site based on the
      * provided $siteSetupType. Valid values are:
@@ -262,6 +267,7 @@ class InstallCommandController extends CommandController
      * - no (which unsurprisingly does nothing at all)
      *
      * @param string $siteSetupType Specify the setup type: Download the list of distributions (dist), Create empty root page (site), Do nothing (no)
+     *
      * @internal
      */
     public function defaultConfigurationCommand($siteSetupType = 'no')
@@ -283,7 +289,7 @@ class InstallCommandController extends CommandController
     }
 
     /**
-     * Check if default configuration needs to be written
+     * Check if default configuration needs to be written.
      *
      * @internal
      */
