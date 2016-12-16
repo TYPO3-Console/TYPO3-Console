@@ -12,11 +12,11 @@ Command Reference
   This reference uses ``./typo3cms`` as the command to invoke. If you are on
   Windows, this will probably not work, there you need to use ``typo3cms.bat``
   instead.
-  In composer based installations, the ``typo3cms`` binary will be located
+  In Composer based installations, the ``typo3cms`` binary will be located
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2016-08-02 22:10:31
+The following reference was automatically generated from code on 2016-11-01 13:03:01
 
 
 .. _`Command Reference: typo3_console`:
@@ -467,11 +467,15 @@ Valid schema update types are:
 
 - field.add
 - field.change
+- field.prefix
 - field.drop
 - table.add
 - table.change
+- table.prefix
 - table.drop
 - table.clear
+- safe (includes all necessary operations, to add or change fields or tables)
+- destructive (includes all operations which rename or drop fields or tables)
 
 The list of schema update types supports wildcards to specify multiple types, e.g.:
 
@@ -483,19 +487,17 @@ To avoid shell matching all types with wildcards should be quoted.
 
 **Example:** ``./typo3cms database:updateschema "*.add,*.change"``
 
-Arguments
-^^^^^^^^^
-
-``--schema-update-types``
-  List of schema update types
-
 
 
 Options
 ^^^^^^^
 
+``--schema-update-types``
+  List of schema update types (default: "safe")
 ``--verbose``
   If set, database queries performed are shown in output
+``--dry-run``
+  If set the updates are only collected and shown, but not executed
 
 
 
@@ -585,12 +587,37 @@ Arguments
 
 **Dump class auto-load**
 
-Updates class loading information in non composer managed TYPO3 installations.
+Updates class loading information in non Composer managed TYPO3 installations.
 
 This command is only needed during development. The extension manager takes care
 creating or updating this info properly during extension (de-)activation.
 
 
+
+
+
+
+
+.. _`Command Reference: typo3_console extension:list`:
+
+``extension:list``
+******************
+
+**List extensions that are available in the system**
+
+
+
+
+
+Options
+^^^^^^^
+
+``--active``
+  Only show active extensions
+``--inactive``
+  Only show inactive extensions
+``--raw``
+  Enable machine readable output (just extension keys separated by line feed)
 
 
 
@@ -766,6 +793,8 @@ Options
 
 ``--non-interactive``
   If specified, optional arguments are not requested, but default values are assumed.
+``--force``
+  Force installation of TYPO3, even if ``LocalConfiguration.php`` file already exists.
 ``--database-user-name``
   User name for database server
 ``--database-user-password``

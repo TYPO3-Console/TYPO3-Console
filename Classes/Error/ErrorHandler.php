@@ -22,7 +22,7 @@ class ErrorHandler
     /**
      * @var array
      */
-    protected $exceptionalErrors = array();
+    protected $exceptionalErrors = [];
 
     /**
      * Defines which error levels result should result in an exception thrown.
@@ -54,7 +54,7 @@ class ErrorHandler
             return;
         }
 
-        $errorLevels = array(
+        $errorLevels = [
             E_WARNING            => 'Warning',
             E_NOTICE             => 'Notice',
             E_USER_ERROR         => 'User Error',
@@ -62,7 +62,7 @@ class ErrorHandler
             E_USER_NOTICE        => 'User Notice',
             E_STRICT             => 'Runtime Notice',
             E_RECOVERABLE_ERROR  => 'Catchable Fatal Error'
-        );
+        ];
 
         if (in_array($errorLevel, (array)$this->exceptionalErrors, true)) {
             throw new \TYPO3\CMS\Core\Error\Exception($errorLevels[$errorLevel] . ': ' . $errorMessage . ' in ' . $errorFile . ' line ' . $errorLine, 1);

@@ -24,15 +24,17 @@ class SchemaUpdateResultRenderer
      *
      * @var array
      */
-    protected $schemaUpdateTypeLabels = array(
+    private static $schemaUpdateTypeLabels = [
         SchemaUpdateType::FIELD_ADD => 'Add fields',
         SchemaUpdateType::FIELD_CHANGE => 'Change fields',
+        SchemaUpdateType::FIELD_PREFIX => 'Prefix fields',
         SchemaUpdateType::FIELD_DROP => 'Drop fields',
         SchemaUpdateType::TABLE_ADD => 'Add tables',
         SchemaUpdateType::TABLE_CHANGE => 'Change tables',
         SchemaUpdateType::TABLE_CLEAR => 'Clear tables',
+        SchemaUpdateType::TABLE_PREFIX => 'Prefix tables',
         SchemaUpdateType::TABLE_DROP => 'Drop tables',
-    );
+    ];
 
     /**
      * Renders a table for a schema update result
@@ -47,9 +49,9 @@ class SchemaUpdateResultRenderer
         $tableRows = [];
 
         foreach ($result->getPerformedUpdates() as $type => $performedUpdates) {
-            $row = [$this->schemaUpdateTypeLabels[(string)$type], count($performedUpdates)];
+            $row = [self::$schemaUpdateTypeLabels[(string)$type], count($performedUpdates)];
             if ($includeStatements) {
-                $row = [$this->schemaUpdateTypeLabels[(string)$type], implode(chr(10) . chr(10), $this->getTruncatedQueries($performedUpdates, $maxStatementLength))];
+                $row = [self::$schemaUpdateTypeLabels[(string)$type], implode(chr(10) . chr(10), $this->getTruncatedQueries($performedUpdates, $maxStatementLength))];
             }
             $tableRows[] = $row;
         }
@@ -61,10 +63,10 @@ class SchemaUpdateResultRenderer
 
         if ($result->hasErrors()) {
             foreach ($result->getErrors() as $type => $errors) {
-                $output->outputLine(sprintf('<error>Errors during "%s" schema update:</error>', $this->schemaUpdateTypeLabels[(string)$type]));
+                $output->outputLine(sprintf('<error>Errors during "%s" schema update:</error>', self::$schemaUpdateTypeLabels[(string)$type]));
 
                 foreach ($errors as $error) {
-                    $output->outputFormatted('<error>' . $error . '</error>', array(), 2);
+                    $output->outputFormatted('<error>' . $error . '</error>', [], 2);
                 }
             }
         }

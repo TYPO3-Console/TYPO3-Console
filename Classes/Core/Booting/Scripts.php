@@ -16,10 +16,13 @@ namespace Helhum\Typo3Console\Core\Booting;
 use Helhum\Typo3Console\Core\Cache\FakeDatabaseBackend;
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Helhum\Typo3Console\Error\ErrorHandler;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Cache\Backend\NullBackend;
 use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
 use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class Scripts
@@ -29,7 +32,7 @@ class Scripts
     /**
      * @var array
      */
-    protected static $earlyCachesConfiguration = array();
+    protected static $earlyCachesConfiguration = [];
 
     /**
      * @param ConsoleBootstrap $bootstrap
@@ -44,13 +47,13 @@ class Scripts
     {
         $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
         foreach (
-            array(
+            [
                 'extbase_object',
                 'extbase_reflection',
                 'extbase_typo3dbbackend_tablecolumns',
                 'extbase_typo3dbbackend_queries',
                 'extbase_datamapfactory_datamap',
-            ) as $id) {
+            ] as $id) {
             if (!isset($cacheConfigurations[$id])) {
                 continue;
             }
@@ -60,15 +63,15 @@ class Scripts
             } else {
                 $cacheConfigurations[$id]['backend'] = NullBackend::class;
             }
-            $cacheConfigurations[$id]['options'] = array();
+            $cacheConfigurations[$id]['options'] = [];
         }
     }
 
     public static function initializeErrorHandling()
     {
         $errorHandler = new ErrorHandler();
-        $errorHandler->setExceptionalErrors(array(E_WARNING, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_RECOVERABLE_ERROR));
-        set_error_handler(array($errorHandler, 'handleError'));
+        $errorHandler->setExceptionalErrors([E_WARNING, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_RECOVERABLE_ERROR]);
+        set_error_handler([$errorHandler, 'handleError']);
         ini_set('display_errors', 1);
         if (((bool)ini_get('display_errors') && strtolower(ini_get('display_errors')) !== 'on' && strtolower(ini_get('display_errors')) !== '1') || !(bool)ini_get('display_errors')) {
             echo 'WARNING: Fatal errors will be suppressed due to your PHP config. You should consider enabling display_errors in your php.ini file!' . chr(10);
@@ -82,10 +85,10 @@ class Scripts
     {
         $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
         foreach (
-            array(
+            [
                 'cache_core',
                 'dbal',
-            ) as $id) {
+            ] as $id) {
             if (isset($cacheConfigurations[$id])) {
                 self::$earlyCachesConfiguration[$id] = $cacheConfigurations[$id];
             }
@@ -110,7 +113,7 @@ class Scripts
         $reflectionObject = new \ReflectionObject($cacheManager);
         $property = $reflectionObject->getProperty('caches');
         $property->setAccessible(true);
-        $property->setValue($cacheManager, array());
+        $property->setValue($cacheManager, []);
     }
 
     /**
@@ -159,7 +162,7 @@ class Scripts
     public static function initializeAuthenticatedOperations(ConsoleBootstrap $bootstrap)
     {
         $bootstrap->initializeBackendUser();
-        self::loadCommandLineBackendUser('_CLI_lowlevel');
+        self::loadCommandLineBackendUser();
         /** @var $backendUser \TYPO3\CMS\Core\Authentication\BackendUserAuthentication */
         $backendUser = $GLOBALS['BE_USER'];
         $backendUser->backendCheckLogin();
@@ -168,37 +171,52 @@ class Scripts
     }
 
     /**
-     * If the backend script is in CLI mode, it will try to load a backend user named by the CLI module name (in lowercase)
+     * If the backend script is in CLI mode, it will try to load a backend user named _cli_lowlevel
      *
-     * @param string $commandLineName the name of the module registered inside $TYPO3_CONF_VARS[SC_OPTIONS][GLOBAL][cliKeys] as second parameter
      * @throws \RuntimeException if a non-admin Backend user could not be loaded
      */
-    protected static function loadCommandLineBackendUser($commandLineName)
+    protected static function loadCommandLineBackendUser()
     {
-        if ($GLOBALS['BE_USER']->user['uid']) {
+        /** @var BackendUserAuthentication $beUser */
+        $beUser = $GLOBALS['BE_USER'];
+        if ($beUser->user['uid']) {
             throw new \RuntimeException('Another user was already loaded which is impossible in CLI mode!', 3);
         }
-        if (!\TYPO3\CMS\Core\Utility\StringUtility::beginsWith($commandLineName, '_CLI_')) {
-            throw new \RuntimeException('Module name, "' . $commandLineName . '", was not prefixed with "_CLI_"', 3);
+        $userName = '_cli_lowlevel';
+        $beUser->setBeUserByName($userName);
+        if (!$beUser->user['uid']) {
+            /** @var DatabaseConnection $db */
+            $db = $GLOBALS['TYPO3_DB'];
+            $db->exec_INSERTquery(
+                'be_users',
+                [
+                    'username' => $userName,
+                    'password' => GeneralUtility::getRandomHexString(48)
+                ]
+            );
+            $beUser->setBeUserByName($userName);
         }
-        $userName = strtolower($commandLineName);
-        $GLOBALS['BE_USER']->setBeUserByName($userName);
         if (!$GLOBALS['BE_USER']->user['uid']) {
-            throw new \RuntimeException('No backend user named "' . $userName . '" was found!', 3);
+            throw new \RuntimeException('No backend user named "' . $userName . '" was found or could not be created! Please create it manually!', 3);
         }
-        if ($GLOBALS['BE_USER']->isAdmin()) {
+        if ($beUser->isAdmin()) {
             throw new \RuntimeException('CLI backend user "' . $userName . '" was ADMIN which is not allowed!', 3);
         }
     }
 
     /**
-     * Provide cleaned implementation of TYPO3 CMS core classes.
+     * Provide cleaned implementation of TYPO3 core classes.
      * Can only be called *after* extension configuration is loaded (needs extbase configuration)!
      *
      * @param ConsoleBootstrap $bootstrap
      */
     public static function provideCleanClassImplementations(ConsoleBootstrap $bootstrap)
     {
+        if (!class_exists(\TYPO3\CMS\Core\Database\Schema\SqlReader::class)) {
+            // Register the legacy schema update in case new API does not exist
+            // @deprecated since TYPO3 8.x will be removed once TYPO3 7.6 support is removed
+            self::registerImplementation(\Helhum\Typo3Console\Database\Schema\SchemaUpdateInterface::class, \Helhum\Typo3Console\Database\Schema\LegacySchemaUpdate::class);
+        }
         self::overrideImplementation(\TYPO3\CMS\Extbase\Mvc\Cli\Command::class, \Helhum\Typo3Console\Mvc\Cli\Command::class);
         self::overrideImplementation(\TYPO3\CMS\Extbase\Command\HelpCommandController::class, \Helhum\Typo3Console\Command\HelpCommandController::class);
         self::overrideImplementation(\TYPO3\CMS\Extensionmanager\Command\ExtensionCommandController::class, \Helhum\Typo3Console\Command\ExtensionCommandController::class);
@@ -207,13 +225,27 @@ class Scripts
 
     /**
      * Tell Extbase, TYPO3 and PHP that we have another implementation
+     *
+     * @param string $originalClassName
+     * @param string $overrideClassName
      */
     public static function overrideImplementation($originalClassName, $overrideClassName)
     {
-        /** @var $extbaseObjectContainer \TYPO3\CMS\Extbase\Object\Container\Container */
-        $extbaseObjectContainer = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\Container\Container::class);
-        $extbaseObjectContainer->registerImplementation($originalClassName, $overrideClassName);
+        self::registerImplementation($originalClassName, $overrideClassName);
         $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][$originalClassName]['className'] = $overrideClassName;
         class_alias($overrideClassName, $originalClassName);
+    }
+
+    /**
+     * Tell Extbase about this implementation
+     *
+     * @param string $className
+     * @param string $alternativeClassName
+     */
+    private static function registerImplementation($className, $alternativeClassName)
+    {
+        /** @var $extbaseObjectContainer \TYPO3\CMS\Extbase\Object\Container\Container */
+        $extbaseObjectContainer = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\Container\Container::class);
+        $extbaseObjectContainer->registerImplementation($className, $alternativeClassName);
     }
 }

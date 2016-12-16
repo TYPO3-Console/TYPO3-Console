@@ -28,7 +28,7 @@ class PersistenceContext
     /**
      * @var array
      */
-    protected $persistenceConfiguration = array();
+    protected $persistenceConfiguration = [];
 
     public function __construct(DatabaseConnection $databaseConnection, array $persistenceConfiguration)
     {

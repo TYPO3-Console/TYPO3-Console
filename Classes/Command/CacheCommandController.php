@@ -45,6 +45,8 @@ class CacheCommandController extends CommandController
 
         // Flush a second time to have extension caches and previously disabled core caches cleared when clearing not forced
         $this->cacheService->flush();
+        // Also call the data handler API to cover legacy hook subscriber code
+        $this->cacheService->flushCachesWithDataHandler();
 
         $this->outputLine(sprintf('%slushed all caches.', $force ? 'Force f' : 'F'));
     }

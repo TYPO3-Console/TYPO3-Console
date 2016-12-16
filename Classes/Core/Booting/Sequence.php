@@ -31,7 +31,7 @@ class Sequence
     /**
      * @var array
      */
-    protected $steps = array();
+    protected $steps = [];
 
     /**
      * @param string $identifier

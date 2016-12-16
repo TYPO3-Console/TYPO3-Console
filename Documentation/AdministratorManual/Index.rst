@@ -30,16 +30,16 @@ the repository is deprecated and most likely will not work any more in the near 
 1. Composer installation
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-In case you use composer to manage dependencies of your TYPO3 project,
-you can just issue the following composer command in your project root directory.
+In case you use Composer to manage dependencies of your TYPO3 project,
+you can just issue the following Composer command in your project root directory.
 
 .. code-block:: bash
 
 	composer require helhum/typo3-console
 
-The ``typo3cms`` binary will be installed by composer in the specified bin-dir (by default ``vendor/bin``).
+The ``typo3cms`` binary will be installed by Composer in the specified bin-dir (by default ``vendor/bin``).
 
-In case you are unsure how to create a composer based TYPO3 project, you can check out
+In case you are unsure how to create a Composer based TYPO3 project, you can check out
 this `TYPO3 distribution`_, which already provides TYPO3 Console integration.
 
 2. Installation with Extension Manager

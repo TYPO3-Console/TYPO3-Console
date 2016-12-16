@@ -47,6 +47,7 @@ class InstallCommandController extends CommandController
      * Manually enter details on the command line or non interactive for automated setups.
      *
      * @param bool $nonInteractive If specified, optional arguments are not requested, but default values are assumed.
+     * @param bool $force Force installation of TYPO3, even if <code>LocalConfiguration.php</code> file already exists.
      * @param string $databaseUserName User name for database server
      * @param string $databaseUserPassword User password for database server
      * @param string $databaseHostName Host name of database server
@@ -61,6 +62,7 @@ class InstallCommandController extends CommandController
      */
     public function setupCommand(
         $nonInteractive = false,
+        $force = false,
         $databaseUserName = '',
         $databaseUserPassword = '',
         $databaseHostName = '',
@@ -74,7 +76,9 @@ class InstallCommandController extends CommandController
         $siteSetupType = 'none'
     ) {
         $this->outputLine();
-        $this->outputLine('<options=bold>Welcome to the console installer of TYPO3 CMS!</options=bold>');
+        $this->outputLine('<i>Welcome to the TYPO3 console installer!</i>');
+
+        $this->ensureInstallationPossible($nonInteractive, $force);
 
         $this->cliSetupRequestHandler->setup(!$nonInteractive, $this->request->getArguments());
 
@@ -181,7 +185,7 @@ class InstallCommandController extends CommandController
      */
     public function databaseConnectCommand($databaseUserName = '', $databaseUserPassword = '', $databaseHostName = 'localhost', $databasePort = '3306', $databaseSocket = '')
     {
-        $this->cliSetupRequestHandler->executeActionWithArguments('databaseConnect', array('host' => $databaseHostName, 'port' => $databasePort, 'username' => $databaseUserName, 'password' => $databaseUserPassword, 'socket' => $databaseSocket));
+        $this->cliSetupRequestHandler->executeActionWithArguments('databaseConnect', ['host' => $databaseHostName, 'port' => $databasePort, 'username' => $databaseUserName, 'password' => $databaseUserPassword, 'socket' => $databaseSocket]);
     }
 
     /**
@@ -197,14 +201,14 @@ class InstallCommandController extends CommandController
      *
      * Select a database by name
      *
-     * @param bool $useExistingDatabase Use existing database (1), or create database (0)
+     * @param bool $useExistingDatabase Use already existing database?
      * @param string $databaseName Name of the database
      * @internal
      */
     public function databaseSelectCommand($useExistingDatabase = false, $databaseName = 'required')
     {
         $selectType = $useExistingDatabase ? 'existing' : 'new';
-        $this->cliSetupRequestHandler->executeActionWithArguments('databaseSelect', array('type' => $selectType, $selectType => $databaseName));
+        $this->cliSetupRequestHandler->executeActionWithArguments('databaseSelect', ['type' => $selectType, $selectType => $databaseName]);
     }
 
     /**
@@ -227,7 +231,7 @@ class InstallCommandController extends CommandController
      */
     public function databaseDataCommand($adminUserName, $adminPassword, $siteName = 'New TYPO3 Console site')
     {
-        $this->cliSetupRequestHandler->executeActionWithArguments('databaseData', array('username' => $adminUserName, 'password' => $adminPassword, 'sitename' => $siteName));
+        $this->cliSetupRequestHandler->executeActionWithArguments('databaseData', ['username' => $adminUserName, 'password' => $adminPassword, 'sitename' => $siteName]);
     }
 
     /**
@@ -279,5 +283,43 @@ class InstallCommandController extends CommandController
     public function defaultConfigurationNeedsExecutionCommand()
     {
         $this->cliSetupRequestHandler->callNeedsExecution('defaultConfiguration');
+    }
+
+    /**
+     * Handles the case when LocalConfiguration.php file already exists
+     *
+     * @param $nonInteractive
+     * @param $force
+     */
+    private function ensureInstallationPossible($nonInteractive, $force)
+    {
+        $localConfFile = PATH_typo3conf . 'LocalConfiguration.php';
+        $packageStatesFile = PATH_typo3conf . 'PackageStates.php';
+        if (!$force && file_exists($localConfFile)) {
+            $this->outputLine();
+            $this->outputLine('<error>TYPO3 seems to be already set up!</error>');
+            $proceed = !$nonInteractive;
+            if (!$nonInteractive) {
+                $this->outputLine();
+                $this->outputLine('<info>If you continue, your <code>typo3conf/LocalConfiguration.php</code></info>');
+                $this->outputLine('<info>and <code>typo3conf/PackageStates.php</code> files will be deleted!</info>');
+                $this->outputLine();
+                $proceed = $this->output->askConfirmation('<info>Do you really want to proceed?</info> (<comment>no</comment>) ',
+                    false);
+            }
+            if (!$proceed) {
+                $this->outputLine('<error>Installation aborted!</error>');
+                $this->quit(2);
+            }
+        }
+        @unlink($localConfFile);
+        @unlink($packageStatesFile);
+        clearstatcache();
+        if (file_exists($localConfFile)) {
+            $this->outputLine();
+            $this->outputLine('<error>Unable to delete configuration file!</error>');
+            $this->outputLine('<error>Installation aborted!</error>');
+            $this->quit(3);
+        }
     }
 }
