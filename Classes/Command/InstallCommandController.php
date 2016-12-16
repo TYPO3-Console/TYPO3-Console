@@ -285,7 +285,6 @@ class InstallCommandController extends CommandController
     /**
      * Check if default configuration needs to be written
      *
-     *
      * @internal
      */
     public function defaultConfigurationNeedsExecutionCommand()
