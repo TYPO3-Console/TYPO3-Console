@@ -135,8 +135,8 @@ class InstallCommandController extends CommandController
      */
     public function fixFolderStructureCommand()
     {
-        /** @var $folderStructureFactory \TYPO3\CMS\Install\FolderStructure\DefaultFactory */
-        $folderStructureFactory = GeneralUtility::makeInstance(\TYPO3\CMS\Install\FolderStructure\DefaultFactory::class);
+        /** @var $folderStructureFactory \Helhum\Typo3Console\FolderStructure\ExtensionFactory */
+        $folderStructureFactory = GeneralUtility::makeInstance(\Helhum\Typo3Console\FolderStructure\ExtensionFactory::class);
         /** @var $structureFacade \TYPO3\CMS\Install\FolderStructure\StructureFacade */
         $structureFacade = $folderStructureFactory->getStructure();
 
@@ -149,16 +149,6 @@ class InstallCommandController extends CommandController
             foreach ($fixedStatusObjects as $fixedStatusObject) {
                 $this->outputLine($fixedStatusObject->getTitle());
             }
-        }
-
-        /** @var $installUtility \TYPO3\CMS\Extensionmanager\Utility\InstallUtility */
-        $installUtility = $this->objectManager->get(\TYPO3\CMS\Extensionmanager\Utility\InstallUtility::class);
-        /** @var $fileHandlingUtility \TYPO3\CMS\Extensionmanager\Utility\FileHandlingUtility */
-        $fileHandlingUtility = $this->objectManager->get(\TYPO3\CMS\Extensionmanager\Utility\FileHandlingUtility::class);
-        foreach ($this->packageManager->getActivePackages() as $package) {
-            $this->outputLine('<info>Create extension directories from "ext_emconf.php" for "%s", if necessary</info>', [$package->getPackageKey()]);
-            $extension = $installUtility->enrichExtensionWithDetails($package->getPackageKey(), false);
-            $fileHandlingUtility->ensureConfiguredDirectoriesExist($extension);
         }
     }
 

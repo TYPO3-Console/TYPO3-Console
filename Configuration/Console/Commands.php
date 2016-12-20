@@ -15,7 +15,6 @@ return [
     'runLevels' => [
         'typo3_console:install:databasedata' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL ,
         'typo3_console:install:defaultconfiguration' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL ,
-        'typo3_console:install:fixfolderstructure' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_FULL ,
         'typo3_console:install:*' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE ,
         'typo3_console:cache:flush' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE ,
         'typo3_console:commandreference:render' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL ,
