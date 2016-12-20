@@ -13,32 +13,27 @@ namespace Helhum\Typo3Console\Service;
  *
  */
 
+use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
+use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * Class CacheService
- * TODO: This is not really a service in DDD terms: it does not act on domain models, it has dependencies and it holds som kind of state (logger) find a better name/pattern for that.
+ * Cache Service handles all cache clearing related tasks
  */
 class CacheService implements SingletonInterface
 {
     /**
-     * @var \TYPO3\CMS\Core\Cache\CacheManager
-     * @inject
+     * @var CacheManager
      */
     protected $cacheManager;
 
     /**
-     * @var \TYPO3\CMS\Core\Package\PackageManager
-     * @inject
-     */
-    protected $packageManager;
-
-    /**
-     * @var \Helhum\Typo3Console\Service\Configuration\ConfigurationService
-     * @inject
+     * @var ConfigurationService
      */
     protected $configurationService;
 
@@ -50,10 +45,17 @@ class CacheService implements SingletonInterface
     /**
      * Builds the dependencies correctly
      *
+     * @param CacheManager $cacheManager
+     * @param ConfigurationService $configurationService
      * @param DatabaseConnection $databaseConnection
      */
-    public function __construct(DatabaseConnection $databaseConnection = null)
+    public function __construct(
+        CacheManager $cacheManager,
+        ConfigurationService $configurationService,
+        DatabaseConnection $databaseConnection = null)
     {
+        $this->cacheManager = $cacheManager;
+        $this->configurationService = $configurationService;
         $this->databaseConnection = $databaseConnection ?: $GLOBALS['TYPO3_DB'];
     }
 
@@ -68,6 +70,31 @@ class CacheService implements SingletonInterface
             $this->forceFlushCoreFileAndDatabaseCaches();
         }
         $this->cacheManager->flushCaches();
+    }
+
+    /**
+     * Flushes caches using the data handler. This should not be necessary any more in the future.
+     * Although we trigger the cache flush API here, the real intention is to trigger
+     * hook subscribers, so that they can do their job (flushing "other" caches when cache is flushed.
+     * For example realurl subscribes to these hooks.
+     *
+     * We use "all" because this method is only called from "flush" command which is indeed meant
+     * to flush all caches. Besides that, "all" is really all caches starting from TYPO3 8.x
+     * thus it would make sense for the hook subscribers to act on that cache clear type.
+     *
+     * However if you find a valid use case for us to also call "pages" here, then please create
+     * a pull request and describe this case. "system" or "temp_cached" will not be added however
+     * because these are deprecated since TYPO3 8.x
+     *
+     * Besides that, this DataHandler API is probably something to be removed in TYPO3,
+     * so we deprecate and mark this method as internal at the same time.
+     *
+     * @deprecated Will be removed once DataHandler cache flush methods are removed in supported TYPO3 versions
+     * @internal
+     */
+    public function flushCachesWithDataHandler()
+    {
+        self::createDataHandlerFromGlobals()->clear_cacheCmd('all');
     }
 
     /**
@@ -124,7 +151,7 @@ class CacheService implements SingletonInterface
      */
     public function getValidCacheGroups()
     {
-        $validGroups = array();
+        $validGroups = [];
         foreach ($this->configurationService->getActive('SYS/caching/cacheConfigurations') as $cacheConfiguration) {
             if (isset($cacheConfiguration['groups']) && is_array($cacheConfiguration['groups'])) {
                 $validGroups = array_merge($validGroups, $cacheConfiguration['groups']);
@@ -160,9 +187,26 @@ class CacheService implements SingletonInterface
         $tables = $this->databaseConnection->admin_get_tables();
         foreach ($tables as $table) {
             $tableName = $table['Name'];
-            if (substr($tableName, 0, 3) === 'cf_' || ($tableName !== 'tx_realurl_redirects' && substr($tableName, 0, 11) === 'tx_realurl_')) {
+            if (strpos($tableName, 'cf_') === 0) {
                 $this->databaseConnection->exec_TRUNCATEquery($tableName);
             }
         }
+    }
+
+    /**
+     * Create a data handler instance from global state (with user being admin)
+     * @internal
+     * @return DataHandler
+     */
+    private static function createDataHandlerFromGlobals()
+    {
+        if (empty($GLOBALS['BE_USER']) || !$GLOBALS['BE_USER'] instanceof BackendUserAuthentication) {
+            throw new \RuntimeException('No backend user initialized. flushCachesWithDataHandler needs fully initialized TYPO3', 1477066610);
+        }
+        $user = clone $GLOBALS['BE_USER'];
+        $user->admin = 1;
+        $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
+        $dataHandler->start([], [], $user);
+        return $dataHandler;
     }
 }

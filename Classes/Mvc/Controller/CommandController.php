@@ -148,7 +148,7 @@ abstract class CommandController implements CommandControllerInterface
     protected function resolveCommandMethodName()
     {
         $commandMethodName = $this->request->getControllerCommandName() . 'Command';
-        if (!is_callable(array($this, $commandMethodName))) {
+        if (!is_callable([$this, $commandMethodName])) {
             throw new NoSuchCommandException(sprintf('A command method "%s()" does not exist in controller "%s".', $commandMethodName, get_class($this)), 1300902143);
         }
         return $commandMethodName;
@@ -219,7 +219,7 @@ abstract class CommandController implements CommandControllerInterface
      * @return void
      * @throws StopActionException
      */
-    protected function forward($commandName, $controllerObjectName = null, array $arguments = array())
+    protected function forward($commandName, $controllerObjectName = null, array $arguments = [])
     {
         $this->request->setDispatched(false);
         $this->request->setControllerCommandName($commandName);
@@ -243,13 +243,13 @@ abstract class CommandController implements CommandControllerInterface
      */
     protected function callCommandMethod()
     {
-        $preparedArguments = array();
+        $preparedArguments = [];
         /** @var Argument $argument */
         foreach ($this->arguments as $argument) {
             $preparedArguments[] = $argument->getValue();
         }
         $originalRole = $this->ensureAdminRoleIfRequested();
-        $commandResult = call_user_func_array(array($this, $this->commandMethodName), $preparedArguments);
+        $commandResult = call_user_func_array([$this, $this->commandMethodName], $preparedArguments);
         $this->restoreUserRole($originalRole);
         if (is_string($commandResult) && $commandResult !== '') {
             $this->response->appendContent($commandResult);
@@ -296,7 +296,7 @@ abstract class CommandController implements CommandControllerInterface
      * @return void
      * @api
      */
-    protected function output($text, array $arguments = array())
+    protected function output($text, array $arguments = [])
     {
         $this->output->output($text, $arguments);
     }
@@ -311,7 +311,7 @@ abstract class CommandController implements CommandControllerInterface
      * @see outputLines()
      * @api
      */
-    protected function outputLine($text = '', array $arguments = array())
+    protected function outputLine($text = '', array $arguments = [])
     {
         $this->output->outputLine($text, $arguments);
     }
@@ -327,7 +327,7 @@ abstract class CommandController implements CommandControllerInterface
      * @see outputLine()
      * @api
      */
-    protected function outputFormatted($text = '', array $arguments = array(), $leftPadding = 0)
+    protected function outputFormatted($text = '', array $arguments = [], $leftPadding = 0)
     {
         $this->output->outputFormatted($text, $arguments, $leftPadding);
     }
@@ -368,7 +368,7 @@ abstract class CommandController implements CommandControllerInterface
      * @param array $options Additional options for the console writer
      * @return LoggerInterface
      */
-    protected function createDefaultLogger($minimumLevel = LogLevel::DEBUG, $options = array())
+    protected function createDefaultLogger($minimumLevel = LogLevel::DEBUG, $options = [])
     {
         $options['output'] = $this->output->getSymfonyConsoleOutput();
         $logger = new Logger(get_class($this));

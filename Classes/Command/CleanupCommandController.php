@@ -54,7 +54,7 @@ class CleanupCommandController extends CommandController
         );
 
         if ($errorCount > 0) {
-            $this->outputLine('<info>%d errors were ' . ($dryRun ? 'found' : 'fixed') . ', while ' . ($dryRun ? 'checking' : 'updating') . ' reference index for %d records from %d tables.</info>', array($errorCount, $recordCount, count($processedTables)));
+            $this->outputLine('<info>%d errors were ' . ($dryRun ? 'found' : 'fixed') . ', while ' . ($dryRun ? 'checking' : 'updating') . ' reference index for %d records from %d tables.</info>', [$errorCount, $recordCount, count($processedTables)]);
         } else {
             $this->outputLine('<info>Index integrity was perfect!</info>');
         }
@@ -110,7 +110,7 @@ class CleanupCommandController extends CommandController
      */
     protected function createLogger($verbose, $addNewLines = false)
     {
-        $options = array();
+        $options = [];
         if ($addNewLines) {
             $options['messageWrap'] = LF . LF . '|' . LF;
         }

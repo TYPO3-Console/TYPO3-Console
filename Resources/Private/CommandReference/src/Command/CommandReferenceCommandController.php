@@ -87,23 +87,25 @@ class CommandReferenceCommandController extends CommandController
     protected function renderReference($reference)
     {
         if (!isset($this->settings['commandReferences'][$reference])) {
-            $this->outputLine('Command reference "%s" is not configured', array($reference));
+            $this->outputLine('Command reference "%s" is not configured', [$reference]);
             $this->quit(1);
         }
         $referenceConfiguration = $this->settings['commandReferences'][$reference];
         $extensionKeysToRender = $referenceConfiguration['extensionKeys'];
-        array_walk($extensionKeysToRender, function (&$extensionKey) {$extensionKey = strtolower($extensionKey);});
+        array_walk($extensionKeysToRender, function (&$extensionKey) {
+            $extensionKey = strtolower($extensionKey);
+        });
 
         $availableCommands = $this->commandManager->getAvailableCommands();
         $commands = $this->buildCommandsIndex($availableCommands);
-        $allCommands = array();
+        $allCommands = [];
         foreach ($commands as $command) {
             if (!in_array(explode(':', $command->getCommandIdentifier())[0], $extensionKeysToRender, true)) {
                 $this->outputLine(sprintf('<warning>Skipped command "%s"</warning>', $command->getCommandIdentifier()));
                 continue;
             }
-            $argumentDescriptions = array();
-            $optionDescriptions = array();
+            $argumentDescriptions = [];
+            $optionDescriptions = [];
 
             foreach ($command->getArgumentDefinitions() as $commandArgumentDefinition) {
                 $argumentDescription = $commandArgumentDefinition->getDescription();
@@ -114,7 +116,7 @@ class CommandReferenceCommandController extends CommandController
                 }
             }
 
-            $relatedCommands = array();
+            $relatedCommands = [];
             $relatedCommandIdentifiers = $command->getRelatedCommandIdentifiers();
             foreach ($relatedCommandIdentifiers as $relatedCommandIdentifier) {
                 try {
@@ -125,14 +127,14 @@ class CommandReferenceCommandController extends CommandController
                 }
             }
 
-            $allCommands[$command->getCommandIdentifier()] = array(
+            $allCommands[$command->getCommandIdentifier()] = [
                 'identifier' => $this->commandManager->getShortestIdentifierForCommand($command),
                 'shortDescription' => $this->transformMarkup($command->getShortDescription()),
                 'description' => $this->transformMarkup($command->getDescription()),
                 'options' => $this->transformMarkup($optionDescriptions),
                 'arguments' => $this->transformMarkup($argumentDescriptions),
                 'relatedCommands' => $relatedCommands
-            );
+            ];
         }
 
         $standaloneView = new StandaloneView();

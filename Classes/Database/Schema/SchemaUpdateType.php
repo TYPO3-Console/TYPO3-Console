@@ -22,11 +22,6 @@ use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 class SchemaUpdateType extends Enumeration
 {
     /**
-     * @var int
-     */
-    protected $value;
-
-    /**
      * Add a field
      */
     const FIELD_ADD = 'field.add';
@@ -35,6 +30,11 @@ class SchemaUpdateType extends Enumeration
      * Change a field
      */
     const FIELD_CHANGE = 'field.change';
+
+    /**
+    * Prefix a field
+    */
+    const FIELD_PREFIX = 'field.prefix';
 
     /**
      * Drop a field
@@ -52,6 +52,11 @@ class SchemaUpdateType extends Enumeration
     const TABLE_CHANGE = 'table.change';
 
     /**
+    * Prefix a table
+    */
+    const TABLE_PREFIX = 'table.prefix';
+
+    /**
      * Drop a table
      */
     const TABLE_DROP = 'table.drop';
@@ -62,6 +67,57 @@ class SchemaUpdateType extends Enumeration
     const TABLE_CLEAR = 'table.clear';
 
     /**
+     * All safe update types
+     */
+    const GROUP_SAFE = 'safe';
+
+    /**
+     * All destructive update types
+     */
+    const GROUP_DESTRUCTIVE = 'destructive';
+
+    /**
+     * Mapping of schema update types to internal statement types
+     *
+     * @var array
+     */
+    private static $schemaUpdateTypesStatementTypesMapping = [
+        self::FIELD_ADD => ['add' => self::GROUP_SAFE],
+        self::FIELD_CHANGE => ['change' => self::GROUP_SAFE],
+        self::FIELD_PREFIX => ['change' => self::GROUP_DESTRUCTIVE],
+        self::FIELD_DROP => ['drop' => self::GROUP_DESTRUCTIVE],
+        self::TABLE_ADD => ['create_table' => self::GROUP_SAFE],
+        self::TABLE_CHANGE => ['change_table' => self::GROUP_SAFE],
+        self::TABLE_CLEAR => ['clear_table' => self::GROUP_SAFE],
+        self::TABLE_PREFIX => ['change_table' => self::GROUP_DESTRUCTIVE],
+        self::TABLE_DROP => ['drop_table' => self::GROUP_DESTRUCTIVE],
+        self::GROUP_SAFE => [
+            self::FIELD_ADD,
+            self::FIELD_CHANGE,
+            self::TABLE_ADD,
+            self::TABLE_CHANGE,
+            self::TABLE_CLEAR,
+        ],
+        self::GROUP_DESTRUCTIVE => [
+            self::FIELD_PREFIX,
+            self::FIELD_DROP,
+            self::TABLE_PREFIX,
+            self::TABLE_DROP,
+        ],
+        '*' => [
+            self::FIELD_ADD,
+            self::FIELD_CHANGE,
+            self::FIELD_PREFIX,
+            self::FIELD_DROP,
+            self::TABLE_ADD,
+            self::TABLE_CHANGE,
+            self::TABLE_PREFIX,
+            self::TABLE_DROP,
+            self::TABLE_CLEAR,
+        ],
+    ];
+
+    /**
      * Expands wildcards in schema update types, e.g. field.* or *.change
      *
      * @param array $schemaUpdateTypes List of schema update types
@@ -70,32 +126,74 @@ class SchemaUpdateType extends Enumeration
      */
     public static function expandSchemaUpdateTypes(array $schemaUpdateTypes)
     {
-        $expandedSchemaUpdateTypes = array();
-        $schemaUpdateTypeConstants = array_values(SchemaUpdateType::getConstants());
+        $expandedSchemaUpdateTypes = [];
+        $schemaUpdateTypeConstants = array_values(self::getConstants());
 
         // Collect total list of types by expanding wildcards
         foreach ($schemaUpdateTypes as $schemaUpdateType) {
-            if (strpos($schemaUpdateType, '*') !== false) {
+            if (in_array($schemaUpdateType, ['*', 'safe', 'destructive'], true)) {
+                if (empty(self::$schemaUpdateTypesStatementTypesMapping[$schemaUpdateType])) {
+                    throw new InvalidEnumerationValueException(
+                        sprintf(
+                            'Invalid schema update type "%s", must be one of: "%s"',
+                            $schemaUpdateType,
+                            implode('", "', $schemaUpdateTypeConstants)
+                        ),
+                        1477998197
+                    );
+                } else {
+                    foreach (self::$schemaUpdateTypesStatementTypesMapping[$schemaUpdateType] as $matchedType) {
+                        $expandedSchemaUpdateTypes[] = $matchedType;
+                    }
+                }
+            } elseif (strpos($schemaUpdateType, '*') !== false) {
                 $matchPattern = '/' . str_replace('\\*', '.+', preg_quote($schemaUpdateType, '/')) . '/';
                 $matchingSchemaUpdateTypes = preg_grep($matchPattern, $schemaUpdateTypeConstants);
-                $expandedSchemaUpdateTypes = array_merge($expandedSchemaUpdateTypes, $matchingSchemaUpdateTypes);
+                if (empty($matchingSchemaUpdateTypes)) {
+                    throw new InvalidEnumerationValueException(
+                        sprintf(
+                            'Invalid schema update type "%s", must be one of: "%s"',
+                            $schemaUpdateType,
+                            implode('", "', $schemaUpdateTypeConstants)
+                        ),
+                        1477998245
+                    );
+                }
+                foreach ($matchingSchemaUpdateTypes as $matchingSchemaUpdateType) {
+                    $expandedSchemaUpdateTypes[] = $matchingSchemaUpdateType;
+                }
             } else {
                 $expandedSchemaUpdateTypes[] = $schemaUpdateType;
             }
         }
-
+        $expandedSchemaUpdateTypes = array_unique($expandedSchemaUpdateTypes);
         // Cast to enumeration objects to ensure valid values
         foreach ($expandedSchemaUpdateTypes as &$schemaUpdateType) {
             try {
-                $schemaUpdateType = SchemaUpdateType::cast($schemaUpdateType);
+                $schemaUpdateType = self::cast($schemaUpdateType);
             } catch (InvalidEnumerationValueException $e) {
-                throw new InvalidEnumerationValueException(sprintf(
-                    'Invalid schema update type "%s", must be one of: "%s"',
-                    $schemaUpdateType,
-                    implode('", "', $schemaUpdateTypeConstants)
-                ), 1439460396);
+                throw new InvalidEnumerationValueException(
+                    sprintf(
+                        'Invalid schema update type "%s", must be one of: "%s"',
+                        $schemaUpdateType,
+                        implode('", "', $schemaUpdateTypeConstants)
+                    ),
+                    1439460396,
+                    $e
+                );
             }
         }
+
         return $expandedSchemaUpdateTypes;
+    }
+
+    /**
+     * Map schema update type to a list of internal statement types
+     *
+     * @return array
+     */
+    public function getStatementTypes()
+    {
+        return self::$schemaUpdateTypesStatementTypesMapping[(string)$this];
     }
 }

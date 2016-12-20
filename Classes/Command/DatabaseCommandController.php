@@ -18,6 +18,7 @@ use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
+use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 
 /**
  * Database command controller
@@ -49,11 +50,15 @@ class DatabaseCommandController extends CommandController
      *
      * - field.add
      * - field.change
+     * - field.prefix
      * - field.drop
      * - table.add
      * - table.change
+     * - table.prefix
      * - table.drop
      * - table.clear
+     * - safe (includes all necessary operations, to add or change fields or tables)
+     * - destructive (includes all operations which rename or drop fields or tables)
      *
      * The list of schema update types supports wildcards to specify multiple types, e.g.:
      *
@@ -65,26 +70,31 @@ class DatabaseCommandController extends CommandController
      *
      * <b>Example:</b> <code>./typo3cms database:updateschema "*.add,*.change"</code>
      *
-     * @param array $schemaUpdateTypes List of schema update types
+     * @param array $schemaUpdateTypes List of schema update types (default: "safe")
      * @param bool $verbose If set, database queries performed are shown in output
-     * @throws \TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException
+     * @param bool $dryRun If set the updates are only collected and shown, but not executed
      */
-    public function updateSchemaCommand(array $schemaUpdateTypes, $verbose = false)
+    public function updateSchemaCommand(array $schemaUpdateTypes = ['safe'], $verbose = false, $dryRun = false)
     {
         try {
-            $schemaUpdateTypes = SchemaUpdateType::expandSchemaUpdateTypes($schemaUpdateTypes);
-        } catch (\UnexpectedValueException $e) {
+            $expandedSchemaUpdateTypes = SchemaUpdateType::expandSchemaUpdateTypes($schemaUpdateTypes);
+        } catch (InvalidEnumerationValueException $e) {
             $this->outputLine(sprintf('<error>%s</error>', $e->getMessage()));
             $this->sendAndExit(1);
         }
 
-        $result = $this->schemaService->updateSchema($schemaUpdateTypes);
+        $result = $this->schemaService->updateSchema($expandedSchemaUpdateTypes, $dryRun);
 
         if ($result->hasPerformedUpdates()) {
-            $this->output->outputLine('<info>The following schema updates were performed:</info>');
+            $this->output->outputLine('<info>The following database schema updates %s performed:</info>', [$dryRun ? 'should be' : 'were']);
             $this->schemaUpdateResultRenderer->render($result, $this->output, $verbose);
         } else {
-            $this->output->outputLine('No schema updates matching the given types were performed');
+            $this->output->outputLine(
+                '<info>No schema updates %s performed for update type%s:%s</info>',
+                [$dryRun ? 'must be' : 'were',
+                count($expandedSchemaUpdateTypes) > 1 ? 's' : '',
+                PHP_EOL . implode(PHP_EOL, $expandedSchemaUpdateTypes)]
+            );
         }
     }
 
@@ -115,7 +125,7 @@ class DatabaseCommandController extends CommandController
             new ProcessBuilder()
         );
         $exitCode = $mysqlCommand->mysql(
-            array('--skip-column-names'),
+            ['--skip-column-names'],
             STDIN,
             $this->buildOutputClosure(),
             $interactive
@@ -142,7 +152,7 @@ class DatabaseCommandController extends CommandController
             new ProcessBuilder()
         );
         $exitCode = $mysqlCommand->mysqldump(
-            array(),
+            [],
             $this->buildOutputClosure()
         );
         $this->quit($exitCode);
