@@ -117,7 +117,7 @@ class InstallCommandController extends CommandController
                 if (empty($activePackages[$package->getPackageKey()])) {
                     $this->packageManager->unregisterPackage($package);
                     GeneralUtility::flushDirectory($package->getPackagePath());
-                    $this->outputLine('Removed Package: '.$package->getPackageKey());
+                    $this->outputLine('Removed Package: ' . $package->getPackageKey());
                 }
             }
             $this->packageManager->forceSortAndSavePackageStates();
