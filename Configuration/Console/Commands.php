@@ -1,5 +1,4 @@
 <?php
-
 return [
     'controllers' => [
         \Helhum\Typo3Console\Command\CacheCommandController::class,
@@ -14,19 +13,19 @@ return [
         \Helhum\Typo3Console\Command\CommandReferenceCommandController::class,
     ],
     'runLevels' => [
-        'typo3_console:install:databasedata'         => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
-        'typo3_console:install:defaultconfiguration' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
-        'typo3_console:install:fixfolderstructure'   => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_FULL,
-        'typo3_console:install:*'                    => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-        'typo3_console:cache:flush'                  => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-        'typo3_console:commandreference:render'      => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
-        'typo3_console:configuration:*'              => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL ,
+        'typo3_console:install:databasedata' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL ,
+        'typo3_console:install:defaultconfiguration' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL ,
+        'typo3_console:install:fixfolderstructure' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_FULL ,
+        'typo3_console:install:*' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE ,
+        'typo3_console:cache:flush' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE ,
+        'typo3_console:commandreference:render' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL ,
+        'typo3_console:configuration:*' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL ,
     ],
     'bootingSteps' => [
         'typo3_console:install:databasedata' => [
-            'helhum.typo3console:database',
+            'helhum.typo3console:database'
         ],
         'typo3_console:install:defaultconfiguration' => ['helhum.typo3console:database'],
-        'typo3_console:cache:flush'                  => ['helhum.typo3console:database'],
-    ],
+        'typo3_console:cache:flush' => ['helhum.typo3console:database'],
+    ]
 ];
