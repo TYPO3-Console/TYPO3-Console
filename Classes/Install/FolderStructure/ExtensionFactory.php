@@ -14,11 +14,10 @@ namespace Helhum\Typo3Console\Install\FolderStructure;
  * The TYPO3 project - inspiring people to share!
  */
 
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use Helhum\Typo3Console\Package\UncachedPackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
-use TYPO3\CMS\Core\Utility\StringUtility;
-use TYPO3\CMS\Extensionmanager\Utility\EmConfUtility;
+use TYPO3\CMS\Install\FolderStructure\DefaultFactory;
 use TYPO3\CMS\Install\FolderStructure\DirectoryNode;
 use TYPO3\CMS\Install\FolderStructure\RootNode;
 use TYPO3\CMS\Install\FolderStructure\StructureFacade;
@@ -26,13 +25,30 @@ use TYPO3\CMS\Install\FolderStructure\StructureFacade;
 /**
  * Factory returns extension folder structure object hierarchy
  */
-class ExtensionFactory extends \TYPO3\CMS\Install\FolderStructure\DefaultFactory
+class ExtensionFactory extends DefaultFactory
 {
+    /**
+     * @var UncachedPackageManager
+     */
+    private $packageManager;
+
+    /**
+     * ExtensionFactory constructor.
+     *
+     * @param UncachedPackageManager $packageManager
+     */
+    public function __construct(UncachedPackageManager $packageManager)
+    {
+        $this->packageManager = $packageManager;
+    }
+
     /**
      * Get default structure object hierarchy
      *
-     * @throws \InvalidArgumentException
      * @return StructureFacade
+     * @throws \InvalidArgumentException
+     * @throws \TYPO3\CMS\Install\FolderStructure\Exception\RootNodeException
+     * @throws \TYPO3\CMS\Install\FolderStructure\Exception\InvalidArgumentException
      */
     public function getStructure()
     {
@@ -47,30 +63,20 @@ class ExtensionFactory extends \TYPO3\CMS\Install\FolderStructure\DefaultFactory
      *
      * @return array
      */
-    protected function getExtensionStructureDefinition()
+    private function getExtensionStructureDefinition()
     {
-        /** @var EmConfUtility $emConfUtility */
-        $emConfUtility = GeneralUtility::makeInstance(EmConfUtility::class);
-        $extensions = ExtensionManagementUtility::getLoadedExtensionListArray();
         $structureBase = [];
-
-        foreach ($extensions as $extension) {
-            $extensionConfiguration = $emConfUtility->includeEmConf([
-                'key' => $extension,
-                'siteRelPath' => ExtensionManagementUtility::siteRelPath($extension)
-            ]);
-            if ($extensionConfiguration === false) {
-                continue;
-            }
+        foreach ($this->packageManager->getActivePackages() as $package) {
+            $extensionConfiguration = $this->packageManager->getExtensionConfiguration($package);
 
             if (isset($extensionConfiguration['uploadfolder']) && (bool)$extensionConfiguration['uploadfolder']) {
-                $structureBase[] = $this->getExtensionUploadDirectory($extension);
+                $structureBase[] = $this->getExtensionUploadDirectory($package->getPackageKey());
             }
 
             if (!empty($extensionConfiguration['createDirs'])) {
                 foreach (explode(',', $extensionConfiguration['createDirs']) as $directoryToCreate) {
                     $absolutePath = GeneralUtility::getFileAbsFileName(trim($directoryToCreate));
-                    // Only create directories within TYPO3 root.
+                    // Only create valid paths.
                     if (!empty($absolutePath)) {
                         $structureBase[] = $this->getDirectoryNodeByPath(PathUtility::stripPathSitePrefix($absolutePath));
                     }
@@ -88,7 +94,7 @@ class ExtensionFactory extends \TYPO3\CMS\Install\FolderStructure\DefaultFactory
      * @param string $extension Extension key
      * @return array
      */
-    protected function getExtensionUploadDirectory($extension)
+    private function getExtensionUploadDirectory($extension)
     {
         return $this->getDirectoryNodeByPath('uploads/tx_' . str_replace('_', '', $extension));
     }
@@ -99,7 +105,7 @@ class ExtensionFactory extends \TYPO3\CMS\Install\FolderStructure\DefaultFactory
      * @param string $path Path to directory
      * @return array
      */
-    protected function getDirectoryNodeByPath($path)
+    private function getDirectoryNodeByPath($path)
     {
         $baseNode = [];
         $parts = explode('/', $path);
@@ -125,7 +131,7 @@ class ExtensionFactory extends \TYPO3\CMS\Install\FolderStructure\DefaultFactory
      * @param array $additional
      * @return array
      */
-    protected function appendStructureDefinition(array $original, array $additional)
+    private function appendStructureDefinition(array $original, array $additional)
     {
         foreach ($additional as $additionalStructure) {
             $structureKey = false;

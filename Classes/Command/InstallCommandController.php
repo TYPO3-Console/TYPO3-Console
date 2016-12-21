@@ -135,12 +135,15 @@ class InstallCommandController extends CommandController
      *
      * @see typo3_console:install:generatepackagestates
      *
+     * @throws \InvalidArgumentException
      * @throws \TYPO3\CMS\Install\FolderStructure\Exception
+     * @throws \TYPO3\CMS\Install\FolderStructure\Exception\InvalidArgumentException
+     * @throws \TYPO3\CMS\Install\FolderStructure\Exception\RootNodeException
      * @throws \TYPO3\CMS\Install\Status\Exception
      */
     public function fixFolderStructureCommand()
     {
-        $folderStructureFactory = GeneralUtility::makeInstance(ExtensionFactory::class);
+        $folderStructureFactory = GeneralUtility::makeInstance(ExtensionFactory::class, $this->packageManager);
         $structureFacade = $folderStructureFactory->getStructure();
         $fixedStatusObjects = $structureFacade->fix();
 
