@@ -1,5 +1,5 @@
 <?php
-namespace Helhum\Typo3Console\FolderStructure;
+namespace Helhum\Typo3Console\Install\FolderStructure;
 
 /*
  * This file is part of the TYPO3 CMS project.

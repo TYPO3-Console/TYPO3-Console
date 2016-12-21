@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Command;
  *
  */
 
+use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -139,9 +140,8 @@ class InstallCommandController extends CommandController
      */
     public function fixFolderStructureCommand()
     {
-        $folderStructureFactory = GeneralUtility::makeInstance(\Helhum\Typo3Console\FolderStructure\ExtensionFactory::class);
+        $folderStructureFactory = GeneralUtility::makeInstance(ExtensionFactory::class);
         $structureFacade = $folderStructureFactory->getStructure();
-
         $fixedStatusObjects = $structureFacade->fix();
 
         if (empty($fixedStatusObjects)) {
