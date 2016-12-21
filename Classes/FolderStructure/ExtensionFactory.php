@@ -41,7 +41,6 @@ class ExtensionFactory extends \TYPO3\CMS\Install\FolderStructure\DefaultFactory
         return GeneralUtility::makeInstance(StructureFacade::class, $rootNode);
     }
 
-
     /**
      * Default definition of folder and file structure with dynamic
      * permission settings
@@ -77,7 +76,6 @@ class ExtensionFactory extends \TYPO3\CMS\Install\FolderStructure\DefaultFactory
                     }
                 }
             }
-
         }
 
         return $structureBase;
