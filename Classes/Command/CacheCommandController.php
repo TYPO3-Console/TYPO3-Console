@@ -62,7 +62,7 @@ class CacheCommandController extends CommandController
      * - pages
      * - system
      *
-     * <b>Example:</b> <code>./typo3cms cache:groups pages,all</code>
+     * <b>Example:</b> <code>typo3cms cache:groups pages,all</code>
      *
      * @param array $groups An array of names (specified as comma separated values) of cache groups to flush
      */
@@ -82,7 +82,7 @@ class CacheCommandController extends CommandController
      *
      * Flushes caches by tags, optionally only caches in specified groups.
      *
-     * <b>Example:</b> <code>./typo3cms cache:flushtags news_123 pages,all</code>
+     * <b>Example:</b> <code>typo3cms cache:flushtags news_123 pages,all</code>
      *
      * @param array $tags Array of tags (specified as comma separated values) to flush.
      * @param array $groups Optional array of groups (specified as comma separated values) for which to flush tags. If no group is specified, caches of all groups are flushed.
