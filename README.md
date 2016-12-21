@@ -28,8 +28,10 @@ Instead of typing
 just type:
 
 ```
-./typo3cms extension:activate realurl
+typo3cms extension:activate realurl
 ```
+
+Notice that the location of `typo3cms` depends on your installation type, see *Installation* below.
 
 ## Features
 * Command line tool

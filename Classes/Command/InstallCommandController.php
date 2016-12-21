@@ -98,7 +98,7 @@ class InstallCommandController extends CommandController
      * - All core extensions that are required (or part of minimal usable system)
      * - All core extensions which are provided in the TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS environment variable. Extension keys in this variable must be separated by comma and without spaces.
      *
-     * <b>Example:</b> <code>TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS="info,info_pagetsconfig" ./typo3cms install:generatepackagestates</code>
+     * <b>Example:</b> <code>TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS="info,info_pagetsconfig" typo3cms install:generatepackagestates</code>
      *
      * @param bool $removeInactive Inactive extensions are <comment>removed</comment> from <code>typo3/sysext</code>. <comment>Handle with care!</comment>
      * @param bool $activateDefault If true, <code>typo3/cms</code> extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
