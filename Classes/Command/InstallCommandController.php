@@ -131,7 +131,6 @@ class InstallCommandController extends CommandController
      *
      * @throws \TYPO3\CMS\Install\FolderStructure\Exception
      * @throws \TYPO3\CMS\Install\Status\Exception
-     * @throws \TYPO3\CMS\Extensionmanager\Exception\ExtensionManagerException
      */
     public function fixFolderStructureCommand()
     {
