@@ -125,18 +125,21 @@ class InstallCommandController extends CommandController
     /**
      * Fix folder structure
      *
-     * Automatically create files and folders, required for a TYPO3 installation and available TYPO3 extensions.
+     * Automatically create files and folders, required for a TYPO3 installation.
      *
-     * This command is great e.g. for creating the typo3temp folder structure during deployment
+     * This command creates the required folder structure needed for TYPO3 including extensions.
+     * It is recommended to be executed <b>after</b> executing
+     * <code>typo3cms install:generatepackagestates</code>, to ensure proper generation of
+     * required folders for all active extensions.
+     *
+     * @see typo3_console:install:generatepackagestates
      *
      * @throws \TYPO3\CMS\Install\FolderStructure\Exception
      * @throws \TYPO3\CMS\Install\Status\Exception
      */
     public function fixFolderStructureCommand()
     {
-        /** @var $folderStructureFactory \Helhum\Typo3Console\FolderStructure\ExtensionFactory */
         $folderStructureFactory = GeneralUtility::makeInstance(\Helhum\Typo3Console\FolderStructure\ExtensionFactory::class);
-        /** @var $structureFacade \TYPO3\CMS\Install\FolderStructure\StructureFacade */
         $structureFacade = $folderStructureFactory->getStructure();
 
         $fixedStatusObjects = $structureFacade->fix();
