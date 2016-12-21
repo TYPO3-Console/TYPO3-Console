@@ -22,13 +22,13 @@ e.g.
 Instead of typing
 
 ```
-./typo3/cli_dispatch.phpsh extbase extension:install realurl
+typo3/cli_dispatch.phpsh extbase extension:install realurl
 ```
 
 just type:
 
 ```
-./typo3cms extension:activate realurl
+vendor/bin/typo3cms extension:activate realurl
 ```
 
 ## Features
