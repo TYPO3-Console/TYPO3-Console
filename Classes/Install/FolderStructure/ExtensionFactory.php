@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\Install\FolderStructure;
 
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Core\Utility\StringUtility;
 use TYPO3\CMS\Extensionmanager\Utility\EmConfUtility;
 use TYPO3\CMS\Install\FolderStructure\DirectoryNode;
@@ -37,8 +38,7 @@ class ExtensionFactory extends \TYPO3\CMS\Install\FolderStructure\DefaultFactory
     {
         $structure = $this->getDefaultStructureDefinition();
         $structure['children'] = $this->appendStructureDefinition($structure['children'], $this->getExtensionStructureDefinition());
-        $rootNode = GeneralUtility::makeInstance(RootNode::class, $structure, null);
-        return GeneralUtility::makeInstance(StructureFacade::class, $rootNode);
+        return new StructureFacade(new RootNode($structure));
     }
 
     /**
@@ -68,11 +68,11 @@ class ExtensionFactory extends \TYPO3\CMS\Install\FolderStructure\DefaultFactory
             }
 
             if (!empty($extensionConfiguration['createDirs'])) {
-                foreach (GeneralUtility::trimExplode(',', $extensionConfiguration['createDirs']) as $directoryToCreate) {
-                    $directory = GeneralUtility::resolveBackPath(PATH_site . $directoryToCreate);
-                    if (StringUtility::beginsWith($directory, PATH_site)) {
-                        // Only create directories within TYPO3 root.
-                        $structureBase[] = $this->getDirectoryNodeByPath(substr($directory, strlen(PATH_site)));
+                foreach (explode(',', $extensionConfiguration['createDirs']) as $directoryToCreate) {
+                    $absolutePath = GeneralUtility::getFileAbsFileName(trim($directoryToCreate));
+                    // Only create directories within TYPO3 root.
+                    if (!empty($absolutePath)) {
+                        $structureBase[] = $this->getDirectoryNodeByPath(PathUtility::stripPathSitePrefix($absolutePath));
                     }
                 }
             }
@@ -102,7 +102,7 @@ class ExtensionFactory extends \TYPO3\CMS\Install\FolderStructure\DefaultFactory
     protected function getDirectoryNodeByPath($path)
     {
         $baseNode = [];
-        $parts = GeneralUtility::trimExplode('/', $path, true);
+        $parts = explode('/', $path);
         $node = &$baseNode;
         foreach ($parts as $part) {
             $node[0] = [
