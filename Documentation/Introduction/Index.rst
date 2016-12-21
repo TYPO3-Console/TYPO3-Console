@@ -31,26 +31,26 @@ This extension comes with a command line tool called ``typo3cms`` and you can ex
 .. code-block:: bash
 
 	# Run reference index check
-	./typo3cms cleanup:updatereferenceindex --dry-run
+	typo3cms cleanup:updatereferenceindex --dry-run
 
 	# Update translated labels
-	./typo3cms language:update
+	typo3cms language:update
 
 	# Lock editing in the backend
-	./typo3cms backend:lock
+	typo3cms backend:lock
 
 Additionally it provides some commands, that wouldn't be possible at all with the current core command line interface:
 
 .. code-block:: bash
 
 	# Force flush all caches in a reliable and robust way
-	./typo3cms cache:flush --force
+	typo3cms cache:flush --force
 
 	# Interactively set up a new TYPO3 instance from command line (instead of using the install tool)
-	./typo3cms install:setup
+	typo3cms install:setup
 
 	# Non interactive automatic setup of a new TYPO3 instance
-	./typo3cms install:setup --non-interactive \
+	typo3cms install:setup --non-interactive \
 		--database-user-name="root" \
 		--database-host-name="localhost" \
 		--database-port="3306" \
@@ -60,17 +60,17 @@ Additionally it provides some commands, that wouldn't be possible at all with th
 		--site-name="Travis Install"
 
 	# Perform safe database schema updates
-	./typo3cms database:updateschema "*.add,*.change"
+	typo3cms database:updateschema "*.add,*.change"
 
 A help system is integrated, so that you can easily list all available commands or get help for individual commands:
 
 .. code-block:: bash
 
 	# List all commands with a short description
-	./typo3cms help
+	typo3cms help
 
 	# Show detailed help for an individual command
-	./typo3cms help cache:flush
+	typo3cms help cache:flush
 
 
 FAQ

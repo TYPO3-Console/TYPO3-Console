@@ -8,7 +8,7 @@
 
 .. note::
 
-  This reference uses ``./typo3cms`` as the command to invoke. If you are on
+  This reference uses ``typo3cms`` as the command to invoke. If you are on
   Windows, this will probably not work, there you need to use ``typo3cms.bat``
   instead.
   In Composer based installations, the ``typo3cms`` binary will be located

@@ -233,7 +233,7 @@ class CliSetupRequestHandler
                     do {
                         $defaultValue = $argument->getDefaultValue();
                         $isRequired = $this->isArgumentRequired($argument);
-                        if ($isPasswordArgument && $isRequired) {
+                        if ($isPasswordArgument) {
                             $argumentValue = $this->output->askHiddenResponse(
                                 sprintf(
                                     '<comment>%s:</comment> ',
