@@ -2,16 +2,15 @@
 namespace Helhum\Typo3Console\Install\FolderStructure;
 
 /*
- * This file is part of the TYPO3 CMS project.
+ * This file is part of the TYPO3 console project.
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 2
  * of the License, or any later version.
  *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
+ * For the full copyright and license information, please read
+ * LICENSE file that was distributed with this source code.
  *
- * The TYPO3 project - inspiring people to share!
  */
 
 use Helhum\Typo3Console\Package\UncachedPackageManager;
@@ -23,7 +22,8 @@ use TYPO3\CMS\Install\FolderStructure\RootNode;
 use TYPO3\CMS\Install\FolderStructure\StructureFacade;
 
 /**
- * Factory returns extension folder structure object hierarchy
+ * Factory returns folder structure object hierarchy
+ * for TYPO3 core and Extensions
  */
 class ExtensionFactory extends DefaultFactory
 {
