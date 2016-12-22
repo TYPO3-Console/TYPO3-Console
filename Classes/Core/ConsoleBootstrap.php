@@ -158,8 +158,12 @@ class ConsoleBootstrap extends Bootstrap
             echo 'The command line must be executed with a cli PHP binary! The current PHP sapi type is "' . PHP_SAPI . '".' . PHP_EOL;
             exit(1);
         }
-        ini_set('memory_limit', -1);
-        set_time_limit(0);
+        if (ini_get('memory_limit') !== '-1') {
+            @ini_set('memory_limit', '-1');
+        }
+        if (ini_get('max_execution_time') !== '0') {
+            @ini_set('max_execution_time', '0');
+        }
     }
 
     /**
