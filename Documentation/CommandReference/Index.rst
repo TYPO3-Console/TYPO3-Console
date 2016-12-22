@@ -16,7 +16,7 @@ Command Reference
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2016-12-21 12:30:03
+The following reference was automatically generated from code on 2016-12-21 23:39:26
 
 
 .. _`Command Reference: typo3_console`:
@@ -736,11 +736,20 @@ Options
 
 Automatically create files and folders, required for a TYPO3 installation.
 
-This command is great e.g. for creating the typo3temp folder structure during deployment
+This command creates the required folder structure needed for TYPO3 including extensions.
+It is recommended to be executed **after** executing
+``typo3cms install:generatepackagestates``, to ensure proper generation of
+required folders for all active extensions.
 
 
 
 
+
+Related commands
+^^^^^^^^^^^^^^^^
+
+``install:generatepackagestates``
+  Generate PackageStates.php file
 
 
 

@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Package;
 
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use TYPO3\CMS\Core\Core\ClassLoadingInformation;
+use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 
 /**
@@ -60,6 +61,17 @@ class UncachedPackageManager extends PackageManager
         } else {
             $this->registerPackagesFromConfiguration($this->packageStatesConfiguration['packages']);
         }
+    }
+
+    /**
+     * Get the extension configuration as array from the config file
+     *
+     * @param PackageInterface $package
+     * @return array
+     */
+    public function getExtensionConfiguration(PackageInterface $package)
+    {
+        return parent::getExtensionEmConf($package->getPackagePath());
     }
 
     /**
