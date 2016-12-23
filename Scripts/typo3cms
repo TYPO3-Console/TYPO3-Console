@@ -2,6 +2,9 @@
 <?php
 if (file_exists(__DIR__ . '/typo3cms.php')) {
     require __DIR__ . '/typo3cms.php';
+} elseif (file_exists(__DIR__ . '/../helhum/typo3-console/Scripts/typo3cms.php')) {
+	// Called with a specific php binary which means __DIR__ is the vendor/bin folder
+    require __DIR__ . '/../helhum/typo3-console/Scripts/typo3cms.php';
 } elseif (file_exists(__DIR__ . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php')) {
     // In non Composer mode we're copied into TYPO3 web root
     putenv('TYPO3_PATH_WEB=' . __DIR__);
