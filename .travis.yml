@@ -66,7 +66,7 @@ before_script:
   - git clean -dffx
   - composer require typo3/cms="$TYPO3_VERSION"
   - export TYPO3_PATH_WEB="$PWD/.Build/Web"
-  - ln -s Scripts/typo3cms typo3cms
+  - export PATH="$PATH:./Scripts"
 
 script:
   - >
@@ -81,48 +81,48 @@ script:
   # Basic functional tests - all commands should exit with 0
   - >
     if [ -n "$TRAVIS_TAG" ]; then
-      ./typo3cms | grep $TRAVIS_TAG
+      typo3cms | grep $TRAVIS_TAG
     fi
-  - ./typo3cms help && [ ! -f "$TYPO3_PATH_WEB/typo3conf/PackageStates.php" ]
-  - ./typo3cms install:setup --non-interactive --database-user-name="root" --database-host-name="localhost" --database-port="3306" --database-name="travis_test" --admin-user-name="admin" --admin-password="password" --site-name="Travis Install" --site-setup-type="createsite"
-  - echo 'select uid,title from pages limit 1' | ./typo3cms database:import | sed 's/[[:blank:]]//g' | grep 1Home
-  - ./typo3cms help
-  - ./typo3cms help:autocomplete
-  - ./typo3cms help:autocomplete bash
-  - ./typo3cms help:autocomplete zsh
-  - ./typo3cms backend:lock
-  - ./typo3cms backend:unlock
-  - ./typo3cms backend:lockforeditors
-  - ./typo3cms backend:unlockforeditors
-  - ./typo3cms cache:flush
-  - ./typo3cms cache:flushgroups pages
-  - ./typo3cms cache:flushtags foo
-  - ./typo3cms cache:flushtags foo pages
-  - ./typo3cms cache:listgroups
-  - ./typo3cms cleanup:updatereferenceindex
-  - ./typo3cms database:updateschema "*" --verbose --dry-run
-  - ./typo3cms database:updateschema --verbose
-  - ./typo3cms database:updateschema "*" --verbose
-  - ./typo3cms database:export > /dev/null
-  - echo "SELECT username from be_users where admin=1;" | ./typo3cms database:import
-  - echo "DROP TABLE fe_users;" | ./typo3cms database:import
-  - ./typo3cms database:updateschema "*" --verbose
-  - ./typo3cms frontend:request / > /dev/null
-  - ./typo3cms documentation:generatexsd TYPO3\\CMS\\Fluid\\ViewHelpers > /dev/null
-  - ./typo3cms configuration:show BE/installToolPassword
-  - ./typo3cms configuration:showLocal BE/installToolPassword
-  - ./typo3cms configuration:showActive BE/installToolPassword
-  - ./typo3cms configuration:set BE/installToolPassword foobar && grep installToolPassword $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php | grep foobar
-  - ./typo3cms configuration:remove BE/installToolPassword --force && grep -qv installToolPassword $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php
-  - ./typo3cms configuration:set BE/installToolPassword blablupp && grep installToolPassword $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php | grep blablupp
-  - ./typo3cms configuration:set EXTCONF/lang/availableLanguages/1 fr_FR && grep fr_FR $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php
-  - ./typo3cms configuration:set EXTCONF/foo/bar baz && grep bar $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php | grep baz
-  - rm -f $TYPO3_PATH_WEB/typo3conf/PackageStates.php && ./typo3cms install:generatepackagestates --activate-default && [ -f "$TYPO3_PATH_WEB/typo3conf/PackageStates.php" ]
-  - rm $TYPO3_PATH_WEB/typo3temp/index.html && ./typo3cms install:fixfolderstructure && [ -f "$TYPO3_PATH_WEB/typo3temp/index.html" ]
-  - ./typo3cms extension:list
-  - ./typo3cms extension:list --raw | grep extbase
-  - ./typo3cms extension:list --active --raw | grep extbase
-  - ./typo3cms extension:list --inactive --raw | tr '\n' ' ' | grep -v extbase
+  - typo3cms help && [ ! -f "$TYPO3_PATH_WEB/typo3conf/PackageStates.php" ]
+  - typo3cms install:setup --non-interactive --database-user-name="root" --database-host-name="localhost" --database-port="3306" --database-name="travis_test" --admin-user-name="admin" --admin-password="password" --site-name="Travis Install" --site-setup-type="createsite"
+  - echo 'select uid,title from pages limit 1' | typo3cms database:import | sed 's/[[:blank:]]//g' | grep 1Home
+  - typo3cms help
+  - typo3cms help:autocomplete
+  - typo3cms help:autocomplete bash
+  - typo3cms help:autocomplete zsh
+  - typo3cms backend:lock
+  - typo3cms backend:unlock
+  - typo3cms backend:lockforeditors
+  - typo3cms backend:unlockforeditors
+  - typo3cms cache:flush
+  - typo3cms cache:flushgroups pages
+  - typo3cms cache:flushtags foo
+  - typo3cms cache:flushtags foo pages
+  - typo3cms cache:listgroups
+  - typo3cms cleanup:updatereferenceindex
+  - typo3cms database:updateschema "*" --verbose --dry-run
+  - typo3cms database:updateschema --verbose
+  - typo3cms database:updateschema "*" --verbose
+  - typo3cms database:export > /dev/null
+  - echo "SELECT username from be_users where admin=1;" | typo3cms database:import
+  - echo "DROP TABLE fe_users;" | typo3cms database:import
+  - typo3cms database:updateschema "*" --verbose
+  - typo3cms frontend:request / > /dev/null
+  - typo3cms documentation:generatexsd TYPO3\\CMS\\Fluid\\ViewHelpers > /dev/null
+  - typo3cms configuration:show BE/installToolPassword
+  - typo3cms configuration:showLocal BE/installToolPassword
+  - typo3cms configuration:showActive BE/installToolPassword
+  - typo3cms configuration:set BE/installToolPassword foobar && grep installToolPassword $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php | grep foobar
+  - typo3cms configuration:remove BE/installToolPassword --force && grep -qv installToolPassword $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php
+  - typo3cms configuration:set BE/installToolPassword blablupp && grep installToolPassword $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php | grep blablupp
+  - typo3cms configuration:set EXTCONF/lang/availableLanguages/1 fr_FR && grep fr_FR $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php
+  - typo3cms configuration:set EXTCONF/foo/bar baz && grep bar $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php | grep baz
+  - rm -f $TYPO3_PATH_WEB/typo3conf/PackageStates.php && typo3cms install:generatepackagestates --activate-default && [ -f "$TYPO3_PATH_WEB/typo3conf/PackageStates.php" ]
+  - rm $TYPO3_PATH_WEB/typo3temp/index.html && typo3cms install:fixfolderstructure && [ -f "$TYPO3_PATH_WEB/typo3temp/index.html" ]
+  - typo3cms extension:list
+  - typo3cms extension:list --raw | grep extbase
+  - typo3cms extension:list --active --raw | grep extbase
+  - typo3cms extension:list --inactive --raw | tr '\n' ' ' | grep -v extbase
 
 after_script:
   - >
