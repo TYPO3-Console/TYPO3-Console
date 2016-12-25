@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Install\FolderStructure;
  */
 
 use Helhum\Typo3Console\Package\UncachedPackageManager;
+use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Install\FolderStructure\DefaultFactory;
@@ -53,7 +54,23 @@ class ExtensionFactory extends DefaultFactory
     public function getStructure()
     {
         $structure = $this->getDefaultStructureDefinition();
-        $structure['children'] = $this->appendStructureDefinition($structure['children'], $this->getExtensionStructureDefinition());
+        $structure['children'] = $this->appendStructureDefinition($structure['children'], $this->createExtensionStructureDefinition($this->packageManager->getActivePackages()));
+        return new StructureFacade(new RootNode($structure));
+    }
+
+    /**
+     * Creates the folder structure for one extension
+     *
+     * @param PackageInterface $package
+     * @return StructureFacade
+     */
+    public function getExtensionStructure(PackageInterface $package)
+    {
+        $structure = [
+            'name' => substr(PATH_site, 0, -1),
+            'targetPermission' => $GLOBALS['TYPO3_CONF_VARS']['SYS']['folderCreateMask'],
+            'children' => $this->appendStructureDefinition([], $this->createExtensionStructureDefinition([$package]))
+        ];
         return new StructureFacade(new RootNode($structure));
     }
 
@@ -61,12 +78,13 @@ class ExtensionFactory extends DefaultFactory
      * Default definition of folder and file structure with dynamic
      * permission settings
      *
+     * @param PackageInterface[] $packages
      * @return array
      */
-    private function getExtensionStructureDefinition()
+    private function createExtensionStructureDefinition(array $packages)
     {
         $structureBase = [];
-        foreach ($this->packageManager->getActivePackages() as $package) {
+        foreach ($packages as $package) {
             $extensionConfiguration = $this->packageManager->getExtensionConfiguration($package);
 
             if (isset($extensionConfiguration['uploadfolder']) && (bool)$extensionConfiguration['uploadfolder']) {
@@ -89,7 +107,6 @@ class ExtensionFactory extends DefaultFactory
 
     /**
      * Extension uploads directory.
-     *
      *
      * @param string $extension Extension key
      * @return array

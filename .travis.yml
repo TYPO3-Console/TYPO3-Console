@@ -123,6 +123,11 @@ script:
   - typo3cms extension:list --raw | grep extbase
   - typo3cms extension:list --active --raw | grep extbase
   - typo3cms extension:list --inactive --raw | tr '\n' ' ' | grep -v extbase
+  - cp -r Tests/Functional/Fixtures/ext_test .Build/Web/typo3conf/ext/
+  - typo3cms extension:activate ext_test && typo3cms database:updateschema | grep 'No schema updates were performed'
+  - typo3cms extension:activate core && typo3cms database:updateschema | grep 'No schema updates were performed'
+  - typo3cms extension:setup core && typo3cms database:updateschema | grep 'No schema updates were performed'
+  - typo3cms extension:setupactive && typo3cms database:updateschema | grep 'No schema updates were performed'
 
 after_script:
   - >

@@ -143,9 +143,10 @@ class InstallCommandController extends CommandController
      */
     public function fixFolderStructureCommand()
     {
-        $folderStructureFactory = GeneralUtility::makeInstance(ExtensionFactory::class, $this->packageManager);
-        $structureFacade = $folderStructureFactory->getStructure();
-        $fixedStatusObjects = $structureFacade->fix();
+        $folderStructureFactory = new ExtensionFactory($this->packageManager);
+        $fixedStatusObjects = $folderStructureFactory
+            ->getStructure()
+            ->fix();
 
         if (empty($fixedStatusObjects)) {
             $this->outputLine('<info>No action performed!</info>');
