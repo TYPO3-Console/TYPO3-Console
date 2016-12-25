@@ -13,9 +13,12 @@ namespace Helhum\Typo3Console\Command;
  *
  */
 
+use Helhum\Typo3Console\Extension\ExtensionSetup;
+use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\ClassLoadingInformation;
+use TYPO3\CMS\Core\Package\PackageInterface;
 
 /**
  * CommandController for working with extension management through CLI
@@ -57,14 +60,27 @@ class ExtensionCommandController extends CommandController
     public function activateCommand(array $extensionKeys)
     {
         $this->emitPackagesMayHaveChangedSignal();
+        $installedExtensions = [];
+        $extensionsToSetUp = [];
         foreach ($extensionKeys as $extensionKey) {
-            $this->extensionInstaller->install($extensionKey);
+            $extensionsToSetUp[] = $this->packageManager->getPackage($extensionKey);
+            if (!$this->packageManager->isPackageActive($extensionKey)) {
+                $this->packageManager->activatePackage($extensionKey);
+                $installedExtensions[] = $extensionKey;
+            }
         }
-        $extensionKeysAsString = implode('", "', $extensionKeys);
-        if (count($extensionKeys) === 1) {
-            $this->outputLine('<info>Extension "%s" is now active.</info>', [$extensionKeysAsString]);
-        } else {
-            $this->outputLine('<info>Extensions "%s" are now active.</info>', [$extensionKeysAsString]);
+
+        if (!empty($installedExtensions)) {
+            $extensionKeysAsString = implode('", "', $installedExtensions);
+            if (count($installedExtensions) === 1) {
+                $this->outputLine('<info>Extension "%s" is now active.</info>', [$extensionKeysAsString]);
+            } else {
+                $this->outputLine('<info>Extensions "%s" are now active.</info>', [$extensionKeysAsString]);
+            }
+        }
+
+        if (!empty($extensionsToSetUp)) {
+            $this->setupExtensions($extensionsToSetUp);
         }
     }
 
@@ -104,11 +120,31 @@ class ExtensionCommandController extends CommandController
      */
     public function setupCommand(array $extensionKeys)
     {
+        $packages = [];
         foreach ($extensionKeys as $extensionKey) {
-            $this->extensionInstaller->processExtensionSetup($extensionKey);
+            $packages[] = $this->packageManager->getPackage($extensionKey);
         }
-        $extensionKeysAsString = implode('", "', $extensionKeys);
-        if (count($extensionKeys) === 1) {
+        $this->setupExtensions($packages);
+    }
+
+    /**
+     * Performs all necessary operations to integrate an extension into the system.
+     * To do so, we avoid buggy TYPO3 API and use our own instead.
+     *
+     * @param PackageInterface[] $packages
+     */
+    private function setupExtensions(array $packages)
+    {
+        $extensionSetup = new ExtensionSetup(
+            new ExtensionFactory($this->packageManager),
+            $this->extensionInstaller
+        );
+
+        $extensionSetup->setupExtensions($packages);
+        $extensionKeysAsString = implode('", "', array_map(function (PackageInterface $package) {
+            return $package->getPackageKey();
+        }, $packages));
+        if (count($packages) === 1) {
             $this->outputLine('<info>Extension "%s" is now set up.</info>', [$extensionKeysAsString]);
         } else {
             $this->outputLine('<info>Extensions "%s" are now set up.</info>', [$extensionKeysAsString]);
@@ -132,11 +168,7 @@ class ExtensionCommandController extends CommandController
      */
     public function setupActiveCommand()
     {
-        $activeExtensions = [];
-        foreach ($this->packageManager->getActivePackages() as $package) {
-            $activeExtensions[] = $package->getPackageKey();
-        }
-        $this->setupCommand($activeExtensions);
+        $this->setupExtensions($this->packageManager->getActivePackages());
     }
 
     /**
