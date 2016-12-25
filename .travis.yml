@@ -18,25 +18,21 @@ matrix:
     - php: 7.0
       env: TYPO3_VERSION=^7.6
     - php: 7.0
-      env: TYPO3_VERSION=~8.0.0
-    - php: 7.0
-      env: TYPO3_VERSION=~8.1.0
-    - php: 7.0
-      env: TYPO3_VERSION=~8.2.0
-    - php: 7.0
       env: TYPO3_VERSION=~8.3.0
     - php: 7.0
       env: TYPO3_VERSION=~8.4.0
     - php: 7.0
-      env: TYPO3_VERSION="dev-master as 8.4.0"
+      env: TYPO3_VERSION=~8.5.0
+    - php: 7.0
+      env: TYPO3_VERSION="dev-master as 8.5.0"
     - php: 7.1
       env: TYPO3_VERSION=^7.6
     - php: 7.1
       env: TYPO3_VERSION=^8
     - php: 7.1
-      env: TYPO3_VERSION="dev-master as 8.4.0"
+      env: TYPO3_VERSION="dev-master as 8.5.0"
   allow_failures:
-    - env: TYPO3_VERSION="dev-master as 8.4.0"
+    - env: TYPO3_VERSION="dev-master as 8.5.0"
 
 cache:
   directories:
