@@ -60,19 +60,20 @@ class ExtensionCommandController extends CommandController
     public function activateCommand(array $extensionKeys)
     {
         $this->emitPackagesMayHaveChangedSignal();
-        $installedExtensions = [];
+        $activatedExtensions = [];
         $extensionsToSetUp = [];
         foreach ($extensionKeys as $extensionKey) {
             $extensionsToSetUp[] = $this->packageManager->getPackage($extensionKey);
             if (!$this->packageManager->isPackageActive($extensionKey)) {
                 $this->packageManager->activatePackage($extensionKey);
-                $installedExtensions[] = $extensionKey;
+                $activatedExtensions[] = $extensionKey;
             }
         }
 
-        if (!empty($installedExtensions)) {
-            $extensionKeysAsString = implode('", "', $installedExtensions);
-            if (count($installedExtensions) === 1) {
+        if (!empty($activatedExtensions)) {
+            $this->extensionInstaller->reloadCaches();
+            $extensionKeysAsString = implode('", "', $activatedExtensions);
+            if (count($activatedExtensions) === 1) {
                 $this->outputLine('<info>Extension "%s" is now active.</info>', [$extensionKeysAsString]);
             } else {
                 $this->outputLine('<info>Extensions "%s" are now active.</info>', [$extensionKeysAsString]);
@@ -80,7 +81,7 @@ class ExtensionCommandController extends CommandController
         }
 
         if (!empty($extensionsToSetUp)) {
-            $this->setupExtensions($extensionsToSetUp);
+            $this->setupExtensions($extensionsToSetUp, $activatedExtensions);
         }
     }
 
@@ -132,15 +133,16 @@ class ExtensionCommandController extends CommandController
      * To do so, we avoid buggy TYPO3 API and use our own instead.
      *
      * @param PackageInterface[] $packages
+     * @param array $activatedExtensionKeys
      */
-    private function setupExtensions(array $packages)
+    private function setupExtensions(array $packages, array $activatedExtensionKeys = [])
     {
         $extensionSetup = new ExtensionSetup(
             new ExtensionFactory($this->packageManager),
             $this->extensionInstaller
         );
 
-        $extensionSetup->setupExtensions($packages);
+        $extensionSetup->setupExtensions($packages, $activatedExtensionKeys);
         $extensionKeysAsString = implode('", "', array_map(function (PackageInterface $package) {
             return $package->getPackageKey();
         }, $packages));
