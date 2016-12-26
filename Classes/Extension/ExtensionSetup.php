@@ -54,9 +54,14 @@ class ExtensionSetup
     }
 
     /**
+     * Performs all necessary operations to integrate extensions into the system.
+     * Instead of using buggy TYPO3 API, we created our own instead.
+     * This might be removed, once the bug is fixed in TYPO3.
+     *
      * @param PackageInterface[] $packages
+     * @param array $activatedExtensionKeys
      */
-    public function setupExtensions(array $packages)
+    public function setupExtensions(array $packages, array $activatedExtensionKeys = [])
     {
         foreach ($packages as $package) {
             $this->extensionFactory->getExtensionStructure($package)->fix();
@@ -67,8 +72,13 @@ class ExtensionSetup
         $this->schemaService->updateSchema(SchemaUpdateType::expandSchemaUpdateTypes(['safe']));
 
         foreach ($packages as $package) {
-            $this->callInstaller('importStaticSqlFile', [PathUtility::stripPathSitePrefix($package->getPackagePath())]);
-            $this->callInstaller('importT3DFile', [PathUtility::stripPathSitePrefix($package->getPackagePath())]);
+            $relativeExtensionPath = PathUtility::stripPathSitePrefix($package->getPackagePath());
+            $extensionKey = $package->getPackageKey();
+            $this->callInstaller('importStaticSqlFile', [$relativeExtensionPath]);
+            $this->callInstaller('importT3DFile', [$relativeExtensionPath]);
+            if (in_array($extensionKey, $activatedExtensionKeys, true)) {
+                $this->callInstaller('emitAfterExtensionInstallSignal', [$extensionKey]);
+            }
         }
     }
 
