@@ -93,7 +93,7 @@ class DatabaseCommandController extends CommandController
                 '<info>No schema updates %s performed for update type%s:%s</info>',
                 [$dryRun ? 'must be' : 'were',
                 count($expandedSchemaUpdateTypes) > 1 ? 's' : '',
-                PHP_EOL . implode(PHP_EOL, $expandedSchemaUpdateTypes)]
+                PHP_EOL . implode('", "', $expandedSchemaUpdateTypes)]
             );
         }
     }
