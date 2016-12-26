@@ -49,6 +49,12 @@ class ExtensionCommandController extends CommandController
     protected $packageManager;
 
     /**
+     * @var \Helhum\Typo3Console\Service\CacheService
+     * @inject
+     */
+    protected $cacheService;
+
+    /**
      * Activate extension(s)
      *
      * Activates one or more extensions by key.
@@ -72,6 +78,8 @@ class ExtensionCommandController extends CommandController
 
         if (!empty($activatedExtensions)) {
             $this->extensionInstaller->reloadCaches();
+            $this->cacheService->flush();
+
             $extensionKeysAsString = implode('", "', $activatedExtensions);
             if (count($activatedExtensions) === 1) {
                 $this->outputLine('<info>Extension "%s" is now active.</info>', [$extensionKeysAsString]);
