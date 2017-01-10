@@ -113,6 +113,8 @@ script:
   - typo3cms configuration:set EXTCONF/lang/availableLanguages/1 fr_FR && grep fr_FR $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php
   - typo3cms configuration:set EXTCONF/foo/bar baz && grep bar $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php | grep baz
   - rm -f $TYPO3_PATH_WEB/typo3conf/PackageStates.php && typo3cms install:generatepackagestates --activate-default && [ -f "$TYPO3_PATH_WEB/typo3conf/PackageStates.php" ]
+  - rm -f $TYPO3_PATH_WEB/typo3conf/PackageStates.php && TYPO3_CONSOLE_TEST_SETUP=yes TYPO3_ACTIVATE_DEFAULT_FRAMEWORK_EXTENSIONS=yes composer dump-autoload -vv 2>&1 | grep 'generated PackageStates.php' && [ -f "$TYPO3_PATH_WEB/typo3conf/PackageStates.php" ]
+  - grep sys_note "$TYPO3_PATH_WEB/typo3conf/PackageStates.php"
   - rm $TYPO3_PATH_WEB/typo3temp/index.html && typo3cms install:fixfolderstructure && [ -f "$TYPO3_PATH_WEB/typo3temp/index.html" ]
   - typo3cms extension:list
   - typo3cms extension:list --raw | grep extbase
@@ -123,6 +125,7 @@ script:
   - typo3cms extension:activate core && typo3cms database:updateschema | grep 'No schema updates were performed'
   - typo3cms extension:setup core && typo3cms database:updateschema | grep 'No schema updates were performed'
   - typo3cms extension:setupactive && typo3cms database:updateschema | grep 'No schema updates were performed'
+  - typo3cms extension:removeinactive --force | grep 'The following directories have been removed'
 
 after_script:
   - >

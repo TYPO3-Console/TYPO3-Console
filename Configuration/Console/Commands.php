@@ -19,11 +19,11 @@ return [
         'typo3_console:cache:flush' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE ,
         'typo3_console:commandreference:render' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL ,
         'typo3_console:configuration:*' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL ,
+        'typo3_console:extension:*' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_FULL ,
+        'typo3_console:extension:removeinactive' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE ,
     ],
     'bootingSteps' => [
-        'typo3_console:install:databasedata' => [
-            'helhum.typo3console:database'
-        ],
+        'typo3_console:install:databasedata' => ['helhum.typo3console:database'],
         'typo3_console:install:defaultconfiguration' => ['helhum.typo3console:database'],
         'typo3_console:cache:flush' => ['helhum.typo3console:database'],
     ]

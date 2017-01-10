@@ -51,6 +51,6 @@ call_user_func(function () {
         // where requiring the main autoload.php is not enough to load extension classes
         require __DIR__ . '/../Classes/Core/ConsoleBootstrap.php';
     }
-    $bootstrap = new \Helhum\Typo3Console\Core\ConsoleBootstrap(getenv('TYPO3_CONTEXT') ?: 'Production');
+    $bootstrap = \Helhum\Typo3Console\Core\ConsoleBootstrap::create(getenv('TYPO3_CONTEXT') ?: 'Production');
     $bootstrap->run($classLoader);
 });

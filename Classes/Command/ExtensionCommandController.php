@@ -19,6 +19,8 @@ use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\ClassLoadingInformation;
 use TYPO3\CMS\Core\Package\PackageInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\PathUtility;
 
 /**
  * CommandController for working with extension management through CLI
@@ -65,6 +67,13 @@ class ExtensionCommandController extends CommandController
      */
     public function activateCommand(array $extensionKeys)
     {
+        if (Bootstrap::usesComposerClassLoading()) {
+            $this->output->outputLine('<warning>This command has been deprecated to be used in composer mode, as it might lead to unexpected results</warning>');
+            $this->output->outputLine('<warning>The PackageStates.php file that tracks which extension should be active,</warning>');
+            $this->output->outputLine('<warning>is now generated automatically when installing the console with composer.</warning>');
+            $this->output->outputLine('<warning>To set up all active extensions correctly, please use the extension:setupactive command</warning>');
+        }
+
         $this->emitPackagesMayHaveChangedSignal();
         $activatedExtensions = [];
         $extensionsToSetUp = [];
@@ -104,6 +113,13 @@ class ExtensionCommandController extends CommandController
      */
     public function deactivateCommand(array $extensionKeys)
     {
+        if (Bootstrap::usesComposerClassLoading()) {
+            $this->output->outputLine('<warning>This command has been deprecated to be used in composer mode, as it might lead to unexpected results</warning>');
+            $this->output->outputLine('<warning>The PackageStates.php file that tracks which extension should be active,</warning>');
+            $this->output->outputLine('<warning>is now generated automatically when installing the console with composer.</warning>');
+            $this->output->outputLine('<warning>To set up all active extensions correctly, please use the extension:setupactive command</warning>');
+        }
+
         foreach ($extensionKeys as $extensionKey) {
             $this->extensionInstaller->uninstall($extensionKey);
         }
@@ -179,6 +195,41 @@ class ExtensionCommandController extends CommandController
     public function setupActiveCommand()
     {
         $this->setupExtensions($this->packageManager->getActivePackages());
+    }
+
+    /**
+     * Removes all extensions that are not marked as active
+     *
+     * Directories of inactive extension are <comment>removed</comment> from <code>typo3/sysext</code> and <code>typo3conf/ext</code>.
+     * This is a one way command with no way back. Don't blame anybody if this command destroys your data.
+     * <comment>Handle with care!</comment>
+     *
+     * @param bool $force The option has to be specified, otherwise nothing happens
+     */
+    public function removeInactiveCommand($force = false)
+    {
+        if ($force) {
+            $activePackages = $this->packageManager->getActivePackages();
+            $this->packageManager->scanAvailablePackages();
+            foreach ($this->packageManager->getAvailablePackages() as $package) {
+                if (empty($activePackages[$package->getPackageKey()])) {
+                    $this->packageManager->unregisterPackage($package);
+                    if (is_dir($package->getPackagePath())) {
+                        GeneralUtility::flushDirectory($package->getPackagePath());
+                        $removedPaths[] = PathUtility::stripPathSitePrefix($package->getPackagePath());
+                    }
+                }
+            }
+            $this->packageManager->forceSortAndSavePackageStates();
+            if (!empty($removedPaths)) {
+                $this->outputLine('<info>The following directories have been removed:</info>' . chr(10) . implode(chr(10), $removedPaths));
+            } else {
+                $this->outputLine('<info>Nothing was removed</info>');
+            }
+        } else {
+            $this->outputLine('<warning>Operation not confirmed and has been skipped</warning>');
+            $this->quit(1);
+        }
     }
 
     /**

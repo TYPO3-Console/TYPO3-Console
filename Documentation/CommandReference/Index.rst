@@ -16,7 +16,7 @@ Command Reference
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2017-01-12 00:08:42
+The following reference was automatically generated from code on 2017-01-14 15:13:59
 
 
 .. _`Command Reference: typo3_console`:
@@ -622,6 +622,29 @@ Options
 
 
 
+.. _`Command Reference: typo3_console extension:removeinactive`:
+
+``extension:removeinactive``
+****************************
+
+**Removes all extensions that are not marked as active**
+
+Directories of inactive extension are **removed** from ``typo3/sysext`` and ``typo3conf/ext``.
+This is a one way command with no way back. Don't blame anybody if this command destroys your data.
+**Handle with care!**
+
+
+
+Options
+^^^^^^^
+
+``--force``
+  The option has to be specified, otherwise nothing happens
+
+
+
+
+
 .. _`Command Reference: typo3_console extension:setup`:
 
 ``extension:setup``
@@ -775,10 +798,12 @@ Marks the following extensions as active:
 Options
 ^^^^^^^
 
-``--remove-inactive``
-  Inactive extensions are **removed** from ``typo3/sysext``. **Handle with care!**
+``--framework-extensions``
+  If given, this argument takes precedence over the environment variable
 ``--activate-default``
   If true, ``typo3/cms`` extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
+``--excluded-extensions``
+  Extensions in typo3conf/ext/ directory, which should stay inactive
 
 
 

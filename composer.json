@@ -36,7 +36,8 @@
         "typo3/cms-scheduler": "^7.6 || >=8.3.0 <8.6",
 
         "symfony/console": "^2.7 || ^3.0",
-        "symfony/process": "^2.7 || ^3.0"
+        "symfony/process": "^2.7 || ^3.0",
+        "typo3/cms": "dev-master as 8.5.1"
     },
     "require-dev": {
         "namelesscoder/typo3-repository-client": "^1.2.0",

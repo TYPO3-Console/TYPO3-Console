@@ -14,8 +14,9 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
+use Helhum\Typo3Console\Install\PackageStatesGenerator;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Core\Bootstrap;
 
 /**
  * Alpha version of a setup command controller
@@ -34,12 +35,6 @@ class InstallCommandController extends CommandController
      * @inject
      */
     protected $cliSetupRequestHandler;
-
-    /**
-     * @var \Helhum\Typo3Console\Install\PackageStatesGenerator
-     * @inject
-     */
-    protected $packageStatesGenerator;
 
     /**
      * TYPO3 Setup
@@ -101,26 +96,19 @@ class InstallCommandController extends CommandController
      *
      * <b>Example:</b> <code>TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS="info,info_pagetsconfig" typo3cms install:generatepackagestates</code>
      *
-     * @param bool $removeInactive Inactive extensions are <comment>removed</comment> from <code>typo3/sysext</code>. <comment>Handle with care!</comment>
+     * @param array $frameworkExtensions If given, this argument takes precedence over the environment variable
      * @param bool $activateDefault If true, <code>typo3/cms</code> extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
-     * @throws \TYPO3\CMS\Core\Package\Exception\InvalidPackageStateException
-     * @throws \TYPO3\CMS\Core\Package\Exception\ProtectedPackageKeyException
+     * @param array $excludedExtensions Extensions in typo3conf/ext/ directory, which should stay inactive
      */
-    public function generatePackageStatesCommand($removeInactive = false, $activateDefault = false)
+    public function generatePackageStatesCommand(array $frameworkExtensions = [], $activateDefault = false, array $excludedExtensions = [])
     {
-        $this->packageStatesGenerator->generate($this->packageManager, $activateDefault);
-
-        if ($removeInactive) {
-            $activePackages = $this->packageManager->getActivePackages();
-            foreach ($this->packageManager->getAvailablePackages() as $package) {
-                if (empty($activePackages[$package->getPackageKey()])) {
-                    $this->packageManager->unregisterPackage($package);
-                    GeneralUtility::flushDirectory($package->getPackagePath());
-                    $this->outputLine('Removed Package: ' . $package->getPackageKey());
-                }
-            }
-            $this->packageManager->forceSortAndSavePackageStates();
+        if (Bootstrap::usesComposerClassLoading()) {
+            $this->output->outputLine('<warning>This command is now always automatically executed after Composer has written the autoload information.</warning>');
+            $this->output->outputLine('<warning>It is therefore deprecated to be used in Composer mode.</warning>');
         }
+        $frameworkExtensions = $frameworkExtensions ?: explode(',', (string)getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS'));
+        $packageStatesGenerator = new PackageStatesGenerator($this->packageManager);
+        $packageStatesGenerator->generate($frameworkExtensions, $activateDefault, $excludedExtensions);
     }
 
     /**
