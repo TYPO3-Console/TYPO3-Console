@@ -56,7 +56,6 @@ class DatabaseCommandController extends CommandController
      * - table.change
      * - table.prefix
      * - table.drop
-     * - table.clear
      * - safe (includes all necessary operations, to add or change fields or tables)
      * - destructive (includes all operations which rename or drop fields or tables)
      *

@@ -38,7 +38,6 @@ class SchemaUpdateTypeTest extends UnitTestCase
                     'table.change',
                     'table.prefix',
                     'table.drop',
-                    'table.clear',
                 ]
             ],
             'all double' => [
@@ -52,7 +51,6 @@ class SchemaUpdateTypeTest extends UnitTestCase
                     'table.change',
                     'table.prefix',
                     'table.drop',
-                    'table.clear',
                 ]
             ],
             'fields' => [
@@ -71,7 +69,6 @@ class SchemaUpdateTypeTest extends UnitTestCase
                     'table.change',
                     'table.prefix',
                     'table.drop',
-                    'table.clear',
                 ]
             ],
             'all add' => [
@@ -102,12 +99,6 @@ class SchemaUpdateTypeTest extends UnitTestCase
                     'table.drop',
                 ]
             ],
-            'all clear' => [
-                ['*.clear'],
-                [
-                    'table.clear',
-                ]
-            ],
             'all safe' => [
                 ['safe'],
                 [
@@ -115,7 +106,6 @@ class SchemaUpdateTypeTest extends UnitTestCase
                     'field.change',
                     'table.add',
                     'table.change',
-                    'table.clear',
                 ]
             ],
             'all destructive' => [
