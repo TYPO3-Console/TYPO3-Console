@@ -5,6 +5,9 @@ branches:
     - master
     - 1.1.x
     - develop
+    - /^[0-9]+\.x$/
+    - /^[0-9]+\.[0-9]+\.x$/
+    - /^[0-9]+\.[0-9]+\.[0-9]+$/
 
 php:
   - 5.3
@@ -65,3 +68,21 @@ script:
   - ./typo3cms database:updateschema "*" --verbose
   - rm -f typo3conf/PackageStates.php && ./typo3cms install:generatepackagestates && [ -f "typo3conf/PackageStates.php" ]
   - rm typo3temp/index.html && ./typo3cms install:fixfolderstructure && [ -f "typo3temp/index.html" ]
+
+after_script:
+  - >
+    if [ -n "$TRAVIS_TAG" ] && [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
+      echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n"
+      curl -sSL https://raw.githubusercontent.com/alrra/travis-after-all/1.4.4/lib/travis-after-all.js | node
+      if [ $? -eq 0 ]; then
+        # Load TER uploader
+        git clone https://github.com/helhum/typo3-repository-client.git ../ter-upload
+        composer install --working-dir ../ter-upload
+        # Switch back to clean repo folder
+        cd $REPO_URL
+        # Upload
+        TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
+        echo "Uploading release ${TRAVIS_TAG} to TER"
+        ../ter-upload/ter-client upload . --username "$TYPO3_ORG_USERNAME" --password "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
+      fi;
+    fi;
