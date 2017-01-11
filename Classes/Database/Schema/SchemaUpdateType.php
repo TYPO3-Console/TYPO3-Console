@@ -67,11 +67,6 @@ class SchemaUpdateType extends Enumeration
     const TABLE_DROP = 'table.drop';
 
     /**
-     * Truncate a table
-     */
-    const TABLE_CLEAR = 'table.clear';
-
-    /**
      * Expands wildcards in schema update types, e.g. field.* or *.change
      *
      * @param array $schemaUpdateTypes List of schema update types
