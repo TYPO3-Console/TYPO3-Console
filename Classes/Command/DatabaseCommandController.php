@@ -28,7 +28,6 @@ namespace Helhum\Typo3Console\Command;
  ***************************************************************/
 
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
-use Helhum\Typo3Console\Service\Database\Schema\SchemaUpdateException;
 use Helhum\Typo3Console\Service\Database\Schema\SchemaUpdateResult;
 use Helhum\Typo3Console\Service\Database\Schema\SchemaUpdateType;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
@@ -56,7 +55,6 @@ class DatabaseCommandController extends CommandController {
 		SchemaUpdateType::FIELD_DROP => 'Drop fields',
 		SchemaUpdateType::TABLE_ADD => 'Add tables',
 		SchemaUpdateType::TABLE_CHANGE => 'Change tables',
-		SchemaUpdateType::TABLE_CLEAR => 'Clear tables',
 		SchemaUpdateType::TABLE_PREFIX => 'Prefix tables',
 		SchemaUpdateType::TABLE_DROP => 'Drop tables',
 	);
