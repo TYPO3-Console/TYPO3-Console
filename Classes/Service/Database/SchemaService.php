@@ -56,7 +56,6 @@ class SchemaService implements SingletonInterface
         SchemaUpdateType::FIELD_DROP => ['drop' => self::STATEMENT_GROUP_DESTRUCTIVE],
         SchemaUpdateType::TABLE_ADD => ['create_table' => self::STATEMENT_GROUP_SAFE],
         SchemaUpdateType::TABLE_CHANGE => ['change_table' => self::STATEMENT_GROUP_SAFE],
-        SchemaUpdateType::TABLE_CLEAR => ['clear_table' => self::STATEMENT_GROUP_SAFE],
         SchemaUpdateType::TABLE_PREFIX => ['change_table' => self::STATEMENT_GROUP_DESTRUCTIVE],
         SchemaUpdateType::TABLE_DROP => ['drop_table' => self::STATEMENT_GROUP_DESTRUCTIVE],
     ];
