@@ -78,9 +78,4 @@ class SchemaUpdateType extends Enumeration {
 	 * Drop a table
 	 */
 	const TABLE_DROP = 'table.drop';
-
-	/**
-	 * Truncate a table
-	 */
-	const TABLE_CLEAR = 'table.clear';
 }
