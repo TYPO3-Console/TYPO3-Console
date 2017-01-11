@@ -18,7 +18,6 @@ use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
-use TYPO3\CMS\Core\Database\Schema\SqlReader;
 
 /**
  * Database command controller
@@ -79,12 +78,6 @@ class DatabaseCommandController extends CommandController
         } catch (\UnexpectedValueException $e) {
             $this->outputLine(sprintf('<error>%s</error>', $e->getMessage()));
             $this->sendAndExit(1);
-        }
-
-        if (class_exists(SqlReader::class)) {
-            $this->outputLine('<error>To avoid data loss, this command has been disabled for TYPO3 8.x and higher</error>');
-            $this->outputLine('<info>Please use newer versions of TYPO3 Console to use this command with newer TYPO3 versions</info>');
-            $this->quit();
         }
 
         $result = $this->schemaService->updateSchema($schemaUpdateTypes);
