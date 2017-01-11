@@ -125,7 +125,7 @@ class DatabaseCommandController extends CommandController
             new ProcessBuilder()
         );
         $exitCode = $mysqlCommand->mysql(
-            ['--skip-column-names'],
+            [],
             STDIN,
             $this->buildOutputClosure(),
             $interactive
