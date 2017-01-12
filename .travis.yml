@@ -4,9 +4,7 @@ branches:
   only:
     - master
     - develop
-    - /^[0-9]+\.x$/
-    - /^[0-9]+\.[0-9]+\.x$/
-    - /^[0-9]+\.[0-9]+\.[0-9]+$/
+    - /^([0-9]+\.){1,2}(x|[0-9]+)$/
 
 matrix:
   fast_finish: true
@@ -63,12 +61,13 @@ before_script:
   - composer require typo3/cms="$TYPO3_VERSION"
   - export TYPO3_PATH_WEB="$PWD/.Build/Web"
   - export PATH="$PATH:./Scripts"
+  - if [ -d .Build/vendor/typo3/cms/components/testing_framework/core/Build ]; then export TYPO3_BUILD_DIR=".Build/vendor/typo3/cms/components/testing_framework/core/Build"; else export TYPO3_BUILD_DIR=".Build/vendor/typo3/cms/typo3/sysext/core/Build"; fi
 
 script:
   - >
     echo;
     echo "Running unit tests";
-    .Build/bin/phpunit -c .Build/vendor/typo3/cms/typo3/sysext/core/Build/UnitTests.xml Tests/Unit/
+    .Build/bin/phpunit -c $TYPO3_BUILD_DIR/UnitTests.xml Tests/Unit/
   - >
     echo;
     echo "Running php lint";

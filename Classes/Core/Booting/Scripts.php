@@ -16,7 +16,7 @@ namespace Helhum\Typo3Console\Core\Booting;
 use Helhum\Typo3Console\Core\Cache\FakeDatabaseBackend;
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Helhum\Typo3Console\Error\ErrorHandler;
-use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
 use TYPO3\CMS\Core\Cache\Backend\NullBackend;
 use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
 use TYPO3\CMS\Core\Cache\CacheManager;
@@ -161,11 +161,8 @@ class Scripts
      */
     public static function initializeAuthenticatedOperations(ConsoleBootstrap $bootstrap)
     {
-        $bootstrap->initializeBackendUser();
+        $bootstrap->initializeBackendUser(CommandLineUserAuthentication::class);
         self::loadCommandLineBackendUser();
-        /** @var $backendUser \TYPO3\CMS\Core\Authentication\BackendUserAuthentication */
-        $backendUser = $GLOBALS['BE_USER'];
-        $backendUser->backendCheckLogin();
         // Global language object on CLI? rly? but seems to be needed by some scheduler tasks :(
         $bootstrap->initializeLanguageObject();
     }
@@ -177,30 +174,36 @@ class Scripts
      */
     protected static function loadCommandLineBackendUser()
     {
-        /** @var BackendUserAuthentication $beUser */
-        $beUser = $GLOBALS['BE_USER'];
-        if ($beUser->user['uid']) {
+        /** @var CommandLineUserAuthentication $backendUser */
+        $backendUser = $GLOBALS['BE_USER'];
+        if ($backendUser->user['uid']) {
             throw new \RuntimeException('Another user was already loaded which is impossible in CLI mode!', 3);
         }
-        $userName = '_cli_lowlevel';
-        $beUser->setBeUserByName($userName);
-        if (!$beUser->user['uid']) {
-            /** @var DatabaseConnection $db */
-            $db = $GLOBALS['TYPO3_DB'];
-            $db->exec_INSERTquery(
-                'be_users',
-                [
-                    'username' => $userName,
-                    'password' => GeneralUtility::getRandomHexString(48)
-                ]
-            );
-            $beUser->setBeUserByName($userName);
-        }
-        if (!$GLOBALS['BE_USER']->user['uid']) {
-            throw new \RuntimeException('No backend user named "' . $userName . '" was found or could not be created! Please create it manually!', 3);
-        }
-        if ($beUser->isAdmin()) {
-            throw new \RuntimeException('CLI backend user "' . $userName . '" was ADMIN which is not allowed!', 3);
+        if (is_callable([$backendUser, 'authenticate'])) {
+            $backendUser->authenticate();
+        } else {
+            // @deprecated can be removed once TYPO3 7.6 support is removed
+            $userName = '_cli_lowlevel';
+            $backendUser->setBeUserByName($userName);
+            if (!$backendUser->user['uid']) {
+                /** @var DatabaseConnection $db */
+                $db = $GLOBALS['TYPO3_DB'];
+                $db->exec_INSERTquery(
+                    'be_users',
+                    [
+                        'username' => $userName,
+                        'password' => GeneralUtility::getRandomHexString(48)
+                    ]
+                );
+                $backendUser->setBeUserByName($userName);
+            }
+            if (!$backendUser->user['uid']) {
+                throw new \RuntimeException('No backend user named "' . $userName . '" was found or could not be created! Please create it manually!', 3);
+            }
+            if ($backendUser->isAdmin()) {
+                throw new \RuntimeException('CLI backend user "' . $userName . '" was ADMIN which is not allowed!', 3);
+            }
+            $backendUser->backendCheckLogin();
         }
     }
 
