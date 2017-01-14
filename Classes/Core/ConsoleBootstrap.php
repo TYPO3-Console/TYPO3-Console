@@ -25,36 +25,34 @@ use TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface;
 
 /**
  * Class ConsoleBootstrap
+ * @internal
  */
 class ConsoleBootstrap extends Bootstrap
 {
     /**
-     * @var array
-     */
-    public $commands = [];
-
-    /**
      * @var RequestHandlerInterface[]
      */
-    protected $requestHandlers = [];
+    private $requestHandlers = [];
 
     /**
      * @var RunLevel
      */
-    protected $runLevel;
+    private $runLevel;
 
     /**
-     * @var string $context Application context
+     * @param string $context
+     * @return ConsoleBootstrap
      */
-    public function __construct($context)
+    public static function create($context)
     {
-        self::$instance = $this;
-        $this->ensureRequiredEnvironment();
-        parent::__construct($context);
+        if (self::$instance !== null) {
+            throw new \RuntimeException('Cannot create bootstrap once it has been initialized', 1484391221);
+        }
+        return new self($context);
     }
 
     /**
-     * Override parent to calrify return type
+     * Override parent to clarify return type
      *
      * @return ConsoleBootstrap
      */
@@ -64,44 +62,52 @@ class ConsoleBootstrap extends Bootstrap
     }
 
     /**
-     * Bootstraps the minimal infrastructure, resolves a fitting request handler and
-     * then passes control over to that request handler.
-     * @return ConsoleBootstrap
+     * Bootstraps the minimal infrastructure, but does not execute any command
+     *
+     * @param \Composer\Autoload\ClassLoader $classLoader
      */
+    public function initialize(\Composer\Autoload\ClassLoader $classLoader)
+    {
+        if (!self::$instance) {
+            $this->ensureRequiredEnvironment();
+            self::$instance = $this;
+            self::$usesComposerClassLoading = class_exists(\Helhum\Typo3Console\Package\UncachedPackageManager::class);
+            $this->initializeClassLoader($classLoader);
+            // @deprecated in TYPO3 8. Condition will be removed when TYPO3 7.6 support is removed
+            if (is_callable([$this, 'setRequestType'])) {
+                $this->defineTypo3RequestTypes();
+                $this->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
+            }
+            $this->baseSetup();
+            $this->requireLibraries();
+            // @deprecated in TYPO3 8 will be removed when TYPO3 7.6 support is removed
+            if (!is_callable([$this, 'setRequestType'])) {
+                $this->defineTypo3RequestTypes();
+            }
+            $this->requestId = uniqid('console_request_', true);
+            $this->initializePackageManagement();
+
+            $this->runLevel = new RunLevel();
+            $this->setEarlyInstance(\Helhum\Typo3Console\Core\Booting\RunLevel::class, $this->runLevel);
+            $exceptionHandler = new ExceptionHandler();
+            set_exception_handler([$exceptionHandler, 'handleException']);
+        }
+    }
 
     /**
-     * @param \Composer\Autoload\ClassLoader|NULL $classLoader
-     * @return $this
+     * Bootstraps the minimal infrastructure, resolves a fitting request handler and
+     * then passes control over to that request handler.
+     *
+     * @param \Composer\Autoload\ClassLoader $classLoader
      * @throws \TYPO3\CMS\Core\Error\Exception
+     * @throws \RuntimeException
      */
-    public function run($classLoader = null)
+    public function run(\Composer\Autoload\ClassLoader $classLoader)
     {
-        $this->initializeClassLoader($classLoader);
-        // @deprecated in TYPO3 8. Condition will be removed when TYPO3 7.6 support is removed
-        if (is_callable([$this, 'setRequestType'])) {
-            $this->defineTypo3RequestTypes();
-            $this->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
-        }
-        $this->baseSetup();
-        $this->requireLibraries();
-        // @deprecated in TYPO3 8 will be removed when TYPO3 7.6 support is removed
-        if (!is_callable([$this, 'setRequestType'])) {
-            $this->defineTypo3RequestTypes();
-        }
-        $this->requestId = uniqid('console_request_', true);
-        $this->initializePackageManagement();
-
-        $this->runLevel = new RunLevel();
-        $this->setEarlyInstance(\Helhum\Typo3Console\Core\Booting\RunLevel::class, $this->runLevel);
-        $exceptionHandler = new ExceptionHandler();
-        set_exception_handler([$exceptionHandler, 'handleException']);
-
+        $this->initialize($classLoader);
         $this->initializeCommandManager();
         $this->registerRequestHandler(new RequestHandler($this));
-
-        $requestHandler = $this->resolveCliRequestHandler();
-        $requestHandler->handleRequest();
-        return $this;
+        $this->resolveCliRequestHandler()->handleRequest();
     }
 
     /**
@@ -152,7 +158,7 @@ class ConsoleBootstrap extends Bootstrap
     /**
      * Checks PHP sapi type and sets required PHP options
      */
-    protected function ensureRequiredEnvironment()
+    private function ensureRequiredEnvironment()
     {
         if (PHP_SAPI !== 'cli') {
             echo 'The command line must be executed with a cli PHP binary! The current PHP sapi type is "' . PHP_SAPI . '".' . PHP_EOL;
@@ -261,7 +267,7 @@ class ConsoleBootstrap extends Bootstrap
     {
         // Make sure the package manager class is available
         // the extension might not be active yet, but will be activated in this class
-        if (!self::usesComposerClassLoading() && !class_exists(\Helhum\Typo3Console\Package\UncachedPackageManager::class)) {
+        if (!self::usesComposerClassLoading()) {
             require __DIR__ . '/../Package/UncachedPackageManager.php';
         }
         $packageManager = new \Helhum\Typo3Console\Package\UncachedPackageManager();
