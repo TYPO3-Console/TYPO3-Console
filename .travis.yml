@@ -125,6 +125,7 @@ script:
   - typo3cms extension:activate core && typo3cms database:updateschema | grep 'No schema updates were performed'
   - typo3cms extension:setup core && typo3cms database:updateschema | grep 'No schema updates were performed'
   - typo3cms extension:setupactive && typo3cms database:updateschema | grep 'No schema updates were performed'
+  - if typo3cms extension:list --raw | grep dbal; then typo3cms extension:activate adodb,dbal && typo3cms database:updateschema | grep 'No schema updates were performed'; fi
   - typo3cms extension:removeinactive --force | grep 'The following directories have been removed'
 
 after_script:
