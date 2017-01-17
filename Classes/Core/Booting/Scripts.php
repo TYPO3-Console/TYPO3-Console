@@ -21,6 +21,7 @@ use TYPO3\CMS\Core\Cache\Backend\NullBackend;
 use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
+use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -136,6 +137,9 @@ class Scripts
      */
     public static function initializeDatabaseConnection(ConsoleBootstrap $bootstrap)
     {
+        if ($bootstrap->getEarlyInstance(PackageManager::class)->isPackageActive('dbal')) {
+            require GeneralUtility::getFileAbsFileName('EXT:dbal/ext_localconf.php');
+        }
         $bootstrap->initializeDatabaseConnection();
     }
 
