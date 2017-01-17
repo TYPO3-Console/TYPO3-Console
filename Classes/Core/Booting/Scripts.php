@@ -122,6 +122,9 @@ class Scripts
      */
     public static function initializeCachingFramework(ConsoleBootstrap $bootstrap)
     {
+        if ($bootstrap->getEarlyInstance(PackageManager::class)->isPackageActive('dbal')) {
+            require GeneralUtility::getFileAbsFileName('EXT:dbal/ext_localconf.php');
+        }
         $cacheManager = new \TYPO3\CMS\Core\Cache\CacheManager();
         $cacheManager->setCacheConfigurations($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']);
         \TYPO3\CMS\Core\Utility\GeneralUtility::setSingletonInstance(\TYPO3\CMS\Core\Cache\CacheManager::class, $cacheManager);
@@ -137,9 +140,6 @@ class Scripts
      */
     public static function initializeDatabaseConnection(ConsoleBootstrap $bootstrap)
     {
-        if ($bootstrap->getEarlyInstance(PackageManager::class)->isPackageActive('dbal')) {
-            require GeneralUtility::getFileAbsFileName('EXT:dbal/ext_localconf.php');
-        }
         $bootstrap->initializeDatabaseConnection();
     }
 
