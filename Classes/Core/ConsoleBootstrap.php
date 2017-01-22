@@ -16,11 +16,11 @@ namespace Helhum\Typo3Console\Core;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\Booting\Sequence;
 use Helhum\Typo3Console\Error\ExceptionHandler;
-use Helhum\Typo3Console\Mvc\Cli\CommandManager;
 use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility;
+use TYPO3\CMS\Extbase\Mvc\Cli\CommandManager;
 use TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface;
 
 /**
@@ -49,16 +49,6 @@ class ConsoleBootstrap extends Bootstrap
             throw new \RuntimeException('Cannot create bootstrap once it has been initialized', 1484391221);
         }
         return new self($context);
-    }
-
-    /**
-     * Override parent to clarify return type
-     *
-     * @return ConsoleBootstrap
-     */
-    public static function getInstance()
-    {
-        return parent::getInstance();
     }
 
     /**
@@ -91,6 +81,8 @@ class ConsoleBootstrap extends Bootstrap
             $this->setEarlyInstance(\Helhum\Typo3Console\Core\Booting\RunLevel::class, $this->runLevel);
             $exceptionHandler = new ExceptionHandler();
             set_exception_handler([$exceptionHandler, 'handleException']);
+            $this->initializeCommandManager();
+            $this->registerCommands();
         }
     }
 
@@ -105,7 +97,6 @@ class ConsoleBootstrap extends Bootstrap
     public function run(\Composer\Autoload\ClassLoader $classLoader)
     {
         $this->initialize($classLoader);
-        $this->initializeCommandManager();
         $this->registerRequestHandler(new RequestHandler($this));
         $this->resolveCliRequestHandler()->handleRequest();
     }
@@ -188,17 +179,6 @@ class ConsoleBootstrap extends Bootstrap
     }
 
     /**
-     * Returns the command manager which can be used to register commands during package management initialisation
-     *
-     * @return CommandManager
-     * @api
-     */
-    public function getCommandManager()
-    {
-        return $this->getEarlyInstance(\TYPO3\CMS\Extbase\Mvc\Cli\CommandManager::class);
-    }
-
-    /**
      * Iterates over the registered request handlers and determines which one fits best.
      *
      * @return RequestHandlerInterface A request handler
@@ -227,11 +207,79 @@ class ConsoleBootstrap extends Bootstrap
      *  Additional Methods needed for the bootstrap sequences
      */
 
-    public function initializeCommandManager()
+    private function initializeCommandManager()
     {
         $commandManager = Utility\GeneralUtility::makeInstance(\Helhum\Typo3Console\Mvc\Cli\CommandManager::class);
-        $this->setEarlyInstance(\TYPO3\CMS\Extbase\Mvc\Cli\CommandManager::class, $commandManager);
-        Utility\GeneralUtility::setSingletonInstance(\TYPO3\CMS\Extbase\Mvc\Cli\CommandManager::class, $commandManager);
+        $this->setEarlyInstance(CommandManager::class, $commandManager);
+        Utility\GeneralUtility::setSingletonInstance(CommandManager::class, $commandManager);
+    }
+
+    private function registerCommands()
+    {
+        foreach ($this->getCommandConfigurations() as $packageKey => $commandConfiguration) {
+            $this->registerCommandsFromConfiguration($commandConfiguration, $packageKey);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    private function getCommandConfigurations()
+    {
+        if (file_exists($commandConfigurationFile = __DIR__ . '/../../Configuration/Console/AllCommands.php')) {
+            return require $commandConfigurationFile;
+        }
+        $commandConfigurationFiles = [];
+        /** @var PackageManager $packageManager */
+        $packageManager = $this->getEarlyInstance(PackageManager::class);
+        foreach ($packageManager->getActivePackages() as $package) {
+            $possibleCommandsFileName = $package->getPackagePath() . '/Configuration/Console/Commands.php';
+            if (!file_exists($possibleCommandsFileName)) {
+                continue;
+            }
+            $commandConfigurationFiles[$package->getPackageKey()] = require $possibleCommandsFileName;
+        }
+        return $commandConfigurationFiles;
+    }
+
+    /**
+     * @param $commandConfiguration
+     * @param $packageKey
+     */
+    private function registerCommandsFromConfiguration($commandConfiguration, $packageKey)
+    {
+        $this->ensureValidCommandsConfiguration($commandConfiguration, $packageKey);
+
+        foreach ($commandConfiguration['controllers'] as $controller) {
+            $this->getEarlyInstance(CommandManager::class)->registerCommandController($controller);
+        }
+        foreach ($commandConfiguration['runLevels'] as $commandIdentifier => $runLevel) {
+            $this->setRunLevelForCommand($commandIdentifier, $runLevel);
+        }
+        foreach ($commandConfiguration['bootingSteps'] as $commandIdentifier => $bootingSteps) {
+            foreach ((array)$bootingSteps as $bootingStep) {
+                $this->addBootingStepForCommand($commandIdentifier, $bootingStep);
+            }
+        }
+    }
+
+    /**
+     * @param mixed $commandConfiguration
+     * @param string $packageKey
+     * @throws \RuntimeException
+     */
+    private function ensureValidCommandsConfiguration($commandConfiguration, $packageKey)
+    {
+        if (
+            !is_array($commandConfiguration)
+            || count($commandConfiguration) !== 3
+            || !isset($commandConfiguration['controllers'], $commandConfiguration['runLevels'], $commandConfiguration['bootingSteps'])
+            || !is_array($commandConfiguration['controllers'])
+            || !is_array($commandConfiguration['runLevels'])
+            || !is_array($commandConfiguration['bootingSteps'])
+        ) {
+            throw new \RuntimeException($packageKey . ' defines invalid commands in Configuration/Console/Commands.php', 1461186959);
+        }
     }
 
     /**
