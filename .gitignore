@@ -2,6 +2,7 @@
 /composer.lock
 /typo3cms
 
+/Configuration/Console/AllCommands.php
 /Libraries/*
 /ext_emconf.php
 /ext_icon.png
