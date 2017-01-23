@@ -14,12 +14,16 @@ namespace Helhum\Typo3Console\Install;
  */
 
 use Helhum\Typo3Console\Install\Status\RedirectStatus;
+use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
+use Helhum\Typo3Console\Mvc\Cli\CommandManager;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition;
 use TYPO3\CMS\Extbase\Mvc\Controller\Argument;
 use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
 use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentTypeException;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 use TYPO3\CMS\Install\Controller\Action\ActionInterface;
 use TYPO3\CMS\Install\Controller\Action\Step\StepInterface;
 use TYPO3\CMS\Install\Controller\Exception\RedirectException;
@@ -35,26 +39,22 @@ class CliSetupRequestHandler
     const INSTALL_COMMAND_CONTROLLER_CLASS = \Helhum\Typo3Console\Command\InstallCommandController::class;
 
     /**
-     * @var \TYPO3\CMS\Extbase\Object\ObjectManager
-     * @inject
+     * @var ObjectManager
      */
     protected $objectManager;
 
     /**
-     * @var \Helhum\Typo3Console\Mvc\Cli\CommandManager
-     * @inject
+     * @var CommandManager
      */
     protected $commandManager;
 
     /**
-     * @var \Helhum\Typo3Console\Mvc\Cli\CommandDispatcher
-     * @inject
+     * @var CommandDispatcher
      */
-    protected $dispatcher;
+    private $commandDispatcher;
 
     /**
-     * @var \TYPO3\CMS\Extbase\Reflection\ReflectionService
-     * @inject
+     * @var ReflectionService
      */
     protected $reflectionService;
 
@@ -85,13 +85,24 @@ class CliSetupRequestHandler
     protected $interactiveSetup = true;
 
     /**
-     * Creates a new output object during object creation
+     * CliSetupRequestHandler constructor.
+     *
+     * @param ObjectManager $objectManager
+     * @param CommandManager $commandManager
+     * @param ReflectionService $reflectionService
+     * @param CommandDispatcher $commandDispatcher
      */
-    public function initializeObject()
-    {
-        if ($this->output === null) {
-            $this->output = $this->objectManager->get(\Helhum\Typo3Console\Mvc\Cli\ConsoleOutput::class);
-        }
+    public function __construct(
+        ObjectManager $objectManager,
+        CommandManager $commandManager,
+        ReflectionService $reflectionService,
+        CommandDispatcher $commandDispatcher = null
+    ) {
+        $this->objectManager = $objectManager;
+        $this->commandManager = $commandManager;
+        $this->reflectionService = $reflectionService;
+        $this->commandDispatcher = $commandDispatcher ?: CommandDispatcher::createFromCommandRun();
+        $this->output = new \Helhum\Typo3Console\Mvc\Cli\ConsoleOutput($output, $input);
     }
 
     /**
@@ -210,7 +221,7 @@ class CliSetupRequestHandler
             $this->output->outputLine();
             $this->output->outputLine(sprintf('%s:', $command->getShortDescription()));
 
-            if (!$this->dispatcher->executeCommand('install:' . strtolower($actionName) . 'needsexecution')) {
+            if (!$this->commandDispatcher->executeCommand('install:' . strtolower($actionName) . 'needsexecution')) {
                 $this->output->outputLine('<info>No execution needed, skipped step!</info>');
                 return;
             }
@@ -264,10 +275,10 @@ class CliSetupRequestHandler
             }
 
             do {
-                $messages = @unserialize($this->dispatcher->executeCommand('install:' . strtolower($actionName), $actionArguments));
+                $messages = @unserialize($this->commandDispatcher->executeCommand('install:' . strtolower($actionName), $actionArguments));
             } while (!empty($messages[0]) && $messages[0] instanceof RedirectStatus);
 
-            $stillNeedsExecution = (bool)$this->dispatcher->executeCommand('install:' . strtolower($actionName) . 'needsexecution');
+            $stillNeedsExecution = (bool)$this->commandDispatcher->executeCommand('install:' . strtolower($actionName) . 'needsexecution');
             if ($stillNeedsExecution) {
                 if (empty($messages)) {
                     $warning = new WarningStatus();
