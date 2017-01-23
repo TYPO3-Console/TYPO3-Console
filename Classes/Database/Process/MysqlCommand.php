@@ -42,7 +42,7 @@ class MysqlCommand
     {
         $this->dbConfig = $dbConfig;
         $this->processBuilder = $processBuilder;
-        $this->processBuilder->setTimeout(300);
+        $this->processBuilder->setTimeout(null);
     }
 
     /**
