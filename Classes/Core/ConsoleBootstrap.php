@@ -102,9 +102,8 @@ class ConsoleBootstrap extends Bootstrap
     }
 
     /**
-     * TODO: Add other API that does not depend on bootstrap
-     *
      * @param string $runLevel
+     * @deprecated Will be removed with 5.0
      */
     public function requestRunLevel($runLevel)
     {
