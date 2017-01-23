@@ -17,6 +17,7 @@ use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Helhum\Typo3Console\Install\PackageStatesGenerator;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Package\PackageInterface;
 
 /**
  * Alpha version of a setup command controller
@@ -102,13 +103,31 @@ class InstallCommandController extends CommandController
      */
     public function generatePackageStatesCommand(array $frameworkExtensions = [], $activateDefault = false, array $excludedExtensions = [])
     {
-        if (Bootstrap::usesComposerClassLoading()) {
+        $ranFromComposerPlugin = getenv('TYPO3_CONSOLE_PLUGIN_RUN');
+        if (!$ranFromComposerPlugin && Bootstrap::usesComposerClassLoading()) {
             $this->output->outputLine('<warning>This command is now always automatically executed after Composer has written the autoload information.</warning>');
             $this->output->outputLine('<warning>It is therefore deprecated to be used in Composer mode.</warning>');
         }
         $frameworkExtensions = $frameworkExtensions ?: explode(',', (string)getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS'));
         $packageStatesGenerator = new PackageStatesGenerator($this->packageManager);
-        $packageStatesGenerator->generate($frameworkExtensions, $activateDefault, $excludedExtensions);
+        $activatedExtensions = $packageStatesGenerator->generate($frameworkExtensions, $activateDefault, $excludedExtensions);
+
+        $this->outputLine(
+            '<info>The following extensions have been added to the generated PackageStates.php file:</info> %s',
+            [
+                implode(', ', array_map(function (PackageInterface $package) {
+                    return $package->getPackageKey();
+                }, $activatedExtensions))
+            ]
+        );
+        if (!empty($excludedExtensions)) {
+            $this->outputLine(
+                '<info>The following third party extensions were excluded during this process:</info> %s',
+                [
+                    implode(', ', $excludedExtensions)
+                ]
+            );
+        }
     }
 
     /**
