@@ -139,21 +139,35 @@ class DatabaseCommandController extends CommandController
      * The mysqldump binary must be available in the path for this command to work.
      * This obviously only works when MySQL is used as DBMS.
      *
+     * A comma-separated list of tables can be passed to exclude from the export:
+     *
+     * <b>Example:</b> <code>typo3cms database:export --exclude-tables be_sessions,fe_sessions,sys_log</code>
+     *
      * <warning>This command passes the plain text database password to the command line process.</warning>
      * This means, that users that have the permission to observe running processes,
      * will be able to read your password.
      * If this imposes a security risk for you, then refrain from using this command!
+     *
+     * @param array $excludeTables Comma-separated list of table names to exclude from the export
      */
-    public function exportCommand()
+    public function exportCommand(array $excludeTables = [])
     {
+        $dbConfig = $this->connectionConfiguration->build();
+        $additionalArguments = [];
+
+        foreach ($excludeTables as $table) {
+            $additionalArguments[] = sprintf('--ignore-table=%s.%s', $dbConfig['dbname'], $table);
+        }
+
         $mysqlCommand = new MysqlCommand(
-            $this->connectionConfiguration->build(),
+            $dbConfig,
             new ProcessBuilder()
         );
         $exitCode = $mysqlCommand->mysqldump(
-            [],
+            $additionalArguments,
             $this->buildOutputClosure()
         );
+
         $this->quit($exitCode);
     }
 

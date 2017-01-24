@@ -16,7 +16,7 @@ Command Reference
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2017-01-14 15:13:59
+The following reference was automatically generated from code on 2017-01-26 15:28:42
 
 
 .. _`Command Reference: typo3_console`:
@@ -412,12 +412,22 @@ Export the database (all tables) directly to stdout.
 The mysqldump binary must be available in the path for this command to work.
 This obviously only works when MySQL is used as DBMS.
 
+A comma-separated list of tables can be passed to exclude from the export:
+
+**Example:** ``typo3cms database:export --exclude-tables be_sessions,fe_sessions,sys_log``
+
 **This command passes the plain text database password to the command line process.**
 This means, that users that have the permission to observe running processes,
 will be able to read your password.
 If this imposes a security risk for you, then refrain from using this command!
 
 
+
+Options
+^^^^^^^
+
+``--exclude-tables``
+  Comma-separated list of table names to exclude from the export
 
 
 
