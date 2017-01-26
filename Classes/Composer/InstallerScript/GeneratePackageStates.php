@@ -14,11 +14,11 @@ namespace Helhum\Typo3Console\Composer\InstallerScript;
  */
 
 use Composer\Script\Event as ScriptEvent;
+use Composer\Util\Filesystem;
 use Helhum\Typo3Console\Composer\InstallerScriptInterface;
-use Helhum\Typo3Console\Core\ConsoleBootstrap;
-use Helhum\Typo3Console\Install\PackageStatesGenerator;
+use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3ConsolePlugin\Config as PluginConfig;
-use TYPO3\CMS\Core\Package\PackageInterface;
+use TYPO3\CMS\Composer\Plugin\Config as Typo3Config;
 
 class GeneratePackageStates implements InstallerScriptInterface
 {
@@ -28,7 +28,28 @@ class GeneratePackageStates implements InstallerScriptInterface
      */
     public function shouldRun(ScriptEvent $event)
     {
-        return getenv('TYPO3_CONSOLE_TEST_SETUP') || $event->getComposer()->getPackage()->getName() !== 'helhum/typo3-console';
+        $io = $event->getIO();
+        $composer = $event->getComposer();
+        $pluginConfig = PluginConfig::load($io, $composer->getConfig());
+        $typo3PluginConfig = Typo3Config::load($composer);
+
+        if ($pluginConfig->get('skip-packagestates-write')) {
+            $io->writeError('<warning>It is highly recommended to let the PackageStates.php file be generated automatically</warning>');
+            $io->writeError('<warning>Disabling this functionality will be removed with TYPO3 Console 5.0</warning>');
+            return false;
+        }
+
+        if ($typo3PluginConfig->get('prepare-web-dir') === false) {
+            return false;
+        }
+
+        if (!getenv('TYPO3_CONSOLE_TEST_SETUP') && $composer->getPackage()->getName() === 'helhum/typo3-console') {
+            return false;
+        }
+
+        // Ensure we have at least the typo3conf folder present
+        (new Filesystem())->ensureDirectoryExists($typo3PluginConfig->get('web-dir') . '/typo3conf');
+        return true;
     }
 
     /**
@@ -40,69 +61,21 @@ class GeneratePackageStates implements InstallerScriptInterface
     public function run(ScriptEvent $event)
     {
         $io = $event->getIO();
-        $pluginConfig = PluginConfig::load($io, $event->getComposer()->getConfig());
+        $composerConfig = $event->getComposer()->getConfig();
 
-        if ($pluginConfig->get('skip-packagestates-write')) {
-            $io->writeError('<warning>It is highly recommended to let the PackageStates.php file be generated automatically</warning>');
-            $io->writeError('<warning>Disabling this functionality will be removed with TYPO3 Console 5.0</warning>');
-            return;
+        $commandDispatcher = CommandDispatcher::createFromComposerRun([$composerConfig->get('bin-dir'), realpath('./Scripts')]);
+        $commandOptions = [
+            'frameworkExtensions' => (string)getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS'),
+        ];
+        if (getenv('TYPO3_ACTIVATE_DEFAULT_FRAMEWORK_EXTENSIONS')) {
+            $commandOptions['activateDefault'] = null;
         }
-        $bootstrap = self::ensureTypo3Booted();
-        $packageManager = $bootstrap->getEarlyInstance(\TYPO3\CMS\Core\Package\PackageManager::class);
-        $packageStateGenerator = new PackageStatesGenerator($packageManager);
-
-        $frameworkExtensions = explode(',', (string)getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS'));
-        $activateDefault = (bool)getenv('TYPO3_ACTIVATE_DEFAULT_FRAMEWORK_EXTENSIONS');
-        $excludedExtensions = $event->isDevMode() ? explode(',', (string)getenv('TYPO3_EXCLUDED_EXTENSIONS')) : [];
-
-        $activatedExtensions = $packageStateGenerator->generate($frameworkExtensions, $activateDefault, $excludedExtensions);
-
-        $io->writeError(
-            sprintf(
-                '<info>The following extensions have been added to the generated PackageStates.php file:</info> %s',
-                implode(', ', array_map(function (PackageInterface $package) {
-                    return $package->getPackageKey();
-                }, $activatedExtensions))
-            ),
-            true,
-            $io::VERBOSE
-        );
-        if ($event->isDevMode() && !empty(getenv('TYPO3_EXCLUDED_EXTENSIONS'))) {
-            $io->writeError(
-                sprintf(
-                    '<info>The following third party extensions were excluded during this process:</info> %s',
-                    getenv('TYPO3_EXCLUDED_EXTENSIONS')
-                ),
-                true,
-                $io::VERBOSE
-            );
+        if ($event->isDevMode()) {
+            $commandOptions['excludedExtensions'] = (string)getenv('TYPO3_EXCLUDED_EXTENSIONS');
         }
+        $output = $commandDispatcher->executeCommand('install:generatepackagestates', $commandOptions);
+        $io->writeError($output, true, $io::VERBOSE);
+
         return true;
-    }
-
-    /**
-     * @return bool
-     */
-    private static function hasTypo3Booted()
-    {
-        // Since this code is executed in composer runtime,
-        // we can safely assume that TYPO3 has not been bootstrapped
-        // until this API has been initialized to return true
-        return ConsoleBootstrap::usesComposerClassLoading();
-    }
-
-    /**
-     * @return ConsoleBootstrap
-     */
-    private static function ensureTypo3Booted()
-    {
-        if (!self::hasTypo3Booted()) {
-            define('PATH_site', getenv('TYPO3_PATH_WEB') . '/');
-            $bootstrap = ConsoleBootstrap::create('Production');
-            $bootstrap->initialize(new \Composer\Autoload\ClassLoader());
-        } else {
-            $bootstrap = ConsoleBootstrap::getInstance();
-        }
-        return $bootstrap;
     }
 }

@@ -30,7 +30,7 @@ class InstallDummyExtension implements InstallerScriptInterface
      */
     public function shouldRun(ScriptEvent $event)
     {
-        return getenv('TYPO3_CONSOLE_TEST_SETUP') || $event->getComposer()->getPackage()->getName() !== 'helhum/typo3-console';
+        return $event->getComposer()->getPackage()->getName() !== 'helhum/typo3-console';
     }
 
     /**
