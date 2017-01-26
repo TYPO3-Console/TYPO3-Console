@@ -99,6 +99,7 @@ script:
   - typo3cms database:updateschema --verbose
   - typo3cms database:updateschema "*" --verbose
   - typo3cms database:export > /dev/null
+  - test $(typo3cms database:export --exclude-tables sys_log | grep "CREATE TABLE" | grep -c sys_log) -eq 0
   - echo "SELECT username from be_users where admin=1;" | typo3cms database:import
   - echo "DROP TABLE fe_users;" | typo3cms database:import
   - typo3cms database:updateschema "*" --verbose
