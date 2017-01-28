@@ -36,7 +36,8 @@
         "typo3/cms-scheduler": "^7.6 || ^8.7",
 
         "symfony/console": "^2.7 || ^3.0",
-        "symfony/process": "^2.7 || ^3.0"
+        "symfony/process": "^2.7 || ^3.0",
+        "typo3/fluid-schema-generator": "^2.1"
     },
     "require-dev": {
         "typo3-console/create-reference-command": "1.0.*@dev",
