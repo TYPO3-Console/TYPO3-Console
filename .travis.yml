@@ -98,10 +98,11 @@ script:
   - typo3cms database:updateschema "*" --verbose --dry-run
   - typo3cms database:updateschema --verbose
   - typo3cms database:updateschema "*" --verbose
-  - typo3cms database:export > /dev/null
+  - typo3cms database:export > travis_test.sql
   - test $(typo3cms database:export --exclude-tables sys_log | grep "CREATE TABLE" | grep -c sys_log) -eq 0
   - echo "SELECT username from be_users where admin=1;" | typo3cms database:import
-  - echo "DROP TABLE fe_users;" | typo3cms database:import
+  - echo "DROP DATABASE travis_test;" | typo3cms database:import
+  - echo "CREATE DATABASE travis_test;" | mysql -uroot && cat travis_test.sql | typo3cms database:import
   - typo3cms database:updateschema "*" --verbose
   - typo3cms frontend:request / > /dev/null
   - typo3cms documentation:generatexsd TYPO3\\CMS\\Fluid\\ViewHelpers > /dev/null
