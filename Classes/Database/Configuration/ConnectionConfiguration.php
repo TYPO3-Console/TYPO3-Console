@@ -31,10 +31,10 @@ class ConnectionConfiguration
         } else {
             // @deprecated with 8 will be removed when 7 Support is dropped
             $dbConfig = [
-                'dbname' => TYPO3_db,
-                'host' => TYPO3_db_host,
-                'user' => TYPO3_db_username,
-                'password' => TYPO3_db_password,
+                'dbname' => $GLOBALS['TYPO3_CONF_VARS']['DB']['database'],
+                'host' => $GLOBALS['TYPO3_CONF_VARS']['DB']['host'],
+                'user' => $GLOBALS['TYPO3_CONF_VARS']['DB']['username'],
+                'password' => $GLOBALS['TYPO3_CONF_VARS']['DB']['password'],
             ];
             if (isset($GLOBALS['TYPO3_CONF_VARS']['DB']['port'])) {
                 $dbConfig['port'] = $GLOBALS['TYPO3_CONF_VARS']['DB']['port'];
