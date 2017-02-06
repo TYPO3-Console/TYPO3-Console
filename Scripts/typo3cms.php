@@ -27,11 +27,11 @@ call_user_func(function () {
     if (file_exists($autoLoadFile = realpath($typo3Root . '/typo3') . '/../vendor/autoload.php')) {
         // The extension is in typo3conf/ext, so we load the main autoload.php from TYPO3 sources
         // Applicable in both Composer and non-Composer mode.
-        $classLoader = require_once $autoLoadFile;
+        $classLoader = require $autoLoadFile;
     } elseif (!empty($vendorDir) && file_exists($autoLoadFile = $vendorDir . '/autoload.php')) {
         // The package is in vendor dir, so we load the main autoload.php from vendor folder
         // Applicable in Composer mode only.
-        $classLoader = require_once $autoLoadFile;
+        $classLoader = require $autoLoadFile;
     } else {
         echo 'Could not find autoload.php file. Is TYPO3_PATH_WEB specified correctly?' . PHP_EOL;
         exit(1);

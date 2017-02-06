@@ -119,6 +119,7 @@ class CommandDispatcher
         } else {
             $processBuilder->setPrefix($typo3cmsCommandPath);
         }
+        $processBuilder->addEnvironmentVariables(['TYPO3_CONSOLE_SUB_PROCESS' => true]);
         return new self($processBuilder);
     }
 
@@ -127,15 +128,18 @@ class CommandDispatcher
      *
      * @param string $command Command identifier
      * @param array $arguments Argument names will automatically be converted to dashed version, fi not provided like so
+     * @param array $environment Environment vars to be added to the command
      * @return string Output of the executed command
      * @throws FailedSubProcessCommandException
      */
-    public function executeCommand($command, array $arguments = [])
+    public function executeCommand($command, array $arguments = [], array $environment = [])
     {
         // We need to clone the builder to be able to re-use the object for multiple commands
         $processBuilder = clone $this->processBuilder;
 
         $processBuilder->add($command);
+        $processBuilder->addEnvironmentVariables($environment);
+
         foreach ($arguments as $argumentName => $argumentValue) {
             if (strpos($argumentName, '--') === 0) {
                 $dashedName = $argumentName;

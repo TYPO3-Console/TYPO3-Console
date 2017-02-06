@@ -21,6 +21,7 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput as SymfonyConsoleOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
@@ -105,7 +106,11 @@ class ConsoleOutput
         if ($arguments !== []) {
             $text = vsprintf($text, $arguments);
         }
-        $this->output->write($text);
+        if (getenv('TYPO3_CONSOLE_SUB_PROCESS')) {
+            $this->output->write($text, false, OutputInterface::OUTPUT_RAW);
+        } else {
+            $this->output->write($text);
+        }
     }
 
     /**
