@@ -9,14 +9,14 @@ Command Reference
 
 .. note::
 
-  This reference uses ``./typo3cms`` as the command to invoke. If you are on
+  This reference uses ``typo3cms`` as the command to invoke. If you are on
   Windows, this will probably not work, there you need to use ``typo3cms.bat``
   instead.
   In Composer based installations, the ``typo3cms`` binary will be located
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2016-11-01 13:03:01
+The following reference was automatically generated from code on 2017-01-26 15:28:42
 
 
 .. _`Command Reference: typo3_console`:
@@ -179,7 +179,7 @@ Valid group names are by default:
 - pages
 - system
 
-**Example:** ``./typo3cms cache:groups pages,all``
+**Example:** ``typo3cms cache:groups pages,all``
 
 Arguments
 ^^^^^^^^^
@@ -202,7 +202,7 @@ Arguments
 
 Flushes caches by tags, optionally only caches in specified groups.
 
-**Example:** ``./typo3cms cache:flushtags news_123 pages,all``
+**Example:** ``typo3cms cache:flushtags news_123 pages,all``
 
 Arguments
 ^^^^^^^^^
@@ -246,7 +246,7 @@ Lists all registered cache groups.
 
 Updates reference index to ensure data integrity
 
-**Example:** ``./typo3cms cleanup:updatereferenceindex --dry-run --verbose``
+**Example:** ``typo3cms cleanup:updatereferenceindex --dry-run --verbose``
 
 
 
@@ -276,7 +276,7 @@ Removes a system configuration option by path.
 For this command to succeed, the configuration option(s) must be in
 LocalConfiguration.php and not be overridden elsewhere.
 
-**Example:** ``./typo3cms configuration:remove DB,EXT/EXTCONF/realurl``
+**Example:** ``typo3cms configuration:remove DB,EXT/EXTCONF/realurl``
 
 Arguments
 ^^^^^^^^^
@@ -305,7 +305,7 @@ Options
 
 Set system configuration option value by path.
 
-**Example:** ``./typo3cms configuration:set SYS/fileCreateMask 0664``
+**Example:** ``typo3cms configuration:set SYS/fileCreateMask 0664``
 
 Arguments
 ^^^^^^^^^
@@ -332,7 +332,7 @@ Shows system configuration value by path.
 If the currently active configuration differs from the value in LocalConfiguration.php
 the difference between these values is shown.
 
-**Example:** ``./typo3cms configuration:show DB``
+**Example:** ``typo3cms configuration:show DB``
 
 Arguments
 ^^^^^^^^^
@@ -356,7 +356,7 @@ Arguments
 Shows active system configuration by path.
 Shows the configuration value that is currently effective, no matter where and how it is set.
 
-**Example:** ``./typo3cms configuration:showActive DB``
+**Example:** ``typo3cms configuration:showActive DB``
 
 Arguments
 ^^^^^^^^^
@@ -379,9 +379,9 @@ Arguments
 
 Shows local configuration option value by path.
 Shows the value which is stored in LocalConfiguration.php.
-Note that this value could be overridden. Use ``./typo3cms configuration:show [path]`` to see if this is the case.
+Note that this value could be overridden. Use ``typo3cms configuration:show [path]`` to see if this is the case.
 
-**Example:** ``./typo3cms configuration:showLocal DB``
+**Example:** ``typo3cms configuration:showLocal DB``
 
 Arguments
 ^^^^^^^^^
@@ -412,12 +412,22 @@ Export the database (all tables) directly to stdout.
 The mysqldump binary must be available in the path for this command to work.
 This obviously only works when MySQL is used as DBMS.
 
+A comma-separated list of tables can be passed to exclude from the export:
+
+**Example:** ``typo3cms database:export --exclude-tables be_sessions,fe_sessions,sys_log``
+
 **This command passes the plain text database password to the command line process.**
 This means, that users that have the permission to observe running processes,
 will be able to read your password.
 If this imposes a security risk for you, then refrain from using this command!
 
 
+
+Options
+^^^^^^^
+
+``--exclude-tables``
+  Comma-separated list of table names to exclude from the export
 
 
 
@@ -435,9 +445,9 @@ it but works as well to pass SELECT statements to it.
 The mysql binary must be available in the path for this command to work.
 This obviously only works when MySQL is used as DBMS.
 
-**Example (import):** ``ssh remote.server '/path/to/typo3cms database:export' | ./typo3cms database:import``
-**Example (select):** ``echo 'SELECT username from be_users WHERE admin=1;' | ./typo3cms database:import``
-**Example (interactive):** ``./typo3cms database:import --interactive``
+**Example (import):** ``ssh remote.server '/path/to/typo3cms database:export' | typo3cms database:import``
+**Example (select):** ``echo 'SELECT username from be_users WHERE admin=1;' | typo3cms database:import``
+**Example (interactive):** ``typo3cms database:import --interactive``
 
 **This command passes the plain text database password to the command line process.**
 This means, that users that have the permission to observe running processes,
@@ -473,7 +483,6 @@ Valid schema update types are:
 - table.change
 - table.prefix
 - table.drop
-- table.clear
 - safe (includes all necessary operations, to add or change fields or tables)
 - destructive (includes all operations which rename or drop fields or tables)
 
@@ -485,7 +494,7 @@ The list of schema update types supports wildcards to specify multiple types, e.
 
 To avoid shell matching all types with wildcards should be quoted.
 
-**Example:** ``./typo3cms database:updateschema "*.add,*.change"``
+**Example:** ``typo3cms database:updateschema "*.add,*.change"``
 
 
 
@@ -623,6 +632,29 @@ Options
 
 
 
+.. _`Command Reference: typo3_console extension:removeinactive`:
+
+``extension:removeinactive``
+****************************
+
+**Removes all extensions that are not marked as active**
+
+Directories of inactive extension are **removed** from ``typo3/sysext`` and ``typo3conf/ext``.
+This is a one way command with no way back. Don't blame anybody if this command destroys your data.
+**Handle with care!**
+
+
+
+Options
+^^^^^^^
+
+``--force``
+  The option has to be specified, otherwise nothing happens
+
+
+
+
+
 .. _`Command Reference: typo3_console extension:setup`:
 
 ``extension:setup``
@@ -711,7 +743,7 @@ Arguments
 Display help for a command
 
 The help command displays help for a given command:
-./typo3cms help <command identifier>
+typo3cms help <command identifier>
 
 
 
@@ -736,11 +768,20 @@ Options
 
 Automatically create files and folders, required for a TYPO3 installation.
 
-This command is great e.g. for creating the typo3temp folder structure during deployment
+This command creates the required folder structure needed for TYPO3 including extensions.
+It is recommended to be executed **after** executing
+``typo3cms install:generatepackagestates``, to ensure proper generation of
+required folders for all active extensions.
 
 
 
 
+
+Related commands
+^^^^^^^^^^^^^^^^
+
+``install:generatepackagestates``
+  Generate PackageStates.php file
 
 
 
@@ -760,17 +801,19 @@ Marks the following extensions as active:
 - All core extensions that are required (or part of minimal usable system)
 - All core extensions which are provided in the TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS environment variable. Extension keys in this variable must be separated by comma and without spaces.
 
-**Example:** ``TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS="info,info_pagetsconfig" ./typo3cms install:generatepackagestates``
+**Example:** ``TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS="info,info_pagetsconfig" typo3cms install:generatepackagestates``
 
 
 
 Options
 ^^^^^^^
 
-``--remove-inactive``
-  Inactive extensions are **removed** from ``typo3/sysext``. **Handle with care!**
+``--framework-extensions``
+  If given, this argument takes precedence over the environment variable
 ``--activate-default``
   If true, ``typo3/cms`` extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
+``--excluded-extensions``
+  Extensions in typo3conf/ext/ directory, which should stay inactive
 
 
 
@@ -831,7 +874,7 @@ Options
 
 Executes tasks that are registered in the scheduler module.
 
-**Example:** ``./typo3cms scheduler:run 42 --force``
+**Example:** ``typo3cms scheduler:run 42 --force``
 
 
 

@@ -13,9 +13,14 @@ namespace Helhum\Typo3Console\Command;
  *
  */
 
+use Helhum\Typo3Console\Extension\ExtensionSetup;
+use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\ClassLoadingInformation;
+use TYPO3\CMS\Core\Package\PackageInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\PathUtility;
 
 /**
  * CommandController for working with extension management through CLI
@@ -46,6 +51,12 @@ class ExtensionCommandController extends CommandController
     protected $packageManager;
 
     /**
+     * @var \Helhum\Typo3Console\Service\CacheService
+     * @inject
+     */
+    protected $cacheService;
+
+    /**
      * Activate extension(s)
      *
      * Activates one or more extensions by key.
@@ -56,15 +67,38 @@ class ExtensionCommandController extends CommandController
      */
     public function activateCommand(array $extensionKeys)
     {
-        $this->emitPackagesMayHaveChangedSignal();
-        foreach ($extensionKeys as $extensionKey) {
-            $this->extensionInstaller->install($extensionKey);
+        if (Bootstrap::usesComposerClassLoading()) {
+            $this->output->outputLine('<warning>This command has been deprecated to be used in composer mode, as it might lead to unexpected results</warning>');
+            $this->output->outputLine('<warning>The PackageStates.php file that tracks which extension should be active,</warning>');
+            $this->output->outputLine('<warning>is now generated automatically when installing the console with composer.</warning>');
+            $this->output->outputLine('<warning>To set up all active extensions correctly, please use the extension:setupactive command</warning>');
         }
-        $extensionKeysAsString = implode('", "', $extensionKeys);
-        if (count($extensionKeys) === 1) {
-            $this->outputLine('<info>Extension "%s" is now active.</info>', [$extensionKeysAsString]);
-        } else {
-            $this->outputLine('<info>Extensions "%s" are now active.</info>', [$extensionKeysAsString]);
+
+        $this->emitPackagesMayHaveChangedSignal();
+        $activatedExtensions = [];
+        $extensionsToSetUp = [];
+        foreach ($extensionKeys as $extensionKey) {
+            $extensionsToSetUp[] = $this->packageManager->getPackage($extensionKey);
+            if (!$this->packageManager->isPackageActive($extensionKey)) {
+                $this->packageManager->activatePackage($extensionKey);
+                $activatedExtensions[] = $extensionKey;
+            }
+        }
+
+        if (!empty($activatedExtensions)) {
+            $this->extensionInstaller->reloadCaches();
+            $this->cacheService->flush();
+
+            $extensionKeysAsString = implode('", "', $activatedExtensions);
+            if (count($activatedExtensions) === 1) {
+                $this->outputLine('<info>Extension "%s" is now active.</info>', [$extensionKeysAsString]);
+            } else {
+                $this->outputLine('<info>Extensions "%s" are now active.</info>', [$extensionKeysAsString]);
+            }
+        }
+
+        if (!empty($extensionsToSetUp)) {
+            $this->setupExtensions($extensionsToSetUp, $activatedExtensions);
         }
     }
 
@@ -79,6 +113,13 @@ class ExtensionCommandController extends CommandController
      */
     public function deactivateCommand(array $extensionKeys)
     {
+        if (Bootstrap::usesComposerClassLoading()) {
+            $this->output->outputLine('<warning>This command has been deprecated to be used in composer mode, as it might lead to unexpected results</warning>');
+            $this->output->outputLine('<warning>The PackageStates.php file that tracks which extension should be active,</warning>');
+            $this->output->outputLine('<warning>is now generated automatically when installing the console with composer.</warning>');
+            $this->output->outputLine('<warning>To set up all active extensions correctly, please use the extension:setupactive command</warning>');
+        }
+
         foreach ($extensionKeys as $extensionKey) {
             $this->extensionInstaller->uninstall($extensionKey);
         }
@@ -104,11 +145,32 @@ class ExtensionCommandController extends CommandController
      */
     public function setupCommand(array $extensionKeys)
     {
+        $packages = [];
         foreach ($extensionKeys as $extensionKey) {
-            $this->extensionInstaller->processExtensionSetup($extensionKey);
+            $packages[] = $this->packageManager->getPackage($extensionKey);
         }
-        $extensionKeysAsString = implode('", "', $extensionKeys);
-        if (count($extensionKeys) === 1) {
+        $this->setupExtensions($packages);
+    }
+
+    /**
+     * Performs all necessary operations to integrate an extension into the system.
+     * To do so, we avoid buggy TYPO3 API and use our own instead.
+     *
+     * @param PackageInterface[] $packages
+     * @param array $activatedExtensionKeys
+     */
+    private function setupExtensions(array $packages, array $activatedExtensionKeys = [])
+    {
+        $extensionSetup = new ExtensionSetup(
+            new ExtensionFactory($this->packageManager),
+            $this->extensionInstaller
+        );
+
+        $extensionSetup->setupExtensions($packages, $activatedExtensionKeys);
+        $extensionKeysAsString = implode('", "', array_map(function (PackageInterface $package) {
+            return $package->getPackageKey();
+        }, $packages));
+        if (count($packages) === 1) {
             $this->outputLine('<info>Extension "%s" is now set up.</info>', [$extensionKeysAsString]);
         } else {
             $this->outputLine('<info>Extensions "%s" are now set up.</info>', [$extensionKeysAsString]);
@@ -132,11 +194,42 @@ class ExtensionCommandController extends CommandController
      */
     public function setupActiveCommand()
     {
-        $activeExtensions = [];
-        foreach ($this->packageManager->getActivePackages() as $package) {
-            $activeExtensions[] = $package->getPackageKey();
+        $this->setupExtensions($this->packageManager->getActivePackages());
+    }
+
+    /**
+     * Removes all extensions that are not marked as active
+     *
+     * Directories of inactive extension are <comment>removed</comment> from <code>typo3/sysext</code> and <code>typo3conf/ext</code>.
+     * This is a one way command with no way back. Don't blame anybody if this command destroys your data.
+     * <comment>Handle with care!</comment>
+     *
+     * @param bool $force The option has to be specified, otherwise nothing happens
+     */
+    public function removeInactiveCommand($force = false)
+    {
+        if ($force) {
+            $activePackages = $this->packageManager->getActivePackages();
+            $this->packageManager->scanAvailablePackages();
+            foreach ($this->packageManager->getAvailablePackages() as $package) {
+                if (empty($activePackages[$package->getPackageKey()])) {
+                    $this->packageManager->unregisterPackage($package);
+                    if (is_dir($package->getPackagePath())) {
+                        GeneralUtility::flushDirectory($package->getPackagePath());
+                        $removedPaths[] = PathUtility::stripPathSitePrefix($package->getPackagePath());
+                    }
+                }
+            }
+            $this->packageManager->forceSortAndSavePackageStates();
+            if (!empty($removedPaths)) {
+                $this->outputLine('<info>The following directories have been removed:</info>' . chr(10) . implode(chr(10), $removedPaths));
+            } else {
+                $this->outputLine('<info>Nothing was removed</info>');
+            }
+        } else {
+            $this->outputLine('<warning>Operation not confirmed and has been skipped</warning>');
+            $this->quit(1);
         }
-        $this->setupCommand($activeExtensions);
     }
 
     /**

@@ -30,7 +30,7 @@ class HelpCommandController extends CommandController
      *
      * @var string
      */
-    private $version = '4.0.1';
+    private $version = '4.1.2';
 
     /**
      * @var \Helhum\Typo3Console\Mvc\Cli\CommandManager
@@ -49,7 +49,7 @@ class HelpCommandController extends CommandController
      * Display help for a command
      *
      * The help command displays help for a given command:
-     * ./typo3cms help <command identifier>
+     * typo3cms help <command identifier>
      *
      * @param string $commandIdentifier Identifier of a command for more details
      * @param bool $raw Raw output of commands only

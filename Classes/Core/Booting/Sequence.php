@@ -60,7 +60,7 @@ class Sequence
      *
      * @param string $stepIdentifier
      * @return void
-     * @throws \TYPO3\Flow\Exception
+     * @throws \Exception
      */
     public function removeStep($stepIdentifier)
     {
@@ -75,7 +75,7 @@ class Sequence
             }
         }
         if ($removedOccurrences === 0) {
-            throw new \TYPO3\Flow\Exception(sprintf('Cannot remove sequence step with identifier "%s" because no such step exists in the given sequence.', $stepIdentifier), 1322591669);
+            throw new \Exception(sprintf('Cannot remove sequence step with identifier "%s" because no such step exists in the given sequence.', $stepIdentifier), 1322591669);
         }
     }
 

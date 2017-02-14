@@ -1,7 +1,7 @@
 <?php
 $EM_CONF[$_EXTKEY] = [
-  'title' => 'TYPO3 Console',
-  'description' => 'A reliable and powerful command line interface for TYPO3 CMS',
+  'title' => 'Test Extension',
+  'description' => 'Extension fixture to prove extension setup working correctly',
   'category' => 'cli',
   'state' => 'stable',
   'uploadfolder' => 0,
@@ -11,12 +11,12 @@ $EM_CONF[$_EXTKEY] = [
   'author' => 'Helmut Hummel',
   'author_email' => 'info@helhum.io',
   'author_company' => 'helhum.io',
-  'version' => '4.1.2',
+  'version' => '0.1.0',
   'constraints' =>
   [
     'depends' =>
     [
-      'typo3' => '7.6.0-8.5.99',
+      'typo3' => '4.5.0-',
     ],
     'conflicts' =>
     [

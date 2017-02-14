@@ -58,7 +58,6 @@ class DatabaseCommandController extends CommandController
      * - table.change
      * - table.prefix
      * - table.drop
-     * - table.clear
      * - safe (includes all necessary operations, to add or change fields or tables)
      * - destructive (includes all operations which rename or drop fields or tables)
      *
@@ -70,7 +69,7 @@ class DatabaseCommandController extends CommandController
      *
      * To avoid shell matching all types with wildcards should be quoted.
      *
-     * <b>Example:</b> <code>./typo3cms database:updateschema "*.add,*.change"</code>
+     * <b>Example:</b> <code>typo3cms database:updateschema "*.add,*.change"</code>
      *
      * @param array $schemaUpdateTypes List of schema update types (default: "safe")
      * @param bool $verbose If set, database queries performed are shown in output
@@ -95,7 +94,7 @@ class DatabaseCommandController extends CommandController
                 '<info>No schema updates %s performed for update type%s:%s</info>',
                 [$dryRun ? 'must be' : 'were',
                 count($expandedSchemaUpdateTypes) > 1 ? 's' : '',
-                PHP_EOL . implode(PHP_EOL, $expandedSchemaUpdateTypes)]
+                PHP_EOL . implode('", "', $expandedSchemaUpdateTypes)]
             );
         }
     }
@@ -108,9 +107,9 @@ class DatabaseCommandController extends CommandController
      * The mysql binary must be available in the path for this command to work.
      * This obviously only works when MySQL is used as DBMS.
      *
-     * <b>Example (import):</b> <code>ssh remote.server '/path/to/typo3cms database:export' | ./typo3cms database:import</code>
-     * <b>Example (select):</b> <code>echo 'SELECT username from be_users WHERE admin=1;' | ./typo3cms database:import</code>
-     * <b>Example (interactive):</b> <code>./typo3cms database:import --interactive</code>
+     * <b>Example (import):</b> <code>ssh remote.server '/path/to/typo3cms database:export' | typo3cms database:import</code>
+     * <b>Example (select):</b> <code>echo 'SELECT username from be_users WHERE admin=1;' | typo3cms database:import</code>
+     * <b>Example (interactive):</b> <code>typo3cms database:import --interactive</code>
      *
      * <warning>This command passes the plain text database password to the command line process.</warning>
      * This means, that users that have the permission to observe running processes,
@@ -127,7 +126,7 @@ class DatabaseCommandController extends CommandController
             new ProcessBuilder()
         );
         $exitCode = $mysqlCommand->mysql(
-            ['--skip-column-names'],
+            $interactive ? [] : ['--skip-column-names'],
             STDIN,
             $this->buildOutputClosure(),
             $interactive
@@ -142,21 +141,35 @@ class DatabaseCommandController extends CommandController
      * The mysqldump binary must be available in the path for this command to work.
      * This obviously only works when MySQL is used as DBMS.
      *
+     * A comma-separated list of tables can be passed to exclude from the export:
+     *
+     * <b>Example:</b> <code>typo3cms database:export --exclude-tables be_sessions,fe_sessions,sys_log</code>
+     *
      * <warning>This command passes the plain text database password to the command line process.</warning>
      * This means, that users that have the permission to observe running processes,
      * will be able to read your password.
      * If this imposes a security risk for you, then refrain from using this command!
+     *
+     * @param array $excludeTables Comma-separated list of table names to exclude from the export
      */
-    public function exportCommand()
+    public function exportCommand(array $excludeTables = [])
     {
+        $dbConfig = $this->connectionConfiguration->build();
+        $additionalArguments = [];
+
+        foreach ($excludeTables as $table) {
+            $additionalArguments[] = sprintf('--ignore-table=%s.%s', $dbConfig['dbname'], $table);
+        }
+
         $mysqlCommand = new MysqlCommand(
-            $this->connectionConfiguration->build(),
+            $dbConfig,
             new ProcessBuilder()
         );
         $exitCode = $mysqlCommand->mysqldump(
-            [],
+            $additionalArguments,
             $this->buildOutputClosure()
         );
+
         $this->quit($exitCode);
     }
 

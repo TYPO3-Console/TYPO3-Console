@@ -13,8 +13,11 @@ namespace Helhum\Typo3Console\Command;
  *
  */
 
+use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
+use Helhum\Typo3Console\Install\PackageStatesGenerator;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Package\PackageInterface;
 
 /**
  * Alpha version of a setup command controller
@@ -33,12 +36,6 @@ class InstallCommandController extends CommandController
      * @inject
      */
     protected $cliSetupRequestHandler;
-
-    /**
-     * @var \Helhum\Typo3Console\Install\PackageStatesGenerator
-     * @inject
-     */
-    protected $packageStatesGenerator;
 
     /**
      * TYPO3 Setup
@@ -98,27 +95,38 @@ class InstallCommandController extends CommandController
      * - All core extensions that are required (or part of minimal usable system)
      * - All core extensions which are provided in the TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS environment variable. Extension keys in this variable must be separated by comma and without spaces.
      *
-     * <b>Example:</b> <code>TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS="info,info_pagetsconfig" ./typo3cms install:generatepackagestates</code>
+     * <b>Example:</b> <code>TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS="info,info_pagetsconfig" typo3cms install:generatepackagestates</code>
      *
-     * @param bool $removeInactive Inactive extensions are <comment>removed</comment> from <code>typo3/sysext</code>. <comment>Handle with care!</comment>
+     * @param array $frameworkExtensions If given, this argument takes precedence over the environment variable
      * @param bool $activateDefault If true, <code>typo3/cms</code> extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
-     * @throws \TYPO3\CMS\Core\Package\Exception\InvalidPackageStateException
-     * @throws \TYPO3\CMS\Core\Package\Exception\ProtectedPackageKeyException
+     * @param array $excludedExtensions Extensions in typo3conf/ext/ directory, which should stay inactive
      */
-    public function generatePackageStatesCommand($removeInactive = false, $activateDefault = false)
+    public function generatePackageStatesCommand(array $frameworkExtensions = [], $activateDefault = false, array $excludedExtensions = [])
     {
-        $this->packageStatesGenerator->generate($this->packageManager, $activateDefault);
+        $ranFromComposerPlugin = getenv('TYPO3_CONSOLE_PLUGIN_RUN');
+        if (!$ranFromComposerPlugin && Bootstrap::usesComposerClassLoading()) {
+            $this->output->outputLine('<warning>This command is now always automatically executed after Composer has written the autoload information.</warning>');
+            $this->output->outputLine('<warning>It is therefore deprecated to be used in Composer mode.</warning>');
+        }
+        $frameworkExtensions = $frameworkExtensions ?: explode(',', (string)getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS'));
+        $packageStatesGenerator = new PackageStatesGenerator($this->packageManager);
+        $activatedExtensions = $packageStatesGenerator->generate($frameworkExtensions, $activateDefault, $excludedExtensions);
 
-        if ($removeInactive) {
-            $activePackages = $this->packageManager->getActivePackages();
-            foreach ($this->packageManager->getAvailablePackages() as $package) {
-                if (empty($activePackages[$package->getPackageKey()])) {
-                    $this->packageManager->unregisterPackage($package);
-                    GeneralUtility::flushDirectory($package->getPackagePath());
-                    $this->outputLine('Removed Package: ' . $package->getPackageKey());
-                }
-            }
-            $this->packageManager->forceSortAndSavePackageStates();
+        $this->outputLine(
+            '<info>The following extensions have been added to the generated PackageStates.php file:</info> %s',
+            [
+                implode(', ', array_map(function (PackageInterface $package) {
+                    return $package->getPackageKey();
+                }, $activatedExtensions))
+            ]
+        );
+        if (!empty($excludedExtensions)) {
+            $this->outputLine(
+                '<info>The following third party extensions were excluded during this process:</info> %s',
+                [
+                    implode(', ', $excludedExtensions)
+                ]
+            );
         }
     }
 
@@ -127,19 +135,25 @@ class InstallCommandController extends CommandController
      *
      * Automatically create files and folders, required for a TYPO3 installation.
      *
-     * This command is great e.g. for creating the typo3temp folder structure during deployment
+     * This command creates the required folder structure needed for TYPO3 including extensions.
+     * It is recommended to be executed <b>after</b> executing
+     * <code>typo3cms install:generatepackagestates</code>, to ensure proper generation of
+     * required folders for all active extensions.
      *
+     * @see typo3_console:install:generatepackagestates
+     *
+     * @throws \InvalidArgumentException
      * @throws \TYPO3\CMS\Install\FolderStructure\Exception
+     * @throws \TYPO3\CMS\Install\FolderStructure\Exception\InvalidArgumentException
+     * @throws \TYPO3\CMS\Install\FolderStructure\Exception\RootNodeException
      * @throws \TYPO3\CMS\Install\Status\Exception
      */
     public function fixFolderStructureCommand()
     {
-        /** @var $folderStructureFactory \TYPO3\CMS\Install\FolderStructure\DefaultFactory */
-        $folderStructureFactory = GeneralUtility::makeInstance(\TYPO3\CMS\Install\FolderStructure\DefaultFactory::class);
-        /** @var $structureFacade \TYPO3\CMS\Install\FolderStructure\StructureFacade */
-        $structureFacade = $folderStructureFactory->getStructure();
-
-        $fixedStatusObjects = $structureFacade->fix();
+        $folderStructureFactory = new ExtensionFactory($this->packageManager);
+        $fixedStatusObjects = $folderStructureFactory
+            ->getStructure()
+            ->fix();
 
         if (empty($fixedStatusObjects)) {
             $this->outputLine('<info>No action performed!</info>');

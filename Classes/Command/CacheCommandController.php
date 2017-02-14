@@ -13,9 +13,9 @@ namespace Helhum\Typo3Console\Command;
  *
  */
 
-use Helhum\Typo3Console\Core\Booting\RunLevel;
-use Helhum\Typo3Console\Core\ConsoleBootstrap;
+use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use Helhum\Typo3Console\Service\CacheService;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 
 /**
@@ -24,10 +24,24 @@ use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 class CacheCommandController extends CommandController
 {
     /**
-     * @var \Helhum\Typo3Console\Service\CacheService
-     * @inject
+     * @var CacheService
      */
-    protected $cacheService;
+    private $cacheService;
+
+    /**
+     * @var CommandDispatcher
+     */
+    private $commandDispatcher;
+
+    /**
+     * @param CacheService $cacheService
+     * @param CommandDispatcher $commandDispatcher
+     */
+    public function __construct(CacheService $cacheService, CommandDispatcher $commandDispatcher = null)
+    {
+        $this->cacheService = $cacheService;
+        $this->commandDispatcher = $commandDispatcher ?: CommandDispatcher::createFromCommandRun();
+    }
 
     /**
      * Flush all caches
@@ -35,20 +49,27 @@ class CacheCommandController extends CommandController
      * Flushes TYPO3 core caches first and after that, flushes caches from extensions.
      *
      * @param bool $force Cache is forcibly flushed (low level operations are performed)
+     * @throws \Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException
      */
     public function flushCommand($force = false)
     {
         $this->cacheService->flush($force);
+        $this->commandDispatcher->executeCommand('cache:flushcomplete');
+        $this->outputLine(sprintf('%slushed all caches.', $force ? 'Force f' : 'F'));
+    }
 
-        // TODO: use nicer API once available
-        ConsoleBootstrap::getInstance()->requestRunLevel(RunLevel::LEVEL_FULL);
-
+    /**
+     * Called only internally in a sub process of the cache:flush command
+     *
+     * This command will then use the full TYPO3 bootstrap.
+     * @internal
+     */
+    public function flushCompleteCommand()
+    {
         // Flush a second time to have extension caches and previously disabled core caches cleared when clearing not forced
         $this->cacheService->flush();
         // Also call the data handler API to cover legacy hook subscriber code
         $this->cacheService->flushCachesWithDataHandler();
-
-        $this->outputLine(sprintf('%slushed all caches.', $force ? 'Force f' : 'F'));
     }
 
     /**
@@ -62,7 +83,7 @@ class CacheCommandController extends CommandController
      * - pages
      * - system
      *
-     * <b>Example:</b> <code>./typo3cms cache:groups pages,all</code>
+     * <b>Example:</b> <code>typo3cms cache:groups pages,all</code>
      *
      * @param array $groups An array of names (specified as comma separated values) of cache groups to flush
      */
@@ -82,7 +103,7 @@ class CacheCommandController extends CommandController
      *
      * Flushes caches by tags, optionally only caches in specified groups.
      *
-     * <b>Example:</b> <code>./typo3cms cache:flushtags news_123 pages,all</code>
+     * <b>Example:</b> <code>typo3cms cache:flushtags news_123 pages,all</code>
      *
      * @param array $tags Array of tags (specified as comma separated values) to flush.
      * @param array $groups Optional array of groups (specified as comma separated values) for which to flush tags. If no group is specified, caches of all groups are flushed.

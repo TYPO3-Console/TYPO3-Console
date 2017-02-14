@@ -62,7 +62,7 @@ class ArrayConverter extends \TYPO3\CMS\Extbase\Property\TypeConverter\AbstractT
             if ($source === '') {
                 return [];
             } else {
-                return explode($this->getConfiguredStringDelimiter($configuration), $source);
+                return array_filter(array_map('trim', explode($this->getConfiguredStringDelimiter($configuration), $source)));
             }
         }
 

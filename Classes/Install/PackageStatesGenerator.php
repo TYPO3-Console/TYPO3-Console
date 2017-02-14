@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Install;
  */
 
 use Helhum\Typo3Console\Package\UncachedPackageManager;
+use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Utility\PathUtility;
 
 /**
@@ -22,40 +23,48 @@ use TYPO3\CMS\Core\Utility\PathUtility;
 class PackageStatesGenerator
 {
     /**
-     * @param UncachedPackageManager $packageManager
-     * @param bool $activateDefaultExtensions
-     * @throws \TYPO3\CMS\Core\Package\Exception\ProtectedPackageKeyException
+     * @var UncachedPackageManager
      */
-    public function generate(UncachedPackageManager $packageManager, $activateDefaultExtensions = false)
+    private $packageManager;
+
+    /**
+     * PackageStatesGenerator constructor.
+     *
+     * @param UncachedPackageManager $packageManager
+     */
+    public function __construct(UncachedPackageManager $packageManager)
     {
-        $frameworkExtensionsFromConfiguration = $this->getFrameworkExtensionsFromConfiguration();
-        $packageManager->scanAvailablePackages();
-        foreach ($packageManager->getAvailablePackages() as $package) {
+        $this->packageManager = $packageManager;
+    }
+
+    /**
+     * @param array $frameworkExtensionsToActivate
+     * @param bool $activateDefaultExtensions
+     * @param array $excludedExtensions
+     * @return PackageInterface[]
+     */
+    public function generate(array $frameworkExtensionsToActivate = [], $activateDefaultExtensions = false, array $excludedExtensions = [])
+    {
+        $this->packageManager->scanAvailablePackages();
+        foreach ($this->packageManager->getAvailablePackages() as $package) {
             if (
-                isset($frameworkExtensionsFromConfiguration[$package->getPackageKey()])
+                in_array($package->getPackageKey(), $frameworkExtensionsToActivate, true)
                 || $package->isProtected()
                 || $package->isPartOfMinimalUsableSystem()
                 || ($activateDefaultExtensions && $package->isPartOfFactoryDefault())
                 // Every extension available in typo3conf/ext is meant to be active
-                || strpos(PathUtility::stripPathSitePrefix($package->getPackagePath()), 'typo3conf/ext/') !== false
+                // except it is added to the exclude array. The latter is useful in dev mode or non composer mode
+                || (
+                    strpos(PathUtility::stripPathSitePrefix($package->getPackagePath()), 'typo3conf/ext/') !== false
+                    && !in_array($package->getPackageKey(), $excludedExtensions, true)
+                    )
             ) {
-                $packageManager->activatePackage($package->getPackageKey());
+                $this->packageManager->activatePackage($package->getPackageKey());
             } else {
-                $packageManager->deactivatePackage($package->getPackageKey());
+                $this->packageManager->deactivatePackage($package->getPackageKey());
             }
         }
-        $packageManager->forceSortAndSavePackageStates();
-    }
-
-    /**
-     * @return array
-     */
-    public function getFrameworkExtensionsFromConfiguration()
-    {
-        $configuredExtensions = [];
-        if (getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS')) {
-            $configuredExtensions = array_flip(explode(',', getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS')));
-        }
-        return $configuredExtensions;
+        $this->packageManager->forceSortAndSavePackageStates();
+        return $this->packageManager->getActivePackages();
     }
 }

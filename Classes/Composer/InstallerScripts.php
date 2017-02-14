@@ -14,15 +14,26 @@ namespace Helhum\Typo3Console\Composer;
  */
 
 use Composer\Script\Event as ScriptEvent;
-use Helhum\Typo3ConsolePlugin\Config as PluginConfig;
-use TYPO3\CMS\Composer\Plugin\Config as Typo3Config;
-use TYPO3\CMS\Composer\Plugin\Util\Filesystem;
+use Helhum\Typo3Console\Composer\InstallerScript\GeneratePackageStates;
+use Helhum\Typo3Console\Composer\InstallerScript\InstallDummyExtension;
+use Helhum\Typo3Console\Composer\InstallerScript\PopulateCommandConfiguration;
 
 /**
  * Class for Composer and Extension Manager install scripts
  */
 class InstallerScripts
 {
+    /**
+     * Scripts to execute when console is set up
+     *
+     * @var array
+     */
+    private static $scripts = [
+        PopulateCommandConfiguration::class,
+        GeneratePackageStates::class,
+        InstallDummyExtension::class,
+    ];
+
     /**
      * Called from Composer
      *
@@ -33,49 +44,17 @@ class InstallerScripts
      */
     public static function setupConsole(ScriptEvent $event)
     {
-        if ($event->getComposer()->getPackage()->getName() === 'helhum/typo3-console') {
-            return;
-        }
-        self::installExtension($event);
-    }
-
-    /**
-     * @param ScriptEvent $event
-     * @deprecated will be removed with 5.0
-     */
-    private static function installExtension(ScriptEvent $event)
-    {
         $io = $event->getIO();
-        $composer = $event->getComposer();
-
-        $composerConfig = $composer->getConfig();
-        $typo3Config = Typo3Config::load($composer);
-        $pluginConfig = PluginConfig::load($io, $composerConfig);
-
-        $webDir = $typo3Config->get('web-dir');
-        $filesystem = new Filesystem();
-        $extensionDir = "$webDir/typo3conf/ext/typo3_console";
-
-        if ($pluginConfig->get('install-extension-dummy')) {
-            $io->writeError('<warning>Installation of TYPO3 extension has been deprecated</warning>');
-            $io->writeError('<warning>To get rid of this message, set "install-extension-dummy" option to false</warning>');
-            $io->writeError('<warning>in "extra -> helhum/typo3-console" section of root composer.json</warning>');
-
-            $extResourcesDir = __DIR__ . '/../../Resources/Private/ExtensionArtifacts';
-            $resources = [
-                'ext_icon.png',
-                'ext_emconf.php',
-            ];
-            foreach ($resources as $resource) {
-                $target = "$extensionDir/$resource";
-                $filesystem->ensureDirectoryExists(dirname($target));
-                $filesystem->copy("$extResourcesDir/$resource", $target);
-            }
-            $io->writeError('<info>TYPO3 Console: Installed TYPO3 extension into TYPO3 extension directory</info>');
-        } else {
-            if (file_exists($extensionDir) || is_dir($extensionDir)) {
-                $filesystem->removeDirectory($extensionDir);
-                $io->writeError('<info>TYPO3 Console: Removed TYPO3 extension from TYPO3 extension directory</info>');
+        foreach (self::$scripts as $scriptClass) {
+            /** @var InstallerScriptInterface $script */
+            $script = new $scriptClass();
+            if ($script->shouldRun($event)) {
+                $io->writeError(sprintf('<info>Executing "%s": </info>', $scriptClass), true, $io::DEBUG);
+                if (!$script->run($event)) {
+                    $io->writeError(sprintf('<error>Executing "%s" failed!</error>', $scriptClass), true);
+                }
+            } else {
+                $io->writeError(sprintf('<info>Skipped executing "%s": </info>', $scriptClass), true, $io::DEBUG);
             }
         }
     }

@@ -36,7 +36,7 @@ class CleanupCommandController extends CommandController
      *
      * Updates reference index to ensure data integrity
      *
-     * <b>Example:</b> <code>./typo3cms cleanup:updatereferenceindex --dry-run --verbose</code>
+     * <b>Example:</b> <code>typo3cms cleanup:updatereferenceindex --dry-run --verbose</code>
      *
      * @param bool $dryRun If set, index is only checked without performing any action
      * @param bool $verbose Whether or not to output results
