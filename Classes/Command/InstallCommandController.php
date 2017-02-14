@@ -93,17 +93,18 @@ class InstallCommandController extends CommandController
      *
      * - Third party extensions
      * - All core extensions that are required (or part of minimal usable system)
-     * - All core extensions which are provided in the TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS environment variable. Extension keys in this variable must be separated by comma and without spaces.
+     * - All core extensions which are provided with the <code>--framework-extensions</code> argument.
+     * - In composer mode all composer dependencies to TYPO3 framework extensions are detected and activated by default.
      *
-     * <b>Example:</b> <code>TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS="info,info_pagetsconfig" typo3cms install:generatepackagestates</code>
+     * <b>Example:</b> <code>typo3cms install:generatepackagestates</code>
      *
-     * @param array $frameworkExtensions If given, this argument takes precedence over the environment variable
+     * @param array $frameworkExtensions TYPO3 system extensions that should be marked as active. Extension keys separated by comma.
      * @param bool $activateDefault If true, <code>typo3/cms</code> extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
      * @param array $excludedExtensions Extensions in typo3conf/ext/ directory, which should stay inactive
      */
     public function generatePackageStatesCommand(array $frameworkExtensions = [], $activateDefault = false, array $excludedExtensions = [])
     {
-        $ranFromComposerPlugin = getenv('TYPO3_CONSOLE_PLUGIN_RUN');
+        $ranFromComposerPlugin = getenv('TYPO3_CONSOLE_PLUGIN_RUN') || !getenv('TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES');
         if (!$ranFromComposerPlugin && Bootstrap::usesComposerClassLoading()) {
             $this->output->outputLine('<warning>This command is now always automatically executed after Composer has written the autoload information.</warning>');
             $this->output->outputLine('<warning>It is therefore deprecated to be used in Composer mode.</warning>');

@@ -16,7 +16,7 @@ Command Reference
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2017-01-26 15:28:42
+The following reference was automatically generated from code on 2017-02-14 21:09:18
 
 
 .. _`Command Reference: typo3_console`:
@@ -799,9 +799,10 @@ Marks the following extensions as active:
 
 - Third party extensions
 - All core extensions that are required (or part of minimal usable system)
-- All core extensions which are provided in the TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS environment variable. Extension keys in this variable must be separated by comma and without spaces.
+- All core extensions which are provided with the ``--framework-extensions`` argument.
+- In composer mode all composer dependencies to TYPO3 framework extensions are detected and activated by default.
 
-**Example:** ``TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS="info,info_pagetsconfig" typo3cms install:generatepackagestates``
+**Example:** ``typo3cms install:generatepackagestates``
 
 
 
@@ -809,7 +810,7 @@ Options
 ^^^^^^^
 
 ``--framework-extensions``
-  If given, this argument takes precedence over the environment variable
+  TYPO3 system extensions that should be marked as active. Extension keys separated by comma.
 ``--activate-default``
   If true, ``typo3/cms`` extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
 ``--excluded-extensions``
