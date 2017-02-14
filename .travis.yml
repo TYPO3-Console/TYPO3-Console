@@ -22,15 +22,17 @@ matrix:
     - php: 7.0
       env: TYPO3_VERSION=~8.5.0
     - php: 7.0
-      env: TYPO3_VERSION="dev-master as 8.5.0"
+      env: TYPO3_VERSION=~8.6.0
+    - php: 7.0
+      env: TYPO3_VERSION="dev-master as 8.6.0"
     - php: 7.1
       env: TYPO3_VERSION=^7.6
     - php: 7.1
       env: TYPO3_VERSION=^8
     - php: 7.1
-      env: TYPO3_VERSION="dev-master as 8.5.0"
+      env: TYPO3_VERSION="dev-master as 8.6.0"
   allow_failures:
-    - env: TYPO3_VERSION="dev-master as 8.5.0"
+    - env: TYPO3_VERSION="dev-master as 8.6.0"
 
 cache:
   directories:
@@ -61,7 +63,7 @@ before_script:
   - composer require typo3/cms="$TYPO3_VERSION"
   - export TYPO3_PATH_WEB="$PWD/.Build/Web"
   - export PATH="$PATH:./Scripts"
-  - if [ -d .Build/vendor/typo3/cms/components/testing_framework/core/Build ]; then export TYPO3_BUILD_DIR=".Build/vendor/typo3/cms/components/testing_framework/core/Build"; else export TYPO3_BUILD_DIR=".Build/vendor/typo3/cms/typo3/sysext/core/Build"; fi
+  - if [ -d .Build/vendor/typo3/cms/components/testing_framework/Resources/Core/Build ]; then export TYPO3_BUILD_DIR=".Build/vendor/typo3/cms/components/testing_framework/Resources/Core/Build"; else export TYPO3_BUILD_DIR=".Build/vendor/typo3/cms/typo3/sysext/core/Build"; fi
 
 script:
   - >
