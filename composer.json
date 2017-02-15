@@ -39,6 +39,7 @@
         "symfony/process": "^2.7 || ^3.0"
     },
     "require-dev": {
+        "typo3-console/create-reference-command": "1.0.*@dev",
         "namelesscoder/typo3-repository-client": "^1.2.0",
         "mikey179/vfsStream": "~1.6.0",
         "phpunit/phpunit": "~4.8.0"
@@ -54,7 +55,6 @@
     "autoload-dev": {
         "psr-4": {
             "Helhum\\Typo3Console\\Tests\\": "Tests/",
-            "Helhum\\Typo3Console\\": "Resources/Private/CommandReference/src/",
             "TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/core/Tests/"
         }
     },
@@ -95,7 +95,6 @@
             "@extension-build",
             "rm Resources/Private/ExtensionArtifacts/ext_*",
             "rm -rf Tests/",
-            "rm -rf Resources/Private/CommandReference/",
             "rm .gitattributes",
             "rm .gitignore",
             "rm .php_cs",
