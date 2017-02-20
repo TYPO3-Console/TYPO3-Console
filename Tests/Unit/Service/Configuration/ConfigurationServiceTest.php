@@ -25,8 +25,8 @@ namespace Helhum\Typo3Console\Tests\Unit\Service\Configuration;
  */
 
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
+use Nimut\TestingFramework\TestCase\UnitTestCase;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
-use TYPO3\CMS\Core\Tests\UnitTestCase;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 
 /**
