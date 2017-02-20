@@ -150,7 +150,12 @@ class CommandDispatcher
             }
             $processBuilder->add($dashedName);
             if ($argumentValue !== null) {
-                $processBuilder->add($argumentValue);
+                if ($argumentValue === false) {
+                    // Convert boolean false to 'false' instead of empty string to correctly pass the value to the sub command
+                    $processBuilder->add('false');
+                } else {
+                    $processBuilder->add($argumentValue);
+                }
             }
         }
 
