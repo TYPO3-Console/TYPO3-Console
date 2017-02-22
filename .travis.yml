@@ -57,6 +57,8 @@ before_script:
       composer set-version $TRAVIS_TAG
       # If this fails, we forgot to update version numbers before tagging the release
       test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
+      # Remove package that causes issues as a quick fix
+      composer remove --dev typo3-console/create-reference-command --no-update
     fi
   - composer extension-create-libs && ls -la Libraries/*.phar | grep -v ^-rwx
   - git clean -dffx
@@ -138,6 +140,7 @@ after_script:
       curl -sSL https://raw.githubusercontent.com/alrra/travis-after-all/1.4.4/lib/travis-after-all.js | node
       if [ $? -eq 0 ]; then
         # Cleanup before we upload
+        composer require --dev namelesscoder/typo3-repository-client:^1.2.0
         git reset --hard HEAD && git clean -fx
 
         # Build extension files

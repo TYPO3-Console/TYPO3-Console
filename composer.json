@@ -40,7 +40,6 @@
     },
     "require-dev": {
         "typo3-console/create-reference-command": "1.0.*@dev",
-        "namelesscoder/typo3-repository-client": "^1.2.0",
         "typo3/cms": "^8.6",
         "nimut/testing-framework": "^0.1",
         "mikey179/vfsStream": "~1.6.0",
