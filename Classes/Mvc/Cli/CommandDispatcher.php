@@ -50,6 +50,7 @@ class CommandDispatcher
      * @param ProcessBuilder $processBuilder
      * @param PhpExecutableFinder $phpFinder
      * @return self
+     * @throws \RuntimeException
      */
     public static function createFromComposerRun(array $searchDirs, ExecutableFinder $binFinder = null, ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
     {
@@ -87,6 +88,7 @@ class CommandDispatcher
      * @param ProcessBuilder $processBuilder
      * @param PhpExecutableFinder $phpFinder
      * @return self
+     * @throws \RuntimeException
      */
     public static function createFromCommandRun(ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
     {
@@ -104,21 +106,17 @@ class CommandDispatcher
      * @param ProcessBuilder $processBuilder
      * @param PhpExecutableFinder $phpFinder
      * @return self
+     * @throws \RuntimeException
      */
     public static function create($typo3cmsCommandPath, ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
     {
         $processBuilder = $processBuilder ?: new ProcessBuilder();
-        $content = file_get_contents($typo3cmsCommandPath, null, null, -1, 18);
-        if ($content === '#!/usr/bin/env php' || strpos($content, '<?php') === 0) {
-            $phpFinder = $phpFinder ?: new PhpExecutableFinder();
-            if (!($php = $phpFinder->find())) {
-                throw new \RuntimeException('The "php" binary could not be found.', 1485128615);
-            }
-            $processBuilder->setPrefix($php);
-            $processBuilder->add($typo3cmsCommandPath);
-        } else {
-            $processBuilder->setPrefix($typo3cmsCommandPath);
+        $phpFinder = $phpFinder ?: new PhpExecutableFinder();
+        if (!($php = $phpFinder->find())) {
+            throw new \RuntimeException('The "php" binary could not be found.', 1485128615);
         }
+        $processBuilder->setPrefix($php);
+        $processBuilder->add($typo3cmsCommandPath);
         $processBuilder->addEnvironmentVariables(['TYPO3_CONSOLE_SUB_PROCESS' => true]);
         return new self($processBuilder);
     }
