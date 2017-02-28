@@ -225,8 +225,6 @@ class Scripts
             self::registerImplementation(\Helhum\Typo3Console\Database\Schema\SchemaUpdateInterface::class, \Helhum\Typo3Console\Database\Schema\LegacySchemaUpdate::class);
         }
         self::overrideImplementation(\TYPO3\CMS\Extbase\Mvc\Cli\Command::class, \Helhum\Typo3Console\Mvc\Cli\Command::class);
-        self::overrideImplementation(\TYPO3\CMS\Extbase\Command\HelpCommandController::class, \Helhum\Typo3Console\Command\HelpCommandController::class);
-        self::overrideImplementation(\TYPO3\CMS\Extensionmanager\Command\ExtensionCommandController::class, \Helhum\Typo3Console\Command\ExtensionCommandController::class);
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerTypeConverter(\Helhum\Typo3Console\Property\TypeConverter\ArrayConverter::class);
     }
 
