@@ -46,10 +46,10 @@ class ExtensionFactory extends DefaultFactory
     /**
      * Get default structure object hierarchy
      *
-     * @return StructureFacade
      * @throws \InvalidArgumentException
      * @throws \TYPO3\CMS\Install\FolderStructure\Exception\RootNodeException
      * @throws \TYPO3\CMS\Install\FolderStructure\Exception\InvalidArgumentException
+     * @return StructureFacade
      */
     public function getStructure()
     {
@@ -69,7 +69,7 @@ class ExtensionFactory extends DefaultFactory
         $structure = [
             'name' => substr(PATH_site, 0, -1),
             'targetPermission' => $GLOBALS['TYPO3_CONF_VARS']['SYS']['folderCreateMask'],
-            'children' => $this->appendStructureDefinition([], $this->createExtensionStructureDefinition([$package]))
+            'children' => $this->appendStructureDefinition([], $this->createExtensionStructureDefinition([$package])),
         ];
         return new StructureFacade(new RootNode($structure));
     }
@@ -132,7 +132,7 @@ class ExtensionFactory extends DefaultFactory
                 'name' => $part,
                 'type' => DirectoryNode::class,
                 'targetPermission' => $GLOBALS['TYPO3_CONF_VARS']['SYS']['folderCreateMask'],
-                'children' => []
+                'children' => [],
             ];
             // Add next directory as children of current node
             $node = &$node[0]['children'];

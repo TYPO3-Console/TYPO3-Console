@@ -87,7 +87,7 @@ class BackendCommandController extends CommandController
     public function lockForEditorsCommand()
     {
         $this->ensureConfigValueModifiable();
-        $lockedForEditors =  $this->configurationService->getLocal('BE/adminOnly') !== self::LOCK_TYPE_UNLOCKED;
+        $lockedForEditors = $this->configurationService->getLocal('BE/adminOnly') !== self::LOCK_TYPE_UNLOCKED;
         if (!$lockedForEditors) {
             $this->configurationService->setLocal('BE/adminOnly', self::LOCK_TYPE_ADMIN);
             $this->outputLine('<info>Locked backend for editor access!</info>');

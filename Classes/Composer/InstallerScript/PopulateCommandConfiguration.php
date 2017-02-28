@@ -37,8 +37,8 @@ class PopulateCommandConfiguration implements InstallerScriptInterface
      * Called from Composer
      *
      * @param ScriptEvent $event
-     * @return bool
      * @throws \RuntimeException
+     * @return bool
      * @internal
      */
     public function run(ScriptEvent $event)

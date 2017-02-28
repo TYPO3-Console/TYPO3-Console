@@ -180,9 +180,8 @@ class CliSetupRequestHandler
 
         if ($needsExecution) {
             return $action->execute();
-        } else {
-            return [];
         }
+        return [];
     }
 
     /**
@@ -236,9 +235,8 @@ class CliSetupRequestHandler
                     if (!$this->interactiveSetup) {
                         if ($this->isArgumentRequired($argument)) {
                             throw new \RuntimeException(sprintf('Argument "%s" is not set, but is required and user interaction has been disabled!', $argument->getName()), 1405273316);
-                        } else {
-                            continue;
                         }
+                        continue;
                     }
                     $argumentValue = null;
                     do {
@@ -310,8 +308,8 @@ class CliSetupRequestHandler
      * method arguments found in the designated command method.
      *
      * @param string $commandMethodName
-     * @return Arguments
      * @throws InvalidArgumentTypeException
+     * @return Arguments
      */
     protected function getCommandMethodArguments($commandMethodName)
     {
@@ -337,8 +335,8 @@ class CliSetupRequestHandler
     /**
      * Call silent upgrade class, redirect to self if configuration was changed.
      *
-     * @return void
      * @throws RedirectException
+     * @return void
      */
     protected function executeSilentConfigurationUpgradesIfNeeded()
     {

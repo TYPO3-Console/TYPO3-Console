@@ -189,8 +189,8 @@ class ConsoleBootstrap extends Bootstrap
     /**
      * Iterates over the registered request handlers and determines which one fits best.
      *
-     * @return RequestHandlerInterface A request handler
      * @throws \RuntimeException
+     * @return RequestHandlerInterface A request handler
      */
     public function resolveCliRequestHandler()
     {
@@ -347,7 +347,7 @@ class ConsoleBootstrap extends Bootstrap
             $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
             $cacheConfigurations['dbal'] = [
                 'backend' => \TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend::class,
-                'groups' => []
+                'groups' => [],
             ];
         }
     }

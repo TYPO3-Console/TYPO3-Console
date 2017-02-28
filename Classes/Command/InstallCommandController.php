@@ -118,14 +118,14 @@ class InstallCommandController extends CommandController
             [
                 implode(', ', array_map(function (PackageInterface $package) {
                     return $package->getPackageKey();
-                }, $activatedExtensions))
+                }, $activatedExtensions)),
             ]
         );
         if (!empty($excludedExtensions)) {
             $this->outputLine(
                 '<info>The following third party extensions were excluded during this process:</info> %s',
                 [
-                    implode(', ', $excludedExtensions)
+                    implode(', ', $excludedExtensions),
                 ]
             );
         }

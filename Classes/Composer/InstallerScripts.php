@@ -38,8 +38,8 @@ class InstallerScripts
      * Called from Composer
      *
      * @param ScriptEvent $event
-     * @return void
      * @throws \RuntimeException
+     * @return void
      * @internal
      */
     public static function setupConsole(ScriptEvent $event)

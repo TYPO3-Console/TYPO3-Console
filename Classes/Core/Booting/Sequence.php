@@ -59,8 +59,8 @@ class Sequence
      * Removes all occurrences of the specified step from this sequence
      *
      * @param string $stepIdentifier
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function removeStep($stepIdentifier)
     {

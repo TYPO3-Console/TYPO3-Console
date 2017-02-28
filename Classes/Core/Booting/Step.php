@@ -28,7 +28,7 @@ class Step
     protected $identifier;
 
     /**
-     * @var Callable
+     * @var callable
      */
     protected $callback;
 

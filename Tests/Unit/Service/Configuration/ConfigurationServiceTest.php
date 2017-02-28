@@ -50,8 +50,8 @@ class ConfigurationServiceTest extends UnitTestCase
     protected $activeConfiguration = [
         'main' => [
             'baz' => 'bah',
-            'foo' => 'bar'
-        ]
+            'foo' => 'bar',
+        ],
     ];
 
     /**
@@ -66,7 +66,7 @@ class ConfigurationServiceTest extends UnitTestCase
         ],
         'main' => [
             'default' => 'value',
-        ]
+        ],
     ];
 
     /**
@@ -82,8 +82,8 @@ class ConfigurationServiceTest extends UnitTestCase
         'main' => [
             'bla' => 'blupp',
             'bazz' => 'buh',
-            'foo' => 'baz'
-        ]
+            'foo' => 'baz',
+        ],
     ];
 
     public function setup()
@@ -155,7 +155,7 @@ class ConfigurationServiceTest extends UnitTestCase
                 'default' => 'value',
                 'bla' => 'blupp',
                 'bazz' => 'buh',
-                'foo' => 'baz'
+                'foo' => 'baz',
             ],
             $this->subject->getLocal('main')
         );
