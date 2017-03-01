@@ -60,8 +60,12 @@ test_script:
   - php Scripts/typo3cms help:autocomplete bash >nul
   - php Scripts/typo3cms help:autocomplete zsh >nul
   - php Scripts/typo3cms backend:lock
+  - php Scripts/typo3cms backend:lock
+  - php Scripts/typo3cms backend:unlock
   - php Scripts/typo3cms backend:unlock
   - php Scripts/typo3cms backend:lockforeditors
+  - php Scripts/typo3cms backend:lockforeditors
+  - php Scripts/typo3cms backend:unlockforeditors
   - php Scripts/typo3cms backend:unlockforeditors
   - php Scripts/typo3cms cache:flush
   - php Scripts/typo3cms cache:flushgroups pages
