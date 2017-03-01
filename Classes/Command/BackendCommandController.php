@@ -32,7 +32,7 @@ class BackendCommandController extends CommandController
     {
         if (@is_file(PATH_typo3conf . 'LOCK_BACKEND')) {
             $this->outputLine('<warning>Backend is already locked!</warning>');
-            $this->sendAndExit(1);
+            $this->sendAndExit(0);
         }
         \TYPO3\CMS\Core\Utility\GeneralUtility::writeFile(PATH_typo3conf . 'LOCK_BACKEND', (string)$redirectUrl);
         if (!@is_file(PATH_typo3conf . 'LOCK_BACKEND')) {
@@ -56,7 +56,7 @@ class BackendCommandController extends CommandController
     {
         if (!@is_file(PATH_typo3conf . 'LOCK_BACKEND')) {
             $this->outputLine('<warning>Backend is already unlocked!</warning>');
-            $this->sendAndExit(1);
+            $this->sendAndExit(0);
         }
         unlink(PATH_typo3conf . 'LOCK_BACKEND');
         if (@is_file(PATH_typo3conf . 'LOCK_BACKEND')) {
@@ -93,7 +93,7 @@ class BackendCommandController extends CommandController
             $this->outputLine('<info>Locked backend for editor access!</info>');
         } else {
             $this->outputLine('<warning>The backend was already locked for editors, hence nothing was done.</warning>');
-            $this->sendAndExit(1);
+            $this->sendAndExit(0);
         }
     }
 
@@ -113,7 +113,7 @@ class BackendCommandController extends CommandController
             $this->outputLine('<info>Unlocked backend for editors!</info>');
         } else {
             $this->outputLine('<warning>The backend was not locked for editors, hence nothing was done.</warning>');
-            $this->sendAndExit(1);
+            $this->sendAndExit(0);
         }
     }
 
