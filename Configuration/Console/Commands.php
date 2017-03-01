@@ -22,9 +22,14 @@ return [
         'typo3_console:configuration:*' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
         'typo3_console:database:import' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
         'typo3_console:database:updateschema' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
+        'typo3_console:extension:setupactive' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
     ],
     'bootingSteps' => [
         'typo3_console:install:databasedata' => ['helhum.typo3console:database'],
+        'typo3_console:extension:setupactive' => [
+            'helhum.typo3console:database',
+            'helhum.typo3console:persistence',
+        ],
         'typo3_console:install:defaultconfiguration' => ['helhum.typo3console:database'],
         'typo3_console:cache:flush' => ['helhum.typo3console:database'],
         'typo3_console:database:updateschema' => [
