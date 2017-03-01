@@ -38,7 +38,7 @@ class SchemaUpdateTypeTest extends UnitTestCase
                     'table.change',
                     'table.prefix',
                     'table.drop',
-                ]
+                ],
             ],
             'all double' => [
                 ['*', '*'],
@@ -51,7 +51,7 @@ class SchemaUpdateTypeTest extends UnitTestCase
                     'table.change',
                     'table.prefix',
                     'table.drop',
-                ]
+                ],
             ],
             'fields' => [
                 ['field.*'],
@@ -60,7 +60,7 @@ class SchemaUpdateTypeTest extends UnitTestCase
                     'field.change',
                     'field.prefix',
                     'field.drop',
-                ]
+                ],
             ],
             'tables' => [
                 ['table.*'],
@@ -69,35 +69,35 @@ class SchemaUpdateTypeTest extends UnitTestCase
                     'table.change',
                     'table.prefix',
                     'table.drop',
-                ]
+                ],
             ],
             'all add' => [
                 ['*.add'],
                 [
                     'field.add',
                     'table.add',
-                ]
+                ],
             ],
             'all change' => [
                 ['*.change'],
                 [
                     'field.change',
                     'table.change',
-                ]
+                ],
             ],
             'all prefix' => [
                 ['*.prefix'],
                 [
                     'field.prefix',
                     'table.prefix',
-                ]
+                ],
             ],
             'all drop' => [
                 ['*.drop'],
                 [
                     'field.drop',
                     'table.drop',
-                ]
+                ],
             ],
             'all safe' => [
                 ['safe'],
@@ -106,7 +106,7 @@ class SchemaUpdateTypeTest extends UnitTestCase
                     'field.change',
                     'table.add',
                     'table.change',
-                ]
+                ],
             ],
             'all destructive' => [
                 ['destructive'],
@@ -115,7 +115,7 @@ class SchemaUpdateTypeTest extends UnitTestCase
                     'field.drop',
                     'table.prefix',
                     'table.drop',
-                ]
+                ],
             ],
         ];
     }
@@ -131,6 +131,7 @@ class SchemaUpdateTypeTest extends UnitTestCase
         $updateTypes = array_map('strval', SchemaUpdateType::expandSchemaUpdateTypes($expandables));
         $this->assertSame($expected, $updateTypes);
     }
+
     /**
      * @return array
      */
@@ -143,6 +144,7 @@ class SchemaUpdateTypeTest extends UnitTestCase
             'all.*' => ['all.*'],
         ];
     }
+
     /**
      * @test
      * @dataProvider expandTypesFailsForInvalidTypesDataProvider

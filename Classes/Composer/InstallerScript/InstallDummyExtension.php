@@ -35,8 +35,8 @@ class InstallDummyExtension implements InstallerScriptInterface
 
     /**
      * @param ScriptEvent $event
-     * @return bool
      * @throws \RuntimeException
+     * @return bool
      * @internal
      */
     public function run(ScriptEvent $event)

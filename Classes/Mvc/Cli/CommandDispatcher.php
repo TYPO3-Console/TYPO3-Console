@@ -49,8 +49,8 @@ class CommandDispatcher
      * @param ExecutableFinder $binFinder
      * @param ProcessBuilder $processBuilder
      * @param PhpExecutableFinder $phpFinder
-     * @return self
      * @throws \RuntimeException
+     * @return self
      */
     public static function createFromComposerRun(array $searchDirs, ExecutableFinder $binFinder = null, ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
     {
@@ -87,8 +87,8 @@ class CommandDispatcher
      *
      * @param ProcessBuilder $processBuilder
      * @param PhpExecutableFinder $phpFinder
-     * @return self
      * @throws \RuntimeException
+     * @return self
      */
     public static function createFromCommandRun(ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
     {
@@ -105,8 +105,8 @@ class CommandDispatcher
      * @param string $typo3cmsCommandPath Absolute path to the typo3cms binary
      * @param ProcessBuilder $processBuilder
      * @param PhpExecutableFinder $phpFinder
-     * @return self
      * @throws \RuntimeException
+     * @return self
      */
     public static function create($typo3cmsCommandPath, ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
     {
@@ -127,8 +127,8 @@ class CommandDispatcher
      * @param string $command Command identifier
      * @param array $arguments Argument names will automatically be converted to dashed version, fi not provided like so
      * @param array $environment Environment vars to be added to the command
-     * @return string Output of the executed command
      * @throws FailedSubProcessCommandException
+     * @return string Output of the executed command
      */
     public function executeCommand($command, array $arguments = [], array $environment = [])
     {

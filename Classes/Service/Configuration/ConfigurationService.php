@@ -76,8 +76,8 @@ class ConfigurationService implements SingletonInterface
 
     /**
      * @param string $path
-     * @return mixed
      * @throws ConfigurationValueNotFoundException
+     * @return mixed
      */
     public function getDefault($path)
     {
@@ -86,8 +86,8 @@ class ConfigurationService implements SingletonInterface
 
     /**
      * @param string $path
-     * @return mixed
      * @throws ConfigurationValueNotFoundException
+     * @return mixed
      */
     public function getLocal($path)
     {
@@ -96,8 +96,8 @@ class ConfigurationService implements SingletonInterface
 
     /**
      * @param string $path
-     * @return mixed
      * @throws ConfigurationValueNotFoundException
+     * @return mixed
      */
     public function getActive($path)
     {
@@ -125,8 +125,8 @@ class ConfigurationService implements SingletonInterface
     /**
      * @param string $path
      * @param array $config
-     * @return mixed
      * @throws ConfigurationValueNotFoundException
+     * @return mixed
      */
     protected function get($path, array $config)
     {
@@ -189,8 +189,8 @@ class ConfigurationService implements SingletonInterface
      *
      * @param string $path
      * @param string $value
-     * @return bool|float|int|string
      * @throws TypesAreNotConvertibleException
+     * @return bool|float|int|string
      */
     public function convertToTargetType($path, $value)
     {

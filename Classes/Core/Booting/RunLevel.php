@@ -87,17 +87,16 @@ class RunLevel
      * Builds the sequence for the given run level
      *
      * @param string $runLevel
-     * @return Sequence
      * @throws \InvalidArgumentException
+     * @return Sequence
      * @internal
      */
     public function buildSequence($runLevel)
     {
         if (is_callable([$this, $runLevel])) {
             return $this->{$runLevel}($runLevel);
-        } else {
-            throw new \InvalidArgumentException('Invalid run level "' . $runLevel . '"', 1402075492);
         }
+        throw new \InvalidArgumentException('Invalid run level "' . $runLevel . '"', 1402075492);
     }
 
     /**

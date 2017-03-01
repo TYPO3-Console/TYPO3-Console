@@ -20,8 +20,8 @@ interface PhpParserInterface
 {
     /**
      * @param string $classFile Path to PHP class file
-     * @return ParsedClass
      * @throws ParsingException
+     * @return ParsedClass
      */
     public function parseClassFile($classFile);
 

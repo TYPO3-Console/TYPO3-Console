@@ -196,7 +196,7 @@ class Scripts
                     'be_users',
                     [
                         'username' => $userName,
-                        'password' => GeneralUtility::getRandomHexString(48)
+                        'password' => GeneralUtility::getRandomHexString(48),
                     ]
                 );
                 $backendUser->setBeUserByName($userName);

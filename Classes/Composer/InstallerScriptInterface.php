@@ -29,8 +29,8 @@ interface InstallerScriptInterface
      * This is executed, when shouldRun returned true
      *
      * @param ScriptEvent $event
-     * @return bool Return false if the script failed
      * @throws \RuntimeException
+     * @return bool Return false if the script failed
      */
     public function run(ScriptEvent $event);
 }

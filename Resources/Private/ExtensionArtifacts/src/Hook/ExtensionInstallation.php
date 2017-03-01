@@ -55,9 +55,9 @@ class ExtensionInstallation
      * @param string $messageTitle Optional message title
      * @param int $severity Optional severity, must be one of \TYPO3\CMS\Core\Messaging\FlashMessage constants
      * @param bool $storeInSession Optional, defines whether the message should be stored in the session (default) or not
-     * @return void
      * @throws \TYPO3\CMS\Core\Exception
      * @throws \InvalidArgumentException if the message body is no string
+     * @return void
      */
     protected function addFlashMessage($messageBody, $messageTitle = '', $severity = AbstractMessage::OK, $storeInSession = true)
     {
