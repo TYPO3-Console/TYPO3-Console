@@ -188,7 +188,7 @@ class ExtensionCommandController extends CommandController
      * As an additional benefit no caches are flushed, which significantly improves performance of this command
      * and avoids unnecessary cache clearing.
      *
-     * @see extensionmanager:extension:setup
+     * @see typo3_console:extension:setup
      * @see typo3_console:install:generatepackagestates
      * @see typo3_console:cache:flush
      */

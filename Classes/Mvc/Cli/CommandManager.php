@@ -14,7 +14,9 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Command\HelpCommandController;
 use TYPO3\CMS\Extbase\Mvc\Cli\Command;
+use TYPO3\CMS\Extensionmanager\Command\ExtensionCommandController;
 
 /**
  * Class CommandManager
@@ -56,8 +58,12 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
      */
     public function getCommandByIdentifier($commandIdentifier)
     {
+        $commandIdentifier = strtolower(trim($commandIdentifier));
+        if ($commandIdentifier === 'help') {
+            $commandIdentifier = 'typo3_console:help:help';
+        }
         if ($commandIdentifier === 'autocomplete') {
-            $commandIdentifier = 'extbase:help:autocomplete';
+            $commandIdentifier = 'typo3_console:help:autocomplete';
         }
         return parent::getCommandByIdentifier($commandIdentifier);
     }
@@ -68,7 +74,10 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
      */
     public function getShortestIdentifierForCommand(Command $command)
     {
-        if ($command->getCommandIdentifier() === 'extbase:help:autocomplete') {
+        if ($command->getCommandIdentifier() === 'typo3_console:help:help') {
+            return 'help';
+        }
+        if ($command->getCommandIdentifier() === 'typo3_console:help:autocomplete') {
             return 'autocomplete';
         }
         return parent::getShortestIdentifierForCommand($command);
@@ -85,6 +94,9 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
         if ($this->availableCommands === null) {
             $commandControllerRegistry = & $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'];
             if (!empty($commandControllerRegistry) && is_array($commandControllerRegistry)) {
+                $commandControllerRegistry = array_filter($commandControllerRegistry, function ($value) {
+                    return !in_array($value, [ExtensionCommandController::class, HelpCommandController::class], true);
+                });
                 $commandControllerRegistry = array_merge($commandControllerRegistry, $this->commandControllers);
             } else {
                 $commandControllerRegistry = $this->commandControllers;

@@ -1,6 +1,7 @@
 <?php
 return [
     'controllers' => [
+        \Helhum\Typo3Console\Command\HelpCommandController::class,
         \Helhum\Typo3Console\Command\CacheCommandController::class,
         \Helhum\Typo3Console\Command\BackendCommandController::class,
         \Helhum\Typo3Console\Command\SchedulerCommandController::class,
@@ -10,6 +11,7 @@ return [
         \Helhum\Typo3Console\Command\DatabaseCommandController::class,
         \Helhum\Typo3Console\Command\ConfigurationCommandController::class,
         \Helhum\Typo3Console\Command\FrontendCommandController::class,
+        \Helhum\Typo3Console\Command\ExtensionCommandController::class,
     ],
     'runLevels' => [
         'typo3_console:install:databasedata' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL ,
