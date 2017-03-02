@@ -5,10 +5,6 @@ services:
   - mysql
 
 environment:
-  COMPOSER_NO_INTERACTION: 1
-  PHP: 1
-  TYPO3_PATH_WEB: 'c:\t3c\.Build\Web'
-
   matrix:
     - TYPO3_VERSION: '~8.6'
       PHP_VERSION: '7.1.1'
@@ -27,7 +23,10 @@ cache:
   - '%LOCALAPPDATA%\Composer\files'
 
 init:
+  - SET PHP=1
   - SET PATH=c:\php;%PATH%
+  - SET COMPOSER_NO_INTERACTION=1
+  - SET TYPO3_PATH_WEB=c:\t3c\.Build\Web
 
 install:
   - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
