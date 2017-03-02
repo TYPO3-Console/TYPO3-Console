@@ -5,10 +5,6 @@ services:
   - mysql
 
 environment:
-  COMPOSER_NO_INTERACTION: 1
-  PHP: 1
-  TYPO3_PATH_WEB: 'c:\t3c\.Build\Web'
-
   matrix:
     - TYPO3_VERSION: '~8.6'
       PHP_VERSION: '7.1.1'
@@ -28,9 +24,13 @@ cache:
 
 init:
   - SET PATH=c:\php;%PATH%
+  - SET COMPOSER_NO_INTERACTION=1
 
 install:
+  - echo %COMPOSER_NO_INTERACTION%
+  - SET PHP=1
   - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
+  - echo %PHP%
   - cd c:\php
   - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/releases/archives/php-%PHP_VERSION%-nts-Win32-VC14-x86.zip
   - IF %PHP%==1 7z x php-%PHP_VERSION%-nts-Win32-VC14-x86.zip -y >nul
@@ -52,6 +52,8 @@ install:
 test_script:
   - cd c:\t3c
   - .Build\bin\phpunit -c .Build/vendor/nimut/testing-framework/res/Configuration/UnitTests.xml Tests/Unit/
+  - SET TYPO3_PATH_WEB=c:\t3c\.Build\Web
+  - echo %TYPO3_PATH_WEB%
   - php Scripts/typo3cms
   - php Scripts/typo3cms install:setup --non-interactive --database-user-name="root" --database-user-password="Password12!" --database-host-name="localhost" --database-port="3306" --database-name="appveyor_test" --admin-user-name="admin" --admin-password="password" --site-name="Appveyor Install" --site-setup-type="createsite"
 #  - echo 'select uid,title from pages limit 1' | typo3cms database:import | sed 's/[[:blank:]]//g' | grep 1Home
