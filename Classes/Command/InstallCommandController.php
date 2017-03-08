@@ -96,6 +96,12 @@ class InstallCommandController extends CommandController
      * - All core extensions which are provided with the <code>--framework-extensions</code> argument.
      * - In composer mode all composer dependencies to TYPO3 framework extensions are detected and activated by default.
      *
+     * To require TYPO3 core extensions use the following command:
+     *
+     * <code>composer require typo3/cms-foo "*"</code>
+     *
+     * This updates your composer.json and composer.lock without any other changes.
+     *
      * <b>Example:</b> <code>typo3cms install:generatepackagestates</code>
      *
      * @param array $frameworkExtensions TYPO3 system extensions that should be marked as active. Extension keys separated by comma.
