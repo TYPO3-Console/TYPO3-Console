@@ -16,7 +16,7 @@ Command Reference
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2017-02-14 21:09:18
+The following reference was automatically generated from code on 2017-03-08 16:00:00
 
 
 .. _`Command Reference: typo3_console`:
@@ -801,6 +801,12 @@ Marks the following extensions as active:
 - All core extensions that are required (or part of minimal usable system)
 - All core extensions which are provided with the ``--framework-extensions`` argument.
 - In composer mode all composer dependencies to TYPO3 framework extensions are detected and activated by default.
+
+To require TYPO3 core extensions use the following command:
+
+``composer require typo3/cms-foo "*"``
+
+This updates your composer.json and composer.lock without any other changes.
 
 **Example:** ``typo3cms install:generatepackagestates``
 
