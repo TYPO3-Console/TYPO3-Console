@@ -6,7 +6,6 @@ services:
 
 environment:
   COMPOSER_NO_INTERACTION: 1
-  PHP: 1
   TYPO3_PATH_WEB: 'c:\t3c\.Build\Web'
   TYPO3_CONSOLE_DEBUG: 1
 
@@ -28,28 +27,27 @@ cache:
   - '%LOCALAPPDATA%\Composer\files'
 
 init:
-  - SET PATH=c:\php;%PATH%
+  - SET PATH=c:\php\%PHP_VERSION%;%PATH%
 
 install:
-  - echo %COMPOSER_NO_INTERACTION%
-  - echo %PHP%
-  - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
-  - echo %PHP%
-  - cd c:\php
-  - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/releases/archives/php-%PHP_VERSION%-nts-Win32-VC14-x86.zip
-  - IF %PHP%==1 7z x php-%PHP_VERSION%-nts-Win32-VC14-x86.zip -y >nul
-  - IF %PHP%==1 del /Q *.zip
-  - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
-  - IF %PHP%==1 copy /Y php.ini-development php.ini
-  - IF %PHP%==1 echo max_execution_time=1200 >> php.ini
-  - IF %PHP%==1 echo date.timezone="UTC" >> php.ini
-  - IF %PHP%==1 echo extension_dir=ext >> php.ini
-  - IF %PHP%==1 echo extension=php_curl.dll >> php.ini
-  - IF %PHP%==1 echo extension=php_openssl.dll >> php.ini
-  - IF %PHP%==1 echo extension=php_mbstring.dll >> php.ini
-  - IF %PHP%==1 echo extension=php_fileinfo.dll >> php.ini
-  - IF %PHP%==1 echo extension=php_mysqli.dll >> php.ini
-  - appveyor DownloadFile https://getcomposer.org/composer.phar
+  - IF NOT EXIST c:\php mkdir c:\php
+  - IF NOT EXIST c:\php\%PHP_VERSION% mkdir c:\php\%PHP_VERSION%
+  - cd c:\php\%PHP_VERSION%
+  - IF NOT EXIST php-installed.txt appveyor DownloadFile http://windows.php.net/downloads/releases/archives/php-%PHP_VERSION%-nts-Win32-VC14-x86.zip
+  - IF NOT EXIST php-installed.txt 7z x php-%PHP_VERSION%-nts-Win32-VC14-x86.zip -y >nul
+  - IF NOT EXIST php-installed.txt del /Q *.zip
+  - IF NOT EXIST php-installed.txt copy /Y php.ini-development php.ini
+  - IF NOT EXIST php-installed.txt echo max_execution_time=1200 >> php.ini
+  - IF NOT EXIST php-installed.txt echo date.timezone="UTC" >> php.ini
+  - IF NOT EXIST php-installed.txt echo extension_dir=ext >> php.ini
+  - IF NOT EXIST php-installed.txt echo extension=php_curl.dll >> php.ini
+  - IF NOT EXIST php-installed.txt echo extension=php_openssl.dll >> php.ini
+  - IF NOT EXIST php-installed.txt echo extension=php_mbstring.dll >> php.ini
+  - IF NOT EXIST php-installed.txt echo extension=php_fileinfo.dll >> php.ini
+  - IF NOT EXIST php-installed.txt echo extension=php_mysqli.dll >> php.ini
+  - IF NOT EXIST php-installed.txt appveyor DownloadFile https://getcomposer.org/composer.phar
+  - IF NOT EXIST php-installed.txt echo @php %%~dp0composer.phar %%* > composer.bat
+  - IF NOT EXIST php-installed.txt type nul >> php-installed.txt
   - cd c:\t3c
   - composer require "typo3/cms=%TYPO3_VERSION%" --prefer-dist --no-progress --ansi
 
