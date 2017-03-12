@@ -38,6 +38,12 @@ class InstallCommandController extends CommandController
     protected $cliSetupRequestHandler;
 
     /**
+     * @var \Helhum\Typo3Console\Install\InstallStepActionExecutor
+     * @inject
+     */
+    protected $installStepActionExecutor;
+
+    /**
      * TYPO3 Setup
      *
      * Use as command line replacement for the web installation process.
@@ -181,15 +187,7 @@ class InstallCommandController extends CommandController
      */
     public function environmentAndFoldersCommand()
     {
-        $this->cliSetupRequestHandler->executeActionWithArguments('environmentAndFolders');
-    }
-
-    /**
-     * @internal
-     */
-    public function environmentAndFoldersNeedsExecutionCommand()
-    {
-        $this->cliSetupRequestHandler->callNeedsExecution('environmentAndFolders');
+        $this->executeActionWithArguments('environmentAndFolders');
     }
 
     /**
@@ -206,15 +204,7 @@ class InstallCommandController extends CommandController
      */
     public function databaseConnectCommand($databaseUserName = '', $databaseUserPassword = '', $databaseHostName = 'localhost', $databasePort = '3306', $databaseSocket = '')
     {
-        $this->cliSetupRequestHandler->executeActionWithArguments('databaseConnect', ['host' => $databaseHostName, 'port' => $databasePort, 'username' => $databaseUserName, 'password' => $databaseUserPassword, 'socket' => $databaseSocket]);
-    }
-
-    /**
-     * @internal
-     */
-    public function databaseConnectNeedsExecutionCommand()
-    {
-        $this->cliSetupRequestHandler->callNeedsExecution('databaseConnect');
+        $this->executeActionWithArguments('databaseConnect', ['host' => $databaseHostName, 'port' => $databasePort, 'username' => $databaseUserName, 'password' => $databaseUserPassword, 'socket' => $databaseSocket]);
     }
 
     /**
@@ -229,15 +219,7 @@ class InstallCommandController extends CommandController
     public function databaseSelectCommand($useExistingDatabase = false, $databaseName = 'required')
     {
         $selectType = $useExistingDatabase ? 'existing' : 'new';
-        $this->cliSetupRequestHandler->executeActionWithArguments('databaseSelect', ['type' => $selectType, $selectType => $databaseName]);
-    }
-
-    /**
-     * @internal
-     */
-    public function databaseSelectNeedsExecutionCommand()
-    {
-        $this->cliSetupRequestHandler->callNeedsExecution('databaseSelect');
+        $this->executeActionWithArguments('databaseSelect', ['type' => $selectType, $selectType => $databaseName]);
     }
 
     /**
@@ -252,17 +234,7 @@ class InstallCommandController extends CommandController
      */
     public function databaseDataCommand($adminUserName, $adminPassword, $siteName = 'New TYPO3 Console site')
     {
-        $this->cliSetupRequestHandler->executeActionWithArguments('databaseData', ['username' => $adminUserName, 'password' => $adminPassword, 'sitename' => $siteName]);
-    }
-
-    /**
-     * Check if database data command is needed
-     *
-     * @internal
-     */
-    public function databaseDataNeedsExecutionCommand()
-    {
-        $this->cliSetupRequestHandler->callNeedsExecution('databaseData');
+        $this->executeActionWithArguments('DatabaseData', ['username' => $adminUserName, 'password' => $adminPassword, 'sitename' => $siteName]);
     }
 
     /**
@@ -283,27 +255,40 @@ class InstallCommandController extends CommandController
         switch ($siteSetupType) {
             case 'site':
             case 'createsite':
-                $argument = ['sitesetup' => 'createsite'];
+                $arguments = ['sitesetup' => 'createsite'];
                 break;
             case 'dist':
             case 'loaddistribution':
-                $argument = ['sitesetup' => 'loaddistribution'];
+                $arguments = ['sitesetup' => 'loaddistribution'];
                 break;
             case 'no':
             default:
-                $argument = ['sitesetup' => 'none'];
+                $arguments = ['sitesetup' => 'none'];
         }
-        $this->cliSetupRequestHandler->executeActionWithArguments('defaultConfiguration', $argument);
+        $this->executeActionWithArguments('defaultConfiguration', $arguments);
     }
 
     /**
-     * Check if default configuration needs to be written
+     * Calls needs execution on the given action and returns the result
      *
+     * @param string $actionName
      * @internal
      */
-    public function defaultConfigurationNeedsExecutionCommand()
+    public function actionNeedsExecutionCommand($actionName)
     {
-        $this->cliSetupRequestHandler->callNeedsExecution('defaultConfiguration');
+        $this->executeActionWithArguments($actionName, [], true);
+    }
+
+    /**
+     * Executes the given action and outputs the serialized result messages
+     *
+     * @param string $actionName Name of the install step
+     * @param array $arguments Arguments for the install step
+     * @param bool $dryRun If true, do not execute the action, but only check if execution is necessary
+     */
+    private function executeActionWithArguments($actionName, array $arguments = [], $dryRun = false)
+    {
+        $this->outputLine(serialize($this->installStepActionExecutor->executeActionWithArguments($actionName, $arguments, $dryRun)));
     }
 
     /**
