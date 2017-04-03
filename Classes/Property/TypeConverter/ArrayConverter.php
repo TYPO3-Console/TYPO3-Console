@@ -61,9 +61,8 @@ class ArrayConverter extends \TYPO3\CMS\Extbase\Property\TypeConverter\AbstractT
         if (is_string($source)) {
             if ($source === '') {
                 return [];
-            } else {
-                return array_filter(array_map('trim', explode($this->getConfiguredStringDelimiter($configuration), $source)));
             }
+            return array_filter(array_map('trim', explode($this->getConfiguredStringDelimiter($configuration), $source)));
         }
 
         return $source;
@@ -71,8 +70,8 @@ class ArrayConverter extends \TYPO3\CMS\Extbase\Property\TypeConverter\AbstractT
 
     /**
      * @param \TYPO3\CMS\Extbase\Property\PropertyMappingConfigurationInterface $configuration
-     * @return string
      * @throws \TYPO3\CMS\Extbase\Property\Exception\InvalidPropertyMappingConfigurationException
+     * @return string
      */
     protected function getConfiguredStringDelimiter(\TYPO3\CMS\Extbase\Property\PropertyMappingConfigurationInterface $configuration = null)
     {

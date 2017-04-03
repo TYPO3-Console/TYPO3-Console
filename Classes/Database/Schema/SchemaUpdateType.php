@@ -113,8 +113,8 @@ class SchemaUpdateType extends Enumeration
      * Expands wildcards in schema update types, e.g. field.* or *.change
      *
      * @param array $schemaUpdateTypes List of schema update types
-     * @return SchemaUpdateType[]
      * @throws InvalidEnumerationValueException If an invalid schema update type was passed
+     * @return SchemaUpdateType[]
      */
     public static function expandSchemaUpdateTypes(array $schemaUpdateTypes)
     {
@@ -133,10 +133,9 @@ class SchemaUpdateType extends Enumeration
                         ),
                         1477998197
                     );
-                } else {
-                    foreach (self::$schemaUpdateTypesStatementTypesMapping[$schemaUpdateType] as $matchedType) {
-                        $expandedSchemaUpdateTypes[] = $matchedType;
-                    }
+                }
+                foreach (self::$schemaUpdateTypesStatementTypesMapping[$schemaUpdateType] as $matchedType) {
+                    $expandedSchemaUpdateTypes[] = $matchedType;
                 }
             } elseif (strpos($schemaUpdateType, '*') !== false) {
                 $matchPattern = '/' . str_replace('\\*', '.+', preg_quote($schemaUpdateType, '/')) . '/';

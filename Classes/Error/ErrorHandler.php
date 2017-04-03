@@ -45,8 +45,8 @@ class ErrorHandler
      * @param string $errorMessage The error message
      * @param string $errorFile Name of the file the error occurred in
      * @param int $errorLine Line number where the error occurred
-     * @return void
      * @throws \TYPO3\CMS\Core\Error\Exception with the data passed to this method
+     * @return void
      */
     public function handleError($errorLevel, $errorMessage, $errorFile, $errorLine)
     {
@@ -55,13 +55,13 @@ class ErrorHandler
         }
 
         $errorLevels = [
-            E_WARNING            => 'Warning',
-            E_NOTICE             => 'Notice',
-            E_USER_ERROR         => 'User Error',
-            E_USER_WARNING       => 'User Warning',
-            E_USER_NOTICE        => 'User Notice',
-            E_STRICT             => 'Runtime Notice',
-            E_RECOVERABLE_ERROR  => 'Catchable Fatal Error'
+            E_WARNING => 'Warning',
+            E_NOTICE => 'Notice',
+            E_USER_ERROR => 'User Error',
+            E_USER_WARNING => 'User Warning',
+            E_USER_NOTICE => 'User Notice',
+            E_STRICT => 'Runtime Notice',
+            E_RECOVERABLE_ERROR => 'Catchable Fatal Error',
         ];
 
         if (in_array($errorLevel, (array)$this->exceptionalErrors, true)) {

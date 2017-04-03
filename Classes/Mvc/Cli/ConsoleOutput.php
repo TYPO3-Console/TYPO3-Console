@@ -170,8 +170,8 @@ class ConsoleOutput
      * @param bool $default The default answer if the user enters nothing
      * @param bool $multiSelect If true the result will be an array with the selected options. Multiple options can be given separated by commas
      * @param bool|int $attempts Max number of times to ask before giving up (false by default, which means infinite)
-     * @return int|string|array The selected value or values (the key of the choices array)
      * @throws \InvalidArgumentException
+     * @return int|string|array The selected value or values (the key of the choices array)
      */
     public function select($question, $choices, $default = null, $multiSelect = false, $attempts = false)
     {
@@ -189,8 +189,8 @@ class ConsoleOutput
      * @param string|array $question The question to ask. If an array each array item is turned into one line of a multi-line question
      * @param string $default The default answer if none is given by the user
      * @param array $autocomplete List of values to autocomplete. This only works if "stty" is installed
-     * @return string The user answer
      * @throws \RuntimeException If there is no data to read in the input stream
+     * @return string The user answer
      */
     public function ask($question, $default = null, array $autocomplete = null)
     {
@@ -221,8 +221,8 @@ class ConsoleOutput
      *
      * @param string|array $question The question. If an array each array item is turned into one line of a multi-line question
      * @param bool $fallback In case the response can not be hidden, whether to fallback on non-hidden question or not
-     * @return string The answer
      * @throws \RuntimeException In case the fallback is deactivated and the response can not be hidden
+     * @return string The answer
      */
     public function askHiddenResponse($question, $fallback = true)
     {
@@ -245,8 +245,8 @@ class ConsoleOutput
      * @param int|bool $attempts Max number of times to ask before giving up (false by default, which means infinite)
      * @param string $default The default answer if none is given by the user
      * @param array $autocomplete List of values to autocomplete. This only works if "stty" is installed
-     * @return mixed
      * @throws \Exception When any of the validators return an error
+     * @return mixed
      */
     public function askAndValidate($question, $validator, $attempts = false, $default = null, array $autocomplete = null)
     {
@@ -269,9 +269,9 @@ class ConsoleOutput
      * @param callable $validator A PHP callback that gets a value and is expected to return the (transformed) value or throw an exception if it wasn't valid
      * @param int|bool $attempts Max number of times to ask before giving up (false by default, which means infinite)
      * @param bool $fallback In case the response can not be hidden, whether to fallback on non-hidden question or not
-     * @return string The response
      * @throws \Exception When any of the validators return an error
      * @throws \RuntimeException In case the fallback is deactivated and the response can not be hidden
+     * @return string The response
      */
     public function askHiddenResponseAndValidate($question, $validator, $attempts = false, $fallback = true)
     {
@@ -299,8 +299,8 @@ class ConsoleOutput
      * Advances the progress output X steps
      *
      * @param int $step Number of steps to advance
-     * @return void
      * @throws \LogicException
+     * @return void
      */
     public function progressAdvance($step = 1)
     {
@@ -311,8 +311,8 @@ class ConsoleOutput
      * Sets the current progress
      *
      * @param int $current The current progress
-     * @return void
      * @throws \LogicException
+     * @return void
      */
     public function progressSet($current)
     {
@@ -330,8 +330,8 @@ class ConsoleOutput
     }
 
     /**
-     * @return ArgvInput
      * @throws \RuntimeException
+     * @return ArgvInput
      */
     protected function getInput()
     {

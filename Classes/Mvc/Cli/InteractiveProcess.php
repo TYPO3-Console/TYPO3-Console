@@ -25,7 +25,7 @@ class InteractiveProcess
         $descriptors = [
             ['file', 'php://stdin', 'r'],   // stdin is a file that the child will read from
             ['file', 'php://stdout', 'w'],  // stdout is a file that the child will write to
-            ['pipe', 'w']                   // stderr is a file that the child will write to
+            ['pipe', 'w'],                  // stderr is a file that the child will write to
         ];
 
         $process = @proc_open($command, $descriptors, $pipes);

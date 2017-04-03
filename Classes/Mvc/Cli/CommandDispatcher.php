@@ -49,6 +49,7 @@ class CommandDispatcher
      * @param ExecutableFinder $binFinder
      * @param ProcessBuilder $processBuilder
      * @param PhpExecutableFinder $phpFinder
+     * @throws \RuntimeException
      * @return self
      */
     public static function createFromComposerRun(array $searchDirs, ExecutableFinder $binFinder = null, ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
@@ -86,6 +87,7 @@ class CommandDispatcher
      *
      * @param ProcessBuilder $processBuilder
      * @param PhpExecutableFinder $phpFinder
+     * @throws \RuntimeException
      * @return self
      */
     public static function createFromCommandRun(ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
@@ -103,22 +105,18 @@ class CommandDispatcher
      * @param string $typo3cmsCommandPath Absolute path to the typo3cms binary
      * @param ProcessBuilder $processBuilder
      * @param PhpExecutableFinder $phpFinder
+     * @throws \RuntimeException
      * @return self
      */
     public static function create($typo3cmsCommandPath, ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
     {
         $processBuilder = $processBuilder ?: new ProcessBuilder();
-        $content = file_get_contents($typo3cmsCommandPath, null, null, -1, 18);
-        if ($content === '#!/usr/bin/env php' || strpos($content, '<?php') === 0) {
-            $phpFinder = $phpFinder ?: new PhpExecutableFinder();
-            if (!($php = $phpFinder->find())) {
-                throw new \RuntimeException('The "php" binary could not be found.', 1485128615);
-            }
-            $processBuilder->setPrefix($php);
-            $processBuilder->add($typo3cmsCommandPath);
-        } else {
-            $processBuilder->setPrefix($typo3cmsCommandPath);
+        $phpFinder = $phpFinder ?: new PhpExecutableFinder();
+        if (!($php = $phpFinder->find())) {
+            throw new \RuntimeException('The "php" binary could not be found.', 1485128615);
         }
+        $processBuilder->setPrefix($php);
+        $processBuilder->add($typo3cmsCommandPath);
         $processBuilder->addEnvironmentVariables(['TYPO3_CONSOLE_SUB_PROCESS' => true]);
         return new self($processBuilder);
     }
@@ -129,8 +127,8 @@ class CommandDispatcher
      * @param string $command Command identifier
      * @param array $arguments Argument names will automatically be converted to dashed version, fi not provided like so
      * @param array $environment Environment vars to be added to the command
-     * @return string Output of the executed command
      * @throws FailedSubProcessCommandException
+     * @return string Output of the executed command
      */
     public function executeCommand($command, array $arguments = [], array $environment = [])
     {
@@ -150,7 +148,12 @@ class CommandDispatcher
             }
             $processBuilder->add($dashedName);
             if ($argumentValue !== null) {
-                $processBuilder->add($argumentValue);
+                if ($argumentValue === false) {
+                    // Convert boolean false to 'false' instead of empty string to correctly pass the value to the sub command
+                    $processBuilder->add('false');
+                } else {
+                    $processBuilder->add($argumentValue);
+                }
             }
         }
 

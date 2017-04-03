@@ -117,8 +117,8 @@ abstract class CommandController implements CommandControllerInterface
      *
      * @param RequestInterface $request The request object
      * @param ResponseInterface $response The response, modified by this handler
-     * @return void
      * @throws UnsupportedRequestTypeException if the controller doesn't support the current request type
+     * @return void
      * @api
      */
     public function processRequest(RequestInterface $request, ResponseInterface $response)
@@ -142,8 +142,8 @@ abstract class CommandController implements CommandControllerInterface
      *
      * Note: The resulting command method name might not have the correct case, which isn't a problem because PHP is case insensitive regarding method names.
      *
-     * @return string Method name of the current command
      * @throws NoSuchCommandException
+     * @return string Method name of the current command
      */
     protected function resolveCommandMethodName()
     {
@@ -158,8 +158,8 @@ abstract class CommandController implements CommandControllerInterface
      * Initializes the arguments array of this controller by creating an empty argument object for each of the
      * method arguments found in the designated command method.
      *
-     * @return void
      * @throws InvalidArgumentTypeException
+     * @return void
      */
     protected function initializeCommandMethodArguments()
     {
@@ -216,8 +216,8 @@ abstract class CommandController implements CommandControllerInterface
      * @param string $commandName
      * @param string $controllerObjectName
      * @param array $arguments
-     * @return void
      * @throws StopActionException
+     * @return void
      */
     protected function forward($commandName, $controllerObjectName = null, array $arguments = [])
     {
@@ -262,7 +262,7 @@ abstract class CommandController implements CommandControllerInterface
      * Set admin permissions for currently authenticated user if requested
      * and returns the original state or NULL
      *
-     * @return NULL|int
+     * @return null|int
      */
     protected function ensureAdminRoleIfRequested()
     {
@@ -277,7 +277,7 @@ abstract class CommandController implements CommandControllerInterface
     /**
      * Restores the original user role
      *
-     * @param NULL|int $originalRole
+     * @param null|int $originalRole
      */
     protected function restoreUserRole($originalRole)
     {
@@ -345,7 +345,7 @@ abstract class CommandController implements CommandControllerInterface
     protected function quit($exitCode = 0)
     {
         $this->response->setExitCode($exitCode);
-        throw new StopActionException;
+        throw new StopActionException();
     }
 
     /**

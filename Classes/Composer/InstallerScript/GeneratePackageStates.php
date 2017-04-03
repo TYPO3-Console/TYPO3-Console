@@ -28,6 +28,9 @@ class GeneratePackageStates implements InstallerScriptInterface
      */
     public function shouldRun(ScriptEvent $event)
     {
+        if (!getenv('TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES')) {
+            return false;
+        }
         $io = $event->getIO();
         $composer = $event->getComposer();
         $pluginConfig = PluginConfig::load($io, $composer->getConfig());
@@ -54,8 +57,8 @@ class GeneratePackageStates implements InstallerScriptInterface
 
     /**
      * @param ScriptEvent $event
-     * @return bool
      * @throws \RuntimeException
+     * @return bool
      * @internal
      */
     public function run(ScriptEvent $event)

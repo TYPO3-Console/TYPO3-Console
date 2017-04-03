@@ -67,7 +67,7 @@ class ExtensionCommandController extends CommandController
      */
     public function activateCommand(array $extensionKeys)
     {
-        if (Bootstrap::usesComposerClassLoading()) {
+        if (getenv('TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES') && Bootstrap::usesComposerClassLoading()) {
             $this->output->outputLine('<warning>This command has been deprecated to be used in composer mode, as it might lead to unexpected results</warning>');
             $this->output->outputLine('<warning>The PackageStates.php file that tracks which extension should be active,</warning>');
             $this->output->outputLine('<warning>is now generated automatically when installing the console with composer.</warning>');
@@ -113,7 +113,7 @@ class ExtensionCommandController extends CommandController
      */
     public function deactivateCommand(array $extensionKeys)
     {
-        if (Bootstrap::usesComposerClassLoading()) {
+        if (getenv('TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES') && Bootstrap::usesComposerClassLoading()) {
             $this->output->outputLine('<warning>This command has been deprecated to be used in composer mode, as it might lead to unexpected results</warning>');
             $this->output->outputLine('<warning>The PackageStates.php file that tracks which extension should be active,</warning>');
             $this->output->outputLine('<warning>is now generated automatically when installing the console with composer.</warning>');
@@ -188,7 +188,7 @@ class ExtensionCommandController extends CommandController
      * As an additional benefit no caches are flushed, which significantly improves performance of this command
      * and avoids unnecessary cache clearing.
      *
-     * @see extensionmanager:extension:setup
+     * @see typo3_console:extension:setup
      * @see typo3_console:install:generatepackagestates
      * @see typo3_console:cache:flush
      */
