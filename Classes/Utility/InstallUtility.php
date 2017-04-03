@@ -19,7 +19,6 @@ namespace Helhum\Typo3Console\Utility;
  */
 class InstallUtility extends \TYPO3\CMS\Extensionmanager\Utility\InstallUtility
 {
-
     /**
      * Override method for public visibility
      *
