@@ -13,10 +13,12 @@ namespace Helhum\Typo3Console\Install;
  *
  */
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Install\Controller\Action\ActionInterface;
 use TYPO3\CMS\Install\Controller\Action\Step\StepInterface;
 use TYPO3\CMS\Install\Controller\Exception\RedirectException;
+use TYPO3\CMS\Install\Service\SilentConfigurationUpgradeService;
 
 /**
  * This class is responsible for properly creating install tool step actions
@@ -85,8 +87,45 @@ class InstallStepActionExecutor
         }
         if ($needsExecution && !$dryRun) {
             $messages = $action->execute();
+            $this->executeSilentConfigurationUpgradesIfNeeded();
             $needsExecution = false;
         }
         return new InstallStepResponse($needsExecution, $messages);
+    }
+
+    /**
+     * Call silent upgrade class, redirect to self if configuration was changed.
+     *
+     * @throws RedirectException
+     * @return void
+     */
+    private function executeSilentConfigurationUpgradesIfNeeded()
+    {
+        if (!file_exists(GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\ConfigurationManager::class)->getLocalConfigurationFileLocation())) {
+            return;
+        }
+        $upgradeService = $this->objectManager->get(SilentConfigurationUpgradeService::class);
+        $count = 0;
+        do {
+            try {
+                $count++;
+                $upgradeService->execute();
+                $redirect = false;
+            } catch (RedirectException $e) {
+                $redirect = true;
+                $this->reloadConfiguration();
+                if ($count > 20) {
+                    throw $e;
+                }
+            }
+        } while ($redirect === true);
+    }
+
+    /**
+     * Fetch the new configuration and expose it to the global array
+     */
+    private function reloadConfiguration()
+    {
+        GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\ConfigurationManager::class)->exportConfiguration();
     }
 }

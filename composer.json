@@ -26,21 +26,21 @@
         "php": ">=5.5.0",
         "helhum/typo3-console-plugin": "^1.5.0",
 
-        "typo3/cms-backend": "^7.6 || >=8.3.0 <8.7",
-        "typo3/cms-core": "^7.6 || >=8.3.0 <8.7",
-        "typo3/cms-extbase": "^7.6 || >=8.3.0 <8.7",
-        "typo3/cms-extensionmanager": "^7.6 || >=8.3.0 <8.7",
-        "typo3/cms-fluid": "^7.6 || >=8.3.0 <8.7",
-        "typo3/cms-install": "^7.6 || >=8.3.0 <8.7",
-        "typo3/cms-saltedpasswords": "^7.6 || >=8.3.0 <8.7",
-        "typo3/cms-scheduler": "^7.6 || >=8.3.0 <8.7",
+        "typo3/cms-backend": "^7.6 || ^8.7",
+        "typo3/cms-core": "^7.6 || ^8.7",
+        "typo3/cms-extbase": "^7.6 || ^8.7",
+        "typo3/cms-extensionmanager": "^7.6 || ^8.7",
+        "typo3/cms-fluid": "^7.6 || ^8.7",
+        "typo3/cms-install": "^7.6 || ^8.7",
+        "typo3/cms-saltedpasswords": "^7.6 || ^8.7",
+        "typo3/cms-scheduler": "^7.6 || ^8.7",
 
         "symfony/console": "^2.7 || ^3.0",
         "symfony/process": "^2.7 || ^3.0"
     },
     "require-dev": {
         "typo3-console/create-reference-command": "1.0.*@dev",
-        "typo3/cms": "^8.6",
+        "typo3/cms": "^8.7",
         "nimut/testing-framework": "^1.0",
         "mikey179/vfsStream": "~1.6.0",
         "phpunit/phpunit": "~4.8.0"
