@@ -157,7 +157,7 @@ class CommandDispatcher
             }
         }
 
-        $process = $processBuilder->getProcess();
+        $process = $processBuilder->setTimeout(null)->getProcess();
         $process->run();
         $output = str_replace("\r\n", "\n", trim($process->getOutput()));
 
