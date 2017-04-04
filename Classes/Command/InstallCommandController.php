@@ -57,6 +57,7 @@ class InstallCommandController extends CommandController
      * @param string $databasePort TCP Port of database server
      * @param string $databaseSocket Unix Socket to connect to (if localhost is given as hostname and this is kept empty, a socket connection will be established)
      * @param string $databaseName Name of the database
+     * @param string $databaseDriver Driver for the database connection
      * @param bool $useExistingDatabase If set an empty database with the specified name will be used. Otherwise a database with the specified name is created.
      * @param string $adminUserName User name of the administrative backend user account to be created
      * @param string $adminPassword Password of the administrative backend user account to be created
@@ -72,6 +73,7 @@ class InstallCommandController extends CommandController
         $databasePort = '',
         $databaseSocket = '',
         $databaseName = '',
+        $databaseDriver = 'mysqli',
         $useExistingDatabase = false,
         $adminUserName = '',
         $adminPassword = '',
@@ -200,11 +202,12 @@ class InstallCommandController extends CommandController
      * @param string $databaseHostName Host name of database server
      * @param string $databasePort TCP Port of database server
      * @param string $databaseSocket Unix Socket to connect to
+     * @param string $databaseDriver Database driver to use
      * @internal
      */
-    public function databaseConnectCommand($databaseUserName = '', $databaseUserPassword = '', $databaseHostName = 'localhost', $databasePort = '3306', $databaseSocket = '')
+    public function databaseConnectCommand($databaseUserName = '', $databaseUserPassword = '', $databaseHostName = 'localhost', $databasePort = '3306', $databaseSocket = '', $databaseDriver = 'mysqli')
     {
-        $this->executeActionWithArguments('databaseConnect', ['host' => $databaseHostName, 'port' => $databasePort, 'username' => $databaseUserName, 'password' => $databaseUserPassword, 'socket' => $databaseSocket]);
+        $this->executeActionWithArguments('databaseConnect', ['host' => $databaseHostName, 'port' => $databasePort, 'username' => $databaseUserName, 'password' => $databaseUserPassword, 'socket' => $databaseSocket, 'driver'=> $databaseDriver]);
     }
 
     /**
