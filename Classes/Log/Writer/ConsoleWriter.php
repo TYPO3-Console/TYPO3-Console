@@ -40,8 +40,9 @@ class ConsoleWriter extends AbstractWriter
         LogLevel::WARNING => '<fg=yellow;options=bold>|</fg=yellow;options=bold>',
         LogLevel::NOTICE => '<fg=yellow>|</fg=yellow>',
         LogLevel::INFO => '<info>|</info>',
-        LogLevel::DEBUG => '|'
+        LogLevel::DEBUG => '|',
     ];
+
     /**
      * @param OutputInterface $output
      */
@@ -62,8 +63,8 @@ class ConsoleWriter extends AbstractWriter
      * Writes the log record
      *
      * @param \TYPO3\CMS\Core\Log\LogRecord $record Log record
-     * @return \TYPO3\CMS\Core\Log\Writer\WriterInterface $this
      * @throws \Exception
+     * @return \TYPO3\CMS\Core\Log\Writer\WriterInterface $this
      */
     public function writeLog(\TYPO3\CMS\Core\Log\LogRecord $record)
     {

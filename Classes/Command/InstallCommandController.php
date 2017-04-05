@@ -38,6 +38,12 @@ class InstallCommandController extends CommandController
     protected $cliSetupRequestHandler;
 
     /**
+     * @var \Helhum\Typo3Console\Install\InstallStepActionExecutor
+     * @inject
+     */
+    protected $installStepActionExecutor;
+
+    /**
      * TYPO3 Setup
      *
      * Use as command line replacement for the web installation process.
@@ -93,17 +99,24 @@ class InstallCommandController extends CommandController
      *
      * - Third party extensions
      * - All core extensions that are required (or part of minimal usable system)
-     * - All core extensions which are provided in the TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS environment variable. Extension keys in this variable must be separated by comma and without spaces.
+     * - All core extensions which are provided with the <code>--framework-extensions</code> argument.
+     * - In composer mode all composer dependencies to TYPO3 framework extensions are detected and activated by default.
      *
-     * <b>Example:</b> <code>TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS="info,info_pagetsconfig" typo3cms install:generatepackagestates</code>
+     * To require TYPO3 core extensions use the following command:
      *
-     * @param array $frameworkExtensions If given, this argument takes precedence over the environment variable
+     * <code>composer require typo3/cms-foo "*"</code>
+     *
+     * This updates your composer.json and composer.lock without any other changes.
+     *
+     * <b>Example:</b> <code>typo3cms install:generatepackagestates</code>
+     *
+     * @param array $frameworkExtensions TYPO3 system extensions that should be marked as active. Extension keys separated by comma.
      * @param bool $activateDefault If true, <code>typo3/cms</code> extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
      * @param array $excludedExtensions Extensions in typo3conf/ext/ directory, which should stay inactive
      */
     public function generatePackageStatesCommand(array $frameworkExtensions = [], $activateDefault = false, array $excludedExtensions = [])
     {
-        $ranFromComposerPlugin = getenv('TYPO3_CONSOLE_PLUGIN_RUN');
+        $ranFromComposerPlugin = getenv('TYPO3_CONSOLE_PLUGIN_RUN') || !getenv('TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES');
         if (!$ranFromComposerPlugin && Bootstrap::usesComposerClassLoading()) {
             $this->output->outputLine('<warning>This command is now always automatically executed after Composer has written the autoload information.</warning>');
             $this->output->outputLine('<warning>It is therefore deprecated to be used in Composer mode.</warning>');
@@ -117,14 +130,14 @@ class InstallCommandController extends CommandController
             [
                 implode(', ', array_map(function (PackageInterface $package) {
                     return $package->getPackageKey();
-                }, $activatedExtensions))
+                }, $activatedExtensions)),
             ]
         );
         if (!empty($excludedExtensions)) {
             $this->outputLine(
                 '<info>The following third party extensions were excluded during this process:</info> %s',
                 [
-                    implode(', ', $excludedExtensions)
+                    implode(', ', $excludedExtensions),
                 ]
             );
         }
@@ -174,15 +187,7 @@ class InstallCommandController extends CommandController
      */
     public function environmentAndFoldersCommand()
     {
-        $this->cliSetupRequestHandler->executeActionWithArguments('environmentAndFolders');
-    }
-
-    /**
-     * @internal
-     */
-    public function environmentAndFoldersNeedsExecutionCommand()
-    {
-        $this->cliSetupRequestHandler->callNeedsExecution('environmentAndFolders');
+        $this->executeActionWithArguments('environmentAndFolders');
     }
 
     /**
@@ -199,15 +204,7 @@ class InstallCommandController extends CommandController
      */
     public function databaseConnectCommand($databaseUserName = '', $databaseUserPassword = '', $databaseHostName = 'localhost', $databasePort = '3306', $databaseSocket = '')
     {
-        $this->cliSetupRequestHandler->executeActionWithArguments('databaseConnect', ['host' => $databaseHostName, 'port' => $databasePort, 'username' => $databaseUserName, 'password' => $databaseUserPassword, 'socket' => $databaseSocket]);
-    }
-
-    /**
-     * @internal
-     */
-    public function databaseConnectNeedsExecutionCommand()
-    {
-        $this->cliSetupRequestHandler->callNeedsExecution('databaseConnect');
+        $this->executeActionWithArguments('databaseConnect', ['host' => $databaseHostName, 'port' => $databasePort, 'username' => $databaseUserName, 'password' => $databaseUserPassword, 'socket' => $databaseSocket, 'driver' => 'mysqli']);
     }
 
     /**
@@ -222,15 +219,7 @@ class InstallCommandController extends CommandController
     public function databaseSelectCommand($useExistingDatabase = false, $databaseName = 'required')
     {
         $selectType = $useExistingDatabase ? 'existing' : 'new';
-        $this->cliSetupRequestHandler->executeActionWithArguments('databaseSelect', ['type' => $selectType, $selectType => $databaseName]);
-    }
-
-    /**
-     * @internal
-     */
-    public function databaseSelectNeedsExecutionCommand()
-    {
-        $this->cliSetupRequestHandler->callNeedsExecution('databaseSelect');
+        $this->executeActionWithArguments('databaseSelect', ['type' => $selectType, $selectType => $databaseName]);
     }
 
     /**
@@ -245,17 +234,7 @@ class InstallCommandController extends CommandController
      */
     public function databaseDataCommand($adminUserName, $adminPassword, $siteName = 'New TYPO3 Console site')
     {
-        $this->cliSetupRequestHandler->executeActionWithArguments('databaseData', ['username' => $adminUserName, 'password' => $adminPassword, 'sitename' => $siteName]);
-    }
-
-    /**
-     * Check if database data command is needed
-     *
-     * @internal
-     */
-    public function databaseDataNeedsExecutionCommand()
-    {
-        $this->cliSetupRequestHandler->callNeedsExecution('databaseData');
+        $this->executeActionWithArguments('DatabaseData', ['username' => $adminUserName, 'password' => $adminPassword, 'sitename' => $siteName]);
     }
 
     /**
@@ -276,27 +255,40 @@ class InstallCommandController extends CommandController
         switch ($siteSetupType) {
             case 'site':
             case 'createsite':
-                $argument = ['sitesetup' => 'createsite'];
+                $arguments = ['sitesetup' => 'createsite'];
                 break;
             case 'dist':
             case 'loaddistribution':
-                $argument = ['sitesetup' => 'loaddistribution'];
+                $arguments = ['sitesetup' => 'loaddistribution'];
                 break;
             case 'no':
             default:
-                $argument = ['sitesetup' => 'none'];
+                $arguments = ['sitesetup' => 'none'];
         }
-        $this->cliSetupRequestHandler->executeActionWithArguments('defaultConfiguration', $argument);
+        $this->executeActionWithArguments('defaultConfiguration', $arguments);
     }
 
     /**
-     * Check if default configuration needs to be written
+     * Calls needs execution on the given action and returns the result
      *
+     * @param string $actionName
      * @internal
      */
-    public function defaultConfigurationNeedsExecutionCommand()
+    public function actionNeedsExecutionCommand($actionName)
     {
-        $this->cliSetupRequestHandler->callNeedsExecution('defaultConfiguration');
+        $this->executeActionWithArguments($actionName, [], true);
+    }
+
+    /**
+     * Executes the given action and outputs the serialized result messages
+     *
+     * @param string $actionName Name of the install step
+     * @param array $arguments Arguments for the install step
+     * @param bool $dryRun If true, do not execute the action, but only check if execution is necessary
+     */
+    private function executeActionWithArguments($actionName, array $arguments = [], $dryRun = false)
+    {
+        $this->outputLine(serialize($this->installStepActionExecutor->executeActionWithArguments($actionName, $arguments, $dryRun)));
     }
 
     /**

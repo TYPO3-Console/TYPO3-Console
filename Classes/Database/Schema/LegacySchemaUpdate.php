@@ -85,8 +85,7 @@ class LegacySchemaUpdate implements SchemaUpdateInterface, SingletonInterface
         $result = $this->schemaMigrationService->performUpdateQueries($statements, $selectedStatements);
         if ($result === true) {
             return [];
-        } else {
-            return $result;
         }
+        return $result;
     }
 }

@@ -77,6 +77,15 @@ class ConsoleBootstrap extends Bootstrap
             $this->requestId = uniqid('console_request_', true);
             $this->initializePackageManagement();
 
+            if (!class_exists(RunLevel::class)) {
+                echo sprintf('Could not initialize TYPO3 Console for TYPO3 in path %s.', PATH_site) . chr(10);
+                echo 'This most likely happened because you have a console code checkout in typo3conf/ext/typo3_console,' . chr(10);
+                echo 'but TYPO3 Console is not set up as extension. If you want to use it as extension,' . chr(10);
+                echo 'please download it from https://typo3.org/extensions/repository/view/typo3_console' . chr(10);
+                echo 'or install it properly using Composer.' . chr(10);
+                exit(1);
+            }
+
             $this->runLevel = new RunLevel();
             $this->setEarlyInstance(\Helhum\Typo3Console\Core\Booting\RunLevel::class, $this->runLevel);
             $exceptionHandler = new ExceptionHandler();
@@ -180,8 +189,8 @@ class ConsoleBootstrap extends Bootstrap
     /**
      * Iterates over the registered request handlers and determines which one fits best.
      *
-     * @return RequestHandlerInterface A request handler
      * @throws \RuntimeException
+     * @return RequestHandlerInterface A request handler
      */
     public function resolveCliRequestHandler()
     {
@@ -338,7 +347,7 @@ class ConsoleBootstrap extends Bootstrap
             $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
             $cacheConfigurations['dbal'] = [
                 'backend' => \TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend::class,
-                'groups' => []
+                'groups' => [],
             ];
         }
     }

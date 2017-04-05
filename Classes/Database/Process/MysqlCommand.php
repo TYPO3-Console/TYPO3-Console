@@ -60,11 +60,10 @@ class MysqlCommand
             // I did not figure out how to change pipes with symfony/process
             $interactiveProcess = new InteractiveProcess();
             return $interactiveProcess->run($this->processBuilder->getProcess()->getCommandLine());
-        } else {
-            $process = $this->processBuilder->getProcess();
-            $process->setInput($inputStream);
-            return $process->run($this->buildDefaultOutputCallback($outputCallback));
         }
+        $process = $this->processBuilder->getProcess();
+        $process->setInput($inputStream);
+        return $process->run($this->buildDefaultOutputCallback($outputCallback));
     }
 
     /**

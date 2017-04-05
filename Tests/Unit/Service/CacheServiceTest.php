@@ -15,8 +15,8 @@ namespace Helhum\Typo3Console\Tests\Unit\Service;
 
 use Helhum\Typo3Console\Service\CacheService;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
+use Nimut\TestingFramework\TestCase\UnitTestCase;
 use TYPO3\CMS\Core\Cache\CacheManager;
-use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * Class CacheServiceTest

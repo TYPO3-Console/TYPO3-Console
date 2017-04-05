@@ -20,8 +20,8 @@ class PhpParser implements PhpParserInterface
 {
     /**
      * @param string $classFile Path to PHP class file
-     * @return ParsedClass
      * @throws ParsingException
+     * @return ParsedClass
      */
     public function parseClassFile($classFile)
     {
@@ -37,8 +37,8 @@ class PhpParser implements PhpParserInterface
 
     /**
      * @param string $classContent
-     * @return ParsedClass
      * @throws ParsingException
+     * @return ParsedClass
      */
     public function parseClass($classContent)
     {
@@ -60,8 +60,8 @@ class PhpParser implements PhpParserInterface
 
     /**
      * @param string $classContent
-     * @return bool
      * @throws ParsingException
+     * @return bool
      */
     protected function parseClassName($classContent)
     {
@@ -93,8 +93,8 @@ class PhpParser implements PhpParserInterface
 
     /**
      * @param string $classContent
-     * @return string
      * @throws ParsingException
+     * @return string
      */
     protected function parseClassNameRaw($classContent)
     {

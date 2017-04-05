@@ -27,7 +27,7 @@ class PersistenceIntegrityService
      * Updating Reference Index
      *
      * @param PersistenceContext $persistenceContext
-     * @param ReferenceIndexIntegrityDelegateInterface|NULL $delegate
+     * @param ReferenceIndexIntegrityDelegateInterface|null $delegate
      * @return array Tuple ($errorCount, $recordCount, $processedTables)
      */
     public function updateReferenceIndex(PersistenceContext $persistenceContext, ReferenceIndexIntegrityDelegateInterface $delegate = null)
@@ -39,7 +39,7 @@ class PersistenceIntegrityService
      * Checking Reference Index
      *
      * @param PersistenceContext $persistenceContext
-     * @param ReferenceIndexIntegrityDelegateInterface|NULL $delegate
+     * @param ReferenceIndexIntegrityDelegateInterface|null $delegate
      * @return array Tuple ($errorCount, $recordCount, $processedTables)
      */
     public function checkReferenceIndex(PersistenceContext $persistenceContext, ReferenceIndexIntegrityDelegateInterface $delegate = null)
@@ -52,7 +52,7 @@ class PersistenceIntegrityService
      *
      * @param bool $dryRun
      * @param PersistenceContext $persistenceContext
-     * @param ReferenceIndexIntegrityDelegateInterface|NULL $delegate
+     * @param ReferenceIndexIntegrityDelegateInterface|null $delegate
      * @return array Tuple ($errorCount, $recordCount, $processedTables)
      */
     protected function checkOrUpdateReferenceIndex($dryRun, PersistenceContext $persistenceContext, ReferenceIndexIntegrityDelegateInterface $delegate = null)
@@ -139,7 +139,7 @@ class PersistenceIntegrityService
     }
 
     /**
-     * @param ReferenceIndexIntegrityDelegateInterface|NULL $delegate
+     * @param ReferenceIndexIntegrityDelegateInterface|null $delegate
      * @param string $eventName
      * @param array $arguments
      */
@@ -152,7 +152,7 @@ class PersistenceIntegrityService
     }
 
     /**
-     * @param ReferenceIndexIntegrityDelegateInterface|NULL $delegate
+     * @param ReferenceIndexIntegrityDelegateInterface|null $delegate
      * @param string $severity
      * @param string $message
      * @param array $data

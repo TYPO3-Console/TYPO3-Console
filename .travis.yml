@@ -16,21 +16,17 @@ matrix:
     - php: 7.0
       env: TYPO3_VERSION=^7.6
     - php: 7.0
-      env: TYPO3_VERSION=~8.3.0
+      env: TYPO3_VERSION=^8.7
     - php: 7.0
-      env: TYPO3_VERSION=~8.4.0
-    - php: 7.0
-      env: TYPO3_VERSION=~8.5.0
-    - php: 7.0
-      env: TYPO3_VERSION="dev-master as 8.5.0"
+      env: TYPO3_VERSION="dev-master as 8.7.0"
     - php: 7.1
       env: TYPO3_VERSION=^7.6
     - php: 7.1
-      env: TYPO3_VERSION=^8
+      env: TYPO3_VERSION=^8.7
     - php: 7.1
-      env: TYPO3_VERSION="dev-master as 8.5.0"
+      env: TYPO3_VERSION="dev-master as 8.7.0"
   allow_failures:
-    - env: TYPO3_VERSION="dev-master as 8.5.0"
+    - env: TYPO3_VERSION="dev-master as 8.7.0"
 
 cache:
   directories:
@@ -55,19 +51,20 @@ before_script:
       composer set-version $TRAVIS_TAG
       # If this fails, we forgot to update version numbers before tagging the release
       test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
+      # Remove package that causes issues as a quick fix
+      composer remove --dev typo3-console/create-reference-command --no-update
     fi
   - composer extension-create-libs && ls -la Libraries/*.phar | grep -v ^-rwx
   - git clean -dffx
   - composer require typo3/cms="$TYPO3_VERSION"
   - export TYPO3_PATH_WEB="$PWD/.Build/Web"
   - export PATH="$PATH:./Scripts"
-  - if [ -d .Build/vendor/typo3/cms/components/testing_framework/core/Build ]; then export TYPO3_BUILD_DIR=".Build/vendor/typo3/cms/components/testing_framework/core/Build"; else export TYPO3_BUILD_DIR=".Build/vendor/typo3/cms/typo3/sysext/core/Build"; fi
 
 script:
   - >
     echo;
     echo "Running unit tests";
-    .Build/bin/phpunit -c $TYPO3_BUILD_DIR/UnitTests.xml Tests/Unit/
+    .Build/bin/phpunit -c .Build/vendor/nimut/testing-framework/res/Configuration/UnitTests.xml Tests/Unit/
   - >
     echo;
     echo "Running php lint";
@@ -86,8 +83,12 @@ script:
   - typo3cms help:autocomplete bash
   - typo3cms help:autocomplete zsh
   - typo3cms backend:lock
+  - typo3cms backend:lock
+  - typo3cms backend:unlock
   - typo3cms backend:unlock
   - typo3cms backend:lockforeditors
+  - typo3cms backend:lockforeditors
+  - typo3cms backend:unlockforeditors
   - typo3cms backend:unlockforeditors
   - typo3cms cache:flush
   - typo3cms cache:flushgroups pages
@@ -115,7 +116,7 @@ script:
   - typo3cms configuration:set EXTCONF/lang/availableLanguages/1 fr_FR && grep fr_FR $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php
   - typo3cms configuration:set EXTCONF/foo/bar baz && grep bar $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php | grep baz
   - rm -f $TYPO3_PATH_WEB/typo3conf/PackageStates.php && typo3cms install:generatepackagestates --activate-default && [ -f "$TYPO3_PATH_WEB/typo3conf/PackageStates.php" ]
-  - rm -f $TYPO3_PATH_WEB/typo3conf/PackageStates.php && TYPO3_CONSOLE_TEST_SETUP=yes TYPO3_ACTIVATE_DEFAULT_FRAMEWORK_EXTENSIONS=yes composer dump-autoload -vv 2>&1 | grep 'generated PackageStates.php' && [ -f "$TYPO3_PATH_WEB/typo3conf/PackageStates.php" ]
+  - rm -f $TYPO3_PATH_WEB/typo3conf/PackageStates.php && TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES=yes TYPO3_CONSOLE_TEST_SETUP=yes TYPO3_ACTIVATE_DEFAULT_FRAMEWORK_EXTENSIONS=yes composer dump-autoload -vv 2>&1 | grep 'generated PackageStates.php' && [ -f "$TYPO3_PATH_WEB/typo3conf/PackageStates.php" ]
   - grep sys_note "$TYPO3_PATH_WEB/typo3conf/PackageStates.php"
   - rm $TYPO3_PATH_WEB/typo3temp/index.html && typo3cms install:fixfolderstructure && [ -f "$TYPO3_PATH_WEB/typo3temp/index.html" ]
   - typo3cms extension:list
@@ -137,6 +138,7 @@ after_script:
       curl -sSL https://raw.githubusercontent.com/alrra/travis-after-all/1.4.4/lib/travis-after-all.js | node
       if [ $? -eq 0 ]; then
         # Cleanup before we upload
+        composer require --dev namelesscoder/typo3-repository-client:^1.2.0
         git reset --hard HEAD && git clean -fx
 
         # Build extension files

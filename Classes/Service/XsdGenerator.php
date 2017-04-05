@@ -44,8 +44,8 @@ class XsdGenerator
      *
      * @param string $viewHelperNamespace Namespace identifier to generate the XSD for, without leading Backslash.
      * @param string $xsdNamespace $xsdNamespace unique target namespace used in the XSD schema (for example "http://yourdomain.org/ns/viewhelpers")
-     * @return string XML Schema definition
      * @throws Exception
+     * @return string XML Schema definition
      */
     public function generateXsd($viewHelperNamespace, $xsdNamespace)
     {
@@ -63,8 +63,8 @@ class XsdGenerator
      *
      * @param array $viewHelperPaths One or more paths to a view helper class files
      * @param string $xsdNamespace $xsdNamespace unique target namespace used in the XSD schema (for example "http://yourdomain.org/ns/viewhelpers")
-     * @return string XML Schema definition
      * @throws Exception
+     * @return string XML Schema definition
      */
     public function generateXsdFromClassFiles(array $viewHelperPaths, $xsdNamespace)
     {
@@ -81,8 +81,8 @@ class XsdGenerator
      *
      * @param array $classNames One or more view helper class names
      * @param string $xsdNamespace $xsdNamespace unique target namespace used in the XSD schema (for example "http://yourdomain.org/ns/viewhelpers")
-     * @return string XML Schema definition
      * @throws Exception
+     * @return string XML Schema definition
      */
     protected function generateXsdFromClassNames(array $classNames, $xsdNamespace)
     {
