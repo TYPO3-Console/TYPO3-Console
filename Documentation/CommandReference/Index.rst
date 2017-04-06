@@ -16,7 +16,7 @@ Command Reference
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2017-03-08 16:00:00
+The following reference was automatically generated from code on 2017-04-06 15:25:57
 
 
 .. _`Command Reference: typo3_console`:
@@ -845,6 +845,8 @@ Options
   If specified, optional arguments are not requested, but default values are assumed.
 ``--force``
   Force installation of TYPO3, even if ``LocalConfiguration.php`` file already exists.
+``--skip-integrity-check``
+  Skip the checking for clean state before executing setup. This allows a pre-defined ``LocalConfiguration.php`` to be present. Handle with care. It might lead to unexpected or broken installation results.
 ``--database-user-name``
   User name for database server
 ``--database-user-password``
