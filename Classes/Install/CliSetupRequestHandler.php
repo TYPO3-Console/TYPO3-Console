@@ -116,6 +116,9 @@ class CliSetupRequestHandler
         foreach ($this->installationActions as $actionName) {
             $this->dispatchAction($actionName);
         }
+        // The TYPO3 installation process does not take care of setting up all extensions properly,
+        // so we do it manually here
+        $this->commandDispatcher->executeCommand('extension:setupactive');
     }
 
     /**
