@@ -2,7 +2,7 @@
 namespace Helhum\Typo3Console\Command;
 
 /*
- * This file is part of the TYPO3 console project.
+ * This file is part of the TYPO3 Console project.
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 2
@@ -79,7 +79,7 @@ class InstallCommandController extends CommandController
         $siteSetupType = 'none'
     ) {
         $this->outputLine();
-        $this->outputLine('<i>Welcome to the TYPO3 console installer!</i>');
+        $this->outputLine('<i>Welcome to the TYPO3 Console installer!</i>');
 
         $this->ensureInstallationPossible($nonInteractive, $force);
 

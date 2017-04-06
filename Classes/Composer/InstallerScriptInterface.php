@@ -2,7 +2,7 @@
 namespace Helhum\Typo3Console\Composer;
 
 /*
- * This file is part of the TYPO3 console project.
+ * This file is part of the TYPO3 Console project.
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 2
