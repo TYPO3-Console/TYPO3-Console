@@ -66,7 +66,9 @@ class ExtensionSetup
         foreach ($packages as $package) {
             $this->extensionFactory->getExtensionStructure($package)->fix();
             $this->callInstaller('importInitialFiles', [PathUtility::stripPathSitePrefix($package->getPackagePath()), $package->getPackageKey()]);
-            if (!isset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$package->getPackageKey()])) {
+            if (!isset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$package->getPackageKey()])
+                && @is_file($package->getPackagePath() . 'ext_conf_template.txt')
+            ) {
                 $this->callInstaller('saveDefaultConfiguration', [$package->getPackageKey()]);
             }
         }
