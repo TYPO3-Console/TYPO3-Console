@@ -59,9 +59,8 @@ class ExtensionSetup
      * This might be removed, once the bug is fixed in TYPO3.
      *
      * @param PackageInterface[] $packages
-     * @param array $activatedExtensionKeys
      */
-    public function setupExtensions(array $packages, array $activatedExtensionKeys = [])
+    public function setupExtensions(array $packages)
     {
         foreach ($packages as $package) {
             $this->extensionFactory->getExtensionStructure($package)->fix();
@@ -80,9 +79,7 @@ class ExtensionSetup
             $extensionKey = $package->getPackageKey();
             $this->callInstaller('importStaticSqlFile', [$relativeExtensionPath]);
             $this->callInstaller('importT3DFile', [$relativeExtensionPath]);
-            if (in_array($extensionKey, $activatedExtensionKeys, true)) {
-                $this->callInstaller('emitAfterExtensionInstallSignal', [$extensionKey]);
-            }
+            $this->callInstaller('emitAfterExtensionInstallSignal', [$extensionKey]);
         }
     }
 
