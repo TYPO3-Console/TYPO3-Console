@@ -98,7 +98,7 @@ class ExtensionCommandController extends CommandController
         }
 
         if (!empty($extensionsToSetUp)) {
-            $this->setupExtensions($extensionsToSetUp, $activatedExtensions);
+            $this->setupExtensions($extensionsToSetUp);
         }
     }
 
@@ -157,16 +157,15 @@ class ExtensionCommandController extends CommandController
      * To do so, we avoid buggy TYPO3 API and use our own instead.
      *
      * @param PackageInterface[] $packages
-     * @param array $activatedExtensionKeys
      */
-    private function setupExtensions(array $packages, array $activatedExtensionKeys = [])
+    private function setupExtensions(array $packages)
     {
         $extensionSetup = new ExtensionSetup(
             new ExtensionFactory($this->packageManager),
             $this->extensionInstaller
         );
 
-        $extensionSetup->setupExtensions($packages, $activatedExtensionKeys);
+        $extensionSetup->setupExtensions($packages);
         $extensionKeysAsString = implode('", "', array_map(function (PackageInterface $package) {
             return $package->getPackageKey();
         }, $packages));
