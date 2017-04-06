@@ -66,7 +66,9 @@ class ExtensionSetup
         foreach ($packages as $package) {
             $this->extensionFactory->getExtensionStructure($package)->fix();
             $this->callInstaller('importInitialFiles', [PathUtility::stripPathSitePrefix($package->getPackagePath()), $package->getPackageKey()]);
-            $this->callInstaller('saveDefaultConfiguration', [$package->getPackageKey()]);
+            if (!isset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$package->getPackageKey()])) {
+                $this->callInstaller('saveDefaultConfiguration', [$package->getPackageKey()]);
+            }
         }
 
         $this->schemaService->updateSchema(SchemaUpdateType::expandSchemaUpdateTypes(['safe']));
