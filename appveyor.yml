@@ -6,7 +6,7 @@ services:
 
 environment:
   COMPOSER_NO_INTERACTION: 1
-  TYPO3_PATH_WEB: 'c:\t3c\.Build\Web'
+  TYPO3_PATH_ROOT: 'c:\t3c\.Build\Web'
   TYPO3_CONSOLE_DEBUG: 1
 
   matrix:
@@ -53,10 +53,10 @@ install:
 
 test_script:
   - cd c:\t3c
-  - echo %TYPO3_PATH_WEB%
+  - echo %TYPO3_PATH_ROOT%
   - .Build\bin\phpunit -c .Build/vendor/nimut/testing-framework/res/Configuration/UnitTests.xml Tests/Unit/
-  - SET TYPO3_PATH_WEB=c:\t3c\.Build\Web
-  - echo %TYPO3_PATH_WEB%
+  - SET TYPO3_PATH_ROOT=c:\t3c\.Build\Web
+  - echo %TYPO3_PATH_ROOT%
   - echo %TYPO3_CONSOLE_DEBUG%
   - php Scripts/typo3cms
   - php Scripts/typo3cms install:setup --non-interactive --database-user-name="root" --database-user-password="Password12!" --database-host-name="localhost" --database-port="3306" --database-name="appveyor_test" --admin-user-name="admin" --admin-password="password" --site-name="Appveyor Install" --site-setup-type="createsite"
@@ -93,15 +93,15 @@ test_script:
   - php Scripts/typo3cms configuration:show BE/installToolPassword
   - php Scripts/typo3cms configuration:showLocal BE/installToolPassword
   - php Scripts/typo3cms configuration:showActive BE/installToolPassword
-#  - php Scripts/typo3cms configuration:set BE/installToolPassword foobar && grep installToolPassword $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php | grep foobar
-#  - php Scripts/typo3cms configuration:remove BE/installToolPassword --force && grep -qv installToolPassword $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php
-#  - php Scripts/typo3cms configuration:set BE/installToolPassword blablupp && grep installToolPassword $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php | grep blablupp
-#  - php Scripts/typo3cms configuration:set EXTCONF/lang/availableLanguages/1 fr_FR && grep fr_FR $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php
-#  - php Scripts/typo3cms configuration:set EXTCONF/foo/bar baz && grep bar $TYPO3_PATH_WEB/typo3conf/LocalConfiguration.php | grep baz
-#  - rm -f $TYPO3_PATH_WEB/typo3conf/PackageStates.php && php Scripts/typo3cms install:generatepackagestates --activate-default && [ -f "$TYPO3_PATH_WEB/typo3conf/PackageStates.php" ]
-#  - rm -f $TYPO3_PATH_WEB/typo3conf/PackageStates.php && TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES=yes TYPO3_CONSOLE_TEST_SETUP=yes TYPO3_ACTIVATE_DEFAULT_FRAMEWORK_EXTENSIONS=yes composer dump-autoload -vv 2>&1 | grep 'generated PackageStates.php' && [ -f "$TYPO3_PATH_WEB/typo3conf/PackageStates.php" ]
-#  - grep sys_note "$TYPO3_PATH_WEB/typo3conf/PackageStates.php"
-#  - rm $TYPO3_PATH_WEB/typo3temp/index.html && php Scripts/typo3cms install:fixfolderstructure && [ -f "$TYPO3_PATH_WEB/typo3temp/index.html" ]
+#  - php Scripts/typo3cms configuration:set BE/installToolPassword foobar && grep installToolPassword $TYPO3_PATH_ROOT/typo3conf/LocalConfiguration.php | grep foobar
+#  - php Scripts/typo3cms configuration:remove BE/installToolPassword --force && grep -qv installToolPassword $TYPO3_PATH_ROOT/typo3conf/LocalConfiguration.php
+#  - php Scripts/typo3cms configuration:set BE/installToolPassword blablupp && grep installToolPassword $TYPO3_PATH_ROOT/typo3conf/LocalConfiguration.php | grep blablupp
+#  - php Scripts/typo3cms configuration:set EXTCONF/lang/availableLanguages/1 fr_FR && grep fr_FR $TYPO3_PATH_ROOT/typo3conf/LocalConfiguration.php
+#  - php Scripts/typo3cms configuration:set EXTCONF/foo/bar baz && grep bar $TYPO3_PATH_ROOT/typo3conf/LocalConfiguration.php | grep baz
+#  - rm -f $TYPO3_PATH_ROOT/typo3conf/PackageStates.php && php Scripts/typo3cms install:generatepackagestates --activate-default && [ -f "$TYPO3_PATH_ROOT/typo3conf/PackageStates.php" ]
+#  - rm -f $TYPO3_PATH_ROOT/typo3conf/PackageStates.php && TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES=yes TYPO3_CONSOLE_TEST_SETUP=yes TYPO3_ACTIVATE_DEFAULT_FRAMEWORK_EXTENSIONS=yes composer dump-autoload -vv 2>&1 | grep 'generated PackageStates.php' && [ -f "$TYPO3_PATH_ROOT/typo3conf/PackageStates.php" ]
+#  - grep sys_note "$TYPO3_PATH_ROOT/typo3conf/PackageStates.php"
+#  - rm $TYPO3_PATH_ROOT/typo3temp/index.html && php Scripts/typo3cms install:fixfolderstructure && [ -f "$TYPO3_PATH_ROOT/typo3temp/index.html" ]
   - php Scripts/typo3cms extension:list
   - php Scripts/typo3cms extension:list --raw
 #  - php Scripts/typo3cms extension:list --raw | grep extbase

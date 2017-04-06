@@ -21,10 +21,10 @@ call_user_func(function () {
         exit(1);
     }
 
-    if (getenv('TYPO3_PATH_WEB')) {
+    if (getenv('TYPO3_PATH_ROOT')) {
         // In case we are symlinked (like for travis tests),
         // we need to accept the location from the outside to find the autoload.php
-        $typo3Root = getenv('TYPO3_PATH_WEB');
+        $typo3Root = getenv('TYPO3_PATH_ROOT');
         $log('Root path: ' . $typo3Root, true);
     } else {
         // Assume TYPO3 web root and vendor dir (only one is applicable at the same time)
@@ -41,17 +41,17 @@ call_user_func(function () {
         // Applicable in Composer mode only.
         $classLoader = require $autoLoadFile;
     } else {
-        echo 'Could not find autoload.php file. Is TYPO3_PATH_WEB specified correctly?' . PHP_EOL;
+        echo 'Could not find autoload.php file. Is TYPO3_PATH_ROOT specified correctly?' . PHP_EOL;
         exit(1);
     }
 
-    if (!getenv('TYPO3_PATH_WEB')) {
+    if (!getenv('TYPO3_PATH_ROOT')) {
         // Fallback to binary location in document root, if the plugin was not available (non Composer mode)
-        // Applicable in both Composer mode (when TYPO3_PATH_WEB was specified) and non-Composer mode.
-        putenv('TYPO3_PATH_WEB=' . $typo3Root);
+        // Applicable in both Composer mode (when TYPO3_PATH_ROOT was specified) and non-Composer mode.
+        putenv('TYPO3_PATH_ROOT=' . $typo3Root);
     }
 
-    define('PATH_site', str_replace('\\', '/', realpath(getenv('TYPO3_PATH_WEB'))) . '/');
+    define('PATH_site', str_replace('\\', '/', realpath(getenv('TYPO3_PATH_ROOT'))) . '/');
     define('PATH_thisScript', PATH_site . 'typo3/cli_dispatch.phpsh');
 
     $log('PATH_site: ' . PATH_site, true);
