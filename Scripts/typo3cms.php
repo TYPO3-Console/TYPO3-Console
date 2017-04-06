@@ -21,37 +21,26 @@ call_user_func(function () {
         exit(1);
     }
 
-    if (getenv('TYPO3_PATH_ROOT')) {
-        // In case we are symlinked (like for travis tests),
-        // we need to accept the location from the outside to find the autoload.php
-        $typo3Root = getenv('TYPO3_PATH_ROOT');
-        $log('Root path: ' . $typo3Root, true);
-    } else {
-        // Assume TYPO3 web root and vendor dir (only one is applicable at the same time)
-        // Both only works if the package is *NOT* symlinked to the typo3conf/ext or vendor folder
-        $typo3Root = dirname(dirname(dirname(dirname(__DIR__))));
-        $vendorDir = dirname(dirname(dirname(__DIR__)));
-    }
-    if (file_exists($autoLoadFile = realpath($typo3Root . '/typo3') . '/../vendor/autoload.php')) {
-        // The extension is in typo3conf/ext, so we load the main autoload.php from TYPO3 sources
-        // Applicable in both Composer and non-Composer mode.
+    if (file_exists($autoLoadFile = dirname(dirname(dirname(__DIR__))) . '/autoload.php')) {
+        // Console is a dependency, thus located in vendor/helhum/typo3-console
         $classLoader = require $autoLoadFile;
-    } elseif (!empty($vendorDir) && file_exists($autoLoadFile = $vendorDir . '/autoload.php')) {
-        // The package is in vendor dir, so we load the main autoload.php from vendor folder
-        // Applicable in Composer mode only.
+    } elseif (file_exists($autoLoadFile = realpath(getenv('TYPO3_PATH_ROOT') . '/typo3') . '/../vendor/autoload.php')) {
+        // Console is extension, this TYPO3_PATH_ROOT was set in typo3cms script, which is located in TYPO3 root
+        $classLoader = require $autoLoadFile;
+    } elseif (file_exists($autoLoadFile = dirname(__DIR__) . '/.Build/vendor/autoload.php')) {
+        // Console is root package, thus vendor folder is .Build/vendor
         $classLoader = require $autoLoadFile;
     } else {
-        echo 'Could not find autoload.php file. Is TYPO3_PATH_ROOT specified correctly?' . PHP_EOL;
+        if (file_exists(realpath(getenv('TYPO3_PATH_WEB') . '/typo3') . '/../vendor/autoload.php')) {
+            // Console is extension, this TYPO3_PATH_WEB was set in outdated typo3cms script, which is located in TYPO3 root
+            $log('You seem to use an outdated typo3cms binary in your TYPO3 root directory.');
+            $log('Please properly install typo3_console in the TYPO3 Extension Manager.');
+        }
+        $log('Could not find autoload.php file. Is TYPO3_PATH_ROOT specified correctly?');
         exit(1);
     }
 
-    if (!getenv('TYPO3_PATH_ROOT')) {
-        // Fallback to binary location in document root, if the plugin was not available (non Composer mode)
-        // Applicable in both Composer mode (when TYPO3_PATH_ROOT was specified) and non-Composer mode.
-        putenv('TYPO3_PATH_ROOT=' . $typo3Root);
-    }
-
-    define('PATH_site', str_replace('\\', '/', realpath(getenv('TYPO3_PATH_ROOT'))) . '/');
+    define('PATH_site', \TYPO3\CMS\Core\Utility\GeneralUtility::fixWindowsFilePath(getenv('TYPO3_PATH_ROOT')) . '/');
     define('PATH_thisScript', PATH_site . 'typo3/cli_dispatch.phpsh');
 
     $log('PATH_site: ' . PATH_site, true);
