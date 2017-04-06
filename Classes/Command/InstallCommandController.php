@@ -2,7 +2,7 @@
 namespace Helhum\Typo3Console\Command;
 
 /*
- * This file is part of the TYPO3 console project.
+ * This file is part of the TYPO3 Console project.
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 2
@@ -51,6 +51,7 @@ class InstallCommandController extends CommandController
      *
      * @param bool $nonInteractive If specified, optional arguments are not requested, but default values are assumed.
      * @param bool $force Force installation of TYPO3, even if <code>LocalConfiguration.php</code> file already exists.
+     * @param bool $skipIntegrityCheck Skip the checking for clean state before executing setup. This allows a pre-defined <code>LocalConfiguration.php</code> to be present. Handle with care. It might lead to unexpected or broken installation results.
      * @param string $databaseUserName User name for database server
      * @param string $databaseUserPassword User password for database server
      * @param string $databaseHostName Host name of database server
@@ -66,6 +67,7 @@ class InstallCommandController extends CommandController
     public function setupCommand(
         $nonInteractive = false,
         $force = false,
+        $skipIntegrityCheck = false,
         $databaseUserName = '',
         $databaseUserPassword = '',
         $databaseHostName = '',
@@ -79,9 +81,11 @@ class InstallCommandController extends CommandController
         $siteSetupType = 'none'
     ) {
         $this->outputLine();
-        $this->outputLine('<i>Welcome to the TYPO3 console installer!</i>');
+        $this->outputLine('<i>Welcome to the TYPO3 Console installer!</i>');
 
-        $this->ensureInstallationPossible($nonInteractive, $force);
+        if (!$skipIntegrityCheck) {
+            $this->ensureInstallationPossible($nonInteractive, $force);
+        }
 
         $this->cliSetupRequestHandler->setup(!$nonInteractive, $this->request->getArguments());
 

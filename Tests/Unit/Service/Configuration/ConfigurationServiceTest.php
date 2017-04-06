@@ -1,19 +1,8 @@
 <?php
-/**
- * This file is part of the TYPO3 console project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * The GNU General Public License can be found at
- * http://www.gnu.org/copyleft/gpl.html.
- *
- */
 namespace Helhum\Typo3Console\Tests\Unit\Service\Configuration;
 
 /*
- * This file is part of the TYPO3 console project.
+ * This file is part of the TYPO3 Console project.
  *
  * It is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, either version 2
