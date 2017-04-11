@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Tests\Unit\Install;
  */
 
 use Helhum\Typo3Console\Install\InstallStepActionExecutor;
+use Helhum\Typo3Console\Install\Upgrade\SilentConfigurationUpgrade;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Install\Controller\Action\Step\AbstractStepAction;
@@ -36,7 +37,8 @@ class InstallStepExecutorTest extends UnitTestCase
         $objectManagerMock->expects($this->any())
             ->method('get')
             ->willReturn($actionMock);
-        $executor = new InstallStepActionExecutor($objectManagerMock);
+        $silentConfigUpgradeMock = $this->getMockBuilder(SilentConfigurationUpgrade::class)->disableOriginalConstructor()->getMock();
+        $executor = new InstallStepActionExecutor($objectManagerMock, $silentConfigUpgradeMock);
         $response = $executor->executeActionWithArguments('test', []);
         $this->assertTrue($response->actionNeedsReevaluation());
     }
@@ -56,7 +58,8 @@ class InstallStepExecutorTest extends UnitTestCase
         $objectManagerMock->expects($this->any())
             ->method('get')
             ->willReturn($actionMock);
-        $executor = new InstallStepActionExecutor($objectManagerMock);
+        $silentConfigUpgradeMock = $this->getMockBuilder(SilentConfigurationUpgrade::class)->disableOriginalConstructor()->getMock();
+        $executor = new InstallStepActionExecutor($objectManagerMock, $silentConfigUpgradeMock);
         $response = $executor->executeActionWithArguments('test', []);
         $this->assertFalse($response->actionNeedsExecution());
     }
@@ -76,7 +79,8 @@ class InstallStepExecutorTest extends UnitTestCase
         $objectManagerMock->expects($this->any())
             ->method('get')
             ->willReturn($actionMock);
-        $executor = new InstallStepActionExecutor($objectManagerMock);
+        $silentConfigUpgradeMock = $this->getMockBuilder(SilentConfigurationUpgrade::class)->disableOriginalConstructor()->getMock();
+        $executor = new InstallStepActionExecutor($objectManagerMock, $silentConfigUpgradeMock);
         $response = $executor->executeActionWithArguments('test', [], true);
         $this->assertTrue($response->actionNeedsExecution());
     }
@@ -97,7 +101,8 @@ class InstallStepExecutorTest extends UnitTestCase
         $objectManagerMock->expects($this->any())
             ->method('get')
             ->willReturn($actionMock);
-        $executor = new InstallStepActionExecutor($objectManagerMock);
+        $silentConfigUpgradeMock = $this->getMockBuilder(SilentConfigurationUpgrade::class)->disableOriginalConstructor()->getMock();
+        $executor = new InstallStepActionExecutor($objectManagerMock, $silentConfigUpgradeMock);
         $response = $executor->executeActionWithArguments('test', []);
         $this->assertFalse($response->actionNeedsExecution());
     }
