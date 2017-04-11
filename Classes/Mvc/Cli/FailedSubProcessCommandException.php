@@ -58,13 +58,13 @@ class FailedSubProcessCommandException extends \Exception
         if (empty($outputMessage . $errorMessage)) {
             $errorMessage = sprintf(
                 "Executing \"%s\" failed (exit code: \"%d\") with no message\n",
-                $command,
+                $commandLine,
                 $exitCode
             );
         } else {
             $errorMessage = sprintf(
                 "Executing \"%s\" failed (exit code: \"%d\") with message:\n\n\"%s\"\n\nand error:\n\n\"%s\"\n",
-                $command,
+                $commandLine,
                 $exitCode,
                 $outputMessage,
                 $errorMessage

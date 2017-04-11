@@ -57,6 +57,7 @@ test_script:
   - .Build\bin\phpunit -c .Build/vendor/nimut/testing-framework/res/Configuration/UnitTests.xml Tests/Unit/
   - SET TYPO3_PATH_ROOT=c:\t3c\.Build\Web
   - echo %TYPO3_PATH_ROOT%
+  - DIR %TYPO3_PATH_ROOT%
   - echo %TYPO3_CONSOLE_DEBUG%
   - php Scripts/typo3cms
   - php Scripts/typo3cms install:setup --non-interactive --database-user-name="root" --database-user-password="Password12!" --database-host-name="localhost" --database-port="3306" --database-name="appveyor_test" --admin-user-name="admin" --admin-password="password" --site-name="Appveyor Install" --site-setup-type="createsite"

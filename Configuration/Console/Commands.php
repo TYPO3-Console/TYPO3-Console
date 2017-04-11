@@ -12,6 +12,7 @@ return [
         \Helhum\Typo3Console\Command\ConfigurationCommandController::class,
         \Helhum\Typo3Console\Command\FrontendCommandController::class,
         \Helhum\Typo3Console\Command\ExtensionCommandController::class,
+        \Helhum\Typo3Console\Command\UpgradeCommandController::class,
     ],
     'runLevels' => [
         'typo3_console:install:databasedata' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
@@ -22,6 +23,8 @@ return [
         'typo3_console:configuration:*' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
         'typo3_console:database:import' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
         'typo3_console:database:updateschema' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
+        'typo3_console:upgrade:subprocess' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_FULL,
+        'typo3_console:upgrade:*' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
     ],
     'bootingSteps' => [
         'typo3_console:install:databasedata' => ['helhum.typo3console:database'],
