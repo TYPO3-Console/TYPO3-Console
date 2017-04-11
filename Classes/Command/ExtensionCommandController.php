@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Helhum\Typo3Console\Extension\ExtensionSetup;
+use Helhum\Typo3Console\Extension\ExtensionSetupRenderer;
 use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Core\Bootstrap;
@@ -63,9 +64,10 @@ class ExtensionCommandController extends CommandController
      * Marks extensions as active, sets them up and clears caches for every activated extension.
      *
      * @param array $extensionKeys Extension keys to activate. Separate multiple extension keys with comma.
+     * @param bool $verbose Whether or not to output results
      * @throws \TYPO3\CMS\Extensionmanager\Exception\ExtensionManagerException
      */
-    public function activateCommand(array $extensionKeys)
+    public function activateCommand(array $extensionKeys, $verbose = false)
     {
         if (getenv('TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES') && Bootstrap::usesComposerClassLoading()) {
             $this->output->outputLine('<warning>This command has been deprecated to be used in composer mode, as it might lead to unexpected results</warning>');
@@ -98,7 +100,7 @@ class ExtensionCommandController extends CommandController
         }
 
         if (!empty($extensionsToSetUp)) {
-            $this->setupExtensions($extensionsToSetUp);
+            $this->setupExtensions($extensionsToSetUp, $verbose);
         }
     }
 
@@ -142,14 +144,15 @@ class ExtensionCommandController extends CommandController
      * - Writing default extension configuration
      *
      * @param array $extensionKeys Extension keys to set up. Separate multiple extension keys with comma.
+     * @param bool $verbose Whether or not to output results
      */
-    public function setupCommand(array $extensionKeys)
+    public function setupCommand(array $extensionKeys, $verbose = false)
     {
         $packages = [];
         foreach ($extensionKeys as $extensionKey) {
             $packages[] = $this->packageManager->getPackage($extensionKey);
         }
-        $this->setupExtensions($packages);
+        $this->setupExtensions($packages, $verbose);
     }
 
     /**
@@ -157,12 +160,21 @@ class ExtensionCommandController extends CommandController
      * To do so, we avoid buggy TYPO3 API and use our own instead.
      *
      * @param PackageInterface[] $packages
+     * @param bool $verbose Whether or not to output results
      */
-    private function setupExtensions(array $packages)
+    private function setupExtensions(array $packages, $verbose = false)
     {
+        $extensionSetupRenderer = null;
+        if ($verbose) {
+            $extensionSetupRenderer = new ExtensionSetupRenderer(
+                $this->output,
+                $this->signalSlotDispatcher
+            );
+        }
         $extensionSetup = new ExtensionSetup(
             new ExtensionFactory($this->packageManager),
-            $this->extensionInstaller
+            $this->extensionInstaller,
+            $extensionSetupRenderer
         );
 
         $extensionSetup->setupExtensions($packages);
@@ -190,10 +202,12 @@ class ExtensionCommandController extends CommandController
      * @see typo3_console:extension:setup
      * @see typo3_console:install:generatepackagestates
      * @see typo3_console:cache:flush
+     *
+     * @param bool $verbose Whether or not to output results
      */
-    public function setupActiveCommand()
+    public function setupActiveCommand($verbose = false)
     {
-        $this->setupExtensions($this->packageManager->getActivePackages());
+        $this->setupExtensions($this->packageManager->getActivePackages(), $verbose);
     }
 
     /**

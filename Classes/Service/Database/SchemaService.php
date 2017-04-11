@@ -17,6 +17,7 @@ use Helhum\Typo3Console\Database\Schema\SchemaUpdateInterface;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateResult;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 /**
  * Service for database schema migrations
@@ -29,13 +30,20 @@ class SchemaService implements SingletonInterface
     private $schemaUpdate;
 
     /**
+     * @var Dispatcher
+     */
+    private $signalSlotDispatcher;
+
+    /**
      * SchemaService constructor.
      *
      * @param SchemaUpdateInterface $schemaUpdate
+     * @param Dispatcher $signalSlotDispatcher
      */
-    public function __construct(SchemaUpdateInterface $schemaUpdate)
+    public function __construct(SchemaUpdateInterface $schemaUpdate, Dispatcher $signalSlotDispatcher)
     {
         $this->schemaUpdate = $schemaUpdate;
+        $this->signalSlotDispatcher = $signalSlotDispatcher;
     }
 
     /**
@@ -79,6 +87,16 @@ class SchemaService implements SingletonInterface
             }
         }
 
+        $this->emitDatabaseUpdateSignal($updateResult);
         return $updateResult;
+    }
+
+    /**
+     * Emits database update executed signal
+     * @param SchemaUpdateResult $updateResult
+     */
+    private function emitDatabaseUpdateSignal($updateResult)
+    {
+        $this->signalSlotDispatcher->dispatch(__CLASS__, 'afterDatabaseUpdate', [$updateResult]);
     }
 }
