@@ -56,6 +56,8 @@ class InstallDummyExtension implements InstallerScriptInterface
             $io->writeError('<warning>Installation of TYPO3 extension has been deprecated</warning>');
             $io->writeError('<warning>To get rid of this message, set "install-extension-dummy" option to false</warning>');
             $io->writeError('<warning>in "extra -> helhum/typo3-console" section of root composer.json</warning>');
+            $io->writeError('<warning>you might use the following command to set the parameter:</warning>');
+            $io->writeError('<warning>composer config extra.helhum/typo3-console.install-extension-dummy false</warning>');
 
             $extResourcesDir = __DIR__ . '/../../../Resources/Private/ExtensionArtifacts';
             $resources = [
