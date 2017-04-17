@@ -84,7 +84,7 @@ class UpgradeCommandController extends CommandController
      */
     public function allCommand(array $arguments = [], $verbose = false)
     {
-        $this->outputLine('<i>Initiating TYPO3 upgrade</i>' . PHP_EOL);
+        $this->outputLine(PHP_EOL . '<i>Initiating TYPO3 upgrade</i>' . PHP_EOL);
 
         $results = $this->upgradeHandling->executeAll($arguments, $this->output);
 
