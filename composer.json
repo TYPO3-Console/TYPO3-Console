@@ -96,7 +96,7 @@
             "rm -rf Tests/",
             "rm .gitattributes",
             "rm .gitignore",
-            "rm .php_cs",
+            "rm .php_cs.dist",
             "rm .travis.yml"
         ],
         "extension-clean": [
