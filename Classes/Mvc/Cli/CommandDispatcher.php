@@ -146,13 +146,13 @@ class CommandDispatcher
                 $dashedName = preg_replace('/([A-Z][a-z0-9]+)/', '$1-', $dashedName);
                 $dashedName = '--' . strtolower(substr($dashedName, 0, -1));
             }
-            $processBuilder->add($dashedName);
             if ($argumentValue !== null) {
                 if ($argumentValue === false) {
                     // Convert boolean false to 'false' instead of empty string to correctly pass the value to the sub command
+                    $processBuilder->add($dashedName);
                     $processBuilder->add('false');
                 } else {
-                    $processBuilder->add($argumentValue);
+                    $processBuilder->add($dashedName . '=' . $argumentValue);
                 }
             }
         }

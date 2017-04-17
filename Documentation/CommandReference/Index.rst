@@ -16,7 +16,7 @@ Command Reference
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2017-04-06 15:25:57
+The following reference was automatically generated from code on 2017-04-17 20:07:34
 
 
 .. _`Command Reference: typo3_console`:
@@ -894,6 +894,81 @@ Options
   Uid of the task that should be executed (instead of all scheduled tasks)
 ``--force``
   The execution can be forced with this flag. The task will then be executed even if it is not scheduled for execution yet. Only works, when a task is specified.
+
+
+
+
+
+.. _`Command Reference: typo3_console upgrade:all`:
+
+``upgrade:all``
+***************
+
+**Execute all upgrade wizards that are scheduled for execution**
+
+
+
+
+
+Options
+^^^^^^^
+
+``--arguments``
+  Arguments for the wizard prefixed with the identifier, e.g. ``compatibility7Extension[install]=0``; multiple arguments separated with comma
+``--verbose``
+  If set, output of the wizards will be shown, including all SQL Queries that were executed
+
+
+
+
+
+.. _`Command Reference: typo3_console upgrade:list`:
+
+``upgrade:list``
+****************
+
+**List upgrade wizards**
+
+
+
+
+
+Options
+^^^^^^^
+
+``--verbose``
+  If set, a more verbose description for each wizard is shown, if not set only the title is shown
+``--all``
+  If set, all wizards will be listed, even the once marked as ready or done
+
+
+
+
+
+.. _`Command Reference: typo3_console upgrade:wizard`:
+
+``upgrade:wizard``
+******************
+
+**Execute a single upgrade wizard**
+
+
+
+Arguments
+^^^^^^^^^
+
+``--identifier``
+  Identifier of the wizard that should be executed
+
+
+
+Options
+^^^^^^^
+
+``--arguments``
+  Arguments for the wizard prefixed with the identifier, e.g. ``compatibility7Extension[install]=0``
+``--force``
+  Force execution, even if the wizard has been marked as done
 
 
 

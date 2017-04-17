@@ -90,7 +90,7 @@ class InstallCommandController extends CommandController
         $this->cliSetupRequestHandler->setup(!$nonInteractive, $this->request->getArguments());
 
         $this->outputLine();
-        $this->outputLine('Successfully installed TYPO3 CMS!');
+        $this->outputLine('<i>Successfully installed TYPO3 CMS!</i>');
     }
 
     /**

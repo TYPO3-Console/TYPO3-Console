@@ -71,9 +71,9 @@ class GeneratePackageStates implements InstallerScriptInterface
             'frameworkExtensions' => (string)getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS'),
         ];
         if (getenv('TYPO3_ACTIVATE_DEFAULT_FRAMEWORK_EXTENSIONS')) {
-            $commandOptions['activateDefault'] = null;
+            $commandOptions['activateDefault'] = true;
         }
-        if ($event->isDevMode()) {
+        if ($event->isDevMode() && getenv('TYPO3_EXCLUDED_EXTENSIONS')) {
             $commandOptions['excludedExtensions'] = (string)getenv('TYPO3_EXCLUDED_EXTENSIONS');
         }
         $output = $commandDispatcher->executeCommand('install:generatepackagestates', $commandOptions);

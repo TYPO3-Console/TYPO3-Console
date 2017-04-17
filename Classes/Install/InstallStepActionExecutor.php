@@ -37,6 +37,7 @@ class InstallStepActionExecutor
 
     /**
      * @param ObjectManager $objectManager
+     * @param SilentConfigurationUpgrade $silentConfigurationUpgrade
      */
     public function __construct(ObjectManager $objectManager, SilentConfigurationUpgrade $silentConfigurationUpgrade)
     {
