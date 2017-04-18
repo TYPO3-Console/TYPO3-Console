@@ -5,6 +5,7 @@
 /Configuration/Console/AllCommands.php
 /Libraries/*
 /ext_emconf.php
-/ext_icon.png
+/ext_icon.svg
+/Resources/Public/Icons/Extension.svg
 /ext_localconf.php
 /.php_cs.cache

@@ -75,7 +75,9 @@
             "Helhum\\Typo3Console\\Composer\\InstallerScripts::setVersion"
         ],
         "extension-copy-artifacts": [
-            "cp -f Resources/Private/ExtensionArtifacts/ext_* ."
+            "cp -f Resources/Private/ExtensionArtifacts/ext_* .",
+            "mkdir -p Resources/Public/Icons",
+            "cp -f ext_icon.svg Resources/Public/Icons/Extension.svg"
         ],
         "extension-create-libs": [
             "mkdir -p Libraries/temp",
@@ -100,7 +102,7 @@
             "rm .travis.yml"
         ],
         "extension-clean": [
-            "rm -rf Libraries",
+            "rm -rf Libraries Resources/Public/Icons",
             "rm -f ext_*"
         ]
     },
