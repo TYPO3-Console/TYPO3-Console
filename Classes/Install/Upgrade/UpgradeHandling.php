@@ -64,6 +64,7 @@ class UpgradeHandling
      */
     private static $wizardsWithArguments = [
         'DbalAndAdodbExtractionUpdate' => [['name' => 'install', 'type' => 'bool', 'default' => '0']],
+        'compatibility6Extension' => [['name' => 'install', 'type' => 'bool', 'default' => '0']],
         'compatibility7Extension' => [['name' => 'install', 'type' => 'bool', 'default' => '0']],
         'rtehtmlareaExtension' => [['name' => 'install', 'type' => 'bool', 'default' => '0']],
     ];
