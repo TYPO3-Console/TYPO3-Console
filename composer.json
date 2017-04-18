@@ -77,7 +77,7 @@
         "extension-copy-artifacts": [
             "cp -f Resources/Private/ExtensionArtifacts/ext_* .",
             "mkdir -p Resources/Public/Icons",
-            "cp -f ext_icon.svg Resources/Public/Icons/Extension.svg"
+            "cp -f ext_icon.png Resources/Public/Icons/Extension.png"
         ],
         "extension-create-libs": [
             "mkdir -p Libraries/temp",
