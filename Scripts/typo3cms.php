@@ -24,6 +24,10 @@ call_user_func(function () {
     if (file_exists($autoLoadFile = dirname(dirname(dirname(__DIR__))) . '/autoload.php')) {
         // Console is a dependency, thus located in vendor/helhum/typo3-console
         $classLoader = require $autoLoadFile;
+    } elseif (file_exists($autoLoadFile = realpath(($rootPath = dirname(dirname(dirname(dirname(__DIR__))))) . '/typo3') . '/../vendor/autoload.php')) {
+        // Console is extension, but TYPO3_PATH_ROOT was not set, because binary is symlinked, so set it here
+        putenv('TYPO3_PATH_ROOT=' . $rootPath);
+        $classLoader = require $autoLoadFile;
     } elseif (file_exists($autoLoadFile = realpath(getenv('TYPO3_PATH_ROOT') . '/typo3') . '/../vendor/autoload.php')) {
         // Console is extension, this TYPO3_PATH_ROOT was set in typo3cms script, which is located in TYPO3 root
         $classLoader = require $autoLoadFile;
