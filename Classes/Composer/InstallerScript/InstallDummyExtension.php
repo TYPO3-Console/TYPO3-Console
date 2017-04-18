@@ -60,7 +60,7 @@ class InstallDummyExtension implements InstallerScriptInterface
 
             $extResourcesDir = __DIR__ . '/../../../Resources/Private/ExtensionArtifacts';
             $resources = [
-                'ext_icon.png',
+                'ext_icon.svg',
                 'ext_emconf.php',
             ];
             foreach ($resources as $resource) {
