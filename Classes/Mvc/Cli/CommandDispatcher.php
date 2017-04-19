@@ -146,13 +146,20 @@ class CommandDispatcher
                 $dashedName = preg_replace('/([A-Z][a-z0-9]+)/', '$1-', $dashedName);
                 $dashedName = '--' . strtolower(substr($dashedName, 0, -1));
             }
-            if ($argumentValue !== null) {
-                if ($argumentValue === false) {
-                    // Convert boolean false to 'false' instead of empty string to correctly pass the value to the sub command
-                    $processBuilder->add($dashedName);
-                    $processBuilder->add('false');
-                } else {
-                    $processBuilder->add($dashedName . '=' . $argumentValue);
+            if (strpos($argumentValue, '=') !== false) {
+                // Big WTF in argument parsing here
+                // If the value contains a = we need to separate the name and value with a = ourselves
+                // to get the parser to correctly read our value
+                $processBuilder->add($dashedName . '=' . $argumentValue);
+            } else {
+                $processBuilder->add($dashedName);
+                if ($argumentValue !== null) {
+                    if ($argumentValue === false) {
+                        // Convert boolean false to 'false' instead of empty string to correctly pass the value to the sub command
+                        $processBuilder->add('false');
+                    } else {
+                        $processBuilder->add($argumentValue);
+                    }
                 }
             }
         }
