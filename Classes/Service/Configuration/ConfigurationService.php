@@ -269,8 +269,7 @@ class ConfigurationService implements SingletonInterface
     /**
      * @return array
      */
-    protected function getMergedConfiguration()
-    {
+    protected function getMergedConfiguration() {
         $mergedConfig = $this->configurationManager->getDefaultConfiguration();
         ArrayUtility::mergeRecursiveWithOverrule($mergedConfig, $this->configurationManager->getLocalConfiguration());
         return $mergedConfig;
