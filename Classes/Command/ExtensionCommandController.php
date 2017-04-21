@@ -132,6 +132,24 @@ class ExtensionCommandController extends CommandController
     }
 
     /**
+     * Remove extension(s)
+     *
+     * Deletes the extension directory and removes the entry from PackageStates.php.
+     */
+    public function removeCommand(array $extensionKeys)
+    {
+        foreach ($extensionKeys as $extensionKey) {
+            $this->extensionInstaller->removeExtension($extensionKey);
+        }
+        $extensionKeysAsString = implode('", "', $extensionKeys);
+        if (count($extensionKeys) === 1) {
+            $this->outputLine('<info>Extension "%s" is now removed.</info>', [$extensionKeysAsString]);
+        } else {
+            $this->outputLine('<info>Extensions "%s" are now removed.</info>', [$extensionKeysAsString]);
+        }
+    }
+
+    /**
      * Set up extension(s)
      *
      * Sets up one or more extensions by key.
