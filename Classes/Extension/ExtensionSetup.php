@@ -46,11 +46,16 @@ class ExtensionSetup
     public function __construct(
         ExtensionFactory $extensionFactory = null,
         InstallUtility $extensionInstaller = null,
+        ExtensionSetupRenderer $extensionSetupRenderer = null,
         SchemaService $schemaService = null
     ) {
         $this->extensionFactory = $extensionFactory ?: new ExtensionFactory(GeneralUtility::makeInstance(PackageManager::class));
         $this->extensionInstaller = $extensionInstaller ?: GeneralUtility::makeInstance(ObjectManager::class)->get(InstallUtility::class);
         $this->schemaService = $schemaService ?: GeneralUtility::makeInstance(ObjectManager::class)->get(SchemaService::class);
+
+        if ($extensionSetupRenderer !== null) {
+            $extensionSetupRenderer->activateSignalSlots();
+        }
     }
 
     /**
