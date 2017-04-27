@@ -16,7 +16,7 @@ Command Reference
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2017-04-27 13:24:04
+The following reference was automatically generated from code on 2017-04-27 13:33:42
 
 
 .. _`Command Reference: typo3_console`:
@@ -935,6 +935,31 @@ Options
   Arguments for the wizard prefixed with the identifier, e.g. ``compatibility7Extension[install]=0``; multiple arguments separated with comma
 ``--verbose``
   If set, output of the wizards will be shown, including all SQL Queries that were executed
+
+
+
+
+
+.. _`Command Reference: typo3_console upgrade:checkextensionconstraints`:
+
+``upgrade:checkextensionconstraints``
+*************************************
+
+**Check TYPO3 version constraints of extensions**
+
+This command is especially useful **before** switching sources to a new TYPO3 version.
+I checks the version constraints of all third party extensions against a given TYPO3 version.
+It therefore relies on the constraints to be correct.
+
+
+
+Options
+^^^^^^^
+
+``--extension-keys``
+  Extension keys to check. Separate multiple extension keys with comma.
+``--typo3-version``
+  TYPO3 version to check against. Defaults to current TYPO3 version.
 
 
 

@@ -13,34 +13,80 @@ namespace Helhum\Typo3Console\Command;
  *
  */
 
+use Helhum\Typo3Console\Extension\ExtensionConstraintCheck;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeHandling;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardListRenderer;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardResultRenderer;
-use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use TYPO3\CMS\Core\Package\Exception\UnknownPackageException;
+use TYPO3\CMS\Core\Package\PackageManager;
 
 class UpgradeCommandController extends CommandController
 {
+    /**
+     * @var PackageManager
+     */
+    private $packageManager;
+
     /**
      * @var UpgradeHandling
      */
     private $upgradeHandling;
 
     /**
-     * @var CommandDispatcher
-     */
-    private $commandDispatcher;
-
-    /**
+     * @param PackageManager $packageManager
      * @param UpgradeHandling|null $upgradeHandling
-     * @param CommandDispatcher|null $commandDispatcher
      */
     public function __construct(
-        UpgradeHandling $upgradeHandling = null,
-        CommandDispatcher $commandDispatcher = null
+        PackageManager $packageManager,
+        UpgradeHandling $upgradeHandling = null
     ) {
+        $this->packageManager = $packageManager;
         $this->upgradeHandling = $upgradeHandling ?: new UpgradeHandling();
-        $this->commandDispatcher = $commandDispatcher ?: CommandDispatcher::createFromCommandRun();
+    }
+
+    /**
+     * Check TYPO3 version constraints of extensions
+     *
+     * This command is especially useful **before** switching sources to a new TYPO3 version.
+     * I checks the version constraints of all third party extensions against a given TYPO3 version.
+     * It therefore relies on the constraints to be correct.
+     *
+     * @param array $extensionKeys Extension keys to check. Separate multiple extension keys with comma.
+     * @param string $typo3Version TYPO3 version to check against. Defaults to current TYPO3 version.
+     */
+    public function checkExtensionConstraintsCommand(array $extensionKeys = [], $typo3Version = TYPO3_version)
+    {
+        $this->packageManager->scanAvailablePackages();
+        if (empty($extensionKeys)) {
+            $packagesToCheck = $this->packageManager->getActivePackages();
+        } else {
+            $packagesToCheck = [];
+            foreach ($extensionKeys as $extensionKey) {
+                try {
+                    $packagesToCheck[] = $this->packageManager->getPackage($extensionKey);
+                } catch (UnknownPackageException $e) {
+                    $this->outputLine('<warning>Extension "%s" is not found in the system</warning>', [$extensionKey]);
+                }
+            }
+        }
+        $extensionConstraintCheck = new ExtensionConstraintCheck();
+        $checkFailed = false;
+        foreach ($packagesToCheck as $package) {
+            if (strpos($package->getPackagePath(), 'typo3conf/ext') === false) {
+                continue;
+            }
+            $constraintMessage = $extensionConstraintCheck->matchConstraints($package, $typo3Version);
+            if (!empty($constraintMessage)) {
+                $this->outputLine('<error>%s</error>', [$constraintMessage]);
+                $checkFailed = true;
+            }
+        }
+        if (!$checkFailed) {
+            $this->outputLine('<info>All third party extensions claim to be compatible with TYPO3 version %s</info>', [$typo3Version]);
+        } else {
+            $this->quit(1);
+        }
     }
 
     /**
