@@ -16,7 +16,7 @@ Command Reference
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
-The following reference was automatically generated from code on 2017-04-17 20:07:34
+The following reference was automatically generated from code on 2017-04-27 13:24:04
 
 
 .. _`Command Reference: typo3_console`:
@@ -563,6 +563,12 @@ Arguments
 
 
 
+Options
+^^^^^^^
+
+``--verbose``
+  Whether or not to output results
+
 
 
 
@@ -677,6 +683,12 @@ Arguments
 
 
 
+Options
+^^^^^^^
+
+``--verbose``
+  Whether or not to output results
+
 
 
 
@@ -697,6 +709,12 @@ As an additional benefit no caches are flushed, which significantly improves per
 and avoids unnecessary cache clearing.
 
 
+
+Options
+^^^^^^^
+
+``--verbose``
+  Whether or not to output results
 
 
 
