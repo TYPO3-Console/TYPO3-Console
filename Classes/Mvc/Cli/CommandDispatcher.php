@@ -100,6 +100,25 @@ class CommandDispatcher
     }
 
     /**
+     * Useful for creating the object during the runtime of a test
+     *
+     * Just use the method without arguments for best results
+     *
+     * @param ProcessBuilder $processBuilder
+     * @param PhpExecutableFinder $phpFinder
+     * @throws \RuntimeException
+     * @return self
+     */
+    public static function createFromTestRun(ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
+    {
+        if (!isset($_SERVER['argv'][0]) && strpos($_SERVER['argv'][0], 'phpunit') === false) {
+            throw new \RuntimeException('Tried to create typo3cms command runner from wrong context', 1493570522);
+        }
+        $typo3cmsCommandPath = dirname(dirname(dirname(__DIR__))) . '/Scripts/typo3cms';
+        return self::create($typo3cmsCommandPath, $processBuilder, $phpFinder);
+    }
+
+    /**
      * Basic factory method, which need the exact path to the typo3cms binary to create the dispatcher
      *
      * @param string $typo3cmsCommandPath Absolute path to the typo3cms binary
@@ -127,16 +146,18 @@ class CommandDispatcher
      * @param string $command Command identifier
      * @param array $arguments Argument names will automatically be converted to dashed version, fi not provided like so
      * @param array $environment Environment vars to be added to the command
+     * @param resource|string|\Traversable|null $input Inpupt (stdin) for the command
      * @throws FailedSubProcessCommandException
-     * @return string Output of the executed command
+     * @return string
      */
-    public function executeCommand($command, array $arguments = [], array $environment = [])
+    public function executeCommand($command, array $arguments = [], array $environment = [], $input = null)
     {
         // We need to clone the builder to be able to re-use the object for multiple commands
         $processBuilder = clone $this->processBuilder;
 
         $processBuilder->add($command);
         $processBuilder->addEnvironmentVariables($environment);
+        $processBuilder->setInput($input);
 
         foreach ($arguments as $argumentName => $argumentValue) {
             if (strpos($argumentName, '--') === 0) {

@@ -170,7 +170,7 @@ class CacheService implements SingletonInterface
         $sanitizedGroups = array_intersect($groups, $validGroups);
         if (count($sanitizedGroups) !== count($groups)) {
             $invalidGroups = array_diff($groups, $sanitizedGroups);
-            throw new NoSuchCacheGroupException('Invalid cache groups "' . implode(', ', $invalidGroups) . '"', 1399630162);
+            throw new NoSuchCacheGroupException('Invalid cache groups "' . implode(', ', $invalidGroups) . '".', 1399630162);
         }
     }
 
