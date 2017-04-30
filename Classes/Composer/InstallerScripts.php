@@ -84,5 +84,10 @@ class InstallerScripts
         $content = file_get_contents($helpCommandFile);
         $content = preg_replace('/(private \$version = )\'\d+\.\d+\.\d+/', '$1\'' . $version, $content);
         file_put_contents($helpCommandFile, $content);
+
+        $travisYmlFile = __DIR__ . '/../../.travis.yml';
+        $content = file_get_contents($travisYmlFile);
+        $content = preg_replace('/(export COMPOSER_ROOT_VERSION)=\d+\.\d+\.\d+/', '$1=' . $version, $content);
+        file_put_contents($travisYmlFile, $content);
     }
 }
