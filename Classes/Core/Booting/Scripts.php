@@ -224,6 +224,7 @@ class Scripts
             // @deprecated since TYPO3 8.x will be removed once TYPO3 7.6 support is removed
             self::registerImplementation(\Helhum\Typo3Console\Database\Schema\SchemaUpdateInterface::class, \Helhum\Typo3Console\Database\Schema\LegacySchemaUpdate::class);
         }
+        self::overrideImplementation(\TYPO3\CMS\Extbase\Command\HelpCommandController::class, \Helhum\Typo3Console\Command\HelpCommandController::class);
         self::overrideImplementation(\TYPO3\CMS\Extbase\Mvc\Cli\Command::class, \Helhum\Typo3Console\Mvc\Cli\Command::class);
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerTypeConverter(\Helhum\Typo3Console\Property\TypeConverter\ArrayConverter::class);
     }

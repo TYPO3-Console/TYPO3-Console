@@ -184,8 +184,6 @@ class HelpCommandController extends CommandController
      */
     public function errorCommand(\TYPO3\CMS\Extbase\Mvc\Exception\CommandException $exception)
     {
-        $this->outputLine('<info>TYPO3 Console</info> version <comment>%s</comment>', [\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getExtensionVersion('typo3_console')]);
-        $this->outputLine();
         $this->outputLine('<error>%s</error>', [$exception->getMessage()]);
         if ($exception instanceof \TYPO3\CMS\Extbase\Mvc\Exception\AmbiguousCommandIdentifierException) {
             $this->outputLine('Please specify the complete command identifier. Matched commands:');
@@ -193,9 +191,10 @@ class HelpCommandController extends CommandController
                 $this->outputLine('    %s', [$matchingCommand->getCommandIdentifier()]);
             }
         }
-        $this->outputLine('');
+        $this->outputLine();
         $this->outputLine('See <info>help</info> for an overview of all available commands');
         $this->outputLine('or <info>help</info> <command> for a detailed description of the corresponding command.');
+        $this->quit(1);
     }
 
     /**

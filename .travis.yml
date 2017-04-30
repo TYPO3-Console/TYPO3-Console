@@ -44,6 +44,7 @@ notifications:
 before_install:
   - echo $TRAVIS_PHP_VERSION
   - if php -i | grep -q xdebug; then phpenv config-rm xdebug.ini; fi
+  - wget https://raw.github.com/lehmannro/assert.sh/v1.1/assert.sh && source assert.sh -v -x && rm assert.sh
 
 before_script:
   - >
@@ -75,6 +76,7 @@ script:
     if [ -n "$TRAVIS_TAG" ]; then
       typo3cms | grep $TRAVIS_TAG
     fi
+  - assert_raises "typo3cms foo" 1
   - typo3cms help && [ ! -f "$TYPO3_PATH_ROOT/typo3conf/PackageStates.php" ]
   - typo3cms install:setup --non-interactive --database-user-name="root" --database-host-name="localhost" --database-port="3306" --database-name="travis_test" --admin-user-name="admin" --admin-password="password" --site-name="Travis Install" --site-setup-type="createsite"
   - echo 'select uid,title from pages limit 1' | typo3cms database:import | sed 's/[[:blank:]]//g' | grep 1Home
