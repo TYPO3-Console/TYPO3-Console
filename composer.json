@@ -39,7 +39,7 @@
         "symfony/process": "^2.7 || ^3.0"
     },
     "require-dev": {
-        "typo3-console/create-reference-command": "1.0.*@dev",
+        "typo3-console/create-reference-command": "^1.0",
         "typo3/cms": "^8.7",
         "symfony/filesystem": "^3.2",
         "nimut/testing-framework": "^1.0",
