@@ -42,7 +42,11 @@ notifications:
     - helmut@typo3.org
 
 before_install:
-  - export COMPOSER_ROOT_VERSION=4.5.3
+  - |
+    export COMPOSER_ROOT_VERSION=4.5.3
+    export CONSOLE_ROOT="$PWD"
+    export TYPO3_PATH_ROOT="$CONSOLE_ROOT/.Build/Web"
+    export PATH="$PATH:./Scripts"
   - if php -i | grep -q xdebug; then phpenv config-rm xdebug.ini; fi
   - wget https://raw.github.com/lehmannro/assert.sh/v1.1/assert.sh && source assert.sh -v -x && rm assert.sh
 
@@ -52,85 +56,19 @@ before_script:
       composer set-version $TRAVIS_TAG
       # If this fails, we forgot to update version numbers before tagging the release
       test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
+      typo3cms | grep $TRAVIS_TAG
     fi
   - composer extension-create-libs && ls -la Libraries/*.phar | grep -v ^-rwx
   - git clean -dffx
   - composer require typo3/cms="$TYPO3_VERSION"
-  - export TYPO3_PATH_ROOT="$PWD/.Build/Web"
-  - export PATH="$PATH:./Scripts"
 
 script:
   - >
-    echo;
-    echo "Running unit tests";
-    .Build/bin/phpunit -c .Build/vendor/nimut/testing-framework/res/Configuration/UnitTests.xml Tests/Unit/
-  - >
-    echo;
     echo "Running php lint";
-    find . -name \*.php ! -path "./.Build/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;
-
-  # Basic functional tests - all commands should exit with 0
+    find . -name \*.php ! -path "./.Build/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;;
   - >
-    if [ -n "$TRAVIS_TAG" ]; then
-      typo3cms | grep $TRAVIS_TAG
-    fi
-  - assert_raises "typo3cms foo" 1
-  - typo3cms help && [ ! -f "$TYPO3_PATH_ROOT/typo3conf/PackageStates.php" ]
-  - typo3cms install:setup --non-interactive --database-user-name="root" --database-host-name="localhost" --database-port="3306" --database-name="travis_test" --admin-user-name="admin" --admin-password="password" --site-name="Travis Install" --site-setup-type="createsite"
-  - echo 'select uid,title from pages limit 1' | typo3cms database:import | sed 's/[[:blank:]]//g' | grep 1Home
-  - chmod ugo-w $TYPO3_PATH_ROOT/typo3conf/LocalConfiguration.php && typo3cms extension:setupactive && chmod ug+w $TYPO3_PATH_ROOT/typo3conf/LocalConfiguration.php
-  - typo3cms help
-  - typo3cms help:autocomplete
-  - typo3cms help:autocomplete bash
-  - typo3cms help:autocomplete zsh
-  - typo3cms backend:lock
-  - typo3cms backend:lock
-  - typo3cms backend:unlock
-  - typo3cms backend:unlock
-  - typo3cms backend:lockforeditors
-  - typo3cms backend:lockforeditors
-  - typo3cms backend:unlockforeditors
-  - typo3cms backend:unlockforeditors
-  - typo3cms cache:flush
-  - typo3cms cache:flushgroups pages
-  - typo3cms cache:flushtags foo
-  - typo3cms cache:flushtags foo pages
-  - typo3cms cache:listgroups
-  - typo3cms cleanup:updatereferenceindex
-  - typo3cms database:updateschema "*" --verbose --dry-run
-  - typo3cms database:updateschema --verbose
-  - typo3cms database:updateschema "*" --verbose
-  - typo3cms database:export > travis_test.sql
-  - test $(typo3cms database:export --exclude-tables sys_log | grep "CREATE TABLE" | grep -c sys_log) -eq 0
-  - echo "SELECT username from be_users where admin=1;" | typo3cms database:import
-  - echo "DROP DATABASE travis_test;" | typo3cms database:import
-  - echo "CREATE DATABASE travis_test;" | mysql -uroot && cat travis_test.sql | typo3cms database:import
-  - typo3cms database:updateschema "*" --verbose
-  - typo3cms frontend:request / > /dev/null
-  - typo3cms documentation:generatexsd TYPO3\\CMS\\Fluid\\ViewHelpers > /dev/null
-  - typo3cms configuration:show BE/installToolPassword
-  - typo3cms configuration:showLocal BE/installToolPassword
-  - typo3cms configuration:showActive BE/installToolPassword
-  - typo3cms configuration:set BE/installToolPassword foobar && grep installToolPassword $TYPO3_PATH_ROOT/typo3conf/LocalConfiguration.php | grep foobar
-  - typo3cms configuration:remove BE/installToolPassword --force && grep -qv installToolPassword $TYPO3_PATH_ROOT/typo3conf/LocalConfiguration.php
-  - typo3cms configuration:set BE/installToolPassword blablupp && grep installToolPassword $TYPO3_PATH_ROOT/typo3conf/LocalConfiguration.php | grep blablupp
-  - typo3cms configuration:set EXTCONF/lang/availableLanguages/1 fr_FR && grep fr_FR $TYPO3_PATH_ROOT/typo3conf/LocalConfiguration.php
-  - typo3cms configuration:set EXTCONF/foo/bar baz && grep bar $TYPO3_PATH_ROOT/typo3conf/LocalConfiguration.php | grep baz
-  - rm -f $TYPO3_PATH_ROOT/typo3conf/PackageStates.php && typo3cms install:generatepackagestates --activate-default && [ -f "$TYPO3_PATH_ROOT/typo3conf/PackageStates.php" ]
-  - rm -f $TYPO3_PATH_ROOT/typo3conf/PackageStates.php && TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES=yes TYPO3_CONSOLE_TEST_SETUP=yes TYPO3_ACTIVATE_DEFAULT_FRAMEWORK_EXTENSIONS=yes composer dump-autoload -vv 2>&1 | grep 'generated PackageStates.php' && [ -f "$TYPO3_PATH_ROOT/typo3conf/PackageStates.php" ]
-  - grep sys_note "$TYPO3_PATH_ROOT/typo3conf/PackageStates.php"
-  - rm $TYPO3_PATH_ROOT/typo3temp/index.html && typo3cms install:fixfolderstructure && [ -f "$TYPO3_PATH_ROOT/typo3temp/index.html" ]
-  - typo3cms extension:list
-  - typo3cms extension:list --raw | grep extbase
-  - typo3cms extension:list --active --raw | grep extbase
-  - typo3cms extension:list --inactive --raw | tr '\n' ' ' | grep -v extbase
-  - cp -r Tests/Functional/Fixtures/ext_test .Build/Web/typo3conf/ext/
-  - typo3cms extension:activate ext_test && typo3cms cache:flush && typo3cms database:updateschema | grep 'No schema updates were performed'
-  - typo3cms extension:activate core && typo3cms database:updateschema | grep 'No schema updates were performed'
-  - typo3cms extension:setup core && typo3cms database:updateschema | grep 'No schema updates were performed'
-  - typo3cms extension:setupactive && typo3cms database:updateschema | grep 'No schema updates were performed'
-  - if typo3cms extension:list --raw | grep dbal; then typo3cms extension:activate adodb,dbal && typo3cms database:updateschema | grep 'No schema updates were performed'; fi
-  - typo3cms extension:removeinactive --force | grep 'The following directories have been removed'
+    echo "Running unit and functional tests…";
+    .Build/bin/phpunit;
 
 after_script:
   - >

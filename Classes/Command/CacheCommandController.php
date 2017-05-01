@@ -91,7 +91,7 @@ class CacheCommandController extends CommandController
     {
         try {
             $this->cacheService->flushGroups($groups);
-            $this->outputLine('Flushed all caches for group(s): "' . implode('","', $groups) . '"');
+            $this->outputLine('Flushed all caches for group(s): "' . implode('","', $groups) . '".');
         } catch (NoSuchCacheGroupException $e) {
             $this->outputLine($e->getMessage());
             $this->sendAndExit(1);
@@ -113,9 +113,9 @@ class CacheCommandController extends CommandController
         try {
             $this->cacheService->flushByTagsAndGroups($tags, $groups);
             if ($groups === null) {
-                $this->outputLine('Flushed caches by tags "' . implode('","', $tags) . '"');
+                $this->outputLine('Flushed caches by tags "' . implode('","', $tags) . '".');
             } else {
-                $this->outputLine('Flushed caches by tags "' . implode('","', $tags) . '" in groups: "' . implode('","', $groups) . '"');
+                $this->outputLine('Flushed caches by tags "' . implode('","', $tags) . '" in groups: "' . implode('","', $groups) . '".');
             }
         } catch (NoSuchCacheGroupException $e) {
             $this->outputLine($e->getMessage());

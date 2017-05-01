@@ -1,0 +1,28 @@
+<phpunit
+    backupGlobals="true"
+    backupStaticAttributes="false"
+    bootstrap=".Build/vendor/nimut/testing-framework/res/Configuration/UnitTestsBootstrap.php"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertWarningsToExceptions="true"
+    forceCoversAnnotation="false"
+    processIsolation="false"
+    stopOnError="false"
+    stopOnFailure="false"
+    stopOnIncomplete="false"
+    stopOnSkipped="false"
+    verbose="true"
+>
+    <testsuites>
+        <testsuite name="TYPO3 Console Unit Tests">
+            <directory>./Tests/Unit/*/</directory>
+        </testsuite>
+        <testsuite name="TYPO3 Console Install Command Tests">
+            <directory>./Tests/Functional/Command/Install/</directory>
+        </testsuite>
+        <testsuite name="TYPO3 Console all Command Tests">
+            <directory>./Tests/Functional/*/</directory>
+            <exclude>./Tests/Functional/Command/Install/</exclude>
+        </testsuite>
+    </testsuites>
+</phpunit>

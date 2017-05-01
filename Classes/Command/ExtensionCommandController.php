@@ -298,7 +298,7 @@ class ExtensionCommandController extends CommandController
         } else {
             $this->output->outputTable(
                 $extensionInformation,
-                ['Package key', 'Version', 'Description']
+                ['Extension key', 'Version', 'Description']
             );
         }
     }
