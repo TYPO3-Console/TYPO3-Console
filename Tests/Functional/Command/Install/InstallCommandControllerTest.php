@@ -129,7 +129,6 @@ class InstallCommandControllerTest extends AbstractCommandTest
         }
         $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
         @unlink($packageStatesFile);
-        chdir(dirname(dirname(dirname(dirname(__DIR__)))));
         $processBuilder = new ProcessBuilder();
         $processBuilder->setEnv('TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES', 'yes');
         $processBuilder->setEnv('TYPO3_CONSOLE_TEST_SETUP', 'yes');
@@ -137,6 +136,8 @@ class InstallCommandControllerTest extends AbstractCommandTest
         $processBuilder->setPrefix('composer');
         $processBuilder->add('dump-autoload');
         $processBuilder->add('-vv');
+        $processBuilder->add('-d');
+        $processBuilder->add(dirname(dirname(dirname(dirname(__DIR__)))));
         $composerProcess = $processBuilder->getProcess();
         $composerProcess->run();
         $this->assertTrue($composerProcess->isSuccessful());

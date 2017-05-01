@@ -51,15 +51,14 @@ install:
   - IF NOT EXIST php-installed.txt appveyor DownloadFile https://getcomposer.org/composer.phar
   - IF NOT EXIST php-installed.txt echo @php %%~dp0composer.phar %%* > composer.bat
   - IF NOT EXIST php-installed.txt type nul >> php-installed.txt
+
   - cd c:\t3c
   - composer require "typo3/cms=%TYPO3_VERSION%" --prefer-dist --no-progress --ansi
-#  - RMDIR c:\t3c\.Build\Web\typo3
+  - RMDIR %TYPO3_PATH_ROOT%\typo3
+  - mklink /d %TYPO3_PATH_ROOT%\typo3 ..\vendor\typo3\cms\typo3
+  - DIR %TYPO3_PATH_ROOT%
 #  - robocopy c:\t3c\.Build\vendor\typo3\cms\typo3 c:\t3c\.Build\Web\typo3 /s /e > NUL
 
 test_script:
   - cd c:\t3c
-  - echo %TYPO3_PATH_ROOT%
-  - SET TYPO3_PATH_ROOT=c:\t3c\.Build\Web
-  - echo %TYPO3_PATH_ROOT%
-  - DIR %TYPO3_PATH_ROOT%
   - .Build\bin\phpunit
