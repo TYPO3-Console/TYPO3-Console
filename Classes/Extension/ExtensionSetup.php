@@ -23,9 +23,6 @@ use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extensionmanager\Utility\InstallUtility;
 
-/**
- * Class ExtensionSetup
- */
 class ExtensionSetup
 {
     /**
