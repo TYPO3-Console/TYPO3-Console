@@ -55,20 +55,24 @@ before_script:
     if [ -n "$TRAVIS_TAG" ]; then
       composer set-version $TRAVIS_TAG
       # If this fails, we forgot to update version numbers before tagging the release
-      test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
-      typo3cms | grep $TRAVIS_TAG
+      assert "git diff --shortstat 2> /dev/null | tail -n1" "";
     fi
   - composer extension-create-libs && ls -la Libraries/*.phar | grep -v ^-rwx
   - git clean -dffx
   - composer require typo3/cms="$TYPO3_VERSION"
+  - git checkout composer.json
 
 script:
   - >
-    echo "Running php lint";
+    echo "Running php lint…";
     find . -name \*.php ! -path "./.Build/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;;
   - >
     echo "Running unit and functional tests…";
     .Build/bin/phpunit;
+  - >
+    echo "Checking command reference completeness…"
+    typo3cms commandreference:render;
+    assert "git diff 2> /dev/null" "";
 
 after_script:
   - >
