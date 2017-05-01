@@ -14,7 +14,7 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Helhum\Typo3Console\Extension\ExtensionSetup;
-use Helhum\Typo3Console\Extension\ExtensionSetupRenderer;
+use Helhum\Typo3Console\Extension\ExtensionSetupResultRenderer;
 use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Core\Bootstrap;
@@ -164,17 +164,11 @@ class ExtensionCommandController extends CommandController
      */
     private function setupExtensions(array $packages, $verbose = false)
     {
-        $extensionSetupRenderer = null;
-        if ($verbose) {
-            $extensionSetupRenderer = new ExtensionSetupRenderer(
-                $this->output,
-                $this->signalSlotDispatcher
-            );
-        }
+        $extensionSetupResultRenderer = new ExtensionSetupResultRenderer($this->signalSlotDispatcher);
+
         $extensionSetup = new ExtensionSetup(
             new ExtensionFactory($this->packageManager),
-            $this->extensionInstaller,
-            $extensionSetupRenderer
+            $this->extensionInstaller
         );
 
         $extensionSetup->setupExtensions($packages);
@@ -185,6 +179,14 @@ class ExtensionCommandController extends CommandController
             $this->outputLine('<info>Extension "%s" is now set up.</info>', [$extensionKeysAsString]);
         } else {
             $this->outputLine('<info>Extensions "%s" are now set up.</info>', [$extensionKeysAsString]);
+        }
+
+        if ($verbose) {
+            $this->outputLine();
+            $extensionSetupResultRenderer->renderSchemaResult($this->output);
+            $extensionSetupResultRenderer->renderExtensionDataImportResult($this->output);
+            $extensionSetupResultRenderer->renderExtensionFileImportResult($this->output);
+            $extensionSetupResultRenderer->renderImportedStaticDataResult($this->output);
         }
     }
 
