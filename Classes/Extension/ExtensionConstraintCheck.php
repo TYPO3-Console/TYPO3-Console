@@ -13,7 +13,7 @@ namespace Helhum\Typo3Console\Extension;
  *
  */
 
-use TYPO3\CMS\Core\Package\Package;
+use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
@@ -23,18 +23,33 @@ use TYPO3\CMS\Extensionmanager\Utility\EmConfUtility;
 class ExtensionConstraintCheck
 {
     /**
-     * @param Package $package
+     * @var EmConfUtility
+     */
+    private $emConfUtility;
+
+    /**
+     * ExtensionConstraintCheck constructor.
+     *
+     * @param EmConfUtility|null $emConfUtility
+     */
+    public function __construct(EmConfUtility $emConfUtility = null)
+    {
+        $this->emConfUtility = $emConfUtility ?: new EmConfUtility();
+    }
+
+    /**
+     * @param PackageInterface $package
      * @param string $typo3Version
      * @return string
      */
-    public function matchConstraints(Package $package, $typo3Version = TYPO3_version)
+    public function matchConstraints(PackageInterface $package, $typo3Version)
     {
         $message = '';
         $extension = [
             'key' => $package->getPackageKey(),
             'siteRelPath' => PathUtility::stripPathSitePrefix($package->getPackagePath()),
         ];
-        $extConf = (new EmConfUtility())->includeEmConf($extension);
+        $extConf = $this->emConfUtility->includeEmConf($extension);
         if (!empty($extConf['constraints']['depends']['typo3'])) {
             $versions = VersionNumberUtility::convertVersionsStringToVersionNumbers($extConf['constraints']['depends']['typo3']);
             $t3version = preg_replace('/-?(dev|alpha|beta|RC).*$/', '', $typo3Version);
@@ -62,5 +77,25 @@ class ExtensionConstraintCheck
             }
         }
         return $message;
+    }
+
+    /**
+     * @param PackageInterface[] $packages
+     * @param string $typo3Version
+     * @return array
+     */
+    public function matchAllConstraints(array $packages, $typo3Version)
+    {
+        $failedPackageMessages = [];
+        foreach ($packages as $package) {
+            if (strpos($package->getPackagePath(), 'typo3conf/ext') === false) {
+                continue;
+            }
+            $constraintMessage = $this->matchConstraints($package, $typo3Version);
+            if (!empty($constraintMessage)) {
+                $failedPackageMessages[$package->getPackageKey()] = $constraintMessage;
+            }
+        }
+        return $failedPackageMessages;
     }
 }

@@ -13,35 +13,26 @@ namespace Helhum\Typo3Console\Command;
  *
  */
 
-use Helhum\Typo3Console\Extension\ExtensionConstraintCheck;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeHandling;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardListRenderer;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardResultRenderer;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Package\Exception\UnknownPackageException;
-use TYPO3\CMS\Core\Package\PackageManager;
+use TYPO3\CMS\Install\Controller\Action\Ajax\ExtensionCompatibilityTester;
 
 class UpgradeCommandController extends CommandController
 {
-    /**
-     * @var PackageManager
-     */
-    private $packageManager;
-
     /**
      * @var UpgradeHandling
      */
     private $upgradeHandling;
 
     /**
-     * @param PackageManager $packageManager
      * @param UpgradeHandling|null $upgradeHandling
      */
     public function __construct(
-        PackageManager $packageManager,
         UpgradeHandling $upgradeHandling = null
     ) {
-        $this->packageManager = $packageManager;
         $this->upgradeHandling = $upgradeHandling ?: new UpgradeHandling();
     }
 
@@ -57,32 +48,24 @@ class UpgradeCommandController extends CommandController
      */
     public function checkExtensionConstraintsCommand(array $extensionKeys = [], $typo3Version = TYPO3_version)
     {
-        $this->packageManager->scanAvailablePackages();
         if (empty($extensionKeys)) {
-            $packagesToCheck = $this->packageManager->getActivePackages();
+            $failedPackageMessages = $this->upgradeHandling->matchAllExtensionConstraints($typo3Version);
         } else {
-            $packagesToCheck = [];
+            $failedPackageMessages = [];
             foreach ($extensionKeys as $extensionKey) {
                 try {
-                    $packagesToCheck[] = $this->packageManager->getPackage($extensionKey);
+                    if (!empty($result = $this->upgradeHandling->matchExtensionConstraints($extensionKey, $typo3Version))) {
+                        $failedPackageMessages[$extensionKey] = $result;
+                    }
                 } catch (UnknownPackageException $e) {
                     $this->outputLine('<warning>Extension "%s" is not found in the system</warning>', [$extensionKey]);
                 }
             }
         }
-        $extensionConstraintCheck = new ExtensionConstraintCheck();
-        $checkFailed = false;
-        foreach ($packagesToCheck as $package) {
-            if (strpos($package->getPackagePath(), 'typo3conf/ext') === false) {
-                continue;
-            }
-            $constraintMessage = $extensionConstraintCheck->matchConstraints($package, $typo3Version);
-            if (!empty($constraintMessage)) {
-                $this->outputLine('<error>%s</error>', [$constraintMessage]);
-                $checkFailed = true;
-            }
+        foreach ($failedPackageMessages as $constraintMessage) {
+            $this->outputLine('<error>%s</error>', [$constraintMessage]);
         }
-        if (!$checkFailed) {
+        if (empty($failedPackageMessages)) {
             $this->outputLine('<info>All third party extensions claim to be compatible with TYPO3 version %s</info>', [$typo3Version]);
         } else {
             $this->quit(1);
@@ -97,7 +80,8 @@ class UpgradeCommandController extends CommandController
      */
     public function listCommand($verbose = false, $all = false)
     {
-        $wizards = $this->upgradeHandling->executeInSubProcess('listWizards');
+        $messages = [];
+        $wizards = $this->upgradeHandling->executeInSubProcess('listWizards', [], $messages);
 
         $listRenderer = new UpgradeWizardListRenderer();
         $this->outputLine('<comment>Wizards scheduled for execution:</comment>');
@@ -106,6 +90,10 @@ class UpgradeCommandController extends CommandController
         if ($all) {
             $this->outputLine(PHP_EOL . '<comment>Wizards marked as done:</comment>');
             $listRenderer->render($wizards['done'], $this->output, $verbose);
+        }
+        $this->outputLine();
+        foreach ($messages as $message) {
+            $this->outputLine($message);
         }
     }
 
@@ -118,8 +106,13 @@ class UpgradeCommandController extends CommandController
      */
     public function wizardCommand($identifier, array $arguments = [], $force = false)
     {
-        $result = $this->upgradeHandling->executeInSubProcess('executeWizard', [$identifier, $arguments, $force]);
+        $messages = [];
+        $result = $this->upgradeHandling->executeInSubProcess('executeWizard', [$identifier, $arguments, $force], $messages);
         (new UpgradeWizardResultRenderer())->render([$identifier => $result], $this->output);
+        $this->outputLine();
+        foreach ($messages as $message) {
+            $this->outputLine($message);
+        }
     }
 
     /**
@@ -132,7 +125,8 @@ class UpgradeCommandController extends CommandController
     {
         $this->outputLine(PHP_EOL . '<i>Initiating TYPO3 upgrade</i>' . PHP_EOL);
 
-        $results = $this->upgradeHandling->executeAll($arguments, $this->output);
+        $messages = [];
+        $results = $this->upgradeHandling->executeAll($arguments, $this->output, $messages);
 
         $this->outputLine(PHP_EOL . PHP_EOL . '<i>Successfully upgraded TYPO3 to version %s</i>', [TYPO3_version]);
 
@@ -140,6 +134,10 @@ class UpgradeCommandController extends CommandController
             $this->outputLine();
             $this->outputLine('<comment>Upgrade report:</comment>');
             (new UpgradeWizardResultRenderer())->render($results, $this->output);
+        }
+        $this->outputLine();
+        foreach ($messages as $message) {
+            $this->outputLine($message);
         }
     }
 
@@ -156,5 +154,21 @@ class UpgradeCommandController extends CommandController
         $arguments = unserialize($arguments);
         $result = call_user_func_array([$this->upgradeHandling, $command], $arguments);
         $this->output(serialize($result));
+    }
+
+    /**
+     * Checks for broken extensions
+     *
+     * This command in meant to be executed as sub process as it is is subject to cause fatal errors
+     * when extensions have broken (incompatible) code
+     *
+     * @param bool $force Needs to be set on first execution
+     * @internal
+     */
+    public function checkBrokenExtensionsCommand($force = false)
+    {
+        // Yeah, right. This class accesses super globals directly
+        $_GET['install']['extensionCompatibilityTester']['forceCheck'] = $force;
+        $this->output(\json_decode($this->objectManager->get(ExtensionCompatibilityTester::class)->handle()));
     }
 }
