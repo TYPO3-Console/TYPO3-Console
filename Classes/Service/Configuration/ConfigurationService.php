@@ -157,12 +157,13 @@ class ConfigurationService implements SingletonInterface
      *
      * @param string $path
      * @param mixed $value
+     * @param string $targetType
      * @return bool
      */
-    public function setLocal($path, $value)
+    public function setLocal($path, $value, $targetType = '')
     {
         try {
-            $value = $this->convertToTargetType($path, $value);
+            $value = $this->convertToTargetType($path, $value, $targetType);
             return $this->configurationManager->setLocalConfigurationValueByPath($path, $value);
         } catch (TypesAreNotConvertibleException $e) {
             return false;
@@ -189,12 +190,13 @@ class ConfigurationService implements SingletonInterface
      *
      * @param string $path
      * @param string $value
+     * @param string $targetType
      * @throws TypesAreNotConvertibleException
      * @return bool|float|int|string
      */
-    public function convertToTargetType($path, $value)
+    public function convertToTargetType($path, $value, $targetType = '')
     {
-        $targetType = $this->getType($path);
+        $targetType = $targetType ?: $this->getType($path);
         $actualType = gettype($value);
         if ($actualType !== $targetType) {
             if ($this->isTypeConvertible($targetType, $actualType)) {

@@ -224,9 +224,14 @@ class UpgradeHandling
 
     private function ensureUpgradeIsPossible()
     {
-        if (!$this->initialUpgradeDone && !$this->configurationService->hasActive('EXTCONF/helhum-typo3-console/initialUpgradeDone')) {
+        if (!$this->initialUpgradeDone
+            && (
+                    !$this->configurationService->hasLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone')
+                    || TYPO3_branch !== $this->configurationService->getLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone')
+                )
+        ) {
             $this->initialUpgradeDone = true;
-            $this->configurationService->setLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone', true);
+            $this->configurationService->setLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone', TYPO3_branch, 'string');
             $this->silentConfigurationUpgrade->executeSilentConfigurationUpgradesIfNeeded();
             $this->commandDispatcher->executeCommand('upgrade:wizard', ['identifier' => DatabaseCharsetUpdate::class]);
             $this->commandDispatcher->executeCommand('database:updateschema');
