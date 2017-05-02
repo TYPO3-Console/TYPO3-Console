@@ -74,7 +74,7 @@ class ConsoleBootstrap extends Bootstrap
             if (!is_callable([$this, 'setRequestType'])) {
                 $this->defineTypo3RequestTypes();
             }
-            $this->requestId = uniqid('console_request_', true);
+            $this->requestId = substr(md5(uniqid('console_request_', true)), 0, 13);
             $this->initializePackageManagement();
 
             if (!class_exists(RunLevel::class)) {
