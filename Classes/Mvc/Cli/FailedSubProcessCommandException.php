@@ -25,9 +25,19 @@ class FailedSubProcessCommandException extends \Exception
     private $command;
 
     /**
+     * @var string
+     */
+    private $commandLine;
+
+    /**
      * @var int
      */
     private $exitCode;
+
+    /**
+     * @var string
+     */
+    private $outputMessage;
 
     /**
      * @var string
@@ -55,28 +65,27 @@ class FailedSubProcessCommandException extends \Exception
      */
     public function __construct($command, $commandLine, $exitCode, $outputMessage, $errorMessage)
     {
-        if (empty($outputMessage . $errorMessage)) {
-            $errorMessage = sprintf(
-                "Executing \"%s\" failed (exit code: \"%d\") with no message\n",
-                $commandLine,
-                $exitCode
-            );
-        } else {
-            $errorMessage = sprintf(
-                "Executing \"%s\" failed (exit code: \"%d\") with message:\n\n\"%s\"\n\nand error:\n\n\"%s\"\n",
-                $commandLine,
-                $exitCode,
-                $outputMessage,
-                $errorMessage
-            );
+        $previousExceptionData = @json_decode($errorMessage, true) ?: null;
+        $previousException = null;
+        if ($previousExceptionData) {
+            $errorMessage = '';
+            $previousException = SubProcessException::createFromArray($previousExceptionData);
         }
+        $exceptionMessage = sprintf(
+            'Executing command "%s" failed (exit code: "%d")',
+            $command,
+            $exitCode
+        );
         parent::__construct(
-            $errorMessage,
-            1485130941
+            $exceptionMessage,
+            1485130941,
+            $previousException
         );
         $this->command = $command;
+        $this->commandLine = $commandLine;
         $this->exitCode = $exitCode;
         $this->errorMessage = $errorMessage;
+        $this->outputMessage = $outputMessage;
     }
 
     /**
@@ -88,11 +97,27 @@ class FailedSubProcessCommandException extends \Exception
     }
 
     /**
+     * @return string
+     */
+    public function getCommandLine()
+    {
+        return $this->commandLine;
+    }
+
+    /**
      * @return int
      */
     public function getExitCode()
     {
         return $this->exitCode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOutputMessage()
+    {
+        return $this->outputMessage;
     }
 
     /**
