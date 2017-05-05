@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Composer;
  */
 
 use Composer\Script\Event as ScriptEvent;
+use Helhum\Typo3Console\Composer\InstallerScript\CopyTypo3Directory;
 use Helhum\Typo3Console\Composer\InstallerScript\GeneratePackageStates;
 use Helhum\Typo3Console\Composer\InstallerScript\InstallDummyExtension;
 use Helhum\Typo3Console\Composer\InstallerScript\PopulateCommandConfiguration;
@@ -29,6 +30,7 @@ class InstallerScripts
      * @var array
      */
     private static $scripts = [
+        CopyTypo3Directory::class,
         PopulateCommandConfiguration::class,
         GeneratePackageStates::class,
         InstallDummyExtension::class,
