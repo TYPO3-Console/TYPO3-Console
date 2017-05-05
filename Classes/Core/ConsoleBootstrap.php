@@ -355,6 +355,9 @@ class ConsoleBootstrap extends Bootstrap
     public function initializeConfigurationManagement()
     {
         $this->populateLocalConfiguration();
+        if (!self::usesComposerClassLoading()) {
+            $this->initializeRuntimeActivatedPackagesFromConfiguration();
+        }
         $this->setDefaultTimezone();
         $this->defineUserAgentConstant();
     }
