@@ -46,9 +46,14 @@ class UpgradeHandling
     private $upgradeWizardList;
 
     /**
-     * @var ConfigurationService|null
+     * @var ConfigurationService
      */
     private $configurationService;
+
+    /**
+     * @var UpgradeWizardFactory
+     */
+    private $factory;
 
     /**
      * Flag for same process
@@ -68,10 +73,6 @@ class UpgradeHandling
         'compatibility7Extension' => [['name' => 'install', 'type' => 'bool', 'default' => '0']],
         'rtehtmlareaExtension' => [['name' => 'install', 'type' => 'bool', 'default' => '0']],
     ];
-    /**
-     * @var UpgradeWizardFactory|null
-     */
-    private $factory;
 
     /**
      * @param UpgradeWizardFactory|null $factory
@@ -227,7 +228,7 @@ class UpgradeHandling
             $this->initialUpgradeDone = true;
             $this->configurationService->setLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone', true);
             $this->silentConfigurationUpgrade->executeSilentConfigurationUpgradesIfNeeded();
-            $this->commandDispatcher->executeCommand('upgrade:executewizard', ['identifier' => DatabaseCharsetUpdate::class]);
+            $this->commandDispatcher->executeCommand('upgrade:wizard', ['identifier' => DatabaseCharsetUpdate::class]);
             $this->commandDispatcher->executeCommand('database:updateschema');
         }
     }
