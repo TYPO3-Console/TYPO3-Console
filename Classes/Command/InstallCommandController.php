@@ -15,6 +15,8 @@ namespace Helhum\Typo3Console\Command;
 
 use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Helhum\Typo3Console\Install\PackageStatesGenerator;
+use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
+use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageInterface;
@@ -179,6 +181,30 @@ class InstallCommandController extends CommandController
             foreach ($fixedStatusObjects as $fixedStatusObject) {
                 $this->outputLine($fixedStatusObject->getTitle());
             }
+        }
+    }
+
+    /**
+     * Setup TYPO3 with extensions if possible
+     *
+     * This command tries up all TYPO3 extensions, but quits gracefully if this is not possible.
+     * This can be used in <code>composer.json</code> scripts to ensure that extensions
+     * are always set up correctly after a composer run on development systems,
+     * but does not fail on packaging for deployment where no database connection is available.
+     *
+     * Besides that, it can be used for a first deploy of a TYPO3 instance in a new environment,
+     * but also works for subsequent deployments.
+     *
+     * @see typo3_console:extension:setupactive
+     */
+    public function extensionSetupIfPossibleCommand()
+    {
+        $commandDispatcher = CommandDispatcher::createFromCommandRun();
+        try {
+            $commandDispatcher->executeCommand('database:updateschema');
+            $this->outputLine($commandDispatcher->executeCommand('extension:setupactive'));
+        } catch (FailedSubProcessCommandException $e) {
+            $this->outputLine('<warning>Extension setup skipped.</warning>');
         }
     }
 

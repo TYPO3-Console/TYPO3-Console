@@ -48,14 +48,13 @@ before_install:
     export TYPO3_PATH_ROOT="$CONSOLE_ROOT/.Build/Web"
     export PATH="$PATH:./Scripts"
   - if php -i | grep -q xdebug; then phpenv config-rm xdebug.ini; fi
-  - wget https://raw.github.com/lehmannro/assert.sh/v1.1/assert.sh && source assert.sh -v -x && rm assert.sh
 
 before_script:
   - >
     if [ -n "$TRAVIS_TAG" ]; then
       composer set-version $TRAVIS_TAG
       # If this fails, we forgot to update version numbers before tagging the release
-      assert "git diff --shortstat 2> /dev/null | tail -n1" "";
+      test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
     fi
   - composer extension-create-libs && ls -la Libraries/*.phar | grep -v ^-rwx
   - git clean -dffx
@@ -72,7 +71,7 @@ script:
   - >
     echo "Checking command reference completeness…"
     typo3cms commandreference:render;
-    assert "git diff 2> /dev/null" "";
+    test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
 
 after_script:
   - >
