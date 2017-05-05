@@ -53,7 +53,7 @@ class CacheCommandControllerTest extends AbstractCommandTest
             $this->commandDispatcher->executeCommand('cache:flushgroups', ['--groups' => 'foo']);
         } catch (FailedSubProcessCommandException $e) {
             $this->assertSame(1, $e->getExitCode());
-            $this->assertContains('Invalid cache groups "foo".', $e->getErrorMessage());
+            $this->assertContains('Invalid cache groups "foo".', $e->getOutputMessage());
         }
     }
 

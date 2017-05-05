@@ -37,7 +37,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $this->commandDispatcher->executeCommand('upgrade:checkextensionconstraints', ['--typo3-version' => '3.6.0']);
         } catch (FailedSubProcessCommandException $e) {
             $this->assertSame(1, $e->getExitCode());
-            $this->assertContains('"ext_test" requires TYPO3 versions 4.5.0', $e->getErrorMessage());
+            $this->assertContains('"ext_test" requires TYPO3 versions 4.5.0', $e->getOutputMessage());
         }
         $this->commandDispatcher->executeCommand('extension:deactivate', ['--extension-keys' => 'ext_test']);
         $this->removeFixtureExtensionCode('ext_test');
