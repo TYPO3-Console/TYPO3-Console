@@ -68,10 +68,8 @@ script:
   - >
     echo "Running unit and functional tests…";
     .Build/bin/phpunit;
-  - >
-    echo "Checking command reference completeness…"
-    typo3cms commandreference:render;
-    test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
+  # This fails when command reference is not up to date
+  - typo3cms commandreference:render && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
 
 after_script:
   - >
