@@ -14,7 +14,6 @@ namespace Helhum\Typo3Console\Tests\Functional\Command\Install;
  */
 
 use Helhum\Typo3Console\Tests\Functional\Command\AbstractCommandTest;
-use Symfony\Component\Process\ProcessBuilder;
 
 class InstallCommandControllerTest extends AbstractCommandTest
 {
@@ -123,24 +122,21 @@ class InstallCommandControllerTest extends AbstractCommandTest
      */
     public function packageStatesFileIsCreatedFromComposerRun()
     {
-        if (DIRECTORY_SEPARATOR === '\\') {
-            // TODO: find out the reason, why composer cannot be executed using Symfony Process
-            $this->markTestSkipped('Currently does not work on Windows');
-        }
         $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
         @unlink($packageStatesFile);
-        $processBuilder = new ProcessBuilder();
-        $processBuilder->setEnv('TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES', 'yes');
-        $processBuilder->setEnv('TYPO3_CONSOLE_TEST_SETUP', 'yes');
-        $processBuilder->setEnv('TYPO3_ACTIVATE_DEFAULT_FRAMEWORK_EXTENSIONS', 'yes');
-        $processBuilder->setPrefix('composer');
-        $processBuilder->add('dump-autoload');
-        $processBuilder->add('-vv');
-        $processBuilder->add('-d');
-        $processBuilder->add(dirname(dirname(dirname(dirname(__DIR__)))));
-        $composerProcess = $processBuilder->getProcess();
-        $composerProcess->run();
-        $this->assertTrue($composerProcess->isSuccessful());
+
+        $this->executeComposerCommand(
+            [
+                'dump-autoload',
+                '-vv',
+            ],
+            [
+                'TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES' => 'yes',
+                'TYPO3_CONSOLE_TEST_SETUP' => 'yes',
+                'TYPO3_ACTIVATE_DEFAULT_FRAMEWORK_EXTENSIONS' => 'yes',
+            ]
+        );
+
         $this->assertTrue(file_exists($packageStatesFile));
         $packageConfig = require $packageStatesFile;
         if ($packageConfig['version'] === 5) {
