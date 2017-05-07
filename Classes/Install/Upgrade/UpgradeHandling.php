@@ -233,7 +233,10 @@ class UpgradeHandling
             $this->initialUpgradeDone = true;
             $this->configurationService->setLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone', TYPO3_branch, 'string');
             $this->silentConfigurationUpgrade->executeSilentConfigurationUpgradesIfNeeded();
-            $this->commandDispatcher->executeCommand('upgrade:wizard', ['identifier' => DatabaseCharsetUpdate::class]);
+            // @deprecated if condition can be removed, when TYPO3 7.6 support is removed
+            if (class_exists(DatabaseCharsetUpdate::class)) {
+                $this->commandDispatcher->executeCommand('upgrade:wizard', ['identifier' => DatabaseCharsetUpdate::class]);
+            }
             $this->commandDispatcher->executeCommand('database:updateschema');
         }
     }
