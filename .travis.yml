@@ -44,8 +44,6 @@ notifications:
 before_install:
   - |
     export COMPOSER_ROOT_VERSION=4.5.3
-    export CONSOLE_ROOT="$PWD"
-    export TYPO3_PATH_ROOT="$CONSOLE_ROOT/.Build/Web"
     export PATH="$PATH:./Scripts"
   - if php -i | grep -q xdebug; then phpenv config-rm xdebug.ini; fi
 

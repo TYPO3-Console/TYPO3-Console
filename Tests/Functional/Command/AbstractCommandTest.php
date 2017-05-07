@@ -14,7 +14,9 @@ namespace Helhum\Typo3Console\Tests\Functional\Command;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
+use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
 
 abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
@@ -115,7 +117,7 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
      */
     protected function installFixtureExtensionCode($extensionKey)
     {
-        $sourcePath = dirname(__DIR__) . '/Fixtures/' . $extensionKey;
+        $sourcePath = dirname(__DIR__) . '/Fixtures/Extensions/' . $extensionKey;
         $targetPath = getenv('TYPO3_PATH_ROOT') . '/typo3conf/ext/' . $extensionKey;
         $this->copyDirectory($sourcePath, $targetPath);
     }
@@ -162,5 +164,37 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
         );
         $fileSystem->remove($iterator);
         $fileSystem->remove($targetPath);
+    }
+
+    /**
+     * @param array $arguments
+     * @param array $environmentVariables
+     * @throws FailedSubProcessCommandException
+     * @return string
+     */
+    protected function executeComposerCommand(array $arguments = [], array $environmentVariables = [])
+    {
+        $processBuilder = new ProcessBuilder();
+        $processBuilder->addEnvironmentVariables($environmentVariables);
+
+        if ($phpPath = getenv('PHP_PATH')) {
+            $phpFinder = new PhpExecutableFinder();
+            $processBuilder->setPrefix($phpFinder->find(false));
+            $processBuilder->add($phpPath . '/composer.phar');
+        } else {
+            $processBuilder->setPrefix('composer');
+        }
+        foreach ($arguments as $argument) {
+            $processBuilder->add($argument);
+        }
+        $processBuilder->add('-d');
+        $processBuilder->add(getenv('TYPO3_PATH_COMPOSER_ROOT'));
+
+        $process = $processBuilder->setTimeout(null)->getProcess();
+        $process->run();
+        if (!$process->isSuccessful()) {
+            throw FailedSubProcessCommandException::forProcess('composer', $process);
+        }
+        return $process->getOutput() . $process->getErrorOutput();
     }
 }
