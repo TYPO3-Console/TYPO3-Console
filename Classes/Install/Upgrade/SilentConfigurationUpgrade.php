@@ -45,8 +45,8 @@ class SilentConfigurationUpgrade
     /**
      * Call silent upgrade class, redirect to self if configuration was changed.
      *
-     * @throws RedirectException
-     * @return void
+     * @throws \UnexpectedValueException
+     * @throws \RuntimeException
      */
     public function executeSilentConfigurationUpgradesIfNeeded()
     {
@@ -64,7 +64,7 @@ class SilentConfigurationUpgrade
                 $redirect = true;
                 $this->configurationManager->exportConfiguration();
                 if ($count > 20) {
-                    throw $e;
+                    throw new \RuntimeException('Too many loops when silently upgrading configuration', 1493897404, $e);
                 }
             }
         } while ($redirect === true);

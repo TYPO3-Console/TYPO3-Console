@@ -14,9 +14,13 @@ namespace Helhum\Typo3Console\Install\Upgrade;
  */
 
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
+use Helhum\Typo3Console\Extension\ExtensionConstraintCheck;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
+use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
+use TYPO3\CMS\Core\Package\PackageManager;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Updates\DatabaseCharsetUpdate;
 
 /**
@@ -25,6 +29,11 @@ use TYPO3\CMS\Install\Updates\DatabaseCharsetUpdate;
  */
 class UpgradeHandling
 {
+    /**
+     * @var UpgradeWizardFactory
+     */
+    private $factory;
+
     /**
      * @var UpgradeWizardExecutor
      */
@@ -51,9 +60,14 @@ class UpgradeHandling
     private $configurationService;
 
     /**
-     * @var UpgradeWizardFactory
+     * @var PackageManager
      */
-    private $factory;
+    private $packageManager;
+
+    /**
+     * @var ExtensionConstraintCheck
+     */
+    private $extensionConstraintCheck;
 
     /**
      * Flag for same process
@@ -81,6 +95,7 @@ class UpgradeHandling
      * @param SilentConfigurationUpgrade|null $silentConfigurationUpgrade
      * @param CommandDispatcher|null $commandDispatcher
      * @param ConfigurationService|null $configurationService
+     * @param ExtensionConstraintCheck|null $extensionConstraintCheck
      */
     public function __construct(
         UpgradeWizardFactory $factory = null,
@@ -88,7 +103,9 @@ class UpgradeHandling
         UpgradeWizardList $upgradeWizardList = null,
         SilentConfigurationUpgrade $silentConfigurationUpgrade = null,
         CommandDispatcher $commandDispatcher = null,
-        ConfigurationService $configurationService = null
+        ConfigurationService $configurationService = null,
+        PackageManager $packageManager = null,
+        ExtensionConstraintCheck $extensionConstraintCheck = null
     ) {
         $this->factory = new UpgradeWizardFactory();
         $this->executor = $executor ?: new UpgradeWizardExecutor($this->factory);
@@ -96,6 +113,8 @@ class UpgradeHandling
         $this->silentConfigurationUpgrade = $silentConfigurationUpgrade ?: new SilentConfigurationUpgrade();
         $this->commandDispatcher = $commandDispatcher ?: CommandDispatcher::createFromCommandRun();
         $this->configurationService = $configurationService ?: new ConfigurationService();
+        $this->packageManager = $packageManager ?: GeneralUtility::makeInstance(PackageManager::class);
+        $this->extensionConstraintCheck = $extensionConstraintCheck ?: new ExtensionConstraintCheck();
     }
 
     /**
@@ -112,16 +131,17 @@ class UpgradeHandling
     /**
      * @param array $arguments
      * @param ConsoleOutput|null $consoleOutput
+     * @param array &$messages
      * @return array
      */
-    public function executeAll(array $arguments, ConsoleOutput $consoleOutput = null)
+    public function executeAll(array $arguments, ConsoleOutput $consoleOutput = null, array &$messages = [])
     {
         if ($consoleOutput) {
             $consoleOutput->progressStart(rand(6, 9));
             $consoleOutput->progressAdvance();
         }
 
-        $wizards = $this->executeInSubProcess('listWizards');
+        $wizards = $this->executeInSubProcess('listWizards', [], $messages);
 
         if ($consoleOutput) {
             $consoleOutput->progressStart(count($wizards['scheduled']) + 2);
@@ -159,7 +179,7 @@ class UpgradeHandling
                         }
                     }
                 }
-                $results[$identifier] = $this->executeInSubProcess('executeWizard', [$identifier, $arguments]);
+                $results[$identifier] = $this->executeInSubProcess('executeWizard', [$identifier, $arguments], $messages);
             }
         }
 
@@ -209,21 +229,54 @@ class UpgradeHandling
     }
 
     /**
+     * @param string $extensionKey
+     * @param string $typo3Version
+     *
+     * @throws \TYPO3\CMS\Core\Package\Exception\UnknownPackageException
+     * @return string
+     */
+    public function matchExtensionConstraints($extensionKey, $typo3Version)
+    {
+        return $this->extensionConstraintCheck->matchConstraints($this->packageManager->getPackage($extensionKey), $typo3Version);
+    }
+
+    /**
+     * @param string $typo3Version
+     *
+     * @return array
+     */
+    public function matchAllExtensionConstraints($typo3Version)
+    {
+        return $this->extensionConstraintCheck->matchAllConstraints($this->packageManager->getActivePackages(), $typo3Version);
+    }
+
+    /**
      * Execute the command in a sub process,
      * but execute some automated migration steps beforehand
      *
      * @param string $command
      * @param array $arguments
+     * @param array &$messages
+     * @throws FailedSubProcessCommandException
+     * @throws \UnexpectedValueException
+     * @throws \RuntimeException
      * @return mixed
      */
-    public function executeInSubProcess($command, array $arguments = [])
+    public function executeInSubProcess($command, array $arguments = [], array &$messages = [])
     {
-        $this->ensureUpgradeIsPossible();
+        $messages = $this->ensureUpgradeIsPossible();
         return @unserialize($this->commandDispatcher->executeCommand('upgrade:subprocess', ['command' => $command, 'arguments' => serialize($arguments)]));
     }
 
+    /**
+     * @throws FailedSubProcessCommandException
+     * @throws \UnexpectedValueException
+     * @throws \RuntimeException
+     * @return string[]
+     */
     private function ensureUpgradeIsPossible()
     {
+        $messages = [];
         if (!$this->initialUpgradeDone
             && (
                     !$this->configurationService->hasLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone')
@@ -232,12 +285,79 @@ class UpgradeHandling
         ) {
             $this->initialUpgradeDone = true;
             $this->configurationService->setLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone', TYPO3_branch, 'string');
+            $this->commandDispatcher->executeCommand('install:fixfolderstructure');
+            $messages = $this->ensureExtensionCompatibility();
+            $messages = array_merge($messages, $this->checkForBrokenExtensions());
             $this->silentConfigurationUpgrade->executeSilentConfigurationUpgradesIfNeeded();
             // @deprecated if condition can be removed, when TYPO3 7.6 support is removed
             if (class_exists(DatabaseCharsetUpdate::class)) {
                 $this->commandDispatcher->executeCommand('upgrade:wizard', ['identifier' => DatabaseCharsetUpdate::class]);
             }
             $this->commandDispatcher->executeCommand('database:updateschema');
+        }
+        return $messages;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function ensureExtensionCompatibility()
+    {
+        $messages = [];
+        $failedPackageMessages = $this->matchAllExtensionConstraints(TYPO3_version);
+        foreach ($failedPackageMessages as $extensionKey => $constraintMessage) {
+            $this->packageManager->deactivatePackage($extensionKey);
+            $messages[] = sprintf('<error>%s</error>', $constraintMessage);
+            $messages[] = sprintf('<info>Deactivated extension "%s".</info>', $extensionKey);
+        }
+        return $messages;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function checkForBrokenExtensions()
+    {
+        $errors = [];
+        $result = '';
+        $force = true;
+        $retryCount = 0;
+        do {
+            try {
+                $result = $this->commandDispatcher->executeCommand('upgrade:checkbrokenextensions', ['--force' => $force]);
+            } catch (FailedSubProcessCommandException $e) {
+                $force = false;
+                $retryCount++;
+                $this->collectErrors($errors);
+                // Happens only when more than 20 broken extensions were found.
+                if ($retryCount > 20) {
+                    throw new \RuntimeException('Loop detected when trying to find broken extensions.', 1494164326);
+                }
+            }
+        } while ($result !== 'OK');
+        $messages = [];
+        if ($failedExtensionKeys = @file_get_contents(PATH_site . 'typo3temp/assets/ExtensionCompatibilityTester.txt')) {
+            foreach (explode(', ', $failedExtensionKeys) as $extensionKey) {
+                $this->packageManager->deactivatePackage($extensionKey);
+                $messages[] = sprintf('<error>Extension "%s" seems to be not compatible or broken</error>', $extensionKey);
+                $messages[] = sprintf('<info>Deactivated extension "%s".</info>', $extensionKey);
+            }
+        }
+        $messages = array_merge($messages, $errors);
+        // Make sure to clean up
+        @unlink(PATH_site . 'typo3temp/assets/ExtensionCompatibilityTester.txt');
+        @unlink(PATH_site . 'typo3temp/assets/ExtensionCompatibilityTesterErrors.json');
+        return $messages;
+    }
+
+    /**
+     * @param array $errors
+     */
+    private function collectErrors(array &$errors)
+    {
+        // @TODO this somehow does not seem to work, as error_get_last() does not return anything. Not sure why currently
+        if (is_array($newErrors = json_decode(@file_get_contents(PATH_site . 'typo3temp/assets/ExtensionCompatibilityTesterErrors.json'), true))) {
+            $errors = array_merge($errors, array_filter($newErrors));
         }
     }
 }
