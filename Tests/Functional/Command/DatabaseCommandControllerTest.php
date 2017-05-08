@@ -76,8 +76,8 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     public function schemaUpdateCanBePerformedWithoutAnyTables()
     {
         $this->backupDatabase();
-        $this->executeMysqlQuery('DROP DATABASE ' . $this->getDatabaseConnectionSettings()['dbName'], false);
-        $this->executeMysqlQuery('CREATE DATABASE ' . $this->getDatabaseConnectionSettings()['dbName'], false);
+        $this->executeMysqlQuery('DROP DATABASE ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
+        $this->executeMysqlQuery('CREATE DATABASE ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
         $output = $this->commandDispatcher->executeCommand('database:updateschema', ['--schema-update-types' => '*']);
         $this->assertContains('The following database schema updates were performed:', $output);
         $this->restoreDatabase();
@@ -90,8 +90,8 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     {
         $this->backupDatabase();
         $output = $this->commandDispatcher->executeCommand('database:export');
-        $this->executeMysqlQuery('DROP DATABASE ' . $this->getDatabaseConnectionSettings()['dbName'], false);
-        $this->executeMysqlQuery('CREATE DATABASE ' . $this->getDatabaseConnectionSettings()['dbName'], false);
+        $this->executeMysqlQuery('DROP DATABASE ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
+        $this->executeMysqlQuery('CREATE DATABASE ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
         $this->commandDispatcher->executeCommand('database:import', [], [], $output);
         $this->restoreDatabase();
     }

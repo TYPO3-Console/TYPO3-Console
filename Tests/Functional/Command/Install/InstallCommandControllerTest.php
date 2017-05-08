@@ -32,19 +32,18 @@ class InstallCommandControllerTest extends AbstractCommandTest
      */
     public function setupCommandWorksWithoutErrors()
     {
-        $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . $this->getDatabaseConnectionSettings()['dbName'], false);
+        $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
         @unlink(getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php');
         @unlink(getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php');
-        $settings = $this->getDatabaseConnectionSettings();
         $output = $this->commandDispatcher->executeCommand(
             'install:setup',
             [
                 '--non-interactive' => true,
-                '--database-user-name' => $settings['dbUser'],
-                '--database-user-password' => $settings['dbPassword'],
+                '--database-user-name' => getenv('TYPO3_INSTALL_DB_USER'),
+                '--database-user-password' => getenv('TYPO3_INSTALL_DB_PASSWORD'),
                 '--database-host-name' => 'localhost',
                 '--database-port' => '3306',
-                '--database-name' => $settings['dbName'],
+                '--database-name' => getenv('TYPO3_INSTALL_DB_DBNAME'),
                 '--admin-user-name' => 'admin',
                 '--admin-password' => 'password',
                 '--site-name' => 'Travis Install',

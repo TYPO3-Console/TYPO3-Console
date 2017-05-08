@@ -181,5 +181,6 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
         $this->assertContains('filemetadata', $output);
 
         $this->copyDirectory(getenv('TYPO3_PATH_ROOT') . '/typo3temp/sysext', getenv('TYPO3_PATH_ROOT') . '/typo3/sysext');
+        $this->removeDirectory(getenv('TYPO3_PATH_ROOT') . '/typo3temp/sysext');
     }
 }

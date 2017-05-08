@@ -27,7 +27,7 @@ class CopyTypo3Directory implements InstallerScriptInterface
     public function shouldRun(ScriptEvent $event)
     {
         // Only run on Windows and only when we are the root package (made for Appveyor tests)
-        return DIRECTORY_SEPARATOR === '\\' && $event->getComposer()->getPackage()->getName() === 'helhum/typo3-console';
+        return DIRECTORY_SEPARATOR === '\\' && (getenv('TYPO3_CONSOLE_SUB_PROCESS') || $event->getComposer()->getPackage()->getName() === 'helhum/typo3-console');
     }
 
     /**

@@ -104,18 +104,16 @@ class CommandDispatcher
      *
      * Just use the method without arguments for best results
      *
-     * @param ProcessBuilder $processBuilder
-     * @param PhpExecutableFinder $phpFinder
-     * @throws \RuntimeException
-     * @return self
+     * @param string|null $typo3cmsCommandPath
+     * @return CommandDispatcher
      */
-    public static function createFromTestRun(ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
+    public static function createFromTestRun($typo3cmsCommandPath = null)
     {
         if (!isset($_SERVER['argv'][0]) && strpos($_SERVER['argv'][0], 'phpunit') === false) {
             throw new \RuntimeException('Tried to create typo3cms command runner from wrong context', 1493570522);
         }
-        $typo3cmsCommandPath = dirname(dirname(dirname(__DIR__))) . '/Scripts/typo3cms';
-        return self::create($typo3cmsCommandPath, $processBuilder, $phpFinder);
+        $typo3cmsCommandPath = $typo3cmsCommandPath ?: dirname(dirname(dirname(__DIR__))) . '/Scripts/typo3cms';
+        return self::create($typo3cmsCommandPath);
     }
 
     /**

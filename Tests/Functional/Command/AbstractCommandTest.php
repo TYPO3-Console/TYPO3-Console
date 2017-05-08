@@ -14,7 +14,6 @@ namespace Helhum\Typo3Console\Tests\Functional\Command;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
-use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
@@ -37,79 +36,64 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return array
-     */
-    protected function getDatabaseConnectionSettings()
-    {
-        return [
-            'dbUser' => getenv('TYPO3_INSTALL_DB_USER') ?: 'root',
-            'dbPassword' => getenv('TYPO3_INSTALL_DB_PASSWORD') ?: '',
-            'dbName' => getenv('TYPO3_INSTALL_DB_DBNAME') ?: 'travis_console_test',
-        ];
-    }
-
-    /**
      * @param string $sql
      * @param bool $useDatabase
      * @return string
      */
     protected function executeMysqlQuery($sql, $useDatabase = true)
     {
-        $settings = $this->getDatabaseConnectionSettings();
         $processBuilder = new ProcessBuilder();
         $processBuilder->setPrefix('mysql');
         $processBuilder->add('--skip-column-names');
         $processBuilder->add('-u');
-        $processBuilder->add($settings['dbUser']);
-        $processBuilder->add('--password=' . $settings['dbPassword']);
+        $processBuilder->add(getenv('TYPO3_INSTALL_DB_USER'));
+        $processBuilder->add('--password=' . getenv('TYPO3_INSTALL_DB_PASSWORD'));
         if ($useDatabase) {
-            $processBuilder->add($settings['dbName']);
+            $processBuilder->add(getenv('TYPO3_INSTALL_DB_DBNAME'));
         }
         $processBuilder->setInput($sql);
 
         $mysqlProcess = $processBuilder->getProcess();
         $mysqlProcess->run();
         if (!$mysqlProcess->isSuccessful()) {
-            throw new \RuntimeException(sprintf('Executing query "%s" failed', $sql), 1493634196);
+            throw new \RuntimeException(sprintf('Executing query "%s" failed. Did you set TYPO3_INSTALL_DB_* correctly? Is your database server running?', $sql), 1493634196);
         }
         return $mysqlProcess->getOutput();
     }
 
     protected function backupDatabase()
     {
-        $settings = $this->getDatabaseConnectionSettings();
         $processBuilder = new ProcessBuilder();
         $processBuilder->setPrefix('mysqldump');
         $processBuilder->add('-u');
-        $processBuilder->add($settings['dbUser']);
-        $processBuilder->add('--password=' . $settings['dbPassword']);
-        $processBuilder->add($settings['dbName']);
+        $processBuilder->add(getenv('TYPO3_INSTALL_DB_USER'));
+        $processBuilder->add('--password=' . getenv('TYPO3_INSTALL_DB_PASSWORD'));
+        $processBuilder->add(getenv('TYPO3_INSTALL_DB_DBNAME'));
 
         $mysqlProcess = $processBuilder->getProcess();
         $mysqlProcess->run();
         if (!$mysqlProcess->isSuccessful()) {
             throw new \RuntimeException('Backing up database failed', 1493634217);
         }
-        file_put_contents(getenv('TYPO3_PATH_ROOT') . '/typo3temp/' . $settings['dbName'] . '.sql', $mysqlProcess->getOutput());
+        file_put_contents(getenv('TYPO3_PATH_ROOT') . '/typo3temp/' . getenv('TYPO3_INSTALL_DB_DBNAME') . '.sql', $mysqlProcess->getOutput());
     }
 
     protected function restoreDatabase()
     {
-        $settings = $this->getDatabaseConnectionSettings();
         $processBuilder = new ProcessBuilder();
         $processBuilder->setPrefix('mysql');
         $processBuilder->add('-u');
-        $processBuilder->add($settings['dbUser']);
-        $processBuilder->add('--password=' . $settings['dbPassword']);
-        $processBuilder->add($settings['dbName']);
-        $processBuilder->setInput(file_get_contents(getenv('TYPO3_PATH_ROOT') . '/typo3temp/' . $settings['dbName'] . '.sql'));
+        $processBuilder->add(getenv('TYPO3_INSTALL_DB_USER'));
+        $processBuilder->add('--password=' . getenv('TYPO3_INSTALL_DB_PASSWORD'));
+        $processBuilder->add(getenv('TYPO3_INSTALL_DB_DBNAME'));
+        $processBuilder->setInput(file_get_contents(getenv('TYPO3_PATH_ROOT') . '/typo3temp/' . getenv('TYPO3_INSTALL_DB_DBNAME') . '.sql'));
 
         $mysqlProcess = $processBuilder->getProcess();
         $mysqlProcess->run();
         if (!$mysqlProcess->isSuccessful()) {
             throw new \RuntimeException('Restoring database failed', 1493634218);
         }
-        unlink(getenv('TYPO3_PATH_ROOT') . '/typo3temp/' . $settings['dbName'] . '.sql');
+        unlink(getenv('TYPO3_PATH_ROOT') . '/typo3temp/' . getenv('TYPO3_INSTALL_DB_DBNAME') . '.sql');
     }
 
     /**
@@ -125,8 +109,9 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $sourcePath
      * @param string $targetPath
+     * @param array $ignoredDirectories
      */
-    protected function copyDirectory($sourcePath, $targetPath)
+    protected function copyDirectory($sourcePath, $targetPath, array $ignoredDirectories = [])
     {
         $fileSystem = new Filesystem();
         $iterator = new \RecursiveIteratorIterator(
@@ -135,6 +120,11 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
         );
         /** @var \SplFileInfo $item */
         foreach ($iterator as $item) {
+            foreach ($ignoredDirectories as $ignoredDirectory) {
+                if (strpos($item->getPathname(), $ignoredDirectory) !== false) {
+                    continue 2;
+                }
+            }
             $target = $targetPath . '/' . $iterator->getSubPathName();
             if ($item->isDir()) {
                 $fileSystem->mkdir($target);
@@ -169,13 +159,13 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $arguments
      * @param array $environmentVariables
-     * @throws FailedSubProcessCommandException
      * @return string
      */
     protected function executeComposerCommand(array $arguments = [], array $environmentVariables = [])
     {
         $processBuilder = new ProcessBuilder();
         $processBuilder->addEnvironmentVariables($environmentVariables);
+        $processBuilder->setEnv('TYPO3_CONSOLE_SUB_PROCESS', 'yes');
 
         if ($phpPath = getenv('PHP_PATH')) {
             $phpFinder = new PhpExecutableFinder();
@@ -187,13 +177,14 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
         foreach ($arguments as $argument) {
             $processBuilder->add($argument);
         }
+        $processBuilder->add('--no-ansi');
         $processBuilder->add('-d');
         $processBuilder->add(getenv('TYPO3_PATH_COMPOSER_ROOT'));
 
         $process = $processBuilder->setTimeout(null)->getProcess();
         $process->run();
         if (!$process->isSuccessful()) {
-            throw FailedSubProcessCommandException::forProcess('composer', $process);
+            $this->fail(sprintf('Composer command failed with message: "%s", output: "%s"', $process->getErrorOutput(), $process->getOutput()));
         }
         return $process->getOutput() . $process->getErrorOutput();
     }
