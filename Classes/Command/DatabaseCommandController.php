@@ -16,9 +16,11 @@ namespace Helhum\Typo3Console\Command;
 use Helhum\Typo3Console\Database\Process\MysqlCommand;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use Helhum\Typo3Console\Service\Database\ImportService;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
  * Database command controller
@@ -171,6 +173,32 @@ class DatabaseCommandController extends CommandController
         );
 
         $this->quit($exitCode);
+    }
+
+    /**
+     * Import static content from extension file "ext_tables_static+adt.sql" to database
+     *
+     * @param bool $force Force import of static database data
+     * @return void
+     */
+    public function importStaticDataCommand($force = false)
+    {
+        /** @var ImportService $importService */
+        $importService = $this->objectManager->get(ImportService::class);
+        $importService->setOutput($this->output);
+
+        // Register signal slot to save md5 values to registry
+        $this->objectManager->get(\TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class)->connect(
+           \TYPO3\CMS\Extensionmanager\Utility\InstallUtility::class,
+           'afterExtensionStaticSqlImport',
+            $importService,
+            'writeMd5Value'
+        );
+
+        $extensionKeys = ExtensionManagementUtility::getLoadedExtensionListArray();
+        foreach ($extensionKeys as $extensionKey) {
+            $importService->importStaticSql($extensionKey, $force);
+        }
     }
 
     /**
