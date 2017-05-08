@@ -159,7 +159,13 @@ class Scripts
      */
     public static function initializePersistence(ConsoleBootstrap $bootstrap)
     {
-        $bootstrap->loadExtensionTables();
+        if (is_callable([$bootstrap, 'loadExtTables'])) {
+            $bootstrap->loadBaseTca();
+            $bootstrap->loadExtTables();
+        } else {
+            // @deprecated can be removed once TYPO3 7.6 support is removed
+            $bootstrap->loadExtensionTables();
+        }
     }
 
     /**

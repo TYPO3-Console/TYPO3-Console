@@ -370,7 +370,10 @@ class ConsoleBootstrap extends Bootstrap
         if (is_callable([$this, 'defineDatabaseConstants'])) {
             $this->defineDatabaseConstants();
         }
-        $this->initializeTypo3DbGlobal();
+        // @deprecated can be removed if TYPO3 7 support is removed
+        if (is_callable([$this, 'initializeTypo3DbGlobal'])) {
+            $this->initializeTypo3DbGlobal();
+        }
     }
 
     protected function flushOutputBuffers()
