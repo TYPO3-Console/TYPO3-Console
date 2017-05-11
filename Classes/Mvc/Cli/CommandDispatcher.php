@@ -165,6 +165,9 @@ class CommandDispatcher
                 $dashedName = preg_replace('/([A-Z][a-z0-9]+)/', '$1-', $dashedName);
                 $dashedName = '--' . strtolower(substr($dashedName, 0, -1));
             }
+            if (is_array($argumentValue)) {
+                $argumentValue = implode(',', $argumentValue);
+            }
             if (strpos($argumentValue, '=') !== false) {
                 // Big WTF in argument parsing here
                 // If the value contains a = we need to separate the name and value with a = ourselves

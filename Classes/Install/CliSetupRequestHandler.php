@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Install;
  *
  */
 
+use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\CommandManager;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
@@ -113,12 +114,28 @@ class CliSetupRequestHandler
             touch($firstInstallPath);
         }
 
+        // Start with a clean set of packages
+        @unlink(PATH_site . 'typo3conf/PackageStates.php');
+        // In composer mode, we rely on the fact that core extensions that should
+        // be active are defined in the composer.json file, while we gracefully activate all default core
+        // packages when setup is done in non composer mode.
+        $packageStatesArguments = ['--activate-default' => !ConsoleBootstrap::usesComposerClassLoading()];
+        // Exclude all local extensions in case any are present, to avoid interference with the setup
+        foreach (glob(PATH_site . 'typo3conf/ext/*') as $item) {
+            $packageStatesArguments['--excluded-extensions'][] = basename($item);
+        }
+        $this->commandDispatcher->executeCommand('install:generatepackagestates', $packageStatesArguments);
+
         foreach ($this->installationActions as $actionName) {
             $this->dispatchAction($actionName);
         }
+
         // The TYPO3 installation process does not take care of setting up all extensions properly,
-        // so we do it manually here
-        $this->commandDispatcher->executeCommand('install:generatepackagestates', ['--activate-default' => true]);
+        // so we do it manually here.
+        unset($packageStatesArguments['excludedExtensions']);
+        $this->commandDispatcher->executeCommand('install:generatepackagestates', $packageStatesArguments);
+        // Flush caches, as the extension list has changed
+        $this->commandDispatcher->executeCommand('cache:flush', ['--force' => true]);
         $this->commandDispatcher->executeCommand('extension:setupactive');
     }
 
