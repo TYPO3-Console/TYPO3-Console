@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Install;
 
 use Helhum\Typo3Console\Package\UncachedPackageManager;
 use TYPO3\CMS\Core\Package\PackageInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 
 /**
@@ -45,6 +46,7 @@ class PackageStatesGenerator
      */
     public function generate(array $frameworkExtensionsToActivate = [], $activateDefaultExtensions = false, array $excludedExtensions = [])
     {
+        $this->ensureDirectoryExists(PATH_site . 'typo3conf');
         $this->packageManager->scanAvailablePackages();
         foreach ($this->packageManager->getAvailablePackages() as $package) {
             if (
@@ -66,5 +68,15 @@ class PackageStatesGenerator
         }
         $this->packageManager->forceSortAndSavePackageStates();
         return $this->packageManager->getActivePackages();
+    }
+
+    /**
+     * @param string $directory
+     */
+    private function ensureDirectoryExists($directory)
+    {
+        if (!is_dir($directory)) {
+            GeneralUtility::mkdir_deep(rtrim($directory, '/\\') . '/');
+        }
     }
 }

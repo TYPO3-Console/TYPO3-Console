@@ -100,15 +100,12 @@ class InstallCommandControllerTest extends AbstractCommandTest
     public function packageStatesFileIsCreatedWithDefaultPackages()
     {
         $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
+        copy($packageStatesFile, $packageStatesFile . '_');
         @unlink($packageStatesFile);
-        $this->commandDispatcher->executeCommand(
-            'install:generatepackagestates',
-            [
-                '--activate-default' => true,
-            ]
-        );
+        $this->commandDispatcher->executeCommand('install:generatepackagestates', ['--activate-default' => true]);
         $this->assertTrue(file_exists($packageStatesFile));
         $packageConfig = require $packageStatesFile;
+        copy($packageStatesFile . '_', $packageStatesFile);
         if ($packageConfig['version'] === 5) {
             $this->assertArrayHasKey('reports', $packageConfig['packages']);
         } else {
@@ -122,6 +119,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
     public function packageStatesFileIsCreatedFromComposerRun()
     {
         $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
+        copy($packageStatesFile, $packageStatesFile . '_');
         @unlink($packageStatesFile);
 
         $this->executeComposerCommand(
@@ -138,6 +136,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
 
         $this->assertTrue(file_exists($packageStatesFile));
         $packageConfig = require $packageStatesFile;
+        copy($packageStatesFile . '_', $packageStatesFile);
         if ($packageConfig['version'] === 5) {
             $this->assertArrayHasKey('reports', $packageConfig['packages']);
         } else {
