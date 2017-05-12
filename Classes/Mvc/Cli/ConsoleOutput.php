@@ -20,7 +20,9 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\Input;
 use Symfony\Component\Console\Output\ConsoleOutput as SymfonyConsoleOutput;
+use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
@@ -58,10 +60,13 @@ class ConsoleOutput
 
     /**
      * Creates and initializes the Symfony I/O instances
+     *
+     * @param Output|null $output
+     * @param Input|null $input
      */
-    public function __construct()
+    public function __construct(Output $output = null, Input $input = null)
     {
-        $this->output = new SymfonyConsoleOutput();
+        $this->output = $output ?: new SymfonyConsoleOutput();
         $this->output->getFormatter()->setStyle('b', new OutputFormatterStyle(null, null, ['bold']));
         $this->output->getFormatter()->setStyle('i', new OutputFormatterStyle('black', 'white'));
         $this->output->getFormatter()->setStyle('u', new OutputFormatterStyle(null, null, ['underscore']));
@@ -72,6 +77,7 @@ class ConsoleOutput
         $this->output->getFormatter()->setStyle('ins', new OutputFormatterStyle('green'));
         $this->output->getFormatter()->setStyle('del', new OutputFormatterStyle('red'));
         $this->output->getFormatter()->setStyle('code', new OutputFormatterStyle(null, null, ['bold']));
+        $this->input = $input;
     }
 
     /**

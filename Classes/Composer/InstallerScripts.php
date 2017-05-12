@@ -18,6 +18,7 @@ use Helhum\Typo3Console\Composer\InstallerScript\CopyTypo3Directory;
 use Helhum\Typo3Console\Composer\InstallerScript\GeneratePackageStates;
 use Helhum\Typo3Console\Composer\InstallerScript\InstallDummyExtension;
 use Helhum\Typo3Console\Composer\InstallerScript\PopulateCommandConfiguration;
+use Helhum\Typo3ConsolePlugin\ScriptDispatcher;
 
 /**
  * Class for Composer and Extension Manager install scripts
@@ -37,27 +38,16 @@ class InstallerScripts
     ];
 
     /**
-     * Called from Composer
+     * Called from Composer Plugin
      *
-     * @param ScriptEvent $event
      * @throws \RuntimeException
      * @return void
      * @internal
      */
-    public static function setupConsole(ScriptEvent $event)
+    public static function setupConsole()
     {
-        $io = $event->getIO();
         foreach (self::$scripts as $scriptClass) {
-            /** @var InstallerScriptInterface $script */
-            $script = new $scriptClass();
-            if ($script->shouldRun($event)) {
-                $io->writeError(sprintf('<info>Executing "%s": </info>', $scriptClass), true, $io::DEBUG);
-                if (!$script->run($event)) {
-                    $io->writeError(sprintf('<error>Executing "%s" failed!</error>', $scriptClass), true);
-                }
-            } else {
-                $io->writeError(sprintf('<info>Skipped executing "%s": </info>', $scriptClass), true, $io::DEBUG);
-            }
+            ScriptDispatcher::addInstallerScript($scriptClass);
         }
     }
 

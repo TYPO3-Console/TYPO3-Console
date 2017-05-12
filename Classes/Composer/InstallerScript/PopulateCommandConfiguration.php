@@ -14,7 +14,7 @@ namespace Helhum\Typo3Console\Composer\InstallerScript;
  */
 
 use Composer\Script\Event as ScriptEvent;
-use Helhum\Typo3Console\Composer\InstallerScriptInterface;
+use Helhum\Typo3ConsolePlugin\InstallerScriptInterface;
 
 /**
  * Reads console command configuration files from all composer packages in the current project

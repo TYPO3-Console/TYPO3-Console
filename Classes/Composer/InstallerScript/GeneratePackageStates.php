@@ -15,9 +15,9 @@ namespace Helhum\Typo3Console\Composer\InstallerScript;
 
 use Composer\Script\Event as ScriptEvent;
 use Composer\Util\Filesystem;
-use Helhum\Typo3Console\Composer\InstallerScriptInterface;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3ConsolePlugin\Config as PluginConfig;
+use Helhum\Typo3ConsolePlugin\InstallerScriptInterface;
 use TYPO3\CMS\Composer\Plugin\Config as Typo3Config;
 
 class GeneratePackageStates implements InstallerScriptInterface

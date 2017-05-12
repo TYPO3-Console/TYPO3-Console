@@ -14,7 +14,7 @@ namespace Helhum\Typo3Console\Composer\InstallerScript;
  */
 
 use Composer\Script\Event as ScriptEvent;
-use Helhum\Typo3Console\Composer\InstallerScriptInterface;
+use Helhum\Typo3ConsolePlugin\InstallerScriptInterface;
 use TYPO3\CMS\Composer\Plugin\Config as Typo3Config;
 use TYPO3\CMS\Composer\Plugin\Util\Filesystem;
 

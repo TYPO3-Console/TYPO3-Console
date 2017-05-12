@@ -86,18 +86,20 @@ class CliSetupRequestHandler
      * @param CommandManager $commandManager
      * @param ReflectionService $reflectionService
      * @param CommandDispatcher $commandDispatcher
+     * @param ConsoleOutput $output
      */
     public function __construct(
         ObjectManager $objectManager,
         CommandManager $commandManager,
         ReflectionService $reflectionService,
-        CommandDispatcher $commandDispatcher = null
+        CommandDispatcher $commandDispatcher = null,
+        ConsoleOutput $output = null
     ) {
         $this->objectManager = $objectManager;
         $this->commandManager = $commandManager;
         $this->reflectionService = $reflectionService;
         $this->commandDispatcher = $commandDispatcher ?: CommandDispatcher::createFromCommandRun();
-        $this->output = new ConsoleOutput();
+        $this->output = $output ?: new ConsoleOutput();
     }
 
     /**
