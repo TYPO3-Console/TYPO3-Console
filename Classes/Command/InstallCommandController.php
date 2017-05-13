@@ -201,7 +201,8 @@ class InstallCommandController extends CommandController
     {
         $commandDispatcher = CommandDispatcher::createFromCommandRun();
         try {
-            $commandDispatcher->executeCommand('database:updateschema');
+            $this->outputLine($commandDispatcher->executeCommand('database:updateschema'));
+            $this->outputLine($commandDispatcher->executeCommand('cache:flush'));
             $this->outputLine($commandDispatcher->executeCommand('extension:setupactive'));
         } catch (FailedSubProcessCommandException $e) {
             $this->outputLine('<warning>Extension setup skipped.</warning>');
