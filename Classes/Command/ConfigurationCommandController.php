@@ -107,18 +107,19 @@ class ConfigurationCommandController extends CommandController implements Single
      * Shows active system configuration by path.
      * Shows the configuration value that is currently effective, no matter where and how it is set.
      *
-     * <b>Example:</b> <code>typo3cms configuration:showActive DB</code>
+     * <b>Example:</b> <code>typo3cms configuration:showActive DB --json</code>
      *
      * @param string $path Path to system configuration
+     * @param bool $json If set, the configuration is shown as JSON
      */
-    public function showActiveCommand($path)
+    public function showActiveCommand($path, $json = false)
     {
         if (!$this->configurationService->hasActive($path)) {
             $this->outputLine('<error>No configuration found for path "%s"</error>', [$path]);
             $this->quit(1);
         }
         $active = $this->configurationService->getActive($path);
-        $this->outputLine($this->consoleRenderer->render($active));
+        $this->outputLine($this->consoleRenderer->render($active, $json));
     }
 
     /**
@@ -131,16 +132,17 @@ class ConfigurationCommandController extends CommandController implements Single
      * <b>Example:</b> <code>typo3cms configuration:showLocal DB</code>
      *
      * @param string $path Path to local system configuration
+     * @param bool $json If set, the configuration is shown as JSON
      * @see typo3_console:configuration:show
      */
-    public function showLocalCommand($path)
+    public function showLocalCommand($path, $json = false)
     {
         if (!$this->configurationService->hasLocal($path)) {
             $this->outputLine('<error>No configuration found for path "%s"</error>', [$path]);
             $this->quit(1);
         }
         $active = $this->configurationService->getLocal($path);
-        $this->outputLine($this->consoleRenderer->render($active));
+        $this->outputLine($this->consoleRenderer->render($active, $json));
     }
 
     /**

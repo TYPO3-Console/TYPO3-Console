@@ -19,8 +19,16 @@ use TYPO3\CMS\Core\Utility\ArrayUtility;
 
 class ConsoleRenderer
 {
-    public function render($config)
+    /**
+     * @param mixed $config
+     * @param bool $renderJson
+     * @return string
+     */
+    public function render($config, $renderJson = false)
     {
+        if ($renderJson) {
+            return $this->getConfigurationAsJson($config);
+        }
         return $this->getConfigurationAsString($config);
     }
 
@@ -36,8 +44,21 @@ class ConsoleRenderer
         return $result;
     }
 
+    /**
+     * @param mixed $config
+     * @return string
+     */
     protected function getConfigurationAsString($config)
     {
         return ArrayUtility::arrayExport([$config]);
+    }
+
+    /**
+     * @param mixed $config
+     * @return string
+     */
+    protected function getConfigurationAsJson($config)
+    {
+        return json_encode([$config]);
     }
 }

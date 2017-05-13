@@ -38,11 +38,31 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
+    public function localConfigurationCanBeShownAsJson()
+    {
+        $output = $this->commandDispatcher->executeCommand('configuration:showlocal', ['--path' => 'BE/installToolPassword', '--json' => true]);
+        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $this->assertContains(\json_encode($config['BE']['installToolPassword']), $output);
+    }
+
+    /**
+     * @test
+     */
     public function activeConfigurationCanBeShown()
     {
         $output = $this->commandDispatcher->executeCommand('configuration:showactive', ['--path' => 'BE/installToolPassword']);
         $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
         $this->assertContains($config['BE']['installToolPassword'], $output);
+    }
+
+    /**
+     * @test
+     */
+    public function activeConfigurationCanBeShownAsJson()
+    {
+        $output = $this->commandDispatcher->executeCommand('configuration:showactive', ['--path' => 'BE/installToolPassword', '--json' => true]);
+        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $this->assertContains(\json_encode($config['BE']['installToolPassword']), $output);
     }
 
     /**
