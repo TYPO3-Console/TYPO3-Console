@@ -363,6 +363,8 @@ Arguments
 
 ``--path``
   Path to system configuration
+``--json``
+  If set, the configuration is shown as JSON
 
 
 
@@ -388,6 +390,8 @@ Arguments
 
 ``--path``
   Path to local system configuration
+``--json``
+  If set, the configuration is shown as JSON
 
 
 
