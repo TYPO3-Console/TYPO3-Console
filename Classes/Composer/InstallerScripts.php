@@ -31,10 +31,10 @@ class InstallerScripts
      * @var array
      */
     private static $scripts = [
-        CopyTypo3Directory::class,
-        PopulateCommandConfiguration::class,
-        GeneratePackageStates::class,
-        InstallDummyExtension::class,
+        100 => CopyTypo3Directory::class,
+        90 => PopulateCommandConfiguration::class,
+        80 => GeneratePackageStates::class,
+        70 => InstallDummyExtension::class,
     ];
 
     /**
@@ -46,8 +46,8 @@ class InstallerScripts
      */
     public static function setupConsole()
     {
-        foreach (self::$scripts as $scriptClass) {
-            ScriptDispatcher::addInstallerScript($scriptClass);
+        foreach (self::$scripts as $priority => $scriptClass) {
+            ScriptDispatcher::addInstallerScript($scriptClass, $priority);
         }
     }
 
