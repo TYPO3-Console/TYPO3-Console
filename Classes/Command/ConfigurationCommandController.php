@@ -110,7 +110,7 @@ class ConfigurationCommandController extends CommandController implements Single
      * <b>Example:</b> <code>typo3cms configuration:showActive DB --json</code>
      *
      * @param string $path Path to system configuration
-     * @param bool $json
+     * @param bool $json If set, the configuration is shown as JSON
      */
     public function showActiveCommand($path, $json = false)
     {
@@ -132,7 +132,7 @@ class ConfigurationCommandController extends CommandController implements Single
      * <b>Example:</b> <code>typo3cms configuration:showLocal DB</code>
      *
      * @param string $path Path to local system configuration
-     * @param bool $json
+     * @param bool $json If set, the configuration is shown as JSON
      * @see typo3_console:configuration:show
      */
     public function showLocalCommand($path, $json = false)

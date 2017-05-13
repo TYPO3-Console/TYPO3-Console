@@ -356,17 +356,21 @@ Arguments
 Shows active system configuration by path.
 Shows the configuration value that is currently effective, no matter where and how it is set.
 
-**Example:** ``typo3cms configuration:showActive DB``
+**Example:** ``typo3cms configuration:showActive DB --json``
 
 Arguments
 ^^^^^^^^^
 
 ``--path``
   Path to system configuration
+
+
+
+Options
+^^^^^^^
+
 ``--json``
   If set, the configuration is shown as JSON
-
-
 
 
 
@@ -390,10 +394,14 @@ Arguments
 
 ``--path``
   Path to local system configuration
+
+
+
+Options
+^^^^^^^
+
 ``--json``
   If set, the configuration is shown as JSON
-
-
 
 
 
