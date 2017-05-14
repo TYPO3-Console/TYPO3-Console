@@ -13,7 +13,7 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  *
  */
 
-use Symfony\Component\Process\ExecutableFinder;
+use Composer\Script\Event as ScriptEvent;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
 
@@ -43,36 +43,29 @@ class CommandDispatcher
     /**
      * Create the dispatcher from within a composer plugin context
      *
-     * Provide the composer bin-dir as search dir to cover most cases
+     * Just provide the composer script event to cover most cases
      *
-     * @param array $searchDirs Directories to look for the typo3cms binary.
-     * @param ExecutableFinder $binFinder
+     * @param ScriptEvent $event
      * @param ProcessBuilder $processBuilder
      * @param PhpExecutableFinder $phpFinder
-     * @throws \RuntimeException
-     * @return self
+     * @return CommandDispatcher
      */
-    public static function createFromComposerRun(array $searchDirs, ExecutableFinder $binFinder = null, ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
+    public static function createFromComposerRun(ScriptEvent $event, ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
     {
-        $binFinder = $binFinder ?: new ExecutableFinder();
         $name = 'typo3cms';
-        $suffixes = [''];
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            $suffixes[] = '.bat';
-        }
-        // The finder first looks in the system directories and then in the
-        // user-defined ones. We want to check the user-defined ones first.
+        $searchDirs = [
+            $event->getComposer()->getConfig()->get('bin-dir'),
+            dirname(dirname(dirname(__DIR__))) . '/Scripts',
+        ];
         foreach ($searchDirs as $dir) {
-            foreach ($suffixes as $suffix) {
-                $file = $dir . DIRECTORY_SEPARATOR . $name . $suffix;
-                if (is_file($file) && ('\\' === DIRECTORY_SEPARATOR || is_executable($file))) {
-                    $typo3cmsCommandPath = $file;
-                    break 2;
-                }
+            $file = $dir . DIRECTORY_SEPARATOR . $name;
+            if (is_file($file)) {
+                $typo3cmsCommandPath = $file;
+                break;
             }
         }
         if (!isset($typo3cmsCommandPath)) {
-            $typo3cmsCommandPath = $binFinder->find($name);
+            throw new \RuntimeException('The "typo3cms" binary could not be found.', 1494778973);
         }
         $processBuilder = $processBuilder ?: new ProcessBuilder();
         $processBuilder->addEnvironmentVariables(['TYPO3_CONSOLE_PLUGIN_RUN' => true]);
