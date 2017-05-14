@@ -64,9 +64,8 @@ class GeneratePackageStates implements InstallerScriptInterface
     public function run(ScriptEvent $event)
     {
         $io = $event->getIO();
-        $composerConfig = $event->getComposer()->getConfig();
 
-        $commandDispatcher = CommandDispatcher::createFromComposerRun([$composerConfig->get('bin-dir'), realpath('./Scripts')]);
+        $commandDispatcher = CommandDispatcher::createFromComposerRun($event);
         $commandOptions = [
             'frameworkExtensions' => (string)getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS'),
         ];
