@@ -206,10 +206,10 @@ class CacheService implements SingletonInterface
         // Get all table names from Default connection starting with 'cf_' and truncate them
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $connection = $connectionPool->getConnectionByName('Default');
-        $tables = $connection->getSchemaManager()->listTables();
-        foreach ($tables as $table) {
-            if ($table->getName() === 'cache_treelist' || strpos($table->getName(), 'cf_') === 0) {
-                $connection->truncate($table->getName());
+        $tablesNames = $tableNames = $connection->getSchemaManager()->listTableNames();
+        foreach ($tablesNames as $tableName) {
+            if ($tableName === 'cache_treelist' || strpos($tableName, 'cf_') === 0) {
+                $connection->truncate($tableName);
             }
         }
     }
