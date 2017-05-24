@@ -23,4 +23,36 @@ class CleanupCommandControllerTest extends AbstractCommandTest
         $output = $this->commandDispatcher->executeCommand('cleanup:updatereferenceindex');
         $this->assertContains('Updating reference index', $output);
     }
+
+    /**
+     * @test
+     */
+    public function referenceIndexIsUpdatedWithNewReferences()
+    {
+        $this->executeMysqlQuery(
+            'INSERT INTO `sys_category` (`pid`, `title`, `description`, `parent`, `items`, `l10n_diffsource`)'
+            . ' VALUES'
+            . ' (1, \'foobar\', \'\', 0, 1, \'\');'
+        );
+        $this->executeMysqlQuery(
+            'INSERT INTO `sys_category_record_mm` (`uid_local`, `uid_foreign`, `tablenames`, `fieldname`, `sorting`, `sorting_foreign`)'
+            . ' VALUES'
+            . ' (1, 1, \'pages\', \'categories\', 0, 1);'
+        );
+        $output = $this->commandDispatcher->executeCommand('cleanup:updatereferenceindex');
+        $this->assertContains('Updating reference index', $output);
+        $this->assertContains('were fixed, while updating reference index for', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function referenceIndexIsUpdatedWithDeletedReferences()
+    {
+        $this->executeMysqlQuery('TRUNCATE `sys_category`;');
+        $this->executeMysqlQuery('TRUNCATE `sys_category_record_mm`;');
+        $output = $this->commandDispatcher->executeCommand('cleanup:updatereferenceindex');
+        $this->assertContains('Updating reference index', $output);
+        $this->assertContains('were fixed, while updating reference index for', $output);
+    }
 }

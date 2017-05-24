@@ -14,72 +14,73 @@ namespace Helhum\Typo3Console\Service\Persistence;
  */
 
 use Helhum\Typo3Console\Service\Delegation\ReferenceIndexIntegrityDelegateInterface;
-use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\ReferenceIndex;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * Class PersistenceIntegrityService
- */
 class PersistenceIntegrityService
 {
     /**
+     * @var PersistenceContextInterface
+     */
+    private $persistenceContext;
+
+    public function __construct(PersistenceContextInterface $persistenceContext)
+    {
+        $this->persistenceContext = $persistenceContext;
+    }
+
+    /**
      * Updating Reference Index
      *
-     * @param PersistenceContext $persistenceContext
      * @param ReferenceIndexIntegrityDelegateInterface|null $delegate
      * @return array Tuple ($errorCount, $recordCount, $processedTables)
      */
-    public function updateReferenceIndex(PersistenceContext $persistenceContext, ReferenceIndexIntegrityDelegateInterface $delegate = null)
+    public function updateReferenceIndex(ReferenceIndexIntegrityDelegateInterface $delegate = null)
     {
-        return $this->checkOrUpdateReferenceIndex(false, $persistenceContext, $delegate);
+        return $this->checkOrUpdateReferenceIndex(false, $delegate);
     }
 
     /**
      * Checking Reference Index
      *
-     * @param PersistenceContext $persistenceContext
      * @param ReferenceIndexIntegrityDelegateInterface|null $delegate
      * @return array Tuple ($errorCount, $recordCount, $processedTables)
      */
-    public function checkReferenceIndex(PersistenceContext $persistenceContext, ReferenceIndexIntegrityDelegateInterface $delegate = null)
+    public function checkReferenceIndex(ReferenceIndexIntegrityDelegateInterface $delegate = null)
     {
-        return $this->checkOrUpdateReferenceIndex(true, $persistenceContext, $delegate);
+        return $this->checkOrUpdateReferenceIndex(true, $delegate);
     }
 
     /**
      * Updating or checking Reference Index
      *
      * @param bool $dryRun
-     * @param PersistenceContext $persistenceContext
      * @param ReferenceIndexIntegrityDelegateInterface|null $delegate
      * @return array Tuple ($errorCount, $recordCount, $processedTables)
      */
-    protected function checkOrUpdateReferenceIndex($dryRun, PersistenceContext $persistenceContext, ReferenceIndexIntegrityDelegateInterface $delegate = null)
+    protected function checkOrUpdateReferenceIndex($dryRun, ReferenceIndexIntegrityDelegateInterface $delegate = null)
     {
         $processedTables = [];
         $errorCount = 0;
         $recordCount = 0;
 
-        $existingTableNames = $persistenceContext->getDatabaseConnection()->admin_get_tables();
-
-        $this->callDelegateForEvent($delegate, 'willStartOperation', [$this->countRowsOfAllRegisteredTables($persistenceContext, $existingTableNames)]);
+        $this->callDelegateForEvent($delegate, 'willStartOperation', [$this->persistenceContext->countAllRecordsOfAllTables()]);
 
         // Traverse all tables:
-        foreach (array_keys($persistenceContext->getPersistenceConfiguration()) as $tableName) {
+        foreach ($this->persistenceContext->getPersistenceConfiguration() as $tableName => $_) {
             // Traverse all records in tables, including deleted records:
-            $selectFields = (BackendUtility::isTableWorkspaceEnabled($tableName) ? 'uid,t3ver_wsid' : 'uid');
-            if (!empty($existingTableNames[$tableName])) {
-                $records = $persistenceContext->getDatabaseConnection()->exec_SELECTgetRows($selectFields, $tableName, '1=1');
-            } else {
-                $this->delegateLog($delegate, 'warning', 'Table "%s" exists in $TCA but does not exist in the database. You should run the Database Analyzer in the Install Tool to fix this.', [$tableName]);
+            try {
+                $records = $this->persistenceContext->getAllRecordsOfTable($tableName);
+            } catch (TableDoesNotExistException $e) {
+                $this->delegateLog($delegate, 'warning', $e->getMessage());
                 continue;
             }
-            if (!is_array($records)) {
+            if (!is_array($records) && !$records instanceof \Traversable) {
                 $this->delegateLog($delegate, 'error', 'Table "%s" exists in $TCA but fetching records from database failed. Check the Database Analyzer in Install Tool for missing fields.', [$tableName]);
                 continue;
             }
             $processedTables[] = $tableName;
+            // @deprecated $uidList can be removed once TYPO3 7.6 support is removed
             $uidList = [0];
             foreach ($records as $record) {
                 $this->callDelegateForEvent($delegate, 'willUpdateRecord', [$tableName, $record]);
@@ -90,6 +91,7 @@ class PersistenceIntegrityService
                     $refIndexObj->setWorkspaceId($record['t3ver_wsid']);
                 }
                 $result = $refIndexObj->updateRefIndexTable($tableName, $record['uid'], $dryRun);
+                // @deprecated $uidList can be removed once TYPO3 7.6 support is removed
                 $uidList[] = $record['uid'];
                 $recordCount++;
                 if ($result['addedNodes'] || $result['deletedNodes']) {
@@ -103,32 +105,35 @@ class PersistenceIntegrityService
                     $this->delegateLog($delegate, 'notice', $errorMessage);
                 }
             }
-            // Searching lost indexes for this table:
-            $where = 'tablename=' . $persistenceContext->getDatabaseConnection()->fullQuoteStr($tableName, 'sys_refindex') . ' AND recuid NOT IN (' . implode(',', $uidList) . ')';
-            $lostIndexes = $persistenceContext->getDatabaseConnection()->exec_SELECTgetRows('hash', 'sys_refindex', $where);
-            if (count($lostIndexes)) {
-                $errorMessage = 'Table ' . $tableName . ' has ' . count($lostIndexes);
-                if ($dryRun) {
-                    $errorMessage .= ' which need to be deleted.';
-                } else {
-                    $errorMessage .= ' which have been deleted.';
+            try {
+                // Searching lost indexes for this table:
+                $lostIndexCount = $this->persistenceContext->countLostIndexesOfRecordsInTable($tableName, $uidList);
+                if ($lostIndexCount > 0) {
+                    $errorMessage = 'Table ' . $tableName . ' has ' . $lostIndexCount;
+                    if ($dryRun) {
+                        $errorMessage .= ' which need to be deleted.';
+                    } else {
+                        $errorMessage .= ' which have been deleted.';
+                    }
+                    $errorCount++;
+                    $this->delegateLog($delegate, 'notice', $errorMessage);
+                    if (!$dryRun) {
+                        $this->persistenceContext->deleteLostIndexesOfRecordsInTable($tableName, $uidList);
+                    }
                 }
-                $errorCount++;
-                $this->delegateLog($delegate, 'notice', $errorMessage);
-                if (!$dryRun) {
-                    $persistenceContext->getDatabaseConnection()->exec_DELETEquery('sys_refindex', $where);
-                }
+            } catch (TableDoesNotExistException $e) {
+                $this->delegateLog($delegate, 'warning', $e->getMessage());
+                continue;
             }
         }
 
         // Searching lost indexes for non-existing tables:
-        $where = 'tablename NOT IN (' . implode(',', $persistenceContext->getDatabaseConnection()->fullQuoteArray($processedTables, 'sys_refindex')) . ')';
-        $lostTablesCount = $persistenceContext->getDatabaseConnection()->exec_SELECTcountRows('hash', 'sys_refindex', $where);
-        if ($lostTablesCount) {
+        $lostTablesCount = $this->persistenceContext->countLostTables($processedTables);
+        if ($lostTablesCount > 0) {
             $errorCount++;
             $this->delegateLog($delegate, 'notice', 'Found ' . $lostTablesCount . ' indexes for not existing tables.');
             if (!$dryRun) {
-                $persistenceContext->getDatabaseConnection()->exec_DELETEquery('sys_refindex', $where);
+                $this->persistenceContext->deleteLostTables($processedTables);
                 $this->delegateLog($delegate, 'info', 'Removed indexes for not existing tables.');
             }
         }
@@ -163,23 +168,5 @@ class PersistenceIntegrityService
             return;
         }
         $delegate->getLogger()->{$severity}($message, $data);
-    }
-
-    /**
-     * @param PersistenceContext $persistenceContext
-     * @param array $existingTableNames
-     * @return int
-     */
-    protected function countRowsOfAllRegisteredTables(PersistenceContext $persistenceContext, $existingTableNames)
-    {
-        $rowsCount = 0;
-        foreach (array_keys($persistenceContext->getPersistenceConfiguration()) as $tableName) {
-            if (empty($existingTableNames[$tableName])) {
-                continue;
-            }
-            $rowsCount += $persistenceContext->getDatabaseConnection()->exec_SELECTcountRows('uid', $tableName, '1=1');
-        }
-
-        return $rowsCount;
     }
 }
