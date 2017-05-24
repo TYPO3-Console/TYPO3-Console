@@ -81,21 +81,22 @@ class ConfigurationCommandController extends CommandController implements Single
      */
     public function showCommand($path)
     {
-        if (!$this->configurationService->hasActive($path) && !$this->configurationService->hasLocal($path)) {
+        $hasActive = $this->configurationService->hasActive($path);
+        $hasLocal = $this->configurationService->hasLocal($path);
+        if (!$hasActive && !$hasLocal) {
             $this->outputLine('<error>No configuration found for path "%s"</error>', [$path]);
             $this->quit(1);
         }
-        if ($this->configurationService->localIsActive($path) && $this->configurationService->hasActive($path)) {
+        $active = null;
+        if ($hasActive) {
             $active = $this->configurationService->getActive($path);
+        }
+        if ($this->configurationService->localIsActive($path) && $hasActive) {
             $this->outputLine($this->consoleRenderer->render($active));
         } else {
             $local = null;
-            $active = null;
-            if ($this->configurationService->hasLocal($path)) {
+            if ($hasLocal) {
                 $local = $this->configurationService->getLocal($path);
-            }
-            if ($this->configurationService->hasActive($path)) {
-                $active = $this->configurationService->getActive($path);
             }
             $this->outputLine($this->consoleRenderer->renderDiff($local, $active));
         }

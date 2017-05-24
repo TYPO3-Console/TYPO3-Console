@@ -59,6 +59,6 @@ class ConsoleRenderer
      */
     protected function getConfigurationAsJson($config)
     {
-        return json_encode([$config]);
+        return \json_encode($config);
     }
 }
