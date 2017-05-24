@@ -15,7 +15,6 @@ namespace Helhum\Typo3Console\Command;
 
 use Helhum\Typo3Console\Command\Delegation\ReferenceIndexUpdateDelegate;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
-use Helhum\Typo3Console\Service\Persistence\PersistenceContext;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Log\LogLevel;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -49,13 +48,13 @@ class CleanupCommandController extends CommandController
         $operation = $dryRun ? 'checkReferenceIndex' : 'updateReferenceIndex';
 
         list($errorCount, $recordCount, $processedTables) = $this->persistenceIntegrityService->{$operation}(
-            new PersistenceContext($GLOBALS['TYPO3_DB'], $GLOBALS['TCA']),
             $this->createReferenceIndexDelegateWithOptions($dryRun, $verbose, $showProgress)
         );
 
         if ($errorCount > 0) {
             $this->outputLine('<info>%d errors were ' . ($dryRun ? 'found' : 'fixed') . ', while ' . ($dryRun ? 'checking' : 'updating') . ' reference index for %d records from %d tables.</info>', [$errorCount, $recordCount, count($processedTables)]);
         } else {
+            $this->outputLine();
             $this->outputLine('<info>Index integrity was perfect!</info>');
         }
     }

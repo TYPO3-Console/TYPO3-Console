@@ -56,7 +56,7 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
         $mysqlProcess = $processBuilder->getProcess();
         $mysqlProcess->run();
         if (!$mysqlProcess->isSuccessful()) {
-            throw new \RuntimeException(sprintf('Executing query "%s" failed. Did you set TYPO3_INSTALL_DB_* correctly? Is your database server running?', $sql), 1493634196);
+            throw new \RuntimeException(sprintf('Executing query "%s" failed. Did you set TYPO3_INSTALL_DB_* correctly? Is your database server running? Output: "%s", Error Output: "%s"', $sql, $mysqlProcess->getOutput(), $mysqlProcess->getErrorOutput()), 1493634196);
         }
         return $mysqlProcess->getOutput();
     }
