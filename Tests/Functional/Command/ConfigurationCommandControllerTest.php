@@ -42,7 +42,7 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     {
         $output = $this->commandDispatcher->executeCommand('configuration:showlocal', ['--path' => 'BE/installToolPassword', '--json' => true]);
         $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
-        $this->assertContains(\json_encode($config['BE']['installToolPassword']), $output);
+        $this->assertSame($config['BE']['installToolPassword'], \json_decode($output));
     }
 
     /**
@@ -62,7 +62,16 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     {
         $output = $this->commandDispatcher->executeCommand('configuration:showactive', ['--path' => 'BE/installToolPassword', '--json' => true]);
         $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
-        $this->assertContains(\json_encode($config['BE']['installToolPassword']), $output);
+        $this->assertSame($config['BE']['installToolPassword'], \json_decode($output));
+    }
+
+    /**
+     * @test
+     */
+    public function activeConfigurationReflectsRealState()
+    {
+        $output = $this->commandDispatcher->executeCommand('configuration:showactive', ['--path' => 'SYS/caching/cacheConfigurations/extbase_reflection/backend', '--json' => true]);
+        $this->assertSame('TYPO3\\CMS\\Core\\Cache\\Backend\\Typo3DatabaseBackend', \json_decode($output));
     }
 
     /**
