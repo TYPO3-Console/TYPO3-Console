@@ -67,7 +67,7 @@ class ExtensionSetupResultRenderer
                 $signalConfig['signalClass'],
                 $signalConfig['signalName'],
                 \Closure::bind(function ($result) use ($signalConfig, $collector) {
-                    $collector->results[$signalConfig['resultName']] = $result;
+                    $collector->results[$signalConfig['resultName']][] = $result;
                 }, null, get_class($this))
             );
         }
@@ -82,7 +82,7 @@ class ExtensionSetupResultRenderer
         if (!isset($this->results['renderSchemaResult'])) {
             return;
         }
-        $result = $this->results['renderSchemaResult'];
+        $result = reset($this->results['renderSchemaResult']);
         if ($result->hasPerformedUpdates()) {
             $schemaUpdateResultRenderer = $schemaUpdateResultRenderer ?: new SchemaUpdateResultRenderer();
             $output->outputLine('<info>The following database schema updates were performed:</info>');
@@ -107,12 +107,13 @@ class ExtensionSetupResultRenderer
         if (!isset($this->results['renderImportedStaticDataResult'])) {
             return;
         }
-        $pathToStaticSqlFile = $this->results['renderImportedStaticDataResult'];
-        // Output content of $pathToStaticSqlFile at cli context
-        $absolutePath = PATH_site . $pathToStaticSqlFile;
-        if (file_exists($absolutePath)) {
-            $output->outputFormatted('<info>Import content of file "%s" into database.</info>', [$pathToStaticSqlFile]);
-            $output->outputFormatted(file_get_contents($absolutePath), [], 2);
+        foreach ($this->results['renderImportedStaticDataResult'] as $pathToStaticSqlFile) {
+            // Output content of $pathToStaticSqlFile at cli context
+            $absolutePath = PATH_site . $pathToStaticSqlFile;
+            if (file_exists($absolutePath)) {
+                $output->outputFormatted('<info>Import content of file "%s" into database.</info>', [$pathToStaticSqlFile]);
+                $output->outputFormatted(file_get_contents($absolutePath), [], 2);
+            }
         }
     }
 
@@ -126,11 +127,12 @@ class ExtensionSetupResultRenderer
         if (!isset($this->results['renderExtensionFileImportResult'])) {
             return;
         }
-        $destinationAbsolutePath = $this->results['renderExtensionFileImportResult'];
-        $output->outputFormatted(
-            '<info>Files from extension was imported to path "%s"</info>',
-            [PathUtility::stripPathSitePrefix($destinationAbsolutePath)]
-        );
+        foreach ($this->results['renderExtensionFileImportResult'] as $destinationAbsolutePath) {
+            $output->outputFormatted(
+                '<info>Files from extension was imported to path "%s"</info>',
+                [PathUtility::stripPathSitePrefix($destinationAbsolutePath)]
+            );
+        }
     }
 
     /**
@@ -143,10 +145,11 @@ class ExtensionSetupResultRenderer
         if (!isset($this->results['renderExtensionDataImportResult'])) {
             return;
         }
-        $importedFile = $this->results['renderExtensionDataImportResult'];
-        $output->outputFormatted(
-            '<info>Data from from file "%s" was imported</info>',
-            [$importedFile]
-        );
+        foreach ($this->results['renderExtensionDataImportResult'] as $importedFile) {
+            $output->outputFormatted(
+                '<info>Data from from file "%s" was imported</info>',
+                [$importedFile]
+            );
+        }
     }
 }
