@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Core;
  *
  */
 
+use Composer\Autoload\ClassLoader;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\Booting\Sequence;
 use Helhum\Typo3Console\Error\ExceptionHandler;
@@ -40,6 +41,11 @@ class ConsoleBootstrap extends Bootstrap
     private $runLevel;
 
     /**
+     * @var ClassLoader
+     */
+    private $classLoader;
+
+    /**
      * @param string $context
      * @return ConsoleBootstrap
      */
@@ -62,6 +68,7 @@ class ConsoleBootstrap extends Bootstrap
             $this->ensureRequiredEnvironment();
             self::$instance = $this;
             self::$usesComposerClassLoading = class_exists(\Helhum\Typo3Console\Package\UncachedPackageManager::class);
+            $this->classLoader = $classLoader;
             $this->initializeClassLoader($classLoader);
             // @deprecated in TYPO3 8. Condition will be removed when TYPO3 7.6 support is removed
             if (is_callable([$this, 'setRequestType'])) {
@@ -93,6 +100,14 @@ class ConsoleBootstrap extends Bootstrap
             $this->initializeCommandManager();
             $this->registerCommands();
         }
+    }
+
+    /**
+     * @return ClassLoader
+     */
+    public function getClassLoader()
+    {
+        return $this->classLoader;
     }
 
     /**
