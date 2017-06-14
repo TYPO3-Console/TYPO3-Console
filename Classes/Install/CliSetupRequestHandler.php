@@ -134,7 +134,7 @@ class CliSetupRequestHandler
 
         // The TYPO3 installation process does not take care of setting up all extensions properly,
         // so we do it manually here.
-        unset($packageStatesArguments['excludedExtensions']);
+        unset($packageStatesArguments['--excluded-extensions']);
         $this->commandDispatcher->executeCommand('install:generatepackagestates', $packageStatesArguments);
         // Flush caches, as the extension list has changed
         $this->commandDispatcher->executeCommand('cache:flush', ['--force' => true]);
