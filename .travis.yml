@@ -43,7 +43,7 @@ notifications:
 
 before_install:
   - |
-    export COMPOSER_ROOT_VERSION=4.6.2
+    export COMPOSER_ROOT_VERSION=4.6.3
     export PATH="$PATH:./Scripts"
   - if php -i | grep -q xdebug; then phpenv config-rm xdebug.ini; fi
 
