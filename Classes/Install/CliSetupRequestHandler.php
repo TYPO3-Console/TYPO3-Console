@@ -148,7 +148,7 @@ class CliSetupRequestHandler
             $this->output->outputLine('<warning>The error message was "%s"</warning>', [$e->getPrevious()->getMessage()]);
         }
         // Flush caches, as the extension list has changed
-        $this->commandDispatcher->executeCommand('cache:flush', ['--force' => true]);
+        $this->commandDispatcher->executeCommand('cache:flush', ['--files-only' => true]);
         $this->commandDispatcher->executeCommand('extension:setupactive');
     }
 

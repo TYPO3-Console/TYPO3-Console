@@ -54,11 +54,12 @@ class CacheService implements SingletonInterface
      * Flushes all caches
      *
      * @param bool $force
+     * @param bool $onlyFileCaches
      */
-    public function flush($force = false)
+    public function flush($force = false, $onlyFileCaches = false)
     {
-        if ($force) {
-            $this->forceFlushCoreFileAndDatabaseCaches();
+        if ($force || $onlyFileCaches) {
+            $this->forceFlushCoreFileAndDatabaseCaches($onlyFileCaches);
         }
         $this->cacheManager->flushCaches();
     }
@@ -167,23 +168,30 @@ class CacheService implements SingletonInterface
 
     /**
      * Recursively delete cache directory and truncate all DB tables prefixed with 'cf_'
+     *
+     * @param bool $onlyFileCaches
      */
-    protected function forceFlushCoreFileAndDatabaseCaches()
+    protected function forceFlushCoreFileAndDatabaseCaches($onlyFileCaches)
     {
         if (class_exists(ConnectionPool::class)) {
-            $this->_forceFlushCoreFileAndDatabaseCaches();
+            $this->_forceFlushCoreFileAndDatabaseCaches($onlyFileCaches);
         } else {
-            $this->_legacyForceFlushCoreFileAndDatabaseCaches();
+            $this->_legacyForceFlushCoreFileAndDatabaseCaches($onlyFileCaches);
         }
     }
 
     /**
      * Recursively delete cache directory and truncate all DB tables prefixed with 'cf_'
+     *
      * @deprecated Will be removed once TYPO3 7.6 support is removed
+     * @param bool $onlyFileCaches
      */
-    private function _legacyForceFlushCoreFileAndDatabaseCaches()
+    private function _legacyForceFlushCoreFileAndDatabaseCaches($onlyFileCaches)
     {
         GeneralUtility::flushDirectory(PATH_site . 'typo3temp/Cache', true);
+        if ($onlyFileCaches) {
+            return;
+        }
         // Get all table names starting with 'cf_' and truncate them
         /** @var DatabaseConnection $db */
         $db = $GLOBALS['TYPO3_DB'];
@@ -198,11 +206,16 @@ class CacheService implements SingletonInterface
 
     /**
      * Recursively delete cache directory and truncate all DB tables prefixed with 'cf_'
+     *
+     * @param bool $onlyFileCaches
      */
-    private function _forceFlushCoreFileAndDatabaseCaches()
+    private function _forceFlushCoreFileAndDatabaseCaches($onlyFileCaches)
     {
         // Delete typo3temp/Cache
         GeneralUtility::flushDirectory(PATH_site . 'typo3temp/var/Cache', true);
+        if ($onlyFileCaches) {
+            return;
+        }
         // Get all table names from Default connection starting with 'cf_' and truncate them
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $connection = $connectionPool->getConnectionByName('Default');

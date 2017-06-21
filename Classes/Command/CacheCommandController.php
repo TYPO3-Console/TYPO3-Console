@@ -49,11 +49,16 @@ class CacheCommandController extends CommandController
      * Flushes TYPO3 core caches first and after that, flushes caches from extensions.
      *
      * @param bool $force Cache is forcibly flushed (low level operations are performed)
+     * @param bool $filesOnly Only file caches are flushed (low level operations are performed)
      * @throws \Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException
      */
-    public function flushCommand($force = false)
+    public function flushCommand($force = false, $filesOnly = false)
     {
-        $this->cacheService->flush($force);
+        $this->cacheService->flush($force, $filesOnly);
+        if ($filesOnly) {
+            $this->outputLine('Force flushed file caches.');
+            return;
+        }
         $this->commandDispatcher->executeCommand('cache:flushcomplete');
         $this->outputLine(sprintf('%slushed all caches.', $force ? 'Force f' : 'F'));
     }
