@@ -159,6 +159,8 @@ Options
 
 ``--force``
   Cache is forcibly flushed (low level operations are performed)
+``--files-only``
+  Only file caches are flushed (low level operations are performed)
 
 
 
