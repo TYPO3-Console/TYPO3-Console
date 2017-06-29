@@ -63,9 +63,7 @@ This directory **must not** be a symlink to another location!
 The extension manager, will copy the `typo3cms` command line tool
 into the installation root directory during activation.
 
-## ToDo & Ideas
+## Submit bug reports or feature requests
 
 Look at the [Issues](https://github.com/TYPO3-Console/typo3_console/issues)
 for what has been planned to be implemented in the (near) future.
-
-* … Add ideas to the issues section of this repository where title is prepended with "idea:"
