@@ -49,32 +49,38 @@ class CacheCommandController extends CommandController
      * Flushes TYPO3 core caches first and after that, flushes caches from extensions.
      *
      * @param bool $force Cache is forcibly flushed (low level operations are performed)
-     * @param bool $filesOnly Only file caches are flushed (low level operations are performed)
+     * @param bool $filesOnly Only file caches are flushed
      * @throws \Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException
      */
     public function flushCommand($force = false, $filesOnly = false)
     {
-        $this->cacheService->flush($force, $filesOnly);
         if ($filesOnly) {
-            $this->outputLine('Force flushed file caches.');
-            return;
+            $this->cacheService->flushFileCaches($force);
+        } else {
+            $this->cacheService->flush($force);
         }
-        $this->commandDispatcher->executeCommand('cache:flushcomplete');
-        $this->outputLine(sprintf('%slushed all caches.', $force ? 'Force f' : 'F'));
+        $this->commandDispatcher->executeCommand('cache:flushcomplete', ['--files-only' => $filesOnly]);
+        $this->outputLine(sprintf('%slushed all %scaches.', $force ? 'Force f' : 'F', $filesOnly ? 'file ' : ''));
     }
 
     /**
      * Called only internally in a sub process of the cache:flush command
      *
      * This command will then use the full TYPO3 bootstrap.
+     *
+     * @param bool $filesOnly Only file caches are flushed
      * @internal
      */
-    public function flushCompleteCommand()
+    public function flushCompleteCommand($filesOnly = false)
     {
         // Flush a second time to have extension caches and previously disabled core caches cleared when clearing not forced
-        $this->cacheService->flush();
-        // Also call the data handler API to cover legacy hook subscriber code
-        $this->cacheService->flushCachesWithDataHandler();
+        if ($filesOnly) {
+            $this->cacheService->flushFileCaches();
+        } else {
+            $this->cacheService->flush();
+            // Also call the data handler API to cover legacy hook subscriber code
+            $this->cacheService->flushCachesWithDataHandler();
+        }
     }
 
     /**
