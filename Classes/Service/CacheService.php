@@ -15,8 +15,10 @@ namespace Helhum\Typo3Console\Service;
 
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Cache\Backend\SimpleFileBackend;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
+use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
@@ -54,14 +56,28 @@ class CacheService implements SingletonInterface
      * Flushes all caches
      *
      * @param bool $force
-     * @param bool $onlyFileCaches
      */
-    public function flush($force = false, $onlyFileCaches = false)
+    public function flush($force = false)
     {
-        if ($force || $onlyFileCaches) {
-            $this->forceFlushCoreFileAndDatabaseCaches($onlyFileCaches);
+        if ($force) {
+            $this->forceFlushCoreFileAndDatabaseCaches();
         }
         $this->cacheManager->flushCaches();
+    }
+
+    /**
+     * Flushes all file based caches
+     *
+     * @param bool $force
+     */
+    public function flushFileCaches($force = false)
+    {
+        if ($force) {
+            $this->forceFlushCoreFileAndDatabaseCaches(true);
+        }
+        foreach ($this->getFileCaches() as $cache) {
+            $cache->flush();
+        }
     }
 
     /**
@@ -167,31 +183,80 @@ class CacheService implements SingletonInterface
     }
 
     /**
-     * Recursively delete cache directory and truncate all DB tables prefixed with 'cf_'
-     *
-     * @param bool $onlyFileCaches
+     * @return FrontendInterface[]
      */
-    protected function forceFlushCoreFileAndDatabaseCaches($onlyFileCaches)
+    private function getFileCaches()
     {
-        if (class_exists(ConnectionPool::class)) {
-            $this->_forceFlushCoreFileAndDatabaseCaches($onlyFileCaches);
-        } else {
-            $this->_legacyForceFlushCoreFileAndDatabaseCaches($onlyFileCaches);
+        $fileCaches = [];
+        foreach ($this->configurationService->getActive('SYS/caching/cacheConfigurations') as $identifier => $cacheConfiguration) {
+            if (
+                isset($cacheConfiguration['backend'])
+                && (
+                    $cacheConfiguration['backend'] === SimpleFileBackend::class
+                    || is_subclass_of($cacheConfiguration['backend'], SimpleFileBackend::class)
+                )
+            ) {
+                $fileCaches[] = $this->cacheManager->getCache($identifier);
+            }
         }
+        return $fileCaches;
     }
 
     /**
      * Recursively delete cache directory and truncate all DB tables prefixed with 'cf_'
      *
-     * @deprecated Will be removed once TYPO3 7.6 support is removed
      * @param bool $onlyFileCaches
      */
-    private function _legacyForceFlushCoreFileAndDatabaseCaches($onlyFileCaches)
+    protected function forceFlushCoreFileAndDatabaseCaches($onlyFileCaches = false)
     {
-        GeneralUtility::flushDirectory(PATH_site . 'typo3temp/Cache', true);
+        $cacheDir = 'var/Cache';
+        $dbFlushMethod = '_forceFlushCoreDatabaseCaches';
+        if (!class_exists(ConnectionPool::class)) {
+            // @deprecated can be removed when TYPO3 7.6 support is removed
+            $cacheDir = 'Cache';
+            $dbFlushMethod = '_legacyForceFlushCoreDatabaseCaches';
+        }
+        $this->forceFlushCoreFileCaches($cacheDir);
         if ($onlyFileCaches) {
             return;
         }
+        $this->$dbFlushMethod();
+    }
+
+    /**
+     * Recursively delete cache directory
+     *
+     * @param string $cacheDirectory
+     */
+    private function forceFlushCoreFileCaches($cacheDirectory)
+    {
+        // Delete typo3temp/Cache
+        GeneralUtility::flushDirectory(PATH_site . 'typo3temp/' . $cacheDirectory, true);
+    }
+
+    /**
+     * Truncate all DB tables prefixed with 'cf_'
+     */
+    private function _forceFlushCoreDatabaseCaches()
+    {
+        // Get all table names from Default connection starting with 'cf_' and truncate them
+        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $connection = $connectionPool->getConnectionByName('Default');
+        $tablesNames = $tableNames = $connection->getSchemaManager()->listTableNames();
+        foreach ($tablesNames as $tableName) {
+            if ($tableName === 'cache_treelist' || strpos($tableName, 'cf_') === 0) {
+                $connection->truncate($tableName);
+            }
+        }
+    }
+
+    /**
+     * Truncate all DB tables prefixed with 'cf_'
+     *
+     * @deprecated Will be removed once TYPO3 7.6 support is removed
+     */
+    private function _legacyForceFlushCoreDatabaseCaches()
+    {
         // Get all table names starting with 'cf_' and truncate them
         /** @var DatabaseConnection $db */
         $db = $GLOBALS['TYPO3_DB'];
@@ -200,29 +265,6 @@ class CacheService implements SingletonInterface
             $tableName = $table['Name'];
             if ($tableName === 'cache_treelist' || strpos($tableName, 'cf_') === 0) {
                 $db->exec_TRUNCATEquery($tableName);
-            }
-        }
-    }
-
-    /**
-     * Recursively delete cache directory and truncate all DB tables prefixed with 'cf_'
-     *
-     * @param bool $onlyFileCaches
-     */
-    private function _forceFlushCoreFileAndDatabaseCaches($onlyFileCaches)
-    {
-        // Delete typo3temp/Cache
-        GeneralUtility::flushDirectory(PATH_site . 'typo3temp/var/Cache', true);
-        if ($onlyFileCaches) {
-            return;
-        }
-        // Get all table names from Default connection starting with 'cf_' and truncate them
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
-        $connection = $connectionPool->getConnectionByName('Default');
-        $tablesNames = $tableNames = $connection->getSchemaManager()->listTableNames();
-        foreach ($tablesNames as $tableName) {
-            if ($tableName === 'cache_treelist' || strpos($tableName, 'cf_') === 0) {
-                $connection->truncate($tableName);
             }
         }
     }

@@ -38,10 +38,19 @@ class CacheCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
-    public function fileCachesCanBeForceFlushedFlushed()
+    public function fileCachesCanBeFlushed()
     {
         $output = $this->commandDispatcher->executeCommand('cache:flush', ['--files-only' => true]);
-        $this->assertSame('Force flushed file caches.', $output);
+        $this->assertSame('Flushed all file caches.', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function fileCachesCanBeForceFlushedFlushed()
+    {
+        $output = $this->commandDispatcher->executeCommand('cache:flush', ['--files-only' => true, '--force' => true]);
+        $this->assertSame('Force flushed all file caches.', $output);
     }
 
     /**
