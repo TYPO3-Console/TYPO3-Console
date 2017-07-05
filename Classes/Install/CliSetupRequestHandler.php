@@ -24,6 +24,7 @@ use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
 use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentTypeException;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Reflection\ReflectionService;
+use TYPO3\CMS\Install\Status\ErrorStatus;
 use TYPO3\CMS\Install\Status\StatusInterface;
 
 /**
@@ -258,8 +259,24 @@ class CliSetupRequestHandler
      */
     private function executeActionWithArguments($actionName, array $arguments = [])
     {
-        $response = @unserialize($this->commandDispatcher->executeCommand('install:' . strtolower($actionName), $arguments));
-        if ($response === false && strtolower($actionName) === 'defaultconfiguration') {
+        $actionName = strtolower($actionName);
+        if (
+            $actionName === 'defaultconfiguration'
+            && !empty($arguments['siteSetupType'])
+            && $arguments['siteSetupType'] === 'dist'
+            && ConsoleBootstrap::usesComposerClassLoading()
+        ) {
+            $errorMessage = new ErrorStatus();
+            $errorMessage->setMessage('Site setup type "dist" is not possible when TYPO3 is installed with composer. Use "composer require" to install a distribution of your choice.');
+            return new InstallStepResponse(
+                true,
+                [
+                    $errorMessage,
+                ]
+            );
+        }
+        $response = @unserialize($this->commandDispatcher->executeCommand('install:' . $actionName, $arguments));
+        if ($response === false && $actionName === 'defaultconfiguration') {
             // This action terminates with exit, (trying to initiate a HTTP redirect)
             // Therefore we gracefully create a valid response here
             $response = new InstallStepResponse(false, []);

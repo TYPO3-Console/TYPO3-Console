@@ -64,7 +64,7 @@ class InstallCommandController extends CommandController
      * @param string $adminUserName User name of the administrative backend user account to be created
      * @param string $adminPassword Password of the administrative backend user account to be created
      * @param string $siteName Site Name
-     * @param string $siteSetupType Can be either <code>no</code> (which unsurprisingly does nothing at all), <code>site</code> (which creates an empty root page and setup) or <code>dist</code> (which loads a list of distributions you can install)
+     * @param string $siteSetupType Can be either <code>no</code> (which unsurprisingly does nothing at all), <code>site</code> (which creates an empty root page and setup) or <code>dist</code> (which loads a list of distributions you can install, but only works in non composer mode)
      */
     public function setupCommand(
         $nonInteractive = false,
@@ -274,11 +274,13 @@ class InstallCommandController extends CommandController
      * Writes default configuration for the TYPO3 site based on the
      * provided $siteSetupType. Valid values are:
      *
-     * - dist (which loads a list of distributions you can install)
      * - site (which creates an empty root page and setup)
      * - no (which unsurprisingly does nothing at all)
      *
-     * @param string $siteSetupType Specify the setup type: Download the list of distributions (dist), Create empty root page (site), Do nothing (no)
+     * In non composer mode the following option is also available:
+     * - dist (which loads a list of distributions you can install)
+     *
+     * @param string $siteSetupType Specify the setup type: Create empty root page (site), Do nothing (no), Only available in non composer mode: Download the list of distributions (dist)
      * @internal
      */
     public function defaultConfigurationCommand($siteSetupType = 'no')
