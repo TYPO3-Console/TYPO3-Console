@@ -55,8 +55,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Helhum\\Typo3Console\\Tests\\": "Tests/",
-            "TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/core/Tests/"
+            "Helhum\\Typo3Console\\Tests\\": "Tests/"
         }
     },
     "replace": {
