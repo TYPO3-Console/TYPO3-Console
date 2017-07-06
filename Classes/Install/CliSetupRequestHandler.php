@@ -134,6 +134,9 @@ class CliSetupRequestHandler
             $this->dispatchAction($actionName);
         }
 
+        $this->output->outputLine();
+        $this->output->outputLine('Set up extensions:');
+
         // The TYPO3 installation process does not take care of setting up all extensions properly,
         // so we do it manually here.
         try {
@@ -151,6 +154,7 @@ class CliSetupRequestHandler
         // Flush caches, as the extension list has changed
         $this->commandDispatcher->executeCommand('cache:flush', ['--files-only' => true]);
         $this->commandDispatcher->executeCommand('extension:setupactive');
+        $this->output->outputLine('<success>OK</success>');
     }
 
     /**
