@@ -76,8 +76,8 @@ after_script:
       curl -sSL https://raw.githubusercontent.com/alrra/travis-after-all/1.4.4/lib/travis-after-all.js | node
       if [ $? -eq 0 ]; then
         # Cleanup before we upload
-        composer require --dev typo3/cms=^8.7 --update-with-dependencies
-        composer require --dev namelesscoder/typo3-repository-client:^1.2.0
+        composer require --dev typo3/cms ^8.7 --update-with-dependencies
+        composer require --dev helhum/ter-client dev-master
         git reset --hard HEAD && git clean -fx
 
         # Build extension files
@@ -86,6 +86,6 @@ after_script:
         # Upload
         TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
         echo "Uploading release ${TRAVIS_TAG} to TER"
-        .Build/bin/upload . "$TYPO3_ORG_USERNAME" "$TYPO3_ORG_PASSWORD" "$TAG_MESSAGE"
+        .Build/bin/ter-client upload typo3_console . -u "$TYPO3_ORG_USERNAME" -p "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
       fi;
     fi;
