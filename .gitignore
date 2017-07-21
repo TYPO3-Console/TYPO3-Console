@@ -1,0 +1,10 @@
+/.Build/*
+/composer.lock
+/typo3cms
+
+/Configuration/Console/AllCommands.php
+/Libraries/*
+/ext_emconf.php
+/ext_icon.png
+/ext_localconf.php
+/.php_cs.cache
