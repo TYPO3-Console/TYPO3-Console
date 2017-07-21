@@ -360,6 +360,9 @@ class ConsoleBootstrap extends Bootstrap
         if (!self::usesComposerClassLoading()) {
             $this->initializeRuntimeActivatedPackagesFromConfiguration();
         }
+        // Because links might be generated from CLI (e.g. by Solr indexer)
+        // We need to properly initialize the cache hash calculator here!
+        $this->setCacheHashOptions();
         $this->setDefaultTimezone();
         $this->defineUserAgentConstant();
     }
