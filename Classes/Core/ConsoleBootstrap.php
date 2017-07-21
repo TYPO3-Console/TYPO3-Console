@@ -375,6 +375,7 @@ class ConsoleBootstrap extends Bootstrap {
 
 	public function initializeConfigurationManagement() {
 		$this->populateLocalConfiguration();
+		$this->setCacheHashOptions();
 		$this->setDefaultTimezone();
 		$this->defineUserAgentConstant();
 	}
