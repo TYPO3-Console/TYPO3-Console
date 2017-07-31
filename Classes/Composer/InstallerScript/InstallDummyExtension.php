@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Composer\InstallerScript;
 
 /*
@@ -15,20 +16,20 @@ namespace Helhum\Typo3Console\Composer\InstallerScript;
 
 use Composer\Script\Event as ScriptEvent;
 use Helhum\Typo3ConsolePlugin\Config as PluginConfig;
-use Helhum\Typo3ConsolePlugin\InstallerScriptInterface;
 use TYPO3\CMS\Composer\Plugin\Config as Typo3Config;
+use TYPO3\CMS\Composer\Plugin\Core\InstallerScript;
 use TYPO3\CMS\Composer\Plugin\Util\Filesystem;
 
 /**
  * @deprecated will be removed with 5.0
  */
-class InstallDummyExtension implements InstallerScriptInterface
+class InstallDummyExtension implements InstallerScript
 {
     /**
      * @param ScriptEvent $event
      * @return bool
      */
-    public function shouldRun(ScriptEvent $event)
+    private function shouldRun(ScriptEvent $event): bool
     {
         return $event->getComposer()->getPackage()->getName() !== 'helhum/typo3-console';
     }
@@ -39,8 +40,12 @@ class InstallDummyExtension implements InstallerScriptInterface
      * @return bool
      * @internal
      */
-    public function run(ScriptEvent $event)
+    public function run(ScriptEvent $event): bool
     {
+        if (!$this->shouldRun($event)) {
+            return true;
+        }
+
         $io = $event->getIO();
         $composer = $event->getComposer();
 

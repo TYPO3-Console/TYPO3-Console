@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Composer;
 
 /*
@@ -13,42 +14,49 @@ namespace Helhum\Typo3Console\Composer;
  *
  */
 
+use Composer\Script\Event;
 use Composer\Script\Event as ScriptEvent;
+use Composer\Semver\Constraint\EmptyConstraint;
 use Helhum\Typo3Console\Composer\InstallerScript\CopyTypo3Directory;
 use Helhum\Typo3Console\Composer\InstallerScript\GeneratePackageStates;
 use Helhum\Typo3Console\Composer\InstallerScript\InstallDummyExtension;
 use Helhum\Typo3Console\Composer\InstallerScript\PopulateCommandConfiguration;
-use Helhum\Typo3ConsolePlugin\ScriptDispatcher;
+use TYPO3\CMS\Composer\Plugin\Core\InstallerScripts\AutoloadConnector;
+use TYPO3\CMS\Composer\Plugin\Core\InstallerScripts\WebDirectory;
+use TYPO3\CMS\Composer\Plugin\Core\InstallerScriptsRegistration;
+use TYPO3\CMS\Composer\Plugin\Core\ScriptDispatcher;
 
 /**
- * Class for Composer and Extension Manager install scripts
+ * Scripts executed on composer build time
  */
-class InstallerScripts
+class InstallerScripts implements InstallerScriptsRegistration
 {
     /**
-     * Scripts to execute when console is set up
+     * Allows to register one or more script objects that implement this interface
+     * This will be called in the Plugin right before the scripts are executed.
      *
-     * @var array
-     */
-    private static $scripts = [
-        100 => CopyTypo3Directory::class,
-        90 => PopulateCommandConfiguration::class,
-        80 => GeneratePackageStates::class,
-        70 => InstallDummyExtension::class,
-    ];
-
-    /**
-     * Called from Composer Plugin
-     *
-     * @throws \RuntimeException
+     * @param Event $event
+     * @param ScriptDispatcher $scriptDispatcher
      * @return void
-     * @internal
      */
-    public static function setupConsole()
+    public static function register(Event $event, ScriptDispatcher $scriptDispatcher)
     {
-        foreach (self::$scripts as $priority => $scriptClass) {
-            ScriptDispatcher::addInstallerScript($scriptClass, $priority);
+        $scriptDispatcher->addInstallerScript(new PopulateCommandConfiguration(), 70);
+        if (
+            !(
+                class_exists(\TYPO3\CMS\Core\Composer\InstallerScripts::class)
+                || class_exists(\Helhum\Typo3NoSymlinkInstall\Composer\InstallerScripts::class)
+                || class_exists(\Helhum\Typo3SecureWeb\Composer\InstallerScripts::class)
+            )
+            && $event->getComposer()->getRepositoryManager()->getLocalRepository()->findPackage('typo3/cms', new EmptyConstraint()) !== null
+        ) {
+            // @deprecated can be removed once TYPO3 8 support is removed
+            $scriptDispatcher->addInstallerScript(new WebDirectory());
+            $scriptDispatcher->addInstallerScript(new AutoloadConnector());
+            $scriptDispatcher->addInstallerScript(new CopyTypo3Directory());
         }
+        $scriptDispatcher->addInstallerScript(new GeneratePackageStates(), 40);
+        $scriptDispatcher->addInstallerScript(new InstallDummyExtension(), 40);
     }
 
     /**

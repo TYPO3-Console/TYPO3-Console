@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Composer\InstallerScript;
 
 /*
@@ -17,20 +18,21 @@ use Composer\Script\Event as ScriptEvent;
 use Composer\Util\Filesystem;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3ConsolePlugin\Config as PluginConfig;
-use Helhum\Typo3ConsolePlugin\InstallerScriptInterface;
 use TYPO3\CMS\Composer\Plugin\Config as Typo3Config;
+use TYPO3\CMS\Composer\Plugin\Core\InstallerScript;
 
-class GeneratePackageStates implements InstallerScriptInterface
+class GeneratePackageStates implements InstallerScript
 {
     /**
      * @param ScriptEvent $event
      * @return bool
      */
-    public function shouldRun(ScriptEvent $event)
+    private function shouldRun(ScriptEvent $event): bool
     {
         if (!getenv('TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES')) {
             return false;
         }
+
         $io = $event->getIO();
         $composer = $event->getComposer();
         $pluginConfig = PluginConfig::load($io, $composer->getConfig());
@@ -42,16 +44,12 @@ class GeneratePackageStates implements InstallerScriptInterface
             return false;
         }
 
-        if ($typo3PluginConfig->get('prepare-web-dir') === false) {
-            return false;
-        }
-
         if (!getenv('TYPO3_CONSOLE_TEST_SETUP') && $composer->getPackage()->getName() === 'helhum/typo3-console') {
             return false;
         }
 
         // Ensure we have at least the typo3conf folder present
-        (new Filesystem())->ensureDirectoryExists($typo3PluginConfig->get('web-dir') . '/typo3conf');
+        (new Filesystem())->ensureDirectoryExists($typo3PluginConfig->get('root-dir') . '/typo3conf');
         return true;
     }
 
@@ -61,10 +59,13 @@ class GeneratePackageStates implements InstallerScriptInterface
      * @return bool
      * @internal
      */
-    public function run(ScriptEvent $event)
+    public function run(ScriptEvent $event): bool
     {
-        $io = $event->getIO();
+        if (!$this->shouldRun($event)) {
+            return true;
+        }
 
+        $io = $event->getIO();
         $commandDispatcher = CommandDispatcher::createFromComposerRun($event);
         $commandOptions = [
             'frameworkExtensions' => (string)getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS'),

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Composer\InstallerScript;
 
 /*
@@ -14,17 +15,18 @@ namespace Helhum\Typo3Console\Composer\InstallerScript;
  */
 
 use Composer\Script\Event as ScriptEvent;
-use Helhum\Typo3ConsolePlugin\InstallerScriptInterface;
+use Composer\Semver\Constraint\EmptyConstraint;
 use TYPO3\CMS\Composer\Plugin\Config as Typo3Config;
+use TYPO3\CMS\Composer\Plugin\Core\InstallerScript;
 use TYPO3\CMS\Composer\Plugin\Util\Filesystem;
 
-class CopyTypo3Directory implements InstallerScriptInterface
+class CopyTypo3Directory implements InstallerScript
 {
     /**
      * @param ScriptEvent $event
      * @return bool
      */
-    public function shouldRun(ScriptEvent $event)
+    private function shouldRun(ScriptEvent $event): bool
     {
         // Only run on Windows and only when we are the root package (made for Appveyor tests)
         return DIRECTORY_SEPARATOR === '\\' && (getenv('TYPO3_CONSOLE_SUB_PROCESS') || $event->getComposer()->getPackage()->getName() === 'helhum/typo3-console');
@@ -36,13 +38,18 @@ class CopyTypo3Directory implements InstallerScriptInterface
      * @return bool
      * @internal
      */
-    public function run(ScriptEvent $event)
+    public function run(ScriptEvent $event): bool
     {
+        if (!$this->shouldRun($event)) {
+            return true;
+        }
+
         $io = $event->getIO();
         $composer = $event->getComposer();
         $typo3Config = Typo3Config::load($composer);
         $webDir = $typo3Config->get('web-dir');
-        $typo3Dir = $typo3Config->get('cms-package-dir');
+        $typo3Package = $event->getComposer()->getRepositoryManager()->getLocalRepository()->findPackage('typo3/cms', new EmptyConstraint());
+        $typo3Dir = $event->getComposer()->getInstallationManager()->getInstallPath($typo3Package);
         if (is_link("$webDir/typo3")) {
             rmdir("$webDir/typo3");
             $filesystem = new Filesystem();

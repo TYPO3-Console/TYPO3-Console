@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Composer\InstallerScript;
 
 /*
@@ -14,25 +15,14 @@ namespace Helhum\Typo3Console\Composer\InstallerScript;
  */
 
 use Composer\Script\Event as ScriptEvent;
-use Helhum\Typo3ConsolePlugin\InstallerScriptInterface;
+use TYPO3\CMS\Composer\Plugin\Core\InstallerScript;
 
 /**
  * Reads console command configuration files from all composer packages in the current project
  * and writes a file with all command configurations accumulated
  */
-class PopulateCommandConfiguration implements InstallerScriptInterface
+class PopulateCommandConfiguration implements InstallerScript
 {
-    /**
-     * This method is called first. setupConsole is not called if this returns false
-     *
-     * @param ScriptEvent $event
-     * @return bool
-     */
-    public function shouldRun(ScriptEvent $event)
-    {
-        return true;
-    }
-
     /**
      * Called from Composer
      *
@@ -41,7 +31,7 @@ class PopulateCommandConfiguration implements InstallerScriptInterface
      * @return bool
      * @internal
      */
-    public function run(ScriptEvent $event)
+    public function run(ScriptEvent $event): bool
     {
         $composer = $event->getComposer();
         $composerConfig = $composer->getConfig();
