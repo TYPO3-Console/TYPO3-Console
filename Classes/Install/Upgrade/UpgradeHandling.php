@@ -293,6 +293,7 @@ class UpgradeHandling
             if (class_exists(DatabaseCharsetUpdate::class)) {
                 $this->commandDispatcher->executeCommand('upgrade:wizard', ['identifier' => DatabaseCharsetUpdate::class]);
             }
+            $this->commandDispatcher->executeCommand('cache:flush');
             $this->commandDispatcher->executeCommand('database:updateschema');
         }
         return $messages;
