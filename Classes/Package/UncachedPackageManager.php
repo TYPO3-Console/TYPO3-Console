@@ -82,6 +82,7 @@ class UncachedPackageManager extends PackageManager
      * Overload original method because the stupid TYPO3 core
      * tries to sort packages by dependencies before *DEACTIVATING* a package
      * In this case we do nothing now until this TYPO3 bug is fixed.
+     * @return array
      */
     protected function sortActivePackagesByDependencies()
     {

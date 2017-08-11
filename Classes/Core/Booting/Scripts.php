@@ -160,12 +160,7 @@ class Scripts
      */
     public static function initializeAuthenticatedOperations(ConsoleBootstrap $bootstrap)
     {
-        if (is_callable([$bootstrap, 'loadExtTables'])) {
-            $bootstrap->loadExtTables();
-        } else {
-            // @deprecated can be removed once TYPO3 7.6 support is removed
-            $bootstrap->loadExtTablesOnly();
-        }
+        $bootstrap->loadExtTablesOnly();
         $bootstrap->initializeBackendUser(CommandLineUserAuthentication::class);
         self::loadCommandLineBackendUser();
         // Global language object on CLI? rly? but seems to be needed by some scheduler tasks :(
