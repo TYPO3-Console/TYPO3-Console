@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Command;
 
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Symfony\Component\Process\PhpProcess;
+use TYPO3\CMS\Core\Tests\Functional\Framework\Frontend\Response;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
