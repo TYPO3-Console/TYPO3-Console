@@ -15,7 +15,7 @@ namespace Helhum\Typo3Console\Command;
 
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Symfony\Component\Process\PhpProcess;
-use TYPO3\CMS\Core\Tests\Functional\Framework\Frontend\Response;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class SchedulerCommandController
@@ -62,13 +62,25 @@ class FrontendCommandController extends CommandController
     protected function makeAbsolute($url)
     {
         $parsedUrl = parse_url($url);
-        $finalUrl = '';
-        if (!isset($parsedUrl['scheme'])) {
-            $finalUrl .= 'http://';
+
+        // if scheme is set or it's an open scheme with '//', then we have an absolute URL
+        // even if it comes from localhost, it doesn't matter
+        if (isset($parsedUrl['scheme']) || preg_match('/^\/\/.*$/', $url)) {
+            return $url;
         }
+
+        $finalUrl = 'http://';
+        // this checks, if a domain is valid if it comes without scheme which means
+        // that parse_url() will set the actual domain as path
+        if (GeneralUtility::isValidUrl($finalUrl . $url)) {
+            return $finalUrl . $url;
+        }
+
+        // if there is just a relative path
         if (!isset($parsedUrl['host'])) {
             $finalUrl .= 'localhost';
         }
+
         return $finalUrl . '/' . ltrim($url, '/');
     }
 }
