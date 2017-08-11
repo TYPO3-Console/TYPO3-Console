@@ -367,13 +367,32 @@ class ConsoleBootstrap extends Bootstrap
         $this->defineUserAgentConstant();
     }
 
+    /**
+     * @deprecated can be removed if TYPO3 7 support is removed (directly use $bootstrap->loadBaseTca())
+     */
+    public function loadTcaOnly()
+    {
+        Utility\ExtensionManagementUtility::loadBaseTca();
+    }
+
+    /**
+     * @deprecated can be removed if TYPO3 7 support is removed (directly use $bootstrap->loadExtTables())
+     */
+    public function loadExtTablesOnly()
+    {
+        Utility\ExtensionManagementUtility::loadExtTables();
+        $this->executeExtTablesAdditionalFile();
+        $this->runExtTablesPostProcessingHooks();
+    }
+
+    /**
+     * @deprecated can be removed if TYPO3 7 support is removed
+     */
     public function initializeDatabaseConnection()
     {
-        // @deprecated can be removed if TYPO3 7 support is removed
         if (is_callable([$this, 'defineDatabaseConstants'])) {
             $this->defineDatabaseConstants();
         }
-        // @deprecated can be removed if TYPO3 7 support is removed
         if (is_callable([$this, 'initializeTypo3DbGlobal'])) {
             $this->initializeTypo3DbGlobal();
         }
