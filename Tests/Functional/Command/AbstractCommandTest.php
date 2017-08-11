@@ -184,7 +184,7 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
         $process = $processBuilder->setTimeout(null)->getProcess();
         $process->run();
         if (!$process->isSuccessful()) {
-            $this->fail(sprintf('Composer command failed with message: "%s", output: "%s"', $process->getErrorOutput(), $process->getOutput()));
+            $this->fail(sprintf('Composer command "%s" failed with message: "%s", output: "%s"', $process->getCommandLine(), $process->getErrorOutput(), $process->getOutput()));
         }
         return $process->getOutput() . $process->getErrorOutput();
     }

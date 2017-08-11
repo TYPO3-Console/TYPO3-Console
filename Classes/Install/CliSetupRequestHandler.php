@@ -153,6 +153,7 @@ class CliSetupRequestHandler
         }
         // Flush caches, as the extension list has changed
         $this->commandDispatcher->executeCommand('cache:flush', ['--files-only' => true]);
+        $this->commandDispatcher->executeCommand('database:updateschema');
         $this->commandDispatcher->executeCommand('extension:setupactive');
         $this->output->outputLine('<success>OK</success>');
     }
