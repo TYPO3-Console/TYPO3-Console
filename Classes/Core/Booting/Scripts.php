@@ -152,20 +152,7 @@ class Scripts
     {
         ExtensionManagementUtility::loadExtLocalconf();
         $bootstrap->applyAdditionalConfigurationSettings();
-    }
-
-    /**
-     * @param ConsoleBootstrap $bootstrap
-     */
-    public static function initializePersistence(ConsoleBootstrap $bootstrap)
-    {
-        if (is_callable([$bootstrap, 'loadExtTables'])) {
-            $bootstrap->loadBaseTca();
-            $bootstrap->loadExtTables();
-        } else {
-            // @deprecated can be removed once TYPO3 7.6 support is removed
-            $bootstrap->loadExtensionTables();
-        }
+        $bootstrap->loadTcaOnly();
     }
 
     /**
@@ -173,6 +160,7 @@ class Scripts
      */
     public static function initializeAuthenticatedOperations(ConsoleBootstrap $bootstrap)
     {
+        $bootstrap->loadExtTablesOnly();
         $bootstrap->initializeBackendUser(CommandLineUserAuthentication::class);
         self::loadCommandLineBackendUser();
         // Global language object on CLI? rly? but seems to be needed by some scheduler tasks :(

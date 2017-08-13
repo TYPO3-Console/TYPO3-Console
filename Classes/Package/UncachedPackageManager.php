@@ -18,9 +18,6 @@ use TYPO3\CMS\Core\Core\ClassLoadingInformation;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 
-/**
- * Class UncachedPackageManager
- */
 class UncachedPackageManager extends PackageManager
 {
     /**
@@ -52,14 +49,10 @@ class UncachedPackageManager extends PackageManager
 
     protected function loadPackageStates()
     {
-        $this->packageStatesConfiguration = $this->packageStatesFileExists ? include($this->packageStatesPathAndFilename) : [];
-        if (!isset($this->packageStatesConfiguration['version']) || $this->packageStatesConfiguration['version'] < 4) {
-            $this->packageStatesConfiguration = [];
-        }
-        if ($this->packageStatesConfiguration === []) {
-            $this->scanAvailablePackages();
+        if ($this->packageStatesFileExists) {
+            parent::loadPackageStates();
         } else {
-            $this->registerPackagesFromConfiguration($this->packageStatesConfiguration['packages']);
+            $this->scanAvailablePackages();
         }
     }
 
@@ -82,7 +75,6 @@ class UncachedPackageManager extends PackageManager
     {
         if ($this->packageStatesFileExists) {
             parent::sortAndSavePackageStates();
-            $this->packageStatesFileExists = true;
         }
     }
 
@@ -90,6 +82,7 @@ class UncachedPackageManager extends PackageManager
      * Overload original method because the stupid TYPO3 core
      * tries to sort packages by dependencies before *DEACTIVATING* a package
      * In this case we do nothing now until this TYPO3 bug is fixed.
+     * @return array
      */
     protected function sortActivePackagesByDependencies()
     {

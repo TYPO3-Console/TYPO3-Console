@@ -19,7 +19,8 @@ use Helhum\Typo3Console\Error\ExceptionHandler;
 use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageManager;
-use TYPO3\CMS\Core\Utility;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Cli\CommandManager;
 use TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface;
 
@@ -217,9 +218,9 @@ class ConsoleBootstrap extends Bootstrap
 
     private function initializeCommandManager()
     {
-        $commandManager = Utility\GeneralUtility::makeInstance(\Helhum\Typo3Console\Mvc\Cli\CommandManager::class);
+        $commandManager = GeneralUtility::makeInstance(\Helhum\Typo3Console\Mvc\Cli\CommandManager::class);
         $this->setEarlyInstance(CommandManager::class, $commandManager);
-        Utility\GeneralUtility::setSingletonInstance(CommandManager::class, $commandManager);
+        GeneralUtility::setSingletonInstance(CommandManager::class, $commandManager);
     }
 
     private function registerCommands()
@@ -330,14 +331,14 @@ class ConsoleBootstrap extends Bootstrap
         }
         $packageManager = new \Helhum\Typo3Console\Package\UncachedPackageManager();
         $this->setEarlyInstance(\TYPO3\CMS\Core\Package\PackageManager::class, $packageManager);
-        Utility\ExtensionManagementUtility::setPackageManager($packageManager);
-        $dependencyResolver = Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Package\DependencyResolver::class);
+        ExtensionManagementUtility::setPackageManager($packageManager);
+        $dependencyResolver = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Package\DependencyResolver::class);
         $dependencyResolver->injectDependencyOrderingService(
-            Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Service\DependencyOrderingService::class)
+            GeneralUtility::makeInstance(\TYPO3\CMS\Core\Service\DependencyOrderingService::class)
         );
         $packageManager->injectDependencyResolver($dependencyResolver);
         $packageManager->init($this);
-        Utility\GeneralUtility::setSingletonInstance(\TYPO3\CMS\Core\Package\PackageManager::class, $packageManager);
+        GeneralUtility::setSingletonInstance(\TYPO3\CMS\Core\Package\PackageManager::class, $packageManager);
     }
 
     public function disableCoreCaches()
@@ -367,13 +368,34 @@ class ConsoleBootstrap extends Bootstrap
         $this->defineUserAgentConstant();
     }
 
+    /**
+     * @deprecated can be removed if TYPO3 7 support is removed (directly use $bootstrap->loadBaseTca())
+     */
+    public function loadTcaOnly()
+    {
+        ExtensionManagementUtility::loadBaseTca();
+    }
+
+    /**
+     * @deprecated can be removed if TYPO3 7 support is removed (directly use $bootstrap->loadExtTables())
+     */
+    public function loadExtTablesOnly()
+    {
+        ExtensionManagementUtility::loadExtTables();
+        if (is_callable([$this, 'executeExtTablesAdditionalFile'])) {
+            $this->executeExtTablesAdditionalFile();
+        }
+        $this->runExtTablesPostProcessingHooks();
+    }
+
+    /**
+     * @deprecated can be removed if TYPO3 7 support is removed
+     */
     public function initializeDatabaseConnection()
     {
-        // @deprecated can be removed if TYPO3 7 support is removed
         if (is_callable([$this, 'defineDatabaseConstants'])) {
             $this->defineDatabaseConstants();
         }
-        // @deprecated can be removed if TYPO3 7 support is removed
         if (is_callable([$this, 'initializeTypo3DbGlobal'])) {
             $this->initializeTypo3DbGlobal();
         }
@@ -381,7 +403,7 @@ class ConsoleBootstrap extends Bootstrap
 
     protected function flushOutputBuffers()
     {
-        \TYPO3\CMS\Core\Utility\GeneralUtility::flushOutputBuffers();
+        GeneralUtility::flushOutputBuffers();
     }
 
     /**

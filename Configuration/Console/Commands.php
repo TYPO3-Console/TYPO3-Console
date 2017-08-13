@@ -33,7 +33,6 @@ return [
         'typo3_console:cache:flush' => ['helhum.typo3console:database'],
         'typo3_console:database:updateschema' => [
             'helhum.typo3console:database',
-            'helhum.typo3console:persistence',
         ],
     ],
 ];
