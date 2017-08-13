@@ -62,17 +62,23 @@ class FrontendCommandController extends CommandController
      */
     protected function makeAbsolute($url)
     {
-        $parsedUrl = parse_url($url);
-
-        // Check if the URL is valid or has a relative scheme
-        if (GeneralUtility::isValidUrl($url) || preg_match('/^\/\/.*$/', $url)) {
+        // Check if the URL is valid
+        // If so return the URL directly
+        if (GeneralUtility::isValidUrl($url)) {
             return $url;
         }
 
+        // return URL with open scheme with proper http://
+        if (preg_match('/^\/\//', $url) && GeneralUtility::isValidUrl('http://' . ltrim($url, '//'))) {
+            return 'http://' . ltrim($url, '//');
+        }
+
+        $parsedUrl = parse_url($url);
+
         $finalUrl = 'http://';
-        // Check if the URL just needs a scheme to be valid
-        if (GeneralUtility::isValidUrl($finalUrl . $url)) {
-            return $finalUrl . $url;
+        // prepend trailing slash if missing
+        if (!preg_match('/^\/.*$/', $parsedUrl['path'])) {
+            $url = '/' . $url;
         }
 
         // if there is just a relative path
