@@ -44,16 +44,16 @@ class FrontendCommandControllerTest extends UnitTestCase
     public function makeAbsoluteDataProvider()
     {
         return [
-            "Relative path to home" => ['http://localhost/', '/'],
-            "Relative path to foo without trailing slash" => ['http://localhost/foo', '/foo'],
-            "Relative path to foo with trailing slash" => ['http://localhost/foo/', '/foo/'],
-            "Test with HTTP scheme" => ['http://typo3.org/', 'http://typo3.org/'],
-            "Test with HTTPS scheme" => ['https://typo3.org/', 'https://typo3.org/'],
-            "Test with open scheme" => ['//typo3.org/', '//typo3.org/'],
-            "No scheme but domain" => ['http://typo3.org', 'typo3.org'],
-            "No scheme but domain with trailing slash" => ['http://typo3.org/', 'typo3.org/'],
-            "No scheme but domain with path without trailing slash" => ['http://typo3.org/foo', 'typo3.org/foo'],
-            "No scheme but domain with path and trailing slash" => ['http://typo3.org/foo/', 'typo3.org/foo/'],
+            'Relative path to home' => ['http://localhost/', '/'],
+            'Relative path to foo without trailing slash' => ['http://localhost/foo', '/foo'],
+            'Relative path to foo with trailing slash' => ['http://localhost/foo/', '/foo/'],
+            'Test with HTTP scheme' => ['http://typo3.org/', 'http://typo3.org/'],
+            'Test with HTTPS scheme' => ['https://typo3.org/', 'https://typo3.org/'],
+            'Test with open scheme' => ['//typo3.org/', '//typo3.org/'],
+            'No scheme but domain' => ['http://typo3.org', 'typo3.org'],
+            'No scheme but domain with trailing slash' => ['http://typo3.org/', 'typo3.org/'],
+            'No scheme but domain with path without trailing slash' => ['http://typo3.org/foo', 'typo3.org/foo'],
+            'No scheme but domain with path and trailing slash' => ['http://typo3.org/foo/', 'typo3.org/foo/'],
         ];
     }
 }
