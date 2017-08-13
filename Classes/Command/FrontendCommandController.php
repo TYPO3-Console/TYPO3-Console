@@ -64,15 +64,13 @@ class FrontendCommandController extends CommandController
     {
         $parsedUrl = parse_url($url);
 
-        // if scheme is set or it's an open scheme with '//', then we have an absolute URL
-        // even if it comes from localhost, it doesn't matter
-        if (isset($parsedUrl['scheme']) || preg_match('/^\/\/.*$/', $url)) {
+        // Check if the URL is valid or has a relative scheme
+        if (GeneralUtility::isValidUrl($url) || preg_match('/^\/\/.*$/', $url)) {
             return $url;
         }
 
         $finalUrl = 'http://';
-        // this checks, if a domain is valid if it comes without scheme which means
-        // that parse_url() will set the actual domain as path
+        // Check if the URL just needs a scheme to be valid
         if (GeneralUtility::isValidUrl($finalUrl . $url)) {
             return $finalUrl . $url;
         }
