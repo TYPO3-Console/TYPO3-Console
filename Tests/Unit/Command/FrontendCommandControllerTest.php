@@ -15,7 +15,7 @@ class FrontendCommandControllerTest extends UnitTestCase
      *
      * @return mixed Method return.
      */
-    public function invokeMethod(&$object, $methodName, array $parameters = array())
+    public function invokeMethod(&$object, $methodName, array $parameters = [])
     {
         $reflection = new \ReflectionClass(get_class($object));
         $method = $reflection->getMethod($methodName);
@@ -27,6 +27,8 @@ class FrontendCommandControllerTest extends UnitTestCase
     /**
      * @test
      * @dataProvider makeAbsoluteDataProvider
+     * @param mixed $expected
+     * @param mixed $given
      */
     public function makeAbsoluteTest($expected, $given)
     {
