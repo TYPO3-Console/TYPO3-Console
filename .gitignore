@@ -1,6 +1,7 @@
 /.Build/*
 /composer.lock
 /typo3cms
+.github
 
 /Configuration/Console/AllCommands.php
 /Libraries/*
