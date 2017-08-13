@@ -56,5 +56,4 @@ class FrontendCommandControllerTest extends UnitTestCase
             'No scheme but domain with path and trailing slash' => ['http://typo3.org/foo/', 'typo3.org/foo/'],
         ];
     }
-
 }
