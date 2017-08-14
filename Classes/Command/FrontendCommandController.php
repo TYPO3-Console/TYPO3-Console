@@ -15,12 +15,7 @@ namespace Helhum\Typo3Console\Command;
 
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Symfony\Component\Process\PhpProcess;
-use TYPO3\CMS\Core\Tests\Functional\Framework\Frontend\Response;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * Class SchedulerCommandController
- */
 class FrontendCommandController extends CommandController
 {
     /**
@@ -62,30 +57,13 @@ class FrontendCommandController extends CommandController
      */
     protected function makeAbsolute($url)
     {
-        // Check if the URL is valid
-        // If so return the URL directly
-        if (GeneralUtility::isValidUrl($url)) {
-            return $url;
-        }
-
-        // return URL with open scheme with proper http://
-        if (preg_match('/^\/\//', $url) && GeneralUtility::isValidUrl('http://' . ltrim($url, '//'))) {
-            return 'http://' . ltrim($url, '//');
-        }
-
         $parsedUrl = parse_url($url);
 
-        $finalUrl = 'http://';
-        // prepend trailing slash if missing
-        if (!preg_match('/^\/.*$/', $parsedUrl['path'])) {
-            $url = '/' . $url;
-        }
+        $scheme = isset($parsedUrl['scheme']) ? $parsedUrl['scheme'] : 'http';
+        $host = isset($parsedUrl['host']) ? $parsedUrl['host'] : 'localhost';
+        $path = isset($parsedUrl['path']) ? $parsedUrl['path'] : '/';
+        $query = isset($parsedUrl['query']) ? '?' . $parsedUrl['query'] : '';
 
-        // if there is just a relative path
-        if (!isset($parsedUrl['host'])) {
-            $finalUrl .= 'localhost';
-        }
-
-        return $finalUrl . '/' . ltrim($url, '/');
+        return $scheme . '://' . $host . '/' . ltrim($path, '/') . $query;
     }
 }
