@@ -64,7 +64,9 @@ script:
   - typo3cms commandreference:render > /dev/null 2>&1 && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
   - >
     echo "Running php lint…";
+    if [[ ${TRAVIS_PHP_VERSION:0:1} == "5" ]]; then rm -rf Classes/Composer/InstallerScript; fi;
     find . -name \*.php ! -path "./.Build/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;;
+    git checkout Classes/Composer/InstallerScript;
   - >
     echo "Running unit and functional tests…";
     .Build/bin/phpunit;
