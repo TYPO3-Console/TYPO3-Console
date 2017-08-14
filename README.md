@@ -1,7 +1,7 @@
 TYPO3 Console
 =================
 
-[![Build Status](https://travis-ci.org/TYPO3-Console/typo3_console.svg?branch=master)](https://travis-ci.org/TYPO3-Console/typo3_console)
+[![Build Status](https://travis-ci.org/TYPO3-Console/TYPO3-Console.svg?branch=master)](https://travis-ci.org/TYPO3-Console/TYPO3-Console)
 [![StyleCI](https://styleci.io/repos/19455482/shield?branch=master)](https://styleci.io/repos/19455482)
 [![Latest Stable Version](https://poser.pugx.org/helhum/typo3-console/v/stable.svg)](https://packagist.org/packages/helhum/typo3-console)
 [![Total Downloads](https://poser.pugx.org/helhum/typo3-console/downloads.svg)](https://packagist.org/packages/helhum/typo3-console)
