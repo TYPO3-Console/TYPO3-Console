@@ -131,6 +131,9 @@ class InstallCommandController extends CommandController
         $packageStatesGenerator = new PackageStatesGenerator($this->packageManager);
         $activatedExtensions = $packageStatesGenerator->generate($frameworkExtensions, $activateDefault, $excludedExtensions);
 
+        // Make sure file caches are empty after generating package states file
+        CommandDispatcher::createFromCommandRun()->executeCommand('cache:flush', ['--files-only' => true]);
+
         $this->outputLine(
             '<info>The following extensions have been added to the generated PackageStates.php file:</info> %s',
             [
