@@ -401,11 +401,6 @@ class ConsoleBootstrap extends Bootstrap
         }
     }
 
-    protected function flushOutputBuffers()
-    {
-        GeneralUtility::flushOutputBuffers();
-    }
-
     /**
      * Sets up additional configuration applied in all scopes
      *
@@ -414,9 +409,12 @@ class ConsoleBootstrap extends Bootstrap
      */
     public function applyAdditionalConfigurationSettings()
     {
-        $this->setFinalCachingFrameworkCacheConfiguration()
-            ->defineLoggingAndExceptionConstants()
-            ->unsetReservedGlobalVariables();
+        $this->setFinalCachingFrameworkCacheConfiguration();
+        // @deprecated can be removed once TYPO3 8.7 support is removed
+        if (is_callable([$this, 'defineLoggingAndExceptionConstants'])) {
+            $this->defineLoggingAndExceptionConstants();
+        }
+        $this->unsetReservedGlobalVariables();
         return $this;
     }
 }
