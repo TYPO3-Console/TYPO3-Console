@@ -13,9 +13,6 @@ namespace Helhum\Typo3Console\Core\Booting;
  *
  */
 
-/**
- * Class RunLevel
- */
 class RunLevel
 {
     const LEVEL_ESSENTIAL = 'buildEssentialSequence';
@@ -188,38 +185,38 @@ class RunLevel
         switch ($stepIdentifier) {
             // Part of essential sequence
             case 'helhum.typo3console:coreconfiguration':
-                $sequence->addStep(new Step('helhum.typo3console:coreconfiguration', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeConfigurationManagement']));
+                $sequence->addStep(new Step('helhum.typo3console:coreconfiguration', [Scripts::class, 'initializeConfigurationManagement']));
                 break;
             case 'helhum.typo3console:providecleanclassimplementations':
-                $sequence->addStep(new Step('helhum.typo3console:providecleanclassimplementations', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'provideCleanClassImplementations'], 'helhum.typo3console:coreconfiguration'));
+                $sequence->addStep(new Step('helhum.typo3console:providecleanclassimplementations', [Scripts::class, 'provideCleanClassImplementations']), 'helhum.typo3console:coreconfiguration');
                 break;
             case 'helhum.typo3console:caching':
-                $sequence->addStep(new Step('helhum.typo3console:caching', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeCachingFramework']));
+                $sequence->addStep(new Step('helhum.typo3console:caching', [Scripts::class, 'initializeCachingFramework']));
                 break;
             case 'helhum.typo3console:errorhandling':
-                $sequence->addStep(new Step('helhum.typo3console:errorhandling', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeErrorHandling']));
+                $sequence->addStep(new Step('helhum.typo3console:errorhandling', [Scripts::class, 'initializeErrorHandling']));
                 break;
 
             // Part of compiletime sequence
             case 'helhum.typo3console:disablecorecaches':
-                $sequence->addStep(new Step('helhum.typo3console:disablecorecaches', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'disableCoreCaches']), 'helhum.typo3console:coreconfiguration');
+                $sequence->addStep(new Step('helhum.typo3console:disablecorecaches', [Scripts::class, 'disableCoreCaches']), 'helhum.typo3console:coreconfiguration');
                 break;
 
             // Part of basic runtime
             case 'helhum.typo3console:extensionconfiguration':
-                $sequence->addStep(new Step('helhum.typo3console:extensionconfiguration', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeExtensionConfiguration']));
+                $sequence->addStep(new Step('helhum.typo3console:extensionconfiguration', [Scripts::class, 'initializeExtensionConfiguration']));
                 break;
 
             // Part of full runtime
             case 'helhum.typo3console:enablecorecaches':
-                $sequence->addStep(new Step('helhum.typo3console:enablecorecaches', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'reEnableOriginalCoreCaches']), 'helhum.typo3console:database');
+                $sequence->addStep(new Step('helhum.typo3console:enablecorecaches', [Scripts::class, 'reEnableOriginalCoreCaches']), 'helhum.typo3console:database');
                 break;
             // @deprecated can be removed if TYPO3 8 support is removed
             case 'helhum.typo3console:database':
-                $sequence->addStep(new Step('helhum.typo3console:database', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeDatabaseConnection']), 'helhum.typo3console:errorhandling');
+                $sequence->addStep(new Step('helhum.typo3console:database', [Scripts::class, 'initializeDatabaseConnection']), 'helhum.typo3console:errorhandling');
                 break;
             case 'helhum.typo3console:authentication':
-                $sequence->addStep(new Step('helhum.typo3console:authentication', [\Helhum\Typo3Console\Core\Booting\Scripts::class, 'initializeAuthenticatedOperations']), 'helhum.typo3console:extensionconfiguration');
+                $sequence->addStep(new Step('helhum.typo3console:authentication', [Scripts::class, 'initializeAuthenticatedOperations']), 'helhum.typo3console:extensionconfiguration');
                 break;
 
             default:
@@ -278,7 +275,6 @@ class RunLevel
     /**
      * @param Sequence $sequence
      * @param string $commandIdentifier
-     * @return string
      * @internal
      */
     protected function addStepsForCommand($sequence, $commandIdentifier)
@@ -294,7 +290,6 @@ class RunLevel
     /**
      * @param Sequence $sequence
      * @param string $commandIdentifier
-     * @return string
      * @internal
      */
     protected function removeStepsForCommand($sequence, $commandIdentifier)
@@ -334,7 +329,8 @@ class RunLevel
             list($packageKey, $controllerName, $commandName) = explode(':', $fullControllerIdentifier);
             if ($controllerName === $currentCommandControllerName && $commandName === $currentCommandName) {
                 return $this->commandOptions[$fullControllerIdentifier];
-            } elseif ($controllerName === $currentCommandControllerName && $commandName === '*') {
+            }
+            if ($controllerName === $currentCommandControllerName && $commandName === '*') {
                 return $this->commandOptions[$fullControllerIdentifier];
             }
         }
