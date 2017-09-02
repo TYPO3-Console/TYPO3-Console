@@ -43,12 +43,12 @@ class InstallerScripts implements InstallerScriptsRegistration
     {
         $scriptDispatcher->addInstallerScript(new PopulateCommandConfiguration(), 70);
         if (
-            !(
-                class_exists(\TYPO3\CMS\Core\Composer\InstallerScripts::class)
-                || class_exists(\Helhum\Typo3NoSymlinkInstall\Composer\InstallerScripts::class)
-                || class_exists(\Helhum\Typo3SecureWeb\Composer\InstallerScripts::class)
+            $event->getComposer()->getPackage()->getName() === 'helhum/typo3-console'
+            || (
+                !class_exists(\TYPO3\CMS\Core\Composer\InstallerScripts::class)
+                && !class_exists(\Helhum\Typo3ComposerSetup\Composer\InstallerScripts::class)
+                && $event->getComposer()->getRepositoryManager()->getLocalRepository()->findPackage('typo3/cms', new EmptyConstraint()) !== null
             )
-            && $event->getComposer()->getRepositoryManager()->getLocalRepository()->findPackage('typo3/cms', new EmptyConstraint()) !== null
         ) {
             // @deprecated can be removed once TYPO3 8 support is removed
             $scriptDispatcher->addInstallerScript(new WebDirectory());
