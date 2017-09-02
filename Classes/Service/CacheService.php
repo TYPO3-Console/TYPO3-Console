@@ -13,6 +13,8 @@ namespace Helhum\Typo3Console\Service;
  *
  */
 
+use Helhum\Typo3Console\Core\Booting\Scripts;
+use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Cache\Backend\SimpleFileBackend;
@@ -59,6 +61,7 @@ class CacheService implements SingletonInterface
      */
     public function flush($force = false)
     {
+        $this->ensureDatabaseIsInitialized();
         if ($force) {
             $this->forceFlushCoreFileAndDatabaseCaches();
         }
@@ -102,6 +105,8 @@ class CacheService implements SingletonInterface
      */
     public function flushCachesWithDataHandler()
     {
+        $this->ensureDatabaseIsInitialized();
+        $this->ensureBackendUserIsInitialized();
         self::createDataHandlerFromGlobals()->clear_cacheCmd('all');
     }
 
@@ -114,6 +119,7 @@ class CacheService implements SingletonInterface
     public function flushGroups(array $groups)
     {
         $this->ensureCacheGroupsExist($groups);
+        $this->ensureDatabaseIsInitialized();
         foreach ($groups as $group) {
             $this->cacheManager->flushCachesInGroup($group);
         }
@@ -127,6 +133,7 @@ class CacheService implements SingletonInterface
      */
     public function flushByTags(array $tags, $group = null)
     {
+        $this->ensureDatabaseIsInitialized();
         foreach ($tags as $tag) {
             if ($group === null) {
                 $this->cacheManager->flushCachesByTag($tag);
@@ -169,10 +176,35 @@ class CacheService implements SingletonInterface
     }
 
     /**
+     * @deprecated can be removed when TYPO3 7.6 support is removed
+     */
+    private function ensureDatabaseIsInitialized()
+    {
+        if (class_exists(ConnectionPool::class)) {
+            // With doctrine, we don't need to initialize $GLOBALS['TYPO3_DB']
+            return;
+        }
+        if (!empty($GLOBALS['TYPO3_DB'])) {
+            // Already initialized
+            return;
+        }
+        ConsoleBootstrap::getInstance()->initializeDatabaseConnection();
+    }
+
+    private function ensureBackendUserIsInitialized()
+    {
+        if (!empty($GLOBALS['BE_USER'])) {
+            // Already initialized
+            return;
+        }
+        Scripts::initializeAuthenticatedOperations(ConsoleBootstrap::getInstance());
+    }
+
+    /**
      * @param array $groups
      * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
      */
-    protected function ensureCacheGroupsExist($groups)
+    private function ensureCacheGroupsExist($groups)
     {
         $validGroups = $this->getValidCacheGroups();
         $sanitizedGroups = array_intersect($groups, $validGroups);
@@ -207,7 +239,7 @@ class CacheService implements SingletonInterface
      *
      * @param bool $onlyFileCaches
      */
-    protected function forceFlushCoreFileAndDatabaseCaches($onlyFileCaches = false)
+    private function forceFlushCoreFileAndDatabaseCaches($onlyFileCaches = false)
     {
         $cacheDir = 'var/Cache';
         $dbFlushMethod = '_forceFlushCoreDatabaseCaches';
