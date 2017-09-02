@@ -151,8 +151,6 @@ class CliSetupRequestHandler
             $this->output->outputLine('<warning>Most likely you have missed correctly specifying depedencies to typo3/cms-* packages</warning>');
             $this->output->outputLine('<warning>The error message was "%s"</warning>', [$e->getPrevious()->getMessage()]);
         }
-        // Flush caches, as the extension list has changed
-        $this->commandDispatcher->executeCommand('cache:flush', ['--files-only' => true]);
         $this->commandDispatcher->executeCommand('database:updateschema');
         $this->commandDispatcher->executeCommand('extension:setupactive');
         $this->output->outputLine('<success>OK</success>');
