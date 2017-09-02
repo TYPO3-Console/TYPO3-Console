@@ -18,6 +18,7 @@ use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\CommandManager;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
+use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition;
 use TYPO3\CMS\Extbase\Mvc\Controller\Argument;
 use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
@@ -340,21 +341,29 @@ class CliSetupRequestHandler
     }
 
     /**
-     * @param StatusInterface $statusMessage
+     * @param StatusInterface|AbstractMessage $statusMessage
      */
-    protected function outputStatusMessage(StatusInterface $statusMessage)
+    protected function outputStatusMessage($statusMessage)
     {
-        $subject = strtoupper($statusMessage->getSeverity()) . ': ' . $statusMessage->getTitle();
-        switch ($statusMessage->getSeverity()) {
+        // @deprecated can be removed once TYPO3 8.7 support is removed
+        $severityMap = [
+            'error' => 'error',
+            'warning' => 'warning',
+            AbstractMessage::ERROR => 'error',
+            AbstractMessage::WARNING => 'warning',
+        ];
+        $severityString = isset($severityMap[$statusMessage->getSeverity()]) ? $severityMap[$statusMessage->getSeverity()] : 'notice';
+        $subject = strtoupper($severityString) . ': ' . $statusMessage->getTitle();
+        switch ($severityString) {
             case 'error':
             case 'warning':
-                $subject = sprintf('<%1$s>' . $subject . '</%1$s>', $statusMessage->getSeverity());
+                $subject = sprintf('<%1$s>' . $subject . '</%1$s>', $severityString);
             break;
             default:
         }
         $this->output->outputLine($subject);
         foreach (explode("\n", wordwrap($statusMessage->getMessage())) as $line) {
-            $this->output->outputLine(sprintf('<%1$s>' . $line . '</%1$s>', $statusMessage->getSeverity()));
+            $this->output->outputLine(sprintf('<%1$s>' . $line . '</%1$s>', $severityString));
         }
     }
 }

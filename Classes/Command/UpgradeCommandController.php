@@ -169,6 +169,10 @@ class UpgradeCommandController extends CommandController
     {
         // Yeah, right. This class accesses super globals directly
         $_GET['install']['extensionCompatibilityTester']['forceCheck'] = $force;
-        $this->output(\json_decode($this->objectManager->get(ExtensionCompatibilityTester::class)->handle()));
+        $result = \json_decode($this->objectManager->get(ExtensionCompatibilityTester::class)->handle(), true);
+        if (is_array($result) && !empty($result['success'])) {
+            $result = 'OK';
+        }
+        $this->output($result);
     }
 }
