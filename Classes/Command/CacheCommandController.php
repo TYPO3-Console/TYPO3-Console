@@ -54,13 +54,34 @@ class CacheCommandController extends CommandController
      */
     public function flushCommand($force = false, $filesOnly = false)
     {
+        $exitCode = 0;
+        if (!$filesOnly) {
+            try {
+                $this->cacheService->flush($force);
+                $this->commandDispatcher->executeCommand('cache:flushcomplete');
+            } catch (\Throwable $e) {
+                $exitCode = 1;
+                $filesOnly = true;
+            } catch (\Exception $e) {
+                // @deprecated can be removed once PHP 5 / TYPO3 7.6 support is removed
+                $exitCode = 1;
+                $filesOnly = true;
+            }
+        }
         if ($filesOnly) {
             $this->cacheService->flushFileCaches($force);
-        } else {
-            $this->cacheService->flush($force);
+            $this->commandDispatcher->executeCommand('cache:flushcomplete', ['--files-only' => true]);
         }
-        $this->commandDispatcher->executeCommand('cache:flushcomplete', ['--files-only' => $filesOnly]);
-        $this->outputLine(sprintf('%slushed all %scaches.', $force ? 'Force f' : 'F', $filesOnly ? 'file ' : ''));
+
+        if (isset($e)) {
+            $this->outputLine('<error>Flushing caches failed with error:</error>');
+            $this->outputLine('<error>"%s"</error>', [$e->getMessage()]);
+            $this->outputLine('<warning>Falling back to flushing file caches only.</warning>');
+            $this->outputLine('<warning>Use "--files-only" option to get rid of this warning"</warning>');
+        }
+
+        $this->outputLine('%slushed all %scaches.', [$force ? 'Force f' : 'F', $filesOnly ? 'file ' : '']);
+        $this->quit($exitCode);
     }
 
     /**
