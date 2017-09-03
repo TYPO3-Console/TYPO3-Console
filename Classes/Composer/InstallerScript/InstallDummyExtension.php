@@ -53,7 +53,7 @@ class InstallDummyExtension implements InstallerScript
         $typo3Config = Typo3Config::load($composer);
         $pluginConfig = PluginConfig::load($io, $composerConfig);
 
-        $webDir = $typo3Config->get('web-dir');
+        $webDir = $typo3Config->get('root-dir');
         $filesystem = new Filesystem();
         $extensionDir = "$webDir/typo3conf/ext/typo3_console";
 
