@@ -51,8 +51,8 @@ class InstallerScripts implements InstallerScriptsRegistration
             $scriptDispatcher->addInstallerScript(new AutoloadConnector());
             $scriptDispatcher->addInstallerScript(new CopyTypo3Directory());
         }
-        $scriptDispatcher->addInstallerScript(new GeneratePackageStates(), 40);
-        $scriptDispatcher->addInstallerScript(new InstallDummyExtension(), 40);
+        $scriptDispatcher->addInstallerScript(new GeneratePackageStates(), 65);
+        $scriptDispatcher->addInstallerScript(new InstallDummyExtension(), 65);
     }
 
     /**

@@ -94,13 +94,8 @@ class LegacyInstallerScripts
             return;
         }
 
-        if (!getenv('TYPO3_CONSOLE_TEST_SETUP') && $composer->getPackage()->getName() === 'helhum/typo3-console') {
-            return;
-        }
-
-        // Ensure we have at least the typo3conf folder present
-        (new Filesystem())->ensureDirectoryExists($typo3PluginConfig->get('web-dir') . '/typo3conf');
-        $io = $event->getIO();
+        $io->writeError('<warning>Using TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES env var has been deprecated.</warning>');
+        $io->writeError('<warning>Please abstain from using it and consider using "typo3-console/auto-setup" composer package instead.</warning>');
 
         $commandDispatcher = CommandDispatcher::createFromComposerRun($event);
         $commandOptions = [

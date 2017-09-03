@@ -112,35 +112,4 @@ class InstallCommandControllerTest extends AbstractCommandTest
             $this->assertSame('active', $packageConfig['packages']['reports']['state']);
         }
     }
-
-    /**
-     * @test
-     */
-    public function packageStatesFileIsCreatedFromComposerRun()
-    {
-        $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
-        copy($packageStatesFile, $packageStatesFile . '_');
-        @unlink($packageStatesFile);
-
-        $this->executeComposerCommand(
-            [
-                'dump-autoload',
-                '-vv',
-            ],
-            [
-                'TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES' => 'yes',
-                'TYPO3_CONSOLE_TEST_SETUP' => 'yes',
-                'TYPO3_ACTIVATE_DEFAULT_FRAMEWORK_EXTENSIONS' => 'yes',
-            ]
-        );
-
-        $this->assertTrue(file_exists($packageStatesFile));
-        $packageConfig = require $packageStatesFile;
-        copy($packageStatesFile . '_', $packageStatesFile);
-        if ($packageConfig['version'] === 5) {
-            $this->assertArrayHasKey('reports', $packageConfig['packages']);
-        } else {
-            $this->assertSame('active', $packageConfig['packages']['reports']['state']);
-        }
-    }
 }

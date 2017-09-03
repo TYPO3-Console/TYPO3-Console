@@ -15,12 +15,14 @@ namespace Helhum\Typo3Console\Composer\InstallerScript;
  */
 
 use Composer\Script\Event as ScriptEvent;
-use Composer\Util\Filesystem;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3ConsolePlugin\Config as PluginConfig;
 use TYPO3\CMS\Composer\Plugin\Config as Typo3Config;
 use TYPO3\CMS\Composer\Plugin\Core\InstallerScript;
 
+/**
+ * @deprecated will be removed with 5.0
+ */
 class GeneratePackageStates implements InstallerScript
 {
     /**
@@ -44,12 +46,9 @@ class GeneratePackageStates implements InstallerScript
             return false;
         }
 
-        if (!getenv('TYPO3_CONSOLE_TEST_SETUP') && $composer->getPackage()->getName() === 'helhum/typo3-console') {
-            return false;
-        }
+        $io->writeError('<warning>Using TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES env var has been deprecated.</warning>');
+        $io->writeError('<warning>Please abstain from using it and consider using "typo3-console/auto-setup" composer package instead.</warning>');
 
-        // Ensure we have at least the typo3conf folder present
-        (new Filesystem())->ensureDirectoryExists($typo3PluginConfig->get('root-dir') . '/typo3conf');
         return true;
     }
 
