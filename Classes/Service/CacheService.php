@@ -43,15 +43,21 @@ class CacheService implements SingletonInterface
     protected $configurationService;
 
     /**
+     * @var ConsoleBootstrap
+     */
+    private $bootstrap;
+
+    /**
      * Builds the dependencies correctly
      *
      * @param CacheManager $cacheManager
      * @param ConfigurationService $configurationService
      */
-    public function __construct(CacheManager $cacheManager, ConfigurationService $configurationService)
+    public function __construct(CacheManager $cacheManager, ConfigurationService $configurationService, ConsoleBootstrap $bootstrap = null)
     {
         $this->cacheManager = $cacheManager;
         $this->configurationService = $configurationService;
+        $this->bootstrap = $bootstrap ?: ConsoleBootstrap::getInstance();
     }
 
     /**
@@ -175,6 +181,11 @@ class CacheService implements SingletonInterface
         return array_unique($validGroups);
     }
 
+    private function reEnableCoreCaches()
+    {
+        Scripts::reEnableOriginalCoreCaches($this->bootstrap);
+    }
+
     /**
      * @deprecated can be removed when TYPO3 7.6 support is removed
      */
@@ -188,7 +199,7 @@ class CacheService implements SingletonInterface
             // Already initialized
             return;
         }
-        ConsoleBootstrap::getInstance()->initializeDatabaseConnection();
+        $this->bootstrap->initializeDatabaseConnection();
     }
 
     private function ensureBackendUserIsInitialized()
@@ -197,7 +208,7 @@ class CacheService implements SingletonInterface
             // Already initialized
             return;
         }
-        Scripts::initializeAuthenticatedOperations(ConsoleBootstrap::getInstance());
+        Scripts::initializeAuthenticatedOperations($this->bootstrap);
     }
 
     /**
@@ -219,8 +230,9 @@ class CacheService implements SingletonInterface
      */
     private function getFileCaches()
     {
+        $this->reEnableCoreCaches();
         $fileCaches = [];
-        foreach ($this->configurationService->getActive('SYS/caching/cacheConfigurations') as $identifier => $cacheConfiguration) {
+        foreach ($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'] as $identifier => $cacheConfiguration) {
             if (
                 isset($cacheConfiguration['backend'])
                 && (
