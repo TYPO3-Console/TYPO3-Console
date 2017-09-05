@@ -365,7 +365,10 @@ class ConsoleBootstrap extends Bootstrap
         // We need to properly initialize the cache hash calculator here!
         $this->setCacheHashOptions();
         $this->setDefaultTimezone();
-        $this->defineUserAgentConstant();
+        // @deprecated can be removed if TYPO3 8 support is removed
+        if (is_callable([$this, 'defineUserAgentConstant'])) {
+            $this->defineUserAgentConstant();
+        }
     }
 
     /**
