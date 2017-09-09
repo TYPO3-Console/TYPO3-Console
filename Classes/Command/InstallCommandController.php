@@ -131,8 +131,16 @@ class InstallCommandController extends CommandController
         $packageStatesGenerator = new PackageStatesGenerator($this->packageManager);
         $activatedExtensions = $packageStatesGenerator->generate($frameworkExtensions, $activateDefault, $excludedExtensions);
 
-        // Make sure file caches are empty after generating package states file
-        CommandDispatcher::createFromCommandRun()->executeCommand('cache:flush', ['--files-only' => true]);
+        try {
+            // Make sure file caches are empty after generating package states file
+            CommandDispatcher::createFromCommandRun()->executeCommand('cache:flush', ['--files-only' => true]);
+        } catch (FailedSubProcessCommandException $e) {
+            // Ignore errors here.
+            // They might be triggered from extensions accessing db or having other things
+            // broken in ext_tables or ext_localconf
+            // In such case we cannot do much about it other than ignoring it for
+            // generating packages states
+        }
 
         $this->outputLine(
             '<info>The following extensions have been added to the generated PackageStates.php file:</info> %s',
