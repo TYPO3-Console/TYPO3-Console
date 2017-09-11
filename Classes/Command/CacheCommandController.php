@@ -58,7 +58,6 @@ class CacheCommandController extends CommandController
         if (!$filesOnly) {
             try {
                 $this->cacheService->flush($force);
-                $this->commandDispatcher->executeCommand('cache:flushcomplete');
             } catch (\Throwable $e) {
                 $exitCode = 1;
                 $filesOnly = true;
@@ -67,6 +66,7 @@ class CacheCommandController extends CommandController
                 $exitCode = 1;
                 $filesOnly = true;
             }
+            $this->commandDispatcher->executeCommand('cache:flushcomplete');
         }
         if ($filesOnly) {
             $this->cacheService->flushFileCaches($force);
