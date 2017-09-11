@@ -118,7 +118,7 @@ class InstallCommandController extends CommandController
      *
      * @param array $frameworkExtensions TYPO3 system extensions that should be marked as active. Extension keys separated by comma.
      * @param bool $activateDefault If true, <code>typo3/cms</code> extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
-     * @param array $excludedExtensions Extensions in typo3conf/ext/ directory, which should stay inactive
+     * @param array $excludedExtensions Extensions which should stay inactive. This does not affect provided framework extensions or framework extensions that are required or part as minimal usable system.
      */
     public function generatePackageStatesCommand(array $frameworkExtensions = [], $activateDefault = false, array $excludedExtensions = [])
     {
