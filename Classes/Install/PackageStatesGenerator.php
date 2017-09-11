@@ -49,21 +49,16 @@ class PackageStatesGenerator
         $this->ensureDirectoryExists(PATH_site . 'typo3conf');
         $this->packageManager->scanAvailablePackages();
         foreach ($this->packageManager->getAvailablePackages() as $package) {
-            if (
-                in_array($package->getPackageKey(), $frameworkExtensionsToActivate, true)
-                || $package->isProtected()
-                || $package->isPartOfMinimalUsableSystem()
-                || ($activateDefaultExtensions && $package->isPartOfFactoryDefault())
-                // Every extension available in typo3conf/ext is meant to be active
-                // except it is added to the exclude array. The latter is useful in dev mode or non composer mode
-                || (
-                    strpos(PathUtility::stripPathSitePrefix($package->getPackagePath()), 'typo3conf/ext/') !== false
-                    && !in_array($package->getPackageKey(), $excludedExtensions, true)
-                    )
-            ) {
-                $this->packageManager->activatePackage($package->getPackageKey());
+            $extKey = $package->getPackageKey();
+            $isLocalExt = strpos(PathUtility::stripPathSitePrefix($package->getPackagePath()), 'typo3conf/ext/') !== false;
+            $isFrameWorkExtToActivate = in_array($extKey, $frameworkExtensionsToActivate, true);
+            $isExcludedExt = in_array($extKey, $excludedExtensions, true);
+            $isFactoryDefault = $activateDefaultExtensions && $package->isPartOfFactoryDefault();
+            $isRequiredFrameworkExt = !$isLocalExt && ($isFrameWorkExtToActivate || $package->isProtected() || $package->isPartOfMinimalUsableSystem());
+            if (($isRequiredFrameworkExt || $isLocalExt || $isFactoryDefault) && (!$isExcludedExt || $isRequiredFrameworkExt)) {
+                $this->packageManager->activatePackage($extKey);
             } else {
-                $this->packageManager->deactivatePackage($package->getPackageKey());
+                $this->packageManager->deactivatePackage($extKey);
             }
         }
         $this->packageManager->forceSortAndSavePackageStates();
