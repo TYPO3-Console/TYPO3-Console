@@ -17,6 +17,7 @@ use Helhum\Typo3Console\Install\Upgrade\UpgradeHandling;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardListRenderer;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardResultRenderer;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use TYPO3\CMS\Core\Http\JsonResponse;
 use TYPO3\CMS\Core\Package\Exception\UnknownPackageException;
 use TYPO3\CMS\Install\Controller\Action\Ajax\ExtensionCompatibilityTester;
 
@@ -169,7 +170,11 @@ class UpgradeCommandController extends CommandController
     {
         // Yeah, right. This class accesses super globals directly
         $_GET['install']['extensionCompatibilityTester']['forceCheck'] = $force;
-        $result = \json_decode($this->objectManager->get(ExtensionCompatibilityTester::class)->handle(), true);
+        $result = $this->objectManager->get(ExtensionCompatibilityTester::class)->handle();
+        if ($result instanceof JsonResponse) {
+            $result = $result->getBody();
+        }
+        $result = \json_decode($result, true);
         if (is_array($result) && !empty($result['success'])) {
             $result = 'OK';
         }
