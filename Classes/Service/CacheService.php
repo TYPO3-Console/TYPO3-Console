@@ -187,14 +187,10 @@ class CacheService implements SingletonInterface
     }
 
     /**
-     * @deprecated can be removed when TYPO3 7.6 support is removed
+     * @deprecated can be removed when TYPO3 8 support is removed
      */
     private function ensureDatabaseIsInitialized()
     {
-        if (class_exists(ConnectionPool::class)) {
-            // With doctrine, we don't need to initialize $GLOBALS['TYPO3_DB']
-            return;
-        }
         if (!empty($GLOBALS['TYPO3_DB'])) {
             // Already initialized
             return;
