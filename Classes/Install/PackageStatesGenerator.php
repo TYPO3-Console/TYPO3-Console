@@ -54,7 +54,7 @@ class PackageStatesGenerator
             $isFrameWorkExtToActivate = in_array($extKey, $frameworkExtensionsToActivate, true);
             $isExcludedExt = in_array($extKey, $excludedExtensions, true);
             $isFactoryDefault = $activateDefaultExtensions && $package->isPartOfFactoryDefault();
-            $isRequiredFrameworkExt = !$isLocalExt && ($isFrameWorkExtToActivate || $package->isProtected() || $package->isPartOfMinimalUsableSystem());
+            $isRequiredFrameworkExt = $isFrameWorkExtToActivate || $package->isProtected() || $package->isPartOfMinimalUsableSystem();
             if (($isRequiredFrameworkExt || $isLocalExt || $isFactoryDefault) && (!$isExcludedExt || $isRequiredFrameworkExt)) {
                 $this->packageManager->activatePackage($extKey);
             } else {
