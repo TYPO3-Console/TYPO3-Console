@@ -179,7 +179,12 @@ class ExceptionHandler
      */
     protected function getPossibleShortenedFileName($fileName)
     {
-        $fileName = str_replace([getenv('TYPO3_PATH_COMPOSER_ROOT') . '/', PATH_site], '', $fileName);
+        $pathPrefixes = [];
+        if (getenv('TYPO3_PATH_COMPOSER_ROOT')) {
+            $pathPrefixes = [getenv('TYPO3_PATH_COMPOSER_ROOT') . '/'];
+        }
+        $pathPrefixes[] = PATH_site;
+        $fileName = str_replace($pathPrefixes, '', $fileName);
         $pathPosition = strpos($fileName, 'typo3conf/ext/');
         $pathAndFilename = ($pathPosition !== false) ? substr($fileName, $pathPosition) : $fileName;
         $pathPosition = strpos($pathAndFilename, 'typo3/sysext/');
