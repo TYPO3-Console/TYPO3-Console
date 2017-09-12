@@ -363,7 +363,10 @@ class ConsoleBootstrap extends Bootstrap
         }
         // Because links might be generated from CLI (e.g. by Solr indexer)
         // We need to properly initialize the cache hash calculator here!
-        $this->setCacheHashOptions();
+        // @deprecated can be removed if TYPO3 8 support is removed
+        if (is_callable([$this, 'setCacheHashOptions'])) {
+            $this->setCacheHashOptions();
+        }
         $this->setDefaultTimezone();
         // @deprecated can be removed if TYPO3 8 support is removed
         if (is_callable([$this, 'defineUserAgentConstant'])) {
