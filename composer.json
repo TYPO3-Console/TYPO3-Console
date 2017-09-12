@@ -98,6 +98,9 @@
             "rm .gitattributes",
             "rm .gitignore",
             "rm .php_cs.dist",
+            "rm .styleci.yml",
+            "rm phpunit.xml.dist",
+            "rm appveyor.yml",
             "rm .travis.yml"
         ],
         "extension-clean": [
