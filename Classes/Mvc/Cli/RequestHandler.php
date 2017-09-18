@@ -13,42 +13,33 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  *
  */
 
+use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\ConsoleBootstrap;
+use Symfony\Component\Console\Input\InputInterface;
+use TYPO3\CMS\Core\Console\RequestHandlerInterface;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Cli\RequestBuilder;
+use TYPO3\CMS\Extbase\Mvc\Cli\Response;
+use TYPO3\CMS\Extbase\Mvc\Dispatcher;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 
-/**
- * The generic command line interface request handler for the MVC framework.
- *
- * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
- */
-class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
+class RequestHandler implements RequestHandlerInterface
 {
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
-
-    /**
-     * @var \TYPO3\CMS\Extbase\Mvc\Dispatcher
-     */
-    protected $dispatcher;
-
-    /**
-     * @var \TYPO3\CMS\Extbase\Mvc\Cli\Request
-     */
-    protected $request;
-
-    /**
-     * @var \TYPO3\CMS\Extbase\Mvc\Cli\Response
-     */
-    protected $response;
-
     /**
      * @var ConsoleBootstrap
      */
-    protected $bootstrap;
+    private $bootstrap;
+
+    /**
+     * @var ObjectManager
+     */
+    private $objectManager;
+
+    /**
+     * @var Dispatcher
+     */
+    private $dispatcher;
 
     /**
      * Constructor
@@ -60,7 +51,7 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
         $this->bootstrap = $bootstrap;
     }
 
-    public function handleRequest()
+    public function handleRequest(InputInterface $input)
     {
         // help command by default
         if ($_SERVER['argc'] === 1) {
@@ -75,12 +66,12 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
         }
 
         $this->boot($_SERVER['argv'][1]);
-        $this->request = $this->objectManager->get(\TYPO3\CMS\Extbase\Mvc\Cli\RequestBuilder::class)->build($commandLine, $callingScript);
-        $this->response = new \TYPO3\CMS\Extbase\Mvc\Cli\Response();
-        $this->dispatcher->dispatch($this->request, $this->response);
+        $request = $this->objectManager->get(RequestBuilder::class)->build($commandLine, $callingScript);
+        $response = new Response();
+        $this->dispatcher->dispatch($request, $response);
 
-        $this->response->send();
-        $this->shutdown();
+        // Store the response for later use in ConsoleApplication
+        $this->bootstrap->setEarlyInstance(Response::class, $response);
     }
 
     /**
@@ -88,17 +79,14 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
      */
     protected function boot($commandIdentifier)
     {
-        $sequence = $this->bootstrap->buildBootingSequenceForCommand($commandIdentifier);
+        /** @var RunLevel $runLevel */
+        $runLevel = $this->bootstrap->getEarlyInstance(RunLevel::class);
+        $sequence = $runLevel->buildSequenceForCommand($commandIdentifier);
         $sequence->invoke($this->bootstrap);
 
-        $this->objectManager = GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\ObjectManager::class);
-        $this->dispatcher = $this->objectManager->get(\TYPO3\CMS\Extbase\Mvc\Dispatcher::class);
-    }
-
-    protected function shutdown()
-    {
-        $this->bootstrap->shutdown();
-        exit($this->response->getExitCode());
+        // Late setting of these objects as they depended on booted state
+        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        $this->dispatcher = $this->objectManager->get(Dispatcher::class);
     }
 
     /**
@@ -115,11 +103,12 @@ class RequestHandler implements \TYPO3\CMS\Extbase\Mvc\RequestHandlerInterface
     /**
      * Checks if the request handler can handle the current request.
      *
+     * @param InputInterface $input
      * @return bool true if it can handle the request, otherwise false
      * @api
      */
-    public function canHandleRequest()
+    public function canHandleRequest(InputInterface $input)
     {
-        return PHP_SAPI === 'cli' && isset($_SERVER['argc']) && isset($_SERVER['argv']);
+        return true;
     }
 }
