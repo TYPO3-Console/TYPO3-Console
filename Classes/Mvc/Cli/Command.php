@@ -79,7 +79,7 @@ class Command
         $numberOfClassNameParts = count($classNameParts);
         if ($numberOfClassNameParts < 3) {
             throw new \InvalidArgumentException(
-                'Controller class names must at least consist of three parts: vendor, extension name and path.',
+                'Controller class names must at least consist of three parts: vendor, extension name and command controller name.',
                 1438782187
             );
         }
