@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\Core;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Error\ExceptionHandler;
 use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
+use Helhum\Typo3Console\Mvc\Cli\SymfonyConsoleRequestHandler;
 use Symfony\Component\Console\Input\ArgvInput;
 use TYPO3\CMS\Core\Core\ApplicationInterface;
 use TYPO3\CMS\Core\Core\Bootstrap;
@@ -57,6 +58,7 @@ class ConsoleApplication implements ApplicationInterface
         }
 
         $this->bootstrap->registerRequestHandlerImplementation(RequestHandler::class);
+        $this->bootstrap->registerRequestHandlerImplementation(SymfonyConsoleRequestHandler::class);
         $this->bootstrap->handleRequest(new ArgvInput());
 
         $this->shutdown();

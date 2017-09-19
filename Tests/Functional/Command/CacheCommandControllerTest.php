@@ -20,7 +20,7 @@ class CacheCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
-    public function cacheCanBeFlushedFlushed()
+    public function cacheCanBeFlushed()
     {
         $output = $this->commandDispatcher->executeCommand('cache:flush');
         $this->assertSame('Flushed all caches.', $output);

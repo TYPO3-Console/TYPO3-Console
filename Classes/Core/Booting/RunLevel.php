@@ -131,6 +131,7 @@ class RunLevel
             // OK, this does not work when there is a cached file... of course, but in compile time we do not have caches
             unset($GLOBALS['TYPO3_LOADED_EXT']['extbase']['ext_localconf.php']);
             require PATH_site . 'typo3/sysext/extbase/ext_localconf.php';
+            Scripts::filterOverriddenCoreCommandControllers();
         }));
 
         return $sequence;

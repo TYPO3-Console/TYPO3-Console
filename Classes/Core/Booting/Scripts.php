@@ -198,6 +198,11 @@ class Scripts
         }
         $bootstrap->unsetReservedGlobalVariables();
         ExtensionManagementUtility::loadBaseTca();
+        self::filterOverriddenCoreCommandControllers();
+    }
+
+    public static function filterOverriddenCoreCommandControllers()
+    {
         $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] = array_filter($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'], function ($value) {
             return !in_array($value, [ExtensionCommandController::class, HelpCommandController::class], true);
         });

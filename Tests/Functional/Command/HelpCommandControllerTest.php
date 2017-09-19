@@ -32,10 +32,10 @@ class HelpCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
-    public function helpShowsListOfAvailableCommands()
+    public function helpCanBeShown()
     {
         $output = $this->commandDispatcher->executeCommand('help');
-        $this->assertContains('Available commands', $output);
+        $this->assertContains('Usage:', $output);
     }
 
     /**
