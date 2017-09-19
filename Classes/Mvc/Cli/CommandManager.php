@@ -14,9 +14,7 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Command\HelpCommandController;
 use TYPO3\CMS\Extbase\Mvc\Cli\Command;
-use TYPO3\CMS\Extensionmanager\Command\ExtensionCommandController;
 
 /**
  * Class CommandManager
@@ -32,6 +30,11 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
      * @var bool
      */
     protected $initialized = false;
+
+    /**
+     * @var array
+     */
+    private $commandRegistry = [];
 
     /**
      * This lifecycle method is called by the object manager after instantiation
@@ -86,22 +89,34 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
     /**
      * Make sure the object manager is set
      *
-     * @return \TYPO3\CMS\Extbase\Mvc\Cli\Command[]
+     * @param bool $onlyNew
+     * @return Command[]
      */
-    public function getAvailableCommands()
+    public function getAvailableCommands($onlyNew = false)
     {
         $this->initialize();
+        if ($onlyNew) {
+            $currentRegistry = $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'];
+            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] = array_diff($currentRegistry, $this->commandRegistry);
+            $availableCommands = $this->availableCommands;
+            $this->availableCommands = null;
+            $newCommands = parent::getAvailableCommands();
+            $this->availableCommands = array_merge($availableCommands, $newCommands);
+            $this->shortCommandIdentifiers = null;
+            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] = $currentRegistry;
+            return $newCommands;
+        }
         if ($this->availableCommands === null) {
-            $commandControllerRegistry = & $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'];
-            if (!empty($commandControllerRegistry) && is_array($commandControllerRegistry)) {
-                $commandControllerRegistry = array_filter($commandControllerRegistry, function ($value) {
-                    return !in_array($value, [ExtensionCommandController::class, HelpCommandController::class], true);
-                });
-                $commandControllerRegistry = array_merge($commandControllerRegistry, $this->commandControllers);
-            } else {
-                $commandControllerRegistry = $this->commandControllers;
+            if (!empty($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'])) {
+                $this->commandControllers = array_merge(
+                    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'],
+                    $this->commandControllers
+                );
             }
+            $this->commandRegistry = $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'];
+            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] = $this->commandControllers;
             $this->availableCommands = parent::getAvailableCommands();
+            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] = $this->commandRegistry;
         }
         return $this->availableCommands;
     }

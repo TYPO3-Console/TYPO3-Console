@@ -108,6 +108,6 @@ class RequestHandler implements RequestHandlerInterface
      */
     public function canHandleRequest(InputInterface $input)
     {
-        return true;
+        return !class_exists(\TYPO3\CMS\Core\Database\ConnectionPool::class);
     }
 }

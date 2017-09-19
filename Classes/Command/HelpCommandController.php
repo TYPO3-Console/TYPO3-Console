@@ -58,7 +58,7 @@ class HelpCommandController extends CommandController
     public function helpCommand($commandIdentifier = null, $raw = false)
     {
         if (!$raw) {
-            $this->outputLine('<info>TYPO3 Console</info> version <comment>%s</comment>', [$this->version]);
+            $this->outputLine('<info>TYPO3 Console</info> <comment>%s</comment>', [$this->version]);
             $this->outputLine();
         }
 
