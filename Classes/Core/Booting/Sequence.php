@@ -13,7 +13,7 @@ namespace Helhum\Typo3Console\Core\Booting;
  *
  */
 
-use Helhum\Typo3Console\Core\ConsoleBootstrap;
+use TYPO3\CMS\Core\Core\Bootstrap;
 
 /**
  * A boot sequence, consisting of individual steps, each of them initializing a
@@ -82,10 +82,10 @@ class Sequence
     /**
      * Executes all steps of this sequence
      *
-     * @param ConsoleBootstrap $bootstrap
+     * @param Bootstrap $bootstrap
      * @return void
      */
-    public function invoke(ConsoleBootstrap $bootstrap)
+    public function invoke(Bootstrap $bootstrap)
     {
         if (isset($this->steps['start'])) {
             foreach ($this->steps['start'] as $step) {
@@ -99,10 +99,10 @@ class Sequence
      * to be executed after the given step.
      *
      * @param \Helhum\Typo3Console\Core\Booting\Step $step The step to invoke
-     * @param ConsoleBootstrap $bootstrap
+     * @param Bootstrap $bootstrap
      * @return void
      */
-    protected function invokeStep(Step $step, ConsoleBootstrap $bootstrap)
+    protected function invokeStep(Step $step, Bootstrap $bootstrap)
     {
         $identifier = $step->getIdentifier();
         $step($bootstrap);

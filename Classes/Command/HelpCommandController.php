@@ -14,8 +14,8 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
-use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Extbase\Mvc\Cli\Command;
 
 /**
@@ -337,8 +337,7 @@ SWITCHCASE;
     protected function buildCommandsIndex()
     {
         $availableCommands = $this->commandManager->getAvailableCommands();
-        /** @var RunLevel $runLevel */
-        $runLevel = ConsoleBootstrap::getInstance()->getEarlyInstance('Helhum\Typo3Console\Core\Booting\RunLevel');
+        $runLevel = Bootstrap::getInstance()->getEarlyInstance(RunLevel::class);
 
         foreach ($availableCommands as $command) {
             if ($command->isInternal()) {

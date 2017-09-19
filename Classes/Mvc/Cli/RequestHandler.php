@@ -14,7 +14,6 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
-use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Symfony\Component\Console\Input\InputInterface;
 use TYPO3\CMS\Core\Console\RequestHandlerInterface;
 use TYPO3\CMS\Core\Core\Bootstrap;
@@ -27,7 +26,7 @@ use TYPO3\CMS\Extbase\Object\ObjectManager;
 class RequestHandler implements RequestHandlerInterface
 {
     /**
-     * @var ConsoleBootstrap
+     * @var Bootstrap
      */
     private $bootstrap;
 

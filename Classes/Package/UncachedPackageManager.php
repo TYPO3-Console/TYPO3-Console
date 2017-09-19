@@ -13,7 +13,7 @@ namespace Helhum\Typo3Console\Package;
  *
  */
 
-use Helhum\Typo3Console\Core\ConsoleBootstrap;
+use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\ClassLoadingInformation;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
@@ -138,7 +138,7 @@ class UncachedPackageManager extends PackageManager
      */
     protected function ensureClassLoadingInformationExists()
     {
-        if (!ConsoleBootstrap::usesComposerClassLoading() && !ClassLoadingInformation::isClassLoadingInformationAvailable()) {
+        if (!Bootstrap::usesComposerClassLoading() && !ClassLoadingInformation::isClassLoadingInformationAvailable()) {
             ClassLoadingInformation::dumpClassLoadingInformation();
             ClassLoadingInformation::registerClassLoadingInformation();
         }
@@ -154,7 +154,7 @@ class UncachedPackageManager extends PackageManager
         if ($this->hasExtension && $this->packageStatesFileExists && !$this->isPackageActive('typo3_console')) {
             $this->scanAvailablePackages();
             $this->activatePackage('typo3_console');
-            if (!ConsoleBootstrap::usesComposerClassLoading()) {
+            if (!Bootstrap::usesComposerClassLoading()) {
                 // Activate Package does not permanently update autoload info
                 // thus we must do so here manually
                 ClassLoadingInformation::dumpClassLoadingInformation();
