@@ -13,11 +13,11 @@ namespace Helhum\Typo3Console\Install;
  *
  */
 
-use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\CommandManager;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
+use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition;
 use TYPO3\CMS\Extbase\Mvc\Controller\Argument;
@@ -268,7 +268,7 @@ class CliSetupRequestHandler
             $actionName === 'defaultconfiguration'
             && !empty($arguments['siteSetupType'])
             && $arguments['siteSetupType'] === 'dist'
-            && ConsoleBootstrap::usesComposerClassLoading()
+            && Bootstrap::usesComposerClassLoading()
         ) {
             $errorMessage = new ErrorStatus();
             $errorMessage->setMessage('Site setup type "dist" is not possible when TYPO3 is installed with composer. Use "composer require" to install a distribution of your choice.');

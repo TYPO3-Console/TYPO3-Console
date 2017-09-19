@@ -14,13 +14,13 @@ namespace Helhum\Typo3Console\Service;
  */
 
 use Helhum\Typo3Console\Core\Booting\Scripts;
-use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Cache\Backend\SimpleFileBackend;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
+use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
@@ -43,7 +43,7 @@ class CacheService implements SingletonInterface
     protected $configurationService;
 
     /**
-     * @var ConsoleBootstrap
+     * @var Bootstrap
      */
     private $bootstrap;
 
@@ -53,11 +53,11 @@ class CacheService implements SingletonInterface
      * @param CacheManager $cacheManager
      * @param ConfigurationService $configurationService
      */
-    public function __construct(CacheManager $cacheManager, ConfigurationService $configurationService, ConsoleBootstrap $bootstrap = null)
+    public function __construct(CacheManager $cacheManager, ConfigurationService $configurationService, Bootstrap $bootstrap = null)
     {
         $this->cacheManager = $cacheManager;
         $this->configurationService = $configurationService;
-        $this->bootstrap = $bootstrap ?: ConsoleBootstrap::getInstance();
+        $this->bootstrap = $bootstrap ?: Bootstrap::getInstance();
     }
 
     /**
@@ -195,7 +195,7 @@ class CacheService implements SingletonInterface
             // Already initialized
             return;
         }
-        $this->bootstrap->initializeDatabaseConnection();
+        Scripts::initializeDatabaseConnection($this->bootstrap);
     }
 
     private function ensureBackendUserIsInitialized()

@@ -13,12 +13,12 @@ namespace Helhum\Typo3Console\Install\Upgrade;
  *
  */
 
-use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Helhum\Typo3Console\Extension\ExtensionConstraintCheck;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
+use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Updates\DatabaseCharsetUpdate;
@@ -163,7 +163,7 @@ class UpgradeHandling
                             continue;
                         }
                         // In composer mode, skip all install extension wizards!
-                        if (ConsoleBootstrap::usesComposerClassLoading()) {
+                        if (Bootstrap::usesComposerClassLoading()) {
                             $arguments[] = sprintf('%s[%s]=%s', $shortIdentifier, $argumentName, $argumentDefault);
                         } elseif ($argumentDefinition['type'] === 'bool') {
                             $wizard = $this->factory->create($shortIdentifier);

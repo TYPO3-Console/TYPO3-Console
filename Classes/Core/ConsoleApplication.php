@@ -18,6 +18,7 @@ use Helhum\Typo3Console\Error\ExceptionHandler;
 use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 use Symfony\Component\Console\Input\ArgvInput;
 use TYPO3\CMS\Core\Core\ApplicationInterface;
+use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -30,14 +31,14 @@ use TYPO3\CMS\Extbase\Mvc\Cli\Response;
 class ConsoleApplication implements ApplicationInterface
 {
     /**
-     * @var ConsoleBootstrap
+     * @var Bootstrap
      */
     private $bootstrap;
 
     public function __construct(\Composer\Autoload\ClassLoader $classLoader)
     {
         $this->ensureRequiredEnvironment();
-        $this->bootstrap = ConsoleBootstrap::getInstance();
+        $this->bootstrap = Bootstrap::getInstance();
         $this->bootstrap->initializeClassLoader($classLoader);
     }
 
@@ -51,12 +52,12 @@ class ConsoleApplication implements ApplicationInterface
     {
         $this->boot();
 
-        $this->bootstrap->registerRequestHandlerImplementation(RequestHandler::class);
-        $this->bootstrap->handleRequest(new ArgvInput());
-
         if ($execute !== null) {
             call_user_func($execute);
         }
+
+        $this->bootstrap->registerRequestHandlerImplementation(RequestHandler::class);
+        $this->bootstrap->handleRequest(new ArgvInput());
 
         $this->shutdown();
     }
@@ -100,7 +101,7 @@ class ConsoleApplication implements ApplicationInterface
             exit(1);
         }
 
-        $this->bootstrap->setEarlyInstance(\Helhum\Typo3Console\Core\Booting\RunLevel::class, new RunLevel());
+        $this->bootstrap->setEarlyInstance(RunLevel::class, new RunLevel());
         $exceptionHandler = new ExceptionHandler();
         set_exception_handler([$exceptionHandler, 'handleException']);
         $this->initializeCommandManager();
@@ -160,7 +161,7 @@ class ConsoleApplication implements ApplicationInterface
     {
         // Make sure the package manager class is available
         // the extension might not be active yet, but will be activated in this class
-        if (!ConsoleBootstrap::usesComposerClassLoading()) {
+        if (!Bootstrap::usesComposerClassLoading()) {
             require __DIR__ . '/../Package/UncachedPackageManager.php';
         }
         $packageManager = new \Helhum\Typo3Console\Package\UncachedPackageManager();

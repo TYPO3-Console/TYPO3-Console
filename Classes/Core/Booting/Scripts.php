@@ -14,17 +14,19 @@ namespace Helhum\Typo3Console\Core\Booting;
  */
 
 use Helhum\Typo3Console\Core\Cache\FakeDatabaseBackend;
-use Helhum\Typo3Console\Core\ConsoleBootstrap;
 use Helhum\Typo3Console\Error\ErrorHandler;
 use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
 use TYPO3\CMS\Core\Cache\Backend\NullBackend;
 use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
 use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Command\HelpCommandController;
+use TYPO3\CMS\Extensionmanager\Command\ExtensionCommandController;
 
 /**
  * Class Scripts
@@ -37,11 +39,35 @@ class Scripts
     protected static $earlyCachesConfiguration = [];
 
     /**
-     * @param ConsoleBootstrap $bootstrap
+     * @param Bootstrap $bootstrap
      */
-    public static function initializeConfigurationManagement(ConsoleBootstrap $bootstrap)
+    public static function initializeConfigurationManagement(Bootstrap $bootstrap)
     {
-        $bootstrap->initializeConfigurationManagement();
+        call_user_func(\Closure::bind(function () use ($bootstrap) {
+            $bootstrap->populateLocalConfiguration();
+            if (empty($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'])) {
+                $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] = [];
+            }
+            if (!Bootstrap::usesComposerClassLoading()) {
+                $bootstrap->initializeRuntimeActivatedPackagesFromConfiguration();
+            }
+            // Because links might be generated from CLI (e.g. by Solr indexer)
+            // We need to properly initialize the cache hash calculator here!
+            // @deprecated can be removed if TYPO3 8 support is removed
+            if (is_callable([$bootstrap, 'setCacheHashOptions'])) {
+                $bootstrap->setCacheHashOptions();
+            }
+            // @deprecated can be removed if TYPO3 8 support is removed
+            if (is_callable([$bootstrap, 'defineUserAgentConstant'])) {
+                $bootstrap->defineUserAgentConstant();
+            }
+            // @deprecated can be removed if TYPO3 7 support is removed
+            if (is_callable([$bootstrap, 'defineDatabaseConstants'])) {
+                $bootstrap->defineDatabaseConstants();
+            }
+            $bootstrap->setDefaultTimezone();
+        }, null, $bootstrap));
+
         self::disableCachesForObjectManagement();
     }
 
@@ -81,30 +107,40 @@ class Scripts
     }
 
     /**
-     * @param ConsoleBootstrap $bootstrap
+     * @param Bootstrap $bootstrap
      */
-    public static function disableCoreCaches(ConsoleBootstrap $bootstrap)
+    public static function disableCoreCaches(Bootstrap $bootstrap)
     {
         $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
         foreach (
             [
                 'cache_core',
+                // @deprecated will be removed when TYPO3 7.6 support is removed
                 'dbal',
             ] as $id) {
             if (isset($cacheConfigurations[$id])) {
                 self::$earlyCachesConfiguration[$id] = $cacheConfigurations[$id];
             }
         }
-        $bootstrap->disableCoreCaches();
+        $bootstrap->disableCoreCache();
+        // @deprecated can be removed once TYPO3 7 support is removed
+        $packageManager = $bootstrap->getEarlyInstance(\TYPO3\CMS\Core\Package\PackageManager::class);
+        if ($packageManager->isPackageActive('dbal')) {
+            $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
+            $cacheConfigurations['dbal'] = [
+                'backend' => \TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend::class,
+                'groups' => [],
+            ];
+        }
     }
 
     /**
      * Reset the internal caches array in the object manager to
      * make it rebuild the caches with new configuration.
      *
-     * @param ConsoleBootstrap $bootstrap
+     * @param Bootstrap $bootstrap
      */
-    public static function reEnableOriginalCoreCaches(ConsoleBootstrap $bootstrap)
+    public static function reEnableOriginalCoreCaches(Bootstrap $bootstrap)
     {
         $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'] = array_replace_recursive($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'], self::$earlyCachesConfiguration);
 
@@ -119,10 +155,11 @@ class Scripts
     }
 
     /**
-     * @param ConsoleBootstrap $bootstrap
+     * @param Bootstrap $bootstrap
      */
-    public static function initializeCachingFramework(ConsoleBootstrap $bootstrap)
+    public static function initializeCachingFramework(Bootstrap $bootstrap)
     {
+        // @deprecated will be removed once TYPO3 7.6 support is removed
         if ($bootstrap->getEarlyInstance(PackageManager::class)->isPackageActive('dbal')) {
             require GeneralUtility::getFileAbsFileName('EXT:dbal/ext_localconf.php');
         }
@@ -138,29 +175,48 @@ class Scripts
     }
 
     /**
-     * @param ConsoleBootstrap $bootstrap
+     * @param Bootstrap $bootstrap
+     * @deprecated can be removed when TYPO3 8 support is removed
      */
-    public static function initializeDatabaseConnection(ConsoleBootstrap $bootstrap)
+    public static function initializeDatabaseConnection(Bootstrap $bootstrap)
     {
-        $bootstrap->initializeDatabaseConnection();
+        if (is_callable([$bootstrap, 'initializeTypo3DbGlobal'])) {
+            $bootstrap->initializeTypo3DbGlobal();
+        }
     }
 
     /**
-     * @param ConsoleBootstrap $bootstrap
+     * @param Bootstrap $bootstrap
      */
-    public static function initializeExtensionConfiguration(ConsoleBootstrap $bootstrap)
+    public static function initializeExtensionConfiguration(Bootstrap $bootstrap)
     {
         ExtensionManagementUtility::loadExtLocalconf();
-        $bootstrap->applyAdditionalConfigurationSettings();
-        $bootstrap->loadTcaOnly();
+        $bootstrap->setFinalCachingFrameworkCacheConfiguration();
+        // @deprecated can be removed once TYPO3 8.7 support is removed
+        if (is_callable([$bootstrap, 'defineLoggingAndExceptionConstants'])) {
+            $bootstrap->defineLoggingAndExceptionConstants();
+        }
+        $bootstrap->unsetReservedGlobalVariables();
+        ExtensionManagementUtility::loadBaseTca();
+        $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] = array_filter($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'], function ($value) {
+            return !in_array($value, [ExtensionCommandController::class, HelpCommandController::class], true);
+        });
     }
 
     /**
-     * @param ConsoleBootstrap $bootstrap
+     * @param Bootstrap $bootstrap
      */
-    public static function initializeAuthenticatedOperations(ConsoleBootstrap $bootstrap)
+    public static function initializeAuthenticatedOperations(Bootstrap $bootstrap)
     {
-        $bootstrap->loadExtTablesOnly();
+        // @deprecated can be removed if TYPO3 7 support is removed (directly use $bootstrap->loadExtTables())
+        ExtensionManagementUtility::loadExtTables();
+        call_user_func(\Closure::bind(function () use ($bootstrap) {
+            if (is_callable([$bootstrap, 'executeExtTablesAdditionalFile'])) {
+                $bootstrap->executeExtTablesAdditionalFile();
+            }
+            $bootstrap->runExtTablesPostProcessingHooks();
+        }, null, $bootstrap));
+
         $bootstrap->initializeBackendUser(CommandLineUserAuthentication::class);
         self::loadCommandLineBackendUser();
         // Global language object on CLI? rly? but seems to be needed by some scheduler tasks :(
@@ -211,9 +267,9 @@ class Scripts
      * Provide cleaned implementation of TYPO3 core classes.
      * Can only be called *after* extension configuration is loaded (needs extbase configuration)!
      *
-     * @param ConsoleBootstrap $bootstrap
+     * @param Bootstrap $bootstrap
      */
-    public static function provideCleanClassImplementations(ConsoleBootstrap $bootstrap)
+    public static function provideCleanClassImplementations(Bootstrap $bootstrap)
     {
         if (!class_exists(\TYPO3\CMS\Core\Database\Schema\SqlReader::class)) {
             // Register the legacy schema update in case new API does not exist

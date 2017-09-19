@@ -56,10 +56,10 @@
     $log('PATH_thisScript: ' . PATH_thisScript, true);
     $log('is_file(PATH_thisScript): ' . var_export(is_file(PATH_thisScript), true), true);
 
-    if (!class_exists('Helhum\\Typo3Console\\Core\\ConsoleBootstrap')) {
+    if (!class_exists(\Helhum\Typo3Console\Core\ConsoleApplication::class)) {
         // This require is needed so that the console works in non Composer mode,
         // where requiring the main autoload.php is not enough to load extension classes
-        require __DIR__ . '/../Classes/Core/ConsoleBootstrap.php';
+        require __DIR__ . '/../Classes/Core/ConsoleApplication.php';
     }
     $application = new \Helhum\Typo3Console\Core\ConsoleApplication($classLoader);
     $application->run();
