@@ -16,7 +16,6 @@ namespace Helhum\Typo3Console\Install;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\CommandManager;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
-use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition;
@@ -139,18 +138,7 @@ class CliSetupRequestHandler
             // so we do it manually here.
             $this->output->outputLine();
             $this->output->outputLine('Set up extensions:');
-            try {
-                $this->commandDispatcher->executeCommand('install:generatepackagestates');
-            } catch (FailedSubProcessCommandException $e) {
-                // There are very likely broken extensions or extensions with invalid dependencies
-                // Therefore we fall back to TYPO3 standard behaviour and only install default TYPO3 core extensions
-                // @deprecated in 4.6, will be removed in 5.0.0
-                $packageStatesArguments['--activate-default'] = true;
-                $this->commandDispatcher->executeCommand('install:generatepackagestates');
-                $this->output->outputLine('<warning>An error occurred while generating PackageStates.php</warning>');
-                $this->output->outputLine('<warning>Most likely you have missed correctly specifying depedencies to typo3/cms-* packages</warning>');
-                $this->output->outputLine('<warning>The error message was "%s"</warning>', [$e->getPrevious()->getMessage()]);
-            }
+            $this->commandDispatcher->executeCommand('install:generatepackagestates');
             $this->commandDispatcher->executeCommand('database:updateschema');
             $this->commandDispatcher->executeCommand('extension:setupactive');
         }
