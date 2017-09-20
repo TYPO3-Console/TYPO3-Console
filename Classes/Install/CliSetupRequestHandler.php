@@ -108,8 +108,9 @@ class CliSetupRequestHandler
     /**
      * @param bool $interactiveSetup
      * @param array $givenRequestArguments
+     * @param bool $skipExtensionSetup
      */
-    public function setup($interactiveSetup, array $givenRequestArguments)
+    public function setup($interactiveSetup, array $givenRequestArguments, $skipExtensionSetup = false)
     {
         $this->interactiveSetup = $interactiveSetup;
         $this->givenRequestArguments = $givenRequestArguments;
@@ -119,41 +120,40 @@ class CliSetupRequestHandler
             touch($firstInstallPath);
         }
 
-        // Start with a clean set of packages
-        @unlink(PATH_site . 'typo3conf/PackageStates.php');
-        // In composer mode, we rely on the fact that core extensions that should
-        // be active are defined in the composer.json file, while we gracefully activate all default core
-        // packages when setup is done in non composer mode.
-        $packageStatesArguments = ['--activate-default' => !ConsoleBootstrap::usesComposerClassLoading()];
-        // Exclude all local extensions in case any are present, to avoid interference with the setup
-        foreach (glob(PATH_site . 'typo3conf/ext/*') as $item) {
-            $packageStatesArguments['--excluded-extensions'][] = basename($item);
+        if (!$skipExtensionSetup) {
+            // Start with a clean set of packages
+            @unlink(PATH_site . 'typo3conf/PackageStates.php');
+            $packageStatesArguments = [];
+            // Exclude all local extensions in case any are present, to avoid interference with the setup
+            foreach (glob(PATH_site . 'typo3conf/ext/*') as $item) {
+                $packageStatesArguments['--excluded-extensions'][] = basename($item);
+            }
+            $this->commandDispatcher->executeCommand('install:generatepackagestates', $packageStatesArguments);
         }
-        $this->commandDispatcher->executeCommand('install:generatepackagestates', $packageStatesArguments);
 
         foreach ($this->installationActions as $actionName) {
             $this->dispatchAction($actionName);
         }
-
-        $this->output->outputLine();
-        $this->output->outputLine('Set up extensions:');
-
-        // The TYPO3 installation process does not take care of setting up all extensions properly,
-        // so we do it manually here.
-        try {
-            $this->commandDispatcher->executeCommand('install:generatepackagestates', array_diff_key($packageStatesArguments, ['--excluded-extensions' => '']));
-        } catch (FailedSubProcessCommandException $e) {
-            // There are very likely broken extensions or extensions with invalid dependencies
-            // Therefore we fall back to TYPO3 standard behaviour and only install default TYPO3 core extensions
-            // @deprecated in 4.6, will be removed in 5.0.0
-            $packageStatesArguments['--activate-default'] = true;
-            $this->commandDispatcher->executeCommand('install:generatepackagestates', $packageStatesArguments);
-            $this->output->outputLine('<warning>An error occurred while generating PackageStates.php</warning>');
-            $this->output->outputLine('<warning>Most likely you have missed correctly specifying depedencies to typo3/cms-* packages</warning>');
-            $this->output->outputLine('<warning>The error message was "%s"</warning>', [$e->getPrevious()->getMessage()]);
+        if (!$skipExtensionSetup) {
+            // The TYPO3 installation process does not take care of setting up all extensions properly,
+            // so we do it manually here.
+            $this->output->outputLine();
+            $this->output->outputLine('Set up extensions:');
+            try {
+                $this->commandDispatcher->executeCommand('install:generatepackagestates');
+            } catch (FailedSubProcessCommandException $e) {
+                // There are very likely broken extensions or extensions with invalid dependencies
+                // Therefore we fall back to TYPO3 standard behaviour and only install default TYPO3 core extensions
+                // @deprecated in 4.6, will be removed in 5.0.0
+                $packageStatesArguments['--activate-default'] = true;
+                $this->commandDispatcher->executeCommand('install:generatepackagestates');
+                $this->output->outputLine('<warning>An error occurred while generating PackageStates.php</warning>');
+                $this->output->outputLine('<warning>Most likely you have missed correctly specifying depedencies to typo3/cms-* packages</warning>');
+                $this->output->outputLine('<warning>The error message was "%s"</warning>', [$e->getPrevious()->getMessage()]);
+            }
+            $this->commandDispatcher->executeCommand('database:updateschema');
+            $this->commandDispatcher->executeCommand('extension:setupactive');
         }
-        $this->commandDispatcher->executeCommand('database:updateschema');
-        $this->commandDispatcher->executeCommand('extension:setupactive');
         $this->output->outputLine('<success>OK</success>');
     }
 
