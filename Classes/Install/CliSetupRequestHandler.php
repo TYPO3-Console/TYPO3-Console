@@ -252,21 +252,6 @@ class CliSetupRequestHandler
     private function executeActionWithArguments($actionName, array $arguments = [])
     {
         $actionName = strtolower($actionName);
-        if (
-            $actionName === 'defaultconfiguration'
-            && !empty($arguments['siteSetupType'])
-            && $arguments['siteSetupType'] === 'dist'
-            && Bootstrap::usesComposerClassLoading()
-        ) {
-            $errorMessage = new ErrorStatus();
-            $errorMessage->setMessage('Site setup type "dist" is not possible when TYPO3 is installed with composer. Use "composer require" to install a distribution of your choice.');
-            return new InstallStepResponse(
-                true,
-                [
-                    $errorMessage,
-                ]
-            );
-        }
         $response = @unserialize($this->commandDispatcher->executeCommand('install:' . $actionName, $arguments));
         if ($response === false && $actionName === 'defaultconfiguration') {
             // This action terminates with exit, (trying to initiate a HTTP redirect)
