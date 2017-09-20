@@ -46,7 +46,7 @@ class UpgradeWizardExecutor
             $closure = \Closure::bind(function () use ($upgradeWizard) {
                 /** @var DummyUpgradeWizard $upgradeWizard here to avoid annoying (and wrong) protected method inspection in PHPStorm */
                 $upgradeWizard->markWizardAsDone(0);
-            }, null, get_class($upgradeWizard));
+            }, null, $upgradeWizard);
             $closure();
         }
 

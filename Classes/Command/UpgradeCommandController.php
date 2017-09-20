@@ -152,8 +152,8 @@ class UpgradeCommandController extends CommandController
      */
     public function subProcessCommand($command, $arguments)
     {
-        $arguments = unserialize($arguments);
-        $result = call_user_func_array([$this->upgradeHandling, $command], $arguments);
+        $arguments = unserialize($arguments, ['allowed_classes' => false]);
+        $result = $this->upgradeHandling->$command(...$arguments);
         $this->output(serialize($result));
     }
 

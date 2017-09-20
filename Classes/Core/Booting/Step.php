@@ -50,7 +50,7 @@ class Step
      */
     public function __invoke(Bootstrap $bootstrap)
     {
-        call_user_func($this->callback, $bootstrap);
+        ($this->callback)($bootstrap);
     }
 
     /**

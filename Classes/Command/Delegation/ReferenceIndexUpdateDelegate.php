@@ -40,7 +40,7 @@ class ReferenceIndexUpdateDelegate implements ReferenceIndexIntegrityDelegateInt
         }
 
         foreach ($this->subscribers[$name] as $subscriber) {
-            call_user_func_array($subscriber, $arguments);
+            $subscriber(...$arguments);
         }
     }
 

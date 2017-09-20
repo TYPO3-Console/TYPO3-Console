@@ -68,7 +68,7 @@ class ExtensionSetupResultRenderer
                 $signalConfig['signalName'],
                 \Closure::bind(function ($result) use ($signalConfig, $collector) {
                     $collector->results[$signalConfig['resultName']][] = $result;
-                }, null, get_class($this))
+                }, null, $this)
             );
         }
     }

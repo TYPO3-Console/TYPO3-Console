@@ -244,12 +244,11 @@ abstract class CommandController implements CommandControllerInterface
     protected function callCommandMethod()
     {
         $preparedArguments = [];
-        /** @var Argument $argument */
         foreach ($this->arguments as $argument) {
             $preparedArguments[] = $argument->getValue();
         }
         $originalRole = $this->ensureAdminRoleIfRequested();
-        $commandResult = call_user_func_array([$this, $this->commandMethodName], $preparedArguments);
+        $commandResult = $this->{$this->commandMethodName}(...$preparedArguments);
         $this->restoreUserRole($originalRole);
         if (is_string($commandResult) && $commandResult !== '') {
             $this->response->appendContent($commandResult);
