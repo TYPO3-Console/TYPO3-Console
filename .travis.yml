@@ -17,16 +17,12 @@ matrix:
       env: TYPO3_VERSION=^7.6
     - php: 7.0
       env: TYPO3_VERSION=^7.6
-    - php: 5.6
-      env: TYPO3_VERSION=^7.6
-    - php: 5.5
-      env: TYPO3_VERSION=^7.6
     - php: 7.0
-      env: TYPO3_VERSION="dev-master as 8.7.0"
+      env: TYPO3_VERSION="dev-master as 8.7.7"
     - php: 7.1
-      env: TYPO3_VERSION="dev-master as 8.7.0"
+      env: TYPO3_VERSION="dev-master as 8.7.7"
   allow_failures:
-    - env: TYPO3_VERSION="dev-master as 8.7.0"
+    - env: TYPO3_VERSION="dev-master as 8.7.7"
 
 cache:
   directories:
