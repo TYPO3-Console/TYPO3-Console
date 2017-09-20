@@ -61,10 +61,6 @@ class CacheCommandController extends CommandController
             } catch (\Throwable $e) {
                 $exitCode = 1;
                 $filesOnly = true;
-            } catch (\Exception $e) {
-                // @deprecated can be removed once PHP 5 / TYPO3 7.6 support is removed
-                $exitCode = 1;
-                $filesOnly = true;
             }
             $this->commandDispatcher->executeCommand('cache:flushcomplete');
         }

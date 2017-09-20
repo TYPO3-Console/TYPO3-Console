@@ -18,8 +18,6 @@ use Composer\Script\Event;
 use Composer\Script\Event as ScriptEvent;
 use Composer\Semver\Constraint\EmptyConstraint;
 use Helhum\Typo3Console\Composer\InstallerScript\CopyTypo3Directory;
-use Helhum\Typo3Console\Composer\InstallerScript\GeneratePackageStates;
-use Helhum\Typo3Console\Composer\InstallerScript\InstallDummyExtension;
 use Helhum\Typo3Console\Composer\InstallerScript\PopulateCommandConfiguration;
 use TYPO3\CMS\Composer\Plugin\Core\InstallerScripts\AutoloadConnector;
 use TYPO3\CMS\Composer\Plugin\Core\InstallerScripts\WebDirectory;
@@ -51,8 +49,6 @@ class InstallerScripts implements InstallerScriptsRegistration
             $scriptDispatcher->addInstallerScript(new AutoloadConnector());
             $scriptDispatcher->addInstallerScript(new CopyTypo3Directory());
         }
-        $scriptDispatcher->addInstallerScript(new GeneratePackageStates(), 65);
-        $scriptDispatcher->addInstallerScript(new InstallDummyExtension(), 65);
     }
 
     /**
