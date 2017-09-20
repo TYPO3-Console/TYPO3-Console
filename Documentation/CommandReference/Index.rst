@@ -929,7 +929,7 @@ Options
 ``--site-name``
   Site Name
 ``--site-setup-type``
-  Can be either ``no`` (which unsurprisingly does nothing at all), ``site`` (which creates an empty root page and setup) or ``dist`` (which loads a list of distributions you can install, but only works in non composer mode)
+  Can be either ``no`` (which unsurprisingly does nothing at all) or ``site`` (which creates an empty root page and setup)
 
 
 
