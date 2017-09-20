@@ -30,6 +30,34 @@ class InstallCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
+    public function setupCommandDoesNotSetupExtensionsIfRequested()
+    {
+        $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
+        @unlink(getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php');
+        @unlink(getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php');
+        $output = $this->commandDispatcher->executeCommand(
+            'install:setup',
+            [
+                '--non-interactive' => true,
+                '--skip-extension-setup' => true,
+                '--database-user-name' => getenv('TYPO3_INSTALL_DB_USER'),
+                '--database-user-password' => getenv('TYPO3_INSTALL_DB_PASSWORD'),
+                '--database-host-name' => 'localhost',
+                '--database-port' => '3306',
+                '--database-name' => getenv('TYPO3_INSTALL_DB_DBNAME'),
+                '--admin-user-name' => 'admin',
+                '--admin-password' => 'password',
+                '--site-name' => 'Travis Install',
+                '--site-setup-type' => 'createsite',
+            ]
+        );
+        $this->assertContains('Successfully installed TYPO3 CMS!', $output);
+        $this->assertNotContains('Set up extensions', $output);
+    }
+
+    /**
+     * @test
+     */
     public function setupCommandWorksWithoutErrors()
     {
         $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
@@ -51,6 +79,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
             ]
         );
         $this->assertContains('Successfully installed TYPO3 CMS!', $output);
+        $this->assertContains('Set up extensions', $output);
     }
 
     /**

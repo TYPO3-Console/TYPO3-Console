@@ -906,6 +906,8 @@ Options
   Force installation of TYPO3, even if ``LocalConfiguration.php`` file already exists.
 ``--skip-integrity-check``
   Skip the checking for clean state before executing setup. This allows a pre-defined ``LocalConfiguration.php`` to be present. Handle with care. It might lead to unexpected or broken installation results.
+``--skip-extension-setup``
+  Skip setting up extensions after TYPO3 is set up. Defaults to false in composer setups and to true in non composer setups.
 ``--database-user-name``
   User name for database server
 ``--database-user-password``
