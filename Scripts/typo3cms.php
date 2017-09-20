@@ -1,5 +1,5 @@
 <?php
-call_user_func(function () {
+(function () {
     $log = function ($message, $debug = false) {
         if (getenv('TYPO3_CONSOLE_SUB_PROCESS') || ($debug && !getenv('TYPO3_CONSOLE_DEBUG'))) {
             return;
@@ -63,4 +63,4 @@ call_user_func(function () {
     }
     $bootstrap = \Helhum\Typo3Console\Core\ConsoleBootstrap::create(getenv('TYPO3_CONTEXT') ?: 'Production');
     $bootstrap->run($classLoader);
-});
+})();

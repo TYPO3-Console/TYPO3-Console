@@ -153,7 +153,7 @@ class PersistenceIntegrityService
         if ($delegate === null) {
             return;
         }
-        call_user_func_array([$delegate, $eventName], $arguments);
+        $delegate->$eventName(...$arguments);
     }
 
     /**

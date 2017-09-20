@@ -56,7 +56,7 @@ class SchemaUpdate implements SchemaUpdateInterface, SingletonInterface
         $addCreateChange = $this->schemaMigrator->getUpdateSuggestions($sqlStatements);
 
         // Aggregate the per-connection statements into one flat array
-        return call_user_func_array('array_merge_recursive', array_values($addCreateChange));
+        return array_merge_recursive(...array_values($addCreateChange));
     }
 
     /**
@@ -71,7 +71,7 @@ class SchemaUpdate implements SchemaUpdateInterface, SingletonInterface
         $dropRename = $this->schemaMigrator->getUpdateSuggestions($sqlStatements, true);
 
         // Aggregate the per-connection statements into one flat array
-        return call_user_func_array('array_merge_recursive', array_values($dropRename));
+        return array_merge_recursive(...array_values($dropRename));
     }
 
     /**

@@ -87,9 +87,8 @@ class ExtensionSetup
     private function callInstaller($method, array $arguments)
     {
         $installer = $this->extensionInstaller;
-        call_user_func(
-         \Closure::bind(function () use ($installer, $method, $arguments) {
-             return call_user_func_array([$installer, $method], $arguments);
-         }, null, InstallUtility::class));
+        \Closure::bind(function () use ($installer, $method, $arguments) {
+            return $installer->$method(...$arguments);
+        }, null, $installer)();
     }
 }
