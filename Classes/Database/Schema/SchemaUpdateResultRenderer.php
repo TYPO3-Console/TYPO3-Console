@@ -58,17 +58,41 @@ class SchemaUpdateResultRenderer
         if ($includeStatements) {
             $tableHeader = ['Type', 'SQL Statements'];
         }
-        $output->outputTable($tableRows, $tableHeader);
+        if (!empty($tableRows)) {
+            $output->outputTable($tableRows, $tableHeader);
+        }
+    }
 
-        if ($result->hasErrors()) {
-            foreach ($result->getErrors() as $type => $errors) {
-                $output->outputLine(sprintf('<error>Errors during "%s" schema update:</error>', self::$schemaUpdateTypeLabels[(string)$type]));
-
-                foreach ($errors as $error) {
-                    $output->outputFormatted('<error>' . $error . '</error>', [], 2);
+    /**
+     * Renders a table for a schema update result
+     *
+     * @param SchemaUpdateResult $result Result of the schema update
+     * @param ConsoleOutput $output
+     * @param bool $includeStatements
+     * @param int $maxStatementLength
+     */
+    public function renderErrors(SchemaUpdateResult $result, ConsoleOutput $output, $includeStatements = false, $maxStatementLength = 90)
+    {
+        $tableRows = [];
+        $messageLength = $includeStatements ? $maxStatementLength * .3 : $maxStatementLength;
+        $statementLength = $maxStatementLength * 0.6;
+        foreach ($result->getErrors() as $type => $errors) {
+            $typeLabel = self::$schemaUpdateTypeLabels[(string)$type];
+            foreach ($errors as $error) {
+                $row = [$typeLabel, implode(PHP_EOL, $this->getTruncatedQueries([$error['message']], $messageLength))];
+                if ($includeStatements) {
+                    $row = [$typeLabel, implode(PHP_EOL, $this->getTruncatedQueries([$error['statement']], $statementLength)), implode(PHP_EOL, $this->getTruncatedQueries([$error['message']], $messageLength))];
                 }
+                $tableRows[] = $row;
+                $tableRows[] = $includeStatements ? ['', '', ''] : ['', ''];
+                $typeLabel = '';
             }
         }
+        $tableHeader = ['Type', 'Message'];
+        if ($includeStatements) {
+            $tableHeader = ['Type', 'SQL Statement', 'Message'];
+        }
+        $output->outputTable($tableRows, $tableHeader);
     }
 
     /**

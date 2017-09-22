@@ -13,6 +13,8 @@ namespace Helhum\Typo3Console\Tests\Functional\Command;
  *
  */
 
+use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
+
 class DatabaseCommandControllerTest extends AbstractCommandTest
 {
     /**
@@ -81,6 +83,31 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
         $output = $this->commandDispatcher->executeCommand('database:updateschema', ['--schema-update-types' => '*']);
         $this->assertContains('The following database schema updates were performed:', $output);
         $this->restoreDatabase();
+    }
+
+    /**
+     * @test
+     */
+    public function schemaUpdateShowsErrorMessageIfTheyOccur()
+    {
+        $this->installFixtureExtensionCode('ext_broken_sql');
+        $this->commandDispatcher->executeCommand('install:generatepackagestates', ['--activate-default' => true]);
+        try {
+            $output = $this->commandDispatcher->executeCommand('database:updateschema', ['--schema-update-types' => '*']);
+        } catch (FailedSubProcessCommandException $e) {
+            $output = $e->getOutputMessage();
+        }
+        $this->assertContains('The following errors occurred:', $output);
+        $this->assertNotContains('SQL Statement', $output);
+        try {
+            $output = $this->commandDispatcher->executeCommand('database:updateschema', ['--schema-update-types' => '*', '--verbose' => true]);
+        } catch (FailedSubProcessCommandException $e) {
+            $output = $e->getOutputMessage();
+        }
+        $this->assertContains('The following errors occurred:', $output);
+        $this->assertContains('SQL Statement', $output);
+        $this->removeFixtureExtensionCode('ext_broken_sql');
+        $this->commandDispatcher->executeCommand('install:generatepackagestates', ['--activate-default' => true]);
     }
 
     /**
