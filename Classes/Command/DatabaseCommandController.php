@@ -97,6 +97,12 @@ class DatabaseCommandController extends CommandController
                 ]
             );
         }
+        if ($result->hasErrors()) {
+            $this->outputLine();
+            $this->output->outputLine('<error>The following errors occurred:</error>');
+            $this->schemaUpdateResultRenderer->renderErrors($result, $this->output, $verbose);
+            $this->quit(1);
+        }
     }
 
     /**

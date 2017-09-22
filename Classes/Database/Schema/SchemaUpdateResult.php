@@ -86,10 +86,18 @@ class SchemaUpdateResult
      *
      * @param SchemaUpdateType $schemaUpdateType Schema update type
      * @param array $errors List of error messages
+     * @param array $statements SQL Statements that were executed
      */
-    public function addErrors(SchemaUpdateType $schemaUpdateType, array $errors)
+    public function addErrors(SchemaUpdateType $schemaUpdateType, array $errors, array $statements = [])
     {
-        $this->errors[(string)$schemaUpdateType] = array_merge((array)$this->errors[(string)$schemaUpdateType], $errors);
+        $collectedErrors = [];
+        foreach ($errors as $id => $error) {
+            $collectedErrors[] = [
+                'message' => $error,
+                'statement' => $statements[$id],
+            ];
+        }
+        $this->errors[(string)$schemaUpdateType] = array_merge((array)$this->errors[(string)$schemaUpdateType], $collectedErrors);
     }
 
     /**
@@ -99,6 +107,6 @@ class SchemaUpdateResult
      */
     public function hasErrors()
     {
-        return count($this->errors);
+        return count($this->errors) > 0;
     }
 }
