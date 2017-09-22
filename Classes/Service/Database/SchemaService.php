@@ -80,7 +80,7 @@ class SchemaService implements SingletonInterface
                         if (empty($result)) {
                             $updateResult->addPerformedUpdates($schemaUpdateType, $statements);
                         } else {
-                            $updateResult->addErrors($schemaUpdateType, $result);
+                            $updateResult->addErrors($schemaUpdateType, $result, $statements);
                         }
                     }
                 }
