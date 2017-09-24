@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Tests\Functional\Command;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
+use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
@@ -187,5 +188,15 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
             $this->fail(sprintf('Composer command "%s" failed with message: "%s", output: "%s"', $process->getCommandLine(), $process->getErrorOutput(), $process->getOutput()));
         }
         return $process->getOutput() . $process->getErrorOutput();
+    }
+
+    protected function executeConsoleCommand($command, array $arguments = [])
+    {
+        try {
+            return $this->commandDispatcher->executeCommand($command, $arguments);
+        } catch (FailedSubProcessCommandException $e) {
+            $this->fail(sprintf('Console command "%s" failed with message: "%s", output: "%s"', $e->getCommandLine(), $e->getErrorMessage(), $e->getOutputMessage()));
+        }
+        return '';
     }
 }

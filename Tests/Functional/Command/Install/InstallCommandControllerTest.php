@@ -23,7 +23,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
     public function helpBeforeSetupDoesNotCreatePackageStatesFile()
     {
         @unlink(getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php');
-        $this->commandDispatcher->executeCommand('help');
+        $this->executeConsoleCommand('help');
         $this->assertFalse(file_exists(getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php'));
     }
 
@@ -35,7 +35,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
         $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
         @unlink(getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php');
         @unlink(getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php');
-        $output = $this->commandDispatcher->executeCommand(
+        $output = $this->executeConsoleCommand(
             'install:setup',
             [
                 '--non-interactive' => true,
@@ -63,7 +63,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
         $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
         @unlink(getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php');
         @unlink(getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php');
-        $output = $this->commandDispatcher->executeCommand(
+        $output = $this->executeConsoleCommand(
             'install:setup',
             [
                 '--non-interactive' => true,
@@ -98,7 +98,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
     {
         $indexFile = getenv('TYPO3_PATH_ROOT') . '/typo3temp/index.html';
         @unlink($indexFile);
-        $this->commandDispatcher->executeCommand(
+        $this->executeConsoleCommand(
             'install:fixfolderstructure'
         );
         $this->assertTrue(file_exists($indexFile));
@@ -111,7 +111,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
     {
         $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
         @unlink($packageStatesFile);
-        $this->commandDispatcher->executeCommand(
+        $this->executeConsoleCommand(
             'install:generatepackagestates'
         );
         $this->assertTrue(file_exists($packageStatesFile));
@@ -131,7 +131,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
         $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
         copy($packageStatesFile, $packageStatesFile . '_');
         @unlink($packageStatesFile);
-        $this->commandDispatcher->executeCommand('install:generatepackagestates', ['--activate-default' => true]);
+        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default' => true]);
         $this->assertTrue(file_exists($packageStatesFile));
         $packageConfig = require $packageStatesFile;
         copy($packageStatesFile . '_', $packageStatesFile);

@@ -33,7 +33,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
      */
     public function canCheckExtensionConstraints()
     {
-        $output = $this->commandDispatcher->executeCommand('upgrade:checkextensionconstraints');
+        $output = $this->executeConsoleCommand('upgrade:checkextensionconstraints');
         $this->assertContains('All third party extensions claim to be compatible with TYPO3 version', $output);
     }
 
@@ -43,14 +43,14 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     public function checkExtensionConstraintsReturnsErrorCodeOnFailure()
     {
         $this->installFixtureExtensionCode('ext_test');
-        $this->commandDispatcher->executeCommand('extension:activate', ['--extension-keys' => 'ext_test']);
+        $this->executeConsoleCommand('extension:activate', ['--extension-keys' => 'ext_test']);
         try {
             $this->commandDispatcher->executeCommand('upgrade:checkextensionconstraints', ['--typo3-version' => '3.6.0']);
         } catch (FailedSubProcessCommandException $e) {
             $this->assertSame(1, $e->getExitCode());
             $this->assertContains('"ext_test" requires TYPO3 versions 4.5.0', $e->getOutputMessage());
         }
-        $this->commandDispatcher->executeCommand('extension:deactivate', ['--extension-keys' => 'ext_test']);
+        $this->executeConsoleCommand('extension:deactivate', ['--extension-keys' => 'ext_test']);
         $this->removeFixtureExtensionCode('ext_test');
     }
 
@@ -59,7 +59,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
      */
     public function checkExtensionConstraintsIssuesWarningForInvalidExtensionKeys()
     {
-        $output = $this->commandDispatcher->executeCommand('upgrade:checkextensionconstraints', ['--extension-keys' => 'foo,bar']);
+        $output = $this->executeConsoleCommand('upgrade:checkextensionconstraints', ['--extension-keys' => 'foo,bar']);
         $this->assertContains('Extension "foo" is not found in the system', $output);
         $this->assertContains('Extension "bar" is not found in the system', $output);
     }
@@ -74,15 +74,12 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $this->setUpNewTypo3Instance($instancePath);
             $this->upgradeCodeToTypo3Version(getenv('TYPO3_VERSION'));
 
-            $output = $this->commandDispatcher->executeCommand('upgrade:list');
+            $output = $this->executeConsoleCommand('upgrade:list');
             $this->assertContains('Wizards scheduled for execution', $output);
-            $output = $this->commandDispatcher->executeCommand('upgrade:all');
+            $output = $this->executeConsoleCommand('upgrade:all');
             $this->assertContains('Initiating TYPO3 upgrade', $output);
             $this->assertContains('Successfully upgraded TYPO3 to version', $output);
         } catch (\Throwable $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            // @deprecated can be removed once 7.6 support has been removed
             throw $e;
         } finally {
             $this->tearDownTypo3Instance($instancePath);
@@ -96,7 +93,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     {
         $this->consoleRootPath = getenv('TYPO3_PATH_COMPOSER_ROOT');
         $this->typo3RootPath = getenv('TYPO3_PATH_ROOT');
-        $this->commandDispatcher = CommandDispatcher::createFromTestRun($instancePath . '/vendor/helhum/typo3-console/Scripts/typo3cms');
+        $this->commandDispatcher = CommandDispatcher::createFromTestRun($instancePath . '/vendor/helhum/typo3-console-test/Scripts/typo3cms');
         if (!is_dir($instancePath)) {
             mkdir($instancePath);
         }
@@ -110,38 +107,34 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         $this->executeComposerCommand(['config', 'extra.typo3/cms.cms-package-dir', '{$vendor-dir}/typo3/cms']);
         $this->executeComposerCommand(['config', 'extra.typo3/cms.web-dir', 'web']);
         $this->executeComposerCommand(['config', 'extra.helhum/typo3-console.install-extension-dummy', '0']);
+        $this->copyDirectory($this->consoleRootPath, $instancePath . '/typo3_console', ['.Build', '.git']);
+        $consoleComposerJson = file_get_contents($instancePath . '/typo3_console/composer.json');
+        $consoleComposerJson = str_replace('"name": "helhum/typo3-console"', '"name": "helhum/typo3-console-test"', $consoleComposerJson);
+        file_put_contents($instancePath . '/typo3_console/composer.json', $consoleComposerJson);
+        $this->executeComposerCommand(['config', 'repositories.console', '{"type": "path", "url": "typo3_console", "options": {"symlink": false}}']);
+        $output = $this->executeComposerCommand(['require', 'typo3/cms=^7.6.18', 'helhum/typo3-console-test=@dev']);
+        $this->assertContains('Mirroring from typo3_console', $output);
         if (DIRECTORY_SEPARATOR === '\\') {
-            $this->executeComposerCommand(['config', 'repositories.console', '{"type": "vcs", "url": "' . addcslashes($this->consoleRootPath, '\\') . '"}']);
-            $output = $this->executeComposerCommand(['require', 'typo3/cms=^7.6.18', 'helhum/typo3-console=dev-ci-test']);
-            $output = preg_replace('/[^\x09-\x0d\x1b\x20-\xff]/', '', $output);
             $this->assertContains('Copied typo3 directory to document root', $output);
-        } else {
-            $this->copyDirectory($this->consoleRootPath, $instancePath . '/typo3_console', ['.Build', '.git']);
-            $this->executeComposerCommand(['config', 'repositories.console', '{"type": "path", "url": "typo3_console", "options": {"symlink": false}}']);
-            $this->executeComposerCommand(['require', 'typo3/cms=^7.6.18', 'helhum/typo3-console=@dev']);
         }
 
         $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
-        try {
-            $output = $this->commandDispatcher->executeCommand(
-                'install:setup',
-                [
-                    '--non-interactive' => true,
-                    '--database-user-name' => getenv('TYPO3_INSTALL_DB_USER'),
-                    '--database-user-password' => getenv('TYPO3_INSTALL_DB_PASSWORD'),
-                    '--database-host-name' => 'localhost',
-                    '--database-port' => '3306',
-                    '--database-name' => getenv('TYPO3_INSTALL_DB_DBNAME'),
-                    '--admin-user-name' => 'admin',
-                    '--admin-password' => 'password',
-                    '--site-name' => 'Travis Install',
-                    '--site-setup-type' => 'createsite',
-                ]
-            );
-            $this->assertContains('Successfully installed TYPO3 CMS!', $output);
-        } catch (FailedSubProcessCommandException $e) {
-            $this->fail(sprintf('install:setup (%s) failed with: "%s", "%s"', $e->getCommandLine(), $e->getOutputMessage(), $e->getErrorMessage()));
-        }
+        $output = $this->executeConsoleCommand(
+            'install:setup',
+            [
+                '--non-interactive' => true,
+                '--database-user-name' => getenv('TYPO3_INSTALL_DB_USER'),
+                '--database-user-password' => getenv('TYPO3_INSTALL_DB_PASSWORD'),
+                '--database-host-name' => 'localhost',
+                '--database-port' => '3306',
+                '--database-name' => getenv('TYPO3_INSTALL_DB_DBNAME'),
+                '--admin-user-name' => 'admin',
+                '--admin-password' => 'password',
+                '--site-name' => 'Travis Install',
+                '--site-setup-type' => 'createsite',
+            ]
+        );
+        $this->assertContains('Successfully installed TYPO3 CMS!', $output);
     }
 
     /**
