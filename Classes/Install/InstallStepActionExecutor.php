@@ -41,7 +41,6 @@ class InstallStepActionExecutor
      */
     public function __construct(ObjectManager $objectManager, SilentConfigurationUpgrade $silentConfigurationUpgrade)
     {
-        // @deprecated Object Manager can be removed, once TYPO3 7.6 support is removed
         $this->objectManager = $objectManager;
         $this->silentConfigurationUpgrade = $silentConfigurationUpgrade;
     }

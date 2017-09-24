@@ -316,7 +316,7 @@ class UpgradeHandling
             $this->commandDispatcher->executeCommand('install:fixfolderstructure');
             $messages = $this->ensureExtensionCompatibility();
             $this->silentConfigurationUpgrade->executeSilentConfigurationUpgradesIfNeeded();
-            // @deprecated if condition can be removed, when TYPO3 7.6 support is removed
+            // TODO: Check what we can do here to get TYPO3 9 support for this feature
             if (class_exists(DatabaseCharsetUpdate::class)) {
                 $this->commandDispatcher->executeCommand('upgrade:wizard', ['identifier' => DatabaseCharsetUpdate::class]);
             }

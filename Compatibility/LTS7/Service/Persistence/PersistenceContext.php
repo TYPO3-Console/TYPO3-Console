@@ -1,5 +1,5 @@
 <?php
-namespace Helhum\Typo3Console\Service\Persistence;
+namespace Helhum\Typo3Console\LTS7\Service\Persistence;
 
 /*
  * This file is part of the TYPO3 Console project.
@@ -13,10 +13,11 @@ namespace Helhum\Typo3Console\Service\Persistence;
  *
  */
 
+use Helhum\Typo3Console\Service\Persistence\PersistenceContextInterface;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 
-class LegacyPersistenceContext implements PersistenceContextInterface
+class PersistenceContext implements PersistenceContextInterface
 {
     /**
      * @var DatabaseConnection

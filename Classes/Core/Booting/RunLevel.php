@@ -214,7 +214,7 @@ class RunLevel
                 break;
             // @deprecated can be removed if TYPO3 8 support is removed
             case 'helhum.typo3console:database':
-                $sequence->addStep(new Step('helhum.typo3console:database', [Scripts::class, 'initializeDatabaseConnection']), 'helhum.typo3console:errorhandling');
+                $sequence->addStep(new Step('helhum.typo3console:database', [CompatibilityScripts::class, 'initializeDatabaseConnection']), 'helhum.typo3console:errorhandling');
                 break;
             case 'helhum.typo3console:authentication':
                 $sequence->addStep(new Step('helhum.typo3console:authentication', [Scripts::class, 'initializeAuthenticatedOperations']), 'helhum.typo3console:extensionconfiguration');

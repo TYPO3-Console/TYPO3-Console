@@ -84,11 +84,10 @@ class PersistenceContext implements PersistenceContextInterface
 
     /**
      * @param string $tableName
-     * @param array $recordIds
      * @throws TableDoesNotExistException
      * @return int
      */
-    public function countLostIndexesOfRecordsInTable($tableName, array $recordIds = [])
+    public function countLostIndexesOfRecordsInTable($tableName)
     {
         // Main query to find lost records
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_refindex');
@@ -109,11 +108,10 @@ class PersistenceContext implements PersistenceContextInterface
 
     /**
      * @param string $tableName
-     * @param array $recordIds
      * @throws \InvalidArgumentException
      * @return bool
      */
-    public function deleteLostIndexesOfRecordsInTable($tableName, array $recordIds = [])
+    public function deleteLostIndexesOfRecordsInTable($tableName)
     {
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_refindex');
         return $queryBuilder->delete('sys_refindex')

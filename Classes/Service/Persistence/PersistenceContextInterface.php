@@ -29,19 +29,17 @@ interface PersistenceContextInterface
 
     /**
      * @param string $tableName
-     * @param array $recordIds
      * @throws \InvalidArgumentException
      * @return int
      */
-    public function countLostIndexesOfRecordsInTable($tableName, array $recordIds = []);
+    public function countLostIndexesOfRecordsInTable($tableName);
 
     /**
      * @param string $tableName
-     * @param array $recordIds
      * @throws \InvalidArgumentException
      * @return bool
      */
-    public function deleteLostIndexesOfRecordsInTable($tableName, array $recordIds = []);
+    public function deleteLostIndexesOfRecordsInTable($tableName);
 
     /**
      * @param array $processedTables
