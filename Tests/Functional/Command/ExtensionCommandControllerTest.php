@@ -147,31 +147,6 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
 
     /**
      * @test
-     * @deprecated can be removed once TYPO3 7.6 support is removed
-     */
-    public function dbalCacheTablesAreRespectedWhenDbalIsActive()
-    {
-        $output = $this->commandDispatcher->executeCommand('extension:list', ['--raw' => true]);
-        if (strpos($output, 'dbal') === false) {
-            // DBAL Extension is only available with TYPO3 versions 7.6.x
-            return;
-        }
-        $this->backupDatabase();
-
-        $output = $this->commandDispatcher->executeCommand('extension:activate', ['--extension-keys' => 'dbal,adodb']);
-        $this->assertContains('Extensions "dbal", "adodb" are now active.', $output);
-
-        $output = $this->commandDispatcher->executeCommand('database:updateschema');
-        $this->assertContains('No schema updates were performed for update types:', $output);
-
-        $output = $this->commandDispatcher->executeCommand('extension:deactivate', ['--extension-keys' => 'dbal,adodb']);
-        $this->assertContains('Extensions "dbal", "adodb" are now inactive.', $output);
-
-        $this->restoreDatabase();
-    }
-
-    /**
-     * @test
      */
     public function canRemoveInactiveExtensions()
     {

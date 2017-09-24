@@ -112,26 +112,8 @@ class Scripts
     public static function disableCoreCaches(Bootstrap $bootstrap)
     {
         $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
-        foreach (
-            [
-                'cache_core',
-                // @deprecated will be removed when TYPO3 7.6 support is removed
-                'dbal',
-            ] as $id) {
-            if (isset($cacheConfigurations[$id])) {
-                self::$earlyCachesConfiguration[$id] = $cacheConfigurations[$id];
-            }
-        }
+        self::$earlyCachesConfiguration['cache_core'] = $cacheConfigurations['cache_core'];
         $bootstrap->disableCoreCache();
-        // @deprecated can be removed once TYPO3 7 support is removed
-        $packageManager = $bootstrap->getEarlyInstance(\TYPO3\CMS\Core\Package\PackageManager::class);
-        if ($packageManager->isPackageActive('dbal')) {
-            $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
-            $cacheConfigurations['dbal'] = [
-                'backend' => \TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend::class,
-                'groups' => [],
-            ];
-        }
     }
 
     /**
@@ -159,10 +141,6 @@ class Scripts
      */
     public static function initializeCachingFramework(Bootstrap $bootstrap)
     {
-        // @deprecated will be removed once TYPO3 7.6 support is removed
-        if ($bootstrap->getEarlyInstance(PackageManager::class)->isPackageActive('dbal')) {
-            require GeneralUtility::getFileAbsFileName('EXT:dbal/ext_localconf.php');
-        }
         $cacheManager = new \TYPO3\CMS\Core\Cache\CacheManager();
         $cacheManager->setCacheConfigurations($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']);
         \TYPO3\CMS\Core\Utility\GeneralUtility::setSingletonInstance(\TYPO3\CMS\Core\Cache\CacheManager::class, $cacheManager);

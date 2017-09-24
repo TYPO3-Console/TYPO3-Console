@@ -45,6 +45,10 @@
         "nimut/testing-framework": "^1.0",
         "mikey179/vfsStream": "~1.6.0"
     },
+    "conflict": {
+        "typo3-ter/dbal": "*",
+        "friendsoftypo3/dbal": "*"
+    },
     "autoload": {
         "psr-4": {
             "Helhum\\Typo3Console\\": [
