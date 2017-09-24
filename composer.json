@@ -38,6 +38,7 @@
         "symfony/process": "^2.7 || ^3.0"
     },
     "require-dev": {
+        "typo3-console/php-server-command": "^0.1.1",
         "typo3-console/create-reference-command": "^1.0",
         "typo3/cms": "^8.7.7",
         "symfony/filesystem": "^3.2",
