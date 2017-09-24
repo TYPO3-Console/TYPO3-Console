@@ -54,7 +54,7 @@ install:
 
   - cd c:\t3c
   - composer require "typo3/cms=%TYPO3_VERSION%" --prefer-dist --no-progress --ansi
-  - git branch ci-test
+  - git checkout .
 
 test_script:
   - cd c:\t3c

@@ -20,7 +20,7 @@ class FrontendCommandControllerTest extends AbstractCommandTest
      */
     public function homePageIsReturnedWhenRequested()
     {
-        $output = $this->commandDispatcher->executeCommand('frontend:request', ['--request-url' => '/']);
+        $output = $this->executeConsoleCommand('frontend:request', ['--request-url' => '/']);
         $this->assertContains('Welcome to a default website made with', $output);
     }
 }

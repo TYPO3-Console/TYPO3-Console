@@ -34,7 +34,7 @@ class HelpCommandControllerTest extends AbstractCommandTest
      */
     public function helpShowsListOfAvailableCommands()
     {
-        $output = $this->commandDispatcher->executeCommand('help');
+        $output = $this->executeConsoleCommand('help');
         $this->assertContains('Available commands', $output);
     }
 
@@ -43,7 +43,7 @@ class HelpCommandControllerTest extends AbstractCommandTest
      */
     public function autoCompleteDefaultsToBash()
     {
-        $output = $this->commandDispatcher->executeCommand('autocomplete');
+        $output = $this->executeConsoleCommand('autocomplete');
         $this->assertContains('#!/usr/bin/env bash', $output);
     }
 
@@ -52,7 +52,7 @@ class HelpCommandControllerTest extends AbstractCommandTest
      */
     public function autoCompleteForBash()
     {
-        $output = $this->commandDispatcher->executeCommand('autocomplete', ['shell' => 'bash']);
+        $output = $this->executeConsoleCommand('autocomplete', ['shell' => 'bash']);
         $this->assertContains('#!/usr/bin/env bash', $output);
     }
 
@@ -61,7 +61,7 @@ class HelpCommandControllerTest extends AbstractCommandTest
      */
     public function autoCompleteForZsh()
     {
-        $output = $this->commandDispatcher->executeCommand('autocomplete', ['shell' => 'zsh']);
+        $output = $this->executeConsoleCommand('autocomplete', ['shell' => 'zsh']);
         $this->assertContains('#!/usr/bin/env zsh', $output);
     }
 

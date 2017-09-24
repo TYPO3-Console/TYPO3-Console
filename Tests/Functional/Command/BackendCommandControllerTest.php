@@ -20,13 +20,13 @@ class BackendCommandControllerTest extends AbstractCommandTest
      */
     public function backendCanBeLockedAndUnlocked()
     {
-        $output = $this->commandDispatcher->executeCommand('backend:lock');
+        $output = $this->executeConsoleCommand('backend:lock');
         $this->assertContains('Backend has been locked', $output);
-        $output = $this->commandDispatcher->executeCommand('backend:lock');
+        $output = $this->executeConsoleCommand('backend:lock');
         $this->assertContains('Backend is already locked', $output);
-        $output = $this->commandDispatcher->executeCommand('backend:unlock');
+        $output = $this->executeConsoleCommand('backend:unlock');
         $this->assertContains('Backend lock is removed', $output);
-        $output = $this->commandDispatcher->executeCommand('backend:unlock');
+        $output = $this->executeConsoleCommand('backend:unlock');
         $this->assertContains('Backend is already unlocked', $output);
     }
 
@@ -35,13 +35,13 @@ class BackendCommandControllerTest extends AbstractCommandTest
      */
     public function backendCanBeLockedAndUnlockedForEditors()
     {
-        $output = $this->commandDispatcher->executeCommand('backend:lockforeditors');
+        $output = $this->executeConsoleCommand('backend:lockforeditors');
         $this->assertContains('Locked backend for editor access', $output);
-        $output = $this->commandDispatcher->executeCommand('backend:lockforeditors');
+        $output = $this->executeConsoleCommand('backend:lockforeditors');
         $this->assertContains('The backend was already locked for editors', $output);
-        $output = $this->commandDispatcher->executeCommand('backend:unlockforeditors');
+        $output = $this->executeConsoleCommand('backend:unlockforeditors');
         $this->assertContains('Unlocked backend for editors', $output);
-        $output = $this->commandDispatcher->executeCommand('backend:unlockforeditors');
+        $output = $this->executeConsoleCommand('backend:unlockforeditors');
         $this->assertContains('The backend was not locked for editors', $output);
     }
 }

@@ -22,7 +22,7 @@ class CacheCommandControllerTest extends AbstractCommandTest
      */
     public function cacheCanBeFlushedFlushed()
     {
-        $output = $this->commandDispatcher->executeCommand('cache:flush');
+        $output = $this->executeConsoleCommand('cache:flush');
         $this->assertSame('Flushed all caches.', $output);
     }
 
@@ -31,7 +31,7 @@ class CacheCommandControllerTest extends AbstractCommandTest
      */
     public function cacheCanBeForceFlushedFlushed()
     {
-        $output = $this->commandDispatcher->executeCommand('cache:flush', ['--force' => true]);
+        $output = $this->executeConsoleCommand('cache:flush', ['--force' => true]);
         $this->assertSame('Force flushed all caches.', $output);
     }
 
@@ -40,7 +40,7 @@ class CacheCommandControllerTest extends AbstractCommandTest
      */
     public function fileCachesCanBeFlushed()
     {
-        $output = $this->commandDispatcher->executeCommand('cache:flush', ['--files-only' => true]);
+        $output = $this->executeConsoleCommand('cache:flush', ['--files-only' => true]);
         $this->assertSame('Flushed all file caches.', $output);
     }
 
@@ -49,7 +49,7 @@ class CacheCommandControllerTest extends AbstractCommandTest
      */
     public function fileCachesCanBeForceFlushedFlushed()
     {
-        $output = $this->commandDispatcher->executeCommand('cache:flush', ['--files-only' => true, '--force' => true]);
+        $output = $this->executeConsoleCommand('cache:flush', ['--files-only' => true, '--force' => true]);
         $this->assertSame('Force flushed all file caches.', $output);
     }
 
@@ -58,7 +58,7 @@ class CacheCommandControllerTest extends AbstractCommandTest
      */
     public function cacheGroupsCanBeFlushed()
     {
-        $output = $this->commandDispatcher->executeCommand('cache:flushgroups', ['--groups' => 'pages']);
+        $output = $this->executeConsoleCommand('cache:flushgroups', ['--groups' => 'pages']);
         $this->assertSame('Flushed all caches for group(s): "pages".', $output);
     }
 
@@ -80,7 +80,7 @@ class CacheCommandControllerTest extends AbstractCommandTest
      */
     public function cacheGroupsCanBeListed()
     {
-        $output = $this->commandDispatcher->executeCommand('cache:listgroups');
+        $output = $this->executeConsoleCommand('cache:listgroups');
         $this->assertContains('The following cache groups are registered: ', $output);
     }
 
@@ -89,7 +89,7 @@ class CacheCommandControllerTest extends AbstractCommandTest
      */
     public function cacheTagsCanBeFlushed()
     {
-        $output = $this->commandDispatcher->executeCommand('cache:flushtags', ['--tags' => 'foo']);
+        $output = $this->executeConsoleCommand('cache:flushtags', ['--tags' => 'foo']);
         $this->assertSame('Flushed caches by tags "foo".', $output);
     }
 
@@ -98,7 +98,7 @@ class CacheCommandControllerTest extends AbstractCommandTest
      */
     public function cacheTagsAndGroupsCanBeFlushed()
     {
-        $output = $this->commandDispatcher->executeCommand('cache:flushtags', ['--tags' => 'foo', '--groups' => 'pages']);
+        $output = $this->executeConsoleCommand('cache:flushtags', ['--tags' => 'foo', '--groups' => 'pages']);
         $this->assertSame('Flushed caches by tags "foo" in groups: "pages".', $output);
     }
 }
