@@ -17,9 +17,7 @@ use Helhum\Typo3Console\Install\Upgrade\UpgradeHandling;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardListRenderer;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardResultRenderer;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
-use TYPO3\CMS\Core\Http\JsonResponse;
 use TYPO3\CMS\Core\Package\Exception\UnknownPackageException;
-use TYPO3\CMS\Install\Controller\Action\Ajax\ExtensionCompatibilityTester;
 
 class UpgradeCommandController extends CommandController
 {
@@ -163,21 +161,12 @@ class UpgradeCommandController extends CommandController
      * This command in meant to be executed as sub process as it is is subject to cause fatal errors
      * when extensions have broken (incompatible) code
      *
-     * @param bool $force Needs to be set on first execution
+     * @param string $extensionKey Extension key for extension to check
+     * @param bool $configOnly
      * @internal
      */
-    public function checkBrokenExtensionsCommand($force = false)
+    public function checkExtensionCompatibilityCommand($extensionKey, $configOnly = false)
     {
-        // Yeah, right. This class accesses super globals directly
-        $_GET['install']['extensionCompatibilityTester']['forceCheck'] = $force;
-        $result = $this->objectManager->get(ExtensionCompatibilityTester::class)->handle();
-        if ($result instanceof JsonResponse) {
-            $result = $result->getBody();
-        }
-        $result = \json_decode($result, true);
-        if (is_array($result) && !empty($result['success'])) {
-            $result = 'OK';
-        }
-        $this->output($result);
+        $this->output(\json_encode($this->upgradeHandling->isCompatible($extensionKey, $configOnly)));
     }
 }
