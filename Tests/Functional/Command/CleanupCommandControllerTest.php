@@ -20,7 +20,7 @@ class CleanupCommandControllerTest extends AbstractCommandTest
      */
     public function referenceIndexIsUpdated()
     {
-        $output = $this->commandDispatcher->executeCommand('cleanup:updatereferenceindex');
+        $output = $this->executeConsoleCommand('cleanup:updatereferenceindex');
         $this->assertContains('Updating reference index', $output);
     }
 
@@ -39,7 +39,7 @@ class CleanupCommandControllerTest extends AbstractCommandTest
             . ' VALUES'
             . ' (1, 1, \'pages\', \'categories\', 0, 1);'
         );
-        $output = $this->commandDispatcher->executeCommand('cleanup:updatereferenceindex');
+        $output = $this->executeConsoleCommand('cleanup:updatereferenceindex');
         $this->assertContains('Updating reference index', $output);
         $this->assertContains('were fixed, while updating reference index for', $output);
     }
@@ -51,7 +51,7 @@ class CleanupCommandControllerTest extends AbstractCommandTest
     {
         $this->executeMysqlQuery('TRUNCATE `sys_category`;');
         $this->executeMysqlQuery('TRUNCATE `sys_category_record_mm`;');
-        $output = $this->commandDispatcher->executeCommand('cleanup:updatereferenceindex');
+        $output = $this->executeConsoleCommand('cleanup:updatereferenceindex');
         $this->assertContains('Updating reference index', $output);
         $this->assertContains('were fixed, while updating reference index for', $output);
     }

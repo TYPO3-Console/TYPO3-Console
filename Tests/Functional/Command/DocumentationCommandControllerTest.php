@@ -20,7 +20,7 @@ class DocumentationCommandControllerTest extends AbstractCommandTest
      */
     public function schemaForFluidCanBeGenerated()
     {
-        $output = $this->commandDispatcher->executeCommand('documentation:generatexsd', ['--php-namespace' => 'TYPO3\\CMS\\Fluid\\ViewHelpers']);
+        $output = $this->executeConsoleCommand('documentation:generatexsd', ['--php-namespace' => 'TYPO3\\CMS\\Fluid\\ViewHelpers']);
         $this->assertContains('<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers">', $output);
     }
 }
