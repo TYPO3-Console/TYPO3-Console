@@ -18,15 +18,12 @@ use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\CommandManager;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
-use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition;
 use TYPO3\CMS\Extbase\Mvc\Controller\Argument;
 use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
 use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentTypeException;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Reflection\ReflectionService;
-use TYPO3\CMS\Install\Status\ErrorStatus;
-use TYPO3\CMS\Install\Status\StatusInterface;
 
 /**
  * This class acts as facade for the install tool step actions.
@@ -73,6 +70,11 @@ class CliSetupRequestHandler
     protected $output;
 
     /**
+     * @var CliMessageRenderer
+     */
+    private $messageRenderer;
+
+    /**
      * @var array
      */
     protected $givenRequestArguments = [];
@@ -96,13 +98,15 @@ class CliSetupRequestHandler
         CommandManager $commandManager,
         ReflectionService $reflectionService,
         CommandDispatcher $commandDispatcher = null,
-        ConsoleOutput $output = null
+        ConsoleOutput $output = null,
+        CliMessageRenderer $messageRenderer = null
     ) {
         $this->objectManager = $objectManager;
         $this->commandManager = $commandManager;
         $this->reflectionService = $reflectionService;
         $this->commandDispatcher = $commandDispatcher ?: CommandDispatcher::createFromCommandRun();
         $this->output = $output ?: new ConsoleOutput();
+        $this->messageRenderer = $messageRenderer ?: new CliMessageRenderer($this->output);
     }
 
     /**
@@ -234,7 +238,7 @@ class CliSetupRequestHandler
             if (empty($messages)) {
                 $this->output->outputLine('<success>OK</success>');
             } else {
-                $this->outputMessages($messages);
+                $this->messageRenderer->render($messages);
             }
 
             if ($loopCounter > 10) {
@@ -324,46 +328,5 @@ class CliSetupRequestHandler
         }
 
         return $arguments;
-    }
-
-    // Logging and output related stuff
-    // TODO: Move to own class
-
-    /**
-     * @param StatusInterface[] $messages
-     */
-    protected function outputMessages(array $messages = [])
-    {
-        $this->output->outputLine();
-        foreach ($messages as $statusMessage) {
-            $this->outputStatusMessage($statusMessage);
-        }
-    }
-
-    /**
-     * @param StatusInterface|AbstractMessage $statusMessage
-     */
-    protected function outputStatusMessage($statusMessage)
-    {
-        // @deprecated can be removed once TYPO3 8.7 support is removed
-        $severityMap = [
-            'error' => 'error',
-            'warning' => 'warning',
-            AbstractMessage::ERROR => 'error',
-            AbstractMessage::WARNING => 'warning',
-        ];
-        $severityString = isset($severityMap[$statusMessage->getSeverity()]) ? $severityMap[$statusMessage->getSeverity()] : 'notice';
-        $subject = strtoupper($severityString) . ': ' . $statusMessage->getTitle();
-        switch ($severityString) {
-            case 'error':
-            case 'warning':
-                $subject = sprintf('<%1$s>' . $subject . '</%1$s>', $severityString);
-            break;
-            default:
-        }
-        $this->output->outputLine($subject);
-        foreach (explode("\n", wordwrap($statusMessage->getMessage())) as $line) {
-            $this->output->outputLine(sprintf('<%1$s>' . $line . '</%1$s>', $severityString));
-        }
     }
 }
