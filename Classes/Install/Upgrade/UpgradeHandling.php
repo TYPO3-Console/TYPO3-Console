@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Install\Upgrade;
  *
  */
 
+use Helhum\Typo3Console\Extension\ExtensionCompatibilityCheck;
 use Helhum\Typo3Console\Extension\ExtensionConstraintCheck;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
@@ -70,6 +71,11 @@ class UpgradeHandling
     private $extensionConstraintCheck;
 
     /**
+     * @var ExtensionCompatibilityCheck
+     */
+    private $extensionCompatibilityCheck;
+
+    /**
      * Flag for same process
      *
      * @var bool
@@ -95,7 +101,9 @@ class UpgradeHandling
      * @param SilentConfigurationUpgrade|null $silentConfigurationUpgrade
      * @param CommandDispatcher|null $commandDispatcher
      * @param ConfigurationService|null $configurationService
+     * @param PackageManager|null $packageManager
      * @param ExtensionConstraintCheck|null $extensionConstraintCheck
+     * @param ExtensionCompatibilityCheck|null $extensionCompatibilityCheck
      */
     public function __construct(
         UpgradeWizardFactory $factory = null,
@@ -105,7 +113,8 @@ class UpgradeHandling
         CommandDispatcher $commandDispatcher = null,
         ConfigurationService $configurationService = null,
         PackageManager $packageManager = null,
-        ExtensionConstraintCheck $extensionConstraintCheck = null
+        ExtensionConstraintCheck $extensionConstraintCheck = null,
+        ExtensionCompatibilityCheck $extensionCompatibilityCheck = null
     ) {
         $this->factory = new UpgradeWizardFactory();
         $this->executor = $executor ?: new UpgradeWizardExecutor($this->factory);
@@ -115,6 +124,7 @@ class UpgradeHandling
         $this->configurationService = $configurationService ?: new ConfigurationService();
         $this->packageManager = $packageManager ?: GeneralUtility::makeInstance(PackageManager::class);
         $this->extensionConstraintCheck = $extensionConstraintCheck ?: new ExtensionConstraintCheck();
+        $this->extensionCompatibilityCheck = $extensionCompatibilityCheck ?: new ExtensionCompatibilityCheck($this->packageManager, $this->commandDispatcher);
     }
 
     /**
@@ -251,6 +261,24 @@ class UpgradeHandling
     }
 
     /**
+     * @param string $extensionKey
+     * @param bool $configOnly
+     * @return bool
+     */
+    public function isCompatible($extensionKey, $configOnly = false)
+    {
+        return $this->extensionCompatibilityCheck->isCompatible($extensionKey, $configOnly);
+    }
+
+    /**
+     * @return array Array of extension keys of not compatible extensions
+     */
+    public function findIncompatible()
+    {
+        return $this->extensionCompatibilityCheck->findIncompatible();
+    }
+
+    /**
      * Execute the command in a sub process,
      * but execute some automated migration steps beforehand
      *
@@ -287,7 +315,6 @@ class UpgradeHandling
             $this->configurationService->setLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone', TYPO3_branch, 'string');
             $this->commandDispatcher->executeCommand('install:fixfolderstructure');
             $messages = $this->ensureExtensionCompatibility();
-            $messages = array_merge($messages, $this->checkForBrokenExtensions());
             $this->silentConfigurationUpgrade->executeSilentConfigurationUpgradesIfNeeded();
             // @deprecated if condition can be removed, when TYPO3 7.6 support is removed
             if (class_exists(DatabaseCharsetUpdate::class)) {
@@ -311,54 +338,10 @@ class UpgradeHandling
             $messages[] = sprintf('<error>%s</error>', $constraintMessage);
             $messages[] = sprintf('<info>Deactivated extension "%s".</info>', $extensionKey);
         }
-        return $messages;
-    }
-
-    /**
-     * @return string[]
-     */
-    private function checkForBrokenExtensions()
-    {
-        $errors = [];
-        $result = '';
-        $force = true;
-        $retryCount = 0;
-        do {
-            try {
-                $result = $this->commandDispatcher->executeCommand('upgrade:checkbrokenextensions', ['--force' => $force]);
-            } catch (FailedSubProcessCommandException $e) {
-                $force = false;
-                $retryCount++;
-                $this->collectErrors($errors);
-                // Happens only when more than 20 broken extensions were found.
-                if ($retryCount > 20) {
-                    throw new \RuntimeException('Loop detected when trying to find broken extensions.', 1494164326);
-                }
-            }
-        } while ($result !== 'OK');
-        $messages = [];
-        if ($failedExtensionKeys = @file_get_contents(PATH_site . 'typo3temp/assets/ExtensionCompatibilityTester.txt')) {
-            foreach (explode(', ', $failedExtensionKeys) as $extensionKey) {
-                $this->packageManager->deactivatePackage($extensionKey);
-                $messages[] = sprintf('<error>Extension "%s" seems to be not compatible or broken</error>', $extensionKey);
-                $messages[] = sprintf('<info>Deactivated extension "%s".</info>', $extensionKey);
-            }
+        foreach ($this->extensionCompatibilityCheck->findIncompatible() as $extensionKey) {
+            $messages[] = sprintf('<error>Extension "%s" seems to be not compatible or broken</error>', $extensionKey);
+            $messages[] = sprintf('<info>Deactivated extension "%s".</info>', $extensionKey);
         }
-        $messages = array_merge($messages, $errors);
-        // Make sure to clean up
-        @unlink(PATH_site . 'typo3temp/assets/ExtensionCompatibilityTester.txt');
-        @unlink(PATH_site . 'typo3temp/assets/ExtensionCompatibilityTesterErrors.json');
         return $messages;
-    }
-
-    /**
-     * @param array $errors
-     */
-    private function collectErrors(array &$errors)
-    {
-        // @TODO this somehow does not seem to work, as error_get_last() does not return anything. Not sure why currently
-        if (is_array($newErrors = json_decode(@file_get_contents(PATH_site . 'typo3temp/assets/ExtensionCompatibilityTesterErrors.json'), true))) {
-            $errors = array_merge($errors, array_filter($newErrors));
-        }
     }
 }
