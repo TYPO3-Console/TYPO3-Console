@@ -1,11 +1,18 @@
 #!/usr/bin/env php
 <?php
-if (file_exists(__DIR__ . '/typo3cms.php')) {
-    require __DIR__ . '/typo3cms.php';
-} elseif (file_exists(__DIR__ . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php')) {
-    // In non Composer mode we're copied into TYPO3 web root
-    putenv('TYPO3_PATH_ROOT=' . __DIR__);
-    require __DIR__ . '/typo3conf/ext/typo3_console/Scripts/typo3cms.php';
+
+// Exit early if php requirement is not satisfied.
+if (version_compare(PHP_VERSION, '7.0.0', '<')) {
+    echo 'This version of TYPO3 Console requires PHP 7.0.0 or above!' . PHP_EOL;
+    if (defined('PHP_BINARY')) {
+        echo 'Your PHP binary is located at: "' . PHP_BINARY . '",' . PHP_EOL;
+        echo 'but its version is only: ' . PHP_VERSION . PHP_EOL;
+    } else {
+        echo 'Your PHP version is: ' . PHP_VERSION . PHP_EOL;
+    }
+    echo 'Please specify a suitable PHP cli binary before the typo3cms binary like that:' . PHP_EOL;
+    echo '/path/to/php55-latest ' . $_SERVER['argv'][0] . PHP_EOL;
+    exit(1);
 }
-echo 'Could not find console! Make sure typo3cms binary is up to date!' . PHP_EOL;
-exit(1);
+
+require __DIR__ . '/typo3cms.php';
