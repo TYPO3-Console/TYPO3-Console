@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Service;
  *
  */
 
+use Helhum\Typo3Console\Core\Booting\CompatibilityScripts;
 use Helhum\Typo3Console\Core\Booting\Scripts;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
@@ -21,8 +22,6 @@ use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\Core\Bootstrap;
-use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -48,16 +47,22 @@ class CacheService implements SingletonInterface
     private $bootstrap;
 
     /**
+     * @var CacheLowLevelCleaner
+     */
+    private $lowLevelCleaner;
+
+    /**
      * Builds the dependencies correctly
      *
      * @param CacheManager $cacheManager
      * @param ConfigurationService $configurationService
      */
-    public function __construct(CacheManager $cacheManager, ConfigurationService $configurationService, Bootstrap $bootstrap = null)
+    public function __construct(CacheManager $cacheManager, ConfigurationService $configurationService, Bootstrap $bootstrap = null, CacheLowLevelCleaner $lowLevelCleaner = null)
     {
         $this->cacheManager = $cacheManager;
         $this->configurationService = $configurationService;
         $this->bootstrap = $bootstrap ?: Bootstrap::getInstance();
+        $this->lowLevelCleaner = $lowLevelCleaner ?: new CacheLowLevelCleaner();
     }
 
     /**
@@ -69,7 +74,8 @@ class CacheService implements SingletonInterface
     {
         $this->ensureDatabaseIsInitialized();
         if ($force) {
-            $this->forceFlushCoreFileAndDatabaseCaches();
+            $this->lowLevelCleaner->forceFlushCachesFiles();
+            $this->lowLevelCleaner->forceFlushDatabaseCacheTables();
         }
         $this->cacheManager->flushCaches();
     }
@@ -82,7 +88,7 @@ class CacheService implements SingletonInterface
     public function flushFileCaches($force = false)
     {
         if ($force) {
-            $this->forceFlushCoreFileAndDatabaseCaches(true);
+            $this->lowLevelCleaner->forceFlushCachesFiles();
         }
         foreach ($this->getFileCaches() as $cache) {
             $cache->flush();
@@ -195,7 +201,7 @@ class CacheService implements SingletonInterface
             // Already initialized
             return;
         }
-        Scripts::initializeDatabaseConnection($this->bootstrap);
+        CompatibilityScripts::initializeDatabaseConnection($this->bootstrap);
     }
 
     private function ensureBackendUserIsInitialized()
@@ -240,73 +246,6 @@ class CacheService implements SingletonInterface
             }
         }
         return $fileCaches;
-    }
-
-    /**
-     * Recursively delete cache directory and truncate all DB tables prefixed with 'cf_'
-     *
-     * @param bool $onlyFileCaches
-     */
-    private function forceFlushCoreFileAndDatabaseCaches($onlyFileCaches = false)
-    {
-        $cacheDir = 'var/Cache';
-        $dbFlushMethod = '_forceFlushCoreDatabaseCaches';
-        if (!class_exists(ConnectionPool::class)) {
-            // @deprecated can be removed when TYPO3 7.6 support is removed
-            $cacheDir = 'Cache';
-            $dbFlushMethod = '_legacyForceFlushCoreDatabaseCaches';
-        }
-        $this->forceFlushCoreFileCaches($cacheDir);
-        if ($onlyFileCaches) {
-            return;
-        }
-        $this->$dbFlushMethod();
-    }
-
-    /**
-     * Recursively delete cache directory
-     *
-     * @param string $cacheDirectory
-     */
-    private function forceFlushCoreFileCaches($cacheDirectory)
-    {
-        // Delete typo3temp/Cache
-        GeneralUtility::flushDirectory(PATH_site . 'typo3temp/' . $cacheDirectory, true);
-    }
-
-    /**
-     * Truncate all DB tables prefixed with 'cf_'
-     */
-    private function _forceFlushCoreDatabaseCaches()
-    {
-        // Get all table names from Default connection starting with 'cf_' and truncate them
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
-        $connection = $connectionPool->getConnectionByName('Default');
-        $tablesNames = $tableNames = $connection->getSchemaManager()->listTableNames();
-        foreach ($tablesNames as $tableName) {
-            if ($tableName === 'cache_treelist' || strpos($tableName, 'cf_') === 0) {
-                $connection->truncate($tableName);
-            }
-        }
-    }
-
-    /**
-     * Truncate all DB tables prefixed with 'cf_'
-     *
-     * @deprecated Will be removed once TYPO3 7.6 support is removed
-     */
-    private function _legacyForceFlushCoreDatabaseCaches()
-    {
-        // Get all table names starting with 'cf_' and truncate them
-        /** @var DatabaseConnection $db */
-        $db = $GLOBALS['TYPO3_DB'];
-        $tables = $db->admin_get_tables();
-        foreach ($tables as $table) {
-            $tableName = $table['Name'];
-            if ($tableName === 'cache_treelist' || strpos($tableName, 'cf_') === 0) {
-                $db->exec_TRUNCATEquery($tableName);
-            }
-        }
     }
 
     /**

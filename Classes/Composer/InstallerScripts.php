@@ -77,7 +77,7 @@ class InstallerScripts implements InstallerScriptsRegistration
         $content = preg_replace('/(private \$version = )\'\d+\.\d+\.\d+/', '$1\'' . $version, $content);
         file_put_contents($helpCommandFile, $content);
 
-        $dispatcherFile = __DIR__ . '/../Mvc/Cli/SymfonyConsoleRequestHandler.php';
+        $dispatcherFile = __DIR__ . '/../Mvc/Cli/RequestHandler.php';
         $content = file_get_contents($dispatcherFile);
         $content = preg_replace('/(new Application\(\'TYPO3 Console\', )\'\d+\.\d+\.\d+/', '$1\'' . $version, $content);
         file_put_contents($dispatcherFile, $content);

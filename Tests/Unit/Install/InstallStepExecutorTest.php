@@ -22,6 +22,14 @@ use TYPO3\CMS\Install\Controller\Exception\RedirectException;
 
 class InstallStepExecutorTest extends UnitTestCase
 {
+    protected function setUp()
+    {
+        if (!class_exists(AbstractStepAction::class)) {
+            // @deprecated We can remove the test once we TYPO3 8 compatibility is removed
+            $this->markTestSkipped();
+        }
+    }
+
     /**
      * @test
      */

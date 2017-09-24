@@ -1,5 +1,5 @@
 <?php
-namespace Helhum\Typo3Console\Database\Schema;
+namespace Helhum\Typo3Console\LTS7\Database\Schema;
 
 /*
  * This file is part of the TYPO3 Console project.
@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Database\Schema;
  *
  */
 
+use Helhum\Typo3Console\Database\Schema\SchemaUpdateInterface;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Install\Service\SqlExpectedSchemaService;
 use TYPO3\CMS\Install\Service\SqlSchemaMigrationService;
@@ -21,7 +22,7 @@ use TYPO3\CMS\Install\Service\SqlSchemaMigrationService;
  * The database schema update implementation for TYPO3 7.6
  * @deprecated since TYPO3 8.x, will be removed when TYPO3 7.6 support will be removed
  */
-class LegacySchemaUpdate implements SchemaUpdateInterface, SingletonInterface
+class SchemaUpdate implements SchemaUpdateInterface, SingletonInterface
 {
     /**
      * @var SqlSchemaMigrationService

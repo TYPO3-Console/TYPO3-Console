@@ -23,14 +23,6 @@
         exit(1);
     }
 
-    define('PATH_site', \TYPO3\CMS\Core\Utility\GeneralUtility::fixWindowsFilePath(getenv('TYPO3_PATH_ROOT')) . '/');
-    if (file_exists(PATH_site . 'typo3/sysext/core/bin/typo3')) {
-        define('PATH_thisScript', PATH_site . 'typo3/sysext/core/bin/typo3');
-    } else {
-        // @deprecated will be removed once 7.6 support is removed
-        define('PATH_thisScript', PATH_site . 'typo3/cli_dispatch.phpsh');
-    }
-
     if (!class_exists(\Helhum\Typo3Console\Core\ConsoleApplication::class)) {
         // This require is needed so that the console works in non Composer mode,
         // where requiring the main autoload.php is not enough to load extension classes

@@ -13,10 +13,10 @@ namespace Helhum\Typo3Console\Core;
  *
  */
 
+use Composer\Autoload\ClassLoader;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Error\ExceptionHandler;
 use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
-use Helhum\Typo3Console\Mvc\Cli\SymfonyConsoleRequestHandler;
 use Symfony\Component\Console\Input\ArgvInput;
 use TYPO3\CMS\Core\Core\ApplicationInterface;
 use TYPO3\CMS\Core\Core\Bootstrap;
@@ -36,11 +36,17 @@ class ConsoleApplication implements ApplicationInterface
      */
     private $bootstrap;
 
+    /**
+     * @var int
+     */
+    private $typo3Branch;
+
     public function __construct(\Composer\Autoload\ClassLoader $classLoader)
     {
         $this->ensureRequiredEnvironment();
         $this->bootstrap = Bootstrap::getInstance();
         $this->bootstrap->initializeClassLoader($classLoader);
+        $this->detectTypo3Branch();
     }
 
     /**
@@ -58,7 +64,6 @@ class ConsoleApplication implements ApplicationInterface
         }
 
         $this->bootstrap->registerRequestHandlerImplementation(RequestHandler::class);
-        $this->bootstrap->registerRequestHandlerImplementation(SymfonyConsoleRequestHandler::class);
         $this->bootstrap->handleRequest(new ArgvInput());
 
         $this->shutdown();
@@ -81,12 +86,23 @@ class ConsoleApplication implements ApplicationInterface
         }
     }
 
+    private function detectTypo3Branch()
+    {
+        $this->typo3Branch = 8;
+        if (!method_exists($this->bootstrap, 'setCacheHashOptions')) {
+            $this->typo3Branch = 9;
+        } elseif (!method_exists($this->bootstrap, 'setRequestType')) {
+            $this->typo3Branch = 7;
+        }
+    }
+
     /**
      * Bootstraps the minimal infrastructure, but does not execute any command
      */
     private function boot()
     {
         $this->defineBaseConstants();
+        $this->initializeCompatibilityLayer();
         $this->bootstrap->baseSetup();
         // I want to see deprecation messages
         error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
@@ -95,11 +111,11 @@ class ConsoleApplication implements ApplicationInterface
         $this->initializePackageManagement();
 
         if (!class_exists(RunLevel::class)) {
-            echo sprintf('Could not initialize TYPO3 Console for TYPO3 in path %s.', PATH_site) . chr(10);
-            echo 'This most likely happened because you have a console code checkout in typo3conf/ext/typo3_console,' . chr(10);
-            echo 'but TYPO3 Console is not set up as extension. If you want to use it as extension,' . chr(10);
-            echo 'please download it from https://typo3.org/extensions/repository/view/typo3_console' . chr(10);
-            echo 'or install it properly using Composer.' . chr(10);
+            echo sprintf('Could not initialize TYPO3 Console for TYPO3 in path %s.', PATH_site) . PHP_EOL;
+            echo 'This most likely happened because you have a console code checkout in typo3conf/ext/typo3_console,' . PHP_EOL;
+            echo 'but TYPO3 Console is not set up as extension. If you want to use it as extension,' . PHP_EOL;
+            echo 'please download it from https://typo3.org/extensions/repository/view/typo3_console' . PHP_EOL;
+            echo 'or install it properly using Composer.' . PHP_EOL;
             exit(1);
         }
 
@@ -124,23 +140,44 @@ class ConsoleApplication implements ApplicationInterface
     private function defineBaseConstants()
     {
         define('TYPO3_MODE', 'BE');
-        // @deprecated to define this constant. Can be removed when TYPO3 7 support is removed
-        define('TYPO3_cliMode', true);
+        define('PATH_site', \TYPO3\CMS\Core\Utility\GeneralUtility::fixWindowsFilePath(getenv('TYPO3_PATH_ROOT')) . '/');
+        define('PATH_thisScript', PATH_site . 'typo3/index.php');
 
-        // @deprecated to define these constants here. Can be removed when TYPO3 7 support is removed
-        if (!defined('TYPO3_REQUESTTYPE_FE')) {
+        if ($this->typo3Branch > 7) {
+            $this->bootstrap->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
+        } else {
+            // @deprecated can be removed once TYPO3 7 support is removed
+            define('TYPO3_cliMode', true);
             define('TYPO3_REQUESTTYPE_FE', 1);
             define('TYPO3_REQUESTTYPE_BE', 2);
             define('TYPO3_REQUESTTYPE_CLI', 4);
             define('TYPO3_REQUESTTYPE_AJAX', 8);
             define('TYPO3_REQUESTTYPE_INSTALL', 16);
+            define('TYPO3_REQUESTTYPE', TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
         }
-        if (is_callable([$this->bootstrap, 'setRequestType'])) {
-            $this->bootstrap->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
-        } else {
-            // @deprecated to define this constants here. Can be removed when TYPO3 7 support is removed
-            define('TYPO3_REQUESTTYPE', TYPO3_REQUESTTYPE_CLI);
+    }
+
+    /**
+     * If detected TYPO3 version does not match the main supported version,
+     * overlay compatibility classes for the detected branch, by registering
+     * an autoloader and aliasing the compatibility class with the original class name.
+     */
+    private function initializeCompatibilityLayer()
+    {
+        if ($this->typo3Branch === 8) {
+            return;
         }
+        $compatibilityClassesPath = __DIR__ . '/../../Compatibility/LTS' . $this->typo3Branch;
+        $compatibilityNamespace = 'Helhum\\Typo3Console\\LTS' . $this->typo3Branch . '\\';
+        $classLoader = new ClassLoader();
+        $classLoader->addPsr4($compatibilityNamespace, $compatibilityClassesPath);
+        spl_autoload_register(function ($className) use ($classLoader, $compatibilityNamespace) {
+            $compatibilityClassName = str_replace('Helhum\\Typo3Console\\', $compatibilityNamespace, $className);
+            if ($file = $classLoader->findFile($compatibilityClassName)) {
+                require $file;
+                class_alias($compatibilityClassName, $className);
+            }
+        }, true, true);
     }
 
     /**
