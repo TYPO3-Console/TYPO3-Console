@@ -25,33 +25,6 @@ Extension *typo3_console*
 -------------------------
 
 
-.. _`Command Reference: typo3_console autocomplete`:
-
-``autocomplete``
-****************
-
-**Generate shell auto complete script**
-
-Inspired by and copied code from https://github.com/bamarni/symfony-console-autocomplete
-See https://github.com/bamarni/symfony-console-autocomplete/blob/master/README.md
-for a description how to install the script in your system.
-
-
-
-Options
-^^^^^^^
-
-``--shell``
-  "bash" or "zsh"
-``--aliases``
-  Aliases for the typo3cms command
-``--dynamic``
-  Dynamic auto completion is slower but more flexible
-
-
-
-
-
 .. _`Command Reference: typo3_console backend:lock`:
 
 ``backend:lock``
@@ -777,15 +750,13 @@ Display help for a command
 The help command displays help for a given command:
 typo3cms help <command identifier>
 
-
-
-Options
-^^^^^^^
+Arguments
+^^^^^^^^^
 
 ``--command-identifier``
   Identifier of a command for more details
-``--raw``
-  Raw output of commands only
+
+
 
 
 

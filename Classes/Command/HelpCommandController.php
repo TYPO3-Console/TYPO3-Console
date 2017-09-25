@@ -46,18 +46,15 @@ class HelpCommandController extends CommandController
      * typo3cms help <command identifier>
      *
      * @param string $commandIdentifier Identifier of a command for more details
-     * @param bool $raw Raw output of commands only
      * @return void
      */
-    public function helpCommand($commandIdentifier = null, $raw = false)
+    public function helpCommand($commandIdentifier = null)
     {
-        if (!$raw) {
-            $this->outputLine('<info>TYPO3 Console</info> <comment>%s</comment>', [Application::TYPO3_CONSOLE_VERSION]);
-            $this->outputLine();
-        }
+        $this->outputLine('<info>TYPO3 Console</info> <comment>%s</comment>', [Application::TYPO3_CONSOLE_VERSION]);
+        $this->outputLine();
 
         if ($commandIdentifier === null) {
-            $this->displayHelpIndex($raw);
+            $this->displayHelpIndex();
         } else {
             try {
                 $command = $this->commandManager->getCommandByIdentifier($commandIdentifier);
@@ -70,33 +67,24 @@ class HelpCommandController extends CommandController
     }
 
     /**
-     * @param bool $raw
      */
-    protected function displayHelpIndex($raw = false)
+    protected function displayHelpIndex()
     {
         $this->buildCommandsIndex();
-        if (!$raw) {
-            $this->outputLine('<comment>Usage:</comment>');
-            $this->outputLine('  command [options] [arguments]');
-            $this->outputLine();
-            $this->outputLine('<comment>Available commands:</comment>');
-        }
+        $this->outputLine('<comment>Usage:</comment>');
+        $this->outputLine('  command [options] [arguments]');
+        $this->outputLine();
+        $this->outputLine('<comment>Available commands:</comment>');
 
         foreach ($this->commands as $shortCommandIdentifier => $command) {
             $description = $command->getShortDescription();
-            if (!$raw) {
-                $description = $this->wordWrap($description, 43);
-                $this->outputLine('%-2s<info>%-40s</info> %s', [' ', $shortCommandIdentifier, $description]);
-            } else {
-                $this->outputLine('%s %s', [$shortCommandIdentifier, $description]);
-            }
+            $description = $this->wordWrap($description, 43);
+            $this->outputLine('%-2s<info>%-40s</info> %s', [' ', $shortCommandIdentifier, $description]);
         }
 
-        if (!$raw) {
-            $this->outputLine();
-            $this->outputLine('See <info>help</info> <command> for more information about a specific command.');
-            $this->outputLine();
-        }
+        $this->outputLine();
+        $this->outputLine('See <info>help</info> <command> for more information about a specific command.');
+        $this->outputLine();
     }
 
     /**
@@ -189,137 +177,6 @@ class HelpCommandController extends CommandController
         $this->outputLine('See <info>help</info> for an overview of all available commands');
         $this->outputLine('or <info>help</info> <command> for a detailed description of the corresponding command.');
         $this->quit(1);
-    }
-
-    /**
-     * Generate shell auto complete script
-     *
-     * Inspired by and copied code from https://github.com/bamarni/symfony-console-autocomplete
-     * See https://github.com/bamarni/symfony-console-autocomplete/blob/master/README.md
-     * for a description how to install the script in your system.
-     *
-     * @param string $shell "bash" or "zsh"
-     * @param array $aliases Aliases for the typo3cms command
-     * @param bool $dynamic Dynamic auto completion is slower but more flexible
-     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
-     */
-    public function autoCompleteCommand($shell = 'bash', array $aliases = [], $dynamic = false)
-    {
-        if (!in_array($shell, ['zsh', 'bash'], true)) {
-            $this->output->outputLine('<error>Shell can only be "bash" or "zsh"</error>');
-            $this->quit(1);
-        }
-        $script = 'typo3cms';
-        $tools = [$script];
-        if ($aliases) {
-            $aliases = array_filter(preg_split('/\s+/', implode(' ', $aliases)));
-            $tools = array_unique(array_merge($tools, $aliases));
-        }
-
-        if ($dynamic) {
-            // dump
-            $template = file_get_contents(__DIR__ . '/../../Resources/Private/AutocompleteTemplates/default.' . $shell . '.tpl');
-            if ('zsh' === $shell) {
-                $tools = array_map(function ($v) {
-                    return 'compdef _typo3console ' . $v;
-                }, $tools);
-            } else {
-                $tools = array_map(function ($v) {
-                    return 'complete -o default -F _typo3console ' . $v;
-                }, $tools);
-            }
-            $this->output->output(str_replace(
-                ['%%TOOLS%%'],
-                [implode("\n", $tools)],
-                $template
-            ));
-        } else {
-            $this->buildCommandsIndex();
-            $commandsDescriptions = [];
-            $commandsOptionsDescriptions = [];
-            $commandsOptions = [];
-            $commands = [];
-            foreach ($this->commands as $commandIdentifier => $command) {
-                $commandIdentifier = strtolower($commandIdentifier);
-                if ($commandIdentifier === 'help:autocomplete') {
-                    $commandIdentifier = 'autocomplete';
-                } elseif ($commandIdentifier === 'help:help') {
-                    $commandIdentifier = 'help';
-                }
-                $commands[] = $commandIdentifier;
-                $commandsDescriptions[$commandIdentifier] = $command->getShortDescription();
-                $commandsOptionsDescriptions[$commandIdentifier] = [];
-                if ($command->hasArguments()) {
-                    $commandOptions = [];
-                    foreach ($command->getArgumentDefinitions() as $commandArgumentDefinition) {
-                        if (!$commandArgumentDefinition->isRequired()) {
-                            $name = $commandArgumentDefinition->getDashedName();
-                            $commandOptions[] = $name;
-                        }
-                    }
-                    $commandsOptions[$commandIdentifier] = $commandOptions;
-                }
-            }
-            $switchCaseStatementTemplate = 'opts="${opts} %%COMMAND_OPTIONS%%"';
-            if ('zsh' === $shell) {
-                $switchCaseStatementTemplate = 'opts+=(%%COMMAND_OPTIONS%%)';
-            }
-            // generate the switch content
-            $switchCaseTemplate = <<<SWITCHCASE
-        %%COMMAND%%)
-                $switchCaseStatementTemplate
-                ;;
-SWITCHCASE;
-
-            $switchContent = '';
-            $zsh_describe = function ($value, $description = null) {
-                $value = '"' . str_replace(':', '\\:', $value);
-                if (!empty($description)) {
-                    $value .= ':' . escapeshellcmd($description);
-                }
-
-                return $value . '"';
-            };
-            foreach ($commandsOptions as $command => $options) {
-                if (empty($options)) {
-                    continue;
-                }
-                if ('zsh' === $shell) {
-                    $options = array_map(function ($option) use ($command, $commandsOptionsDescriptions, $zsh_describe) {
-                        return $zsh_describe($option, $commandsOptionsDescriptions[$command][$option]);
-                    }, $options);
-                }
-
-                $switchContent .= str_replace(
-                    ['%%COMMAND%%', '%%COMMAND_OPTIONS%%'],
-                    [$command, implode(' ', $options)],
-                    $switchCaseTemplate
-                ) . "\n        ";
-            }
-            $switchContent = rtrim($switchContent, ' ');
-
-            // dump
-            $template = file_get_contents(__DIR__ . '/../../Resources/Private/AutocompleteTemplates/cached.' . $shell . '.tpl');
-            if ('zsh' === $shell) {
-                $commands = array_map(function ($command) use ($commandsDescriptions, $zsh_describe) {
-                    return $zsh_describe($command, $commandsDescriptions[$command]);
-                }, $commands);
-
-                $tools = array_map(function ($v) use ($script) {
-                    return "compdef _$script $v";
-                }, $tools);
-            } else {
-                $tools = array_map(function ($v) use ($script) {
-                    return "complete -o default -F _$script $v";
-                }, $tools);
-            }
-
-            $this->output->output(str_replace(
-                ['%%SCRIPT%%', '%%COMMANDS%%', '%%SHARED_OPTIONS%%', '%%SWITCH_CONTENT%%', '%%TOOLS%%'],
-                [$script, implode(' ', $commands), '', $switchContent, implode("\n", $tools)],
-                $template
-            ));
-        }
     }
 
     /**

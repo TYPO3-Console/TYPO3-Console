@@ -56,40 +56,12 @@ The extension will automatically be activated and the ``typo3cms`` script will a
 Shell auto complete
 -------------------
 
-You can get shell auto completion either for bash or zsh shells.
+You can get shell auto completion by using the great `autocomplete package`_.
+Install the package and make the binary available in your path. Please read the installation instructions
+of this package on how to do that.
 
-1. Static auto complete
-^^^^^^^^^^^^^^^^^^^^^^^
+To temporary activate auto complete in the current shell session, type ``eval "$(symfony-autocomplete --aliases=typo3cms)"``
+You can also put this into your ``.profile`` or ``.bashrc`` file to have it always available.
+Auto completion is then always dynamic and reflects the commands you have available in your TYPO3 installation.
 
-To generate an auto completion shell script, which includes all commands and command options of the current
-TYPO3 installation, just type ``/path/to/typo3cms autocomplete bash`` (or ``/path/to/typo3cms autocomplete zsh`` for zsh shell).
-
-To temporary activate auto complete in the current shell session, type ``eval "$(/path/to/typo3cms autocomplete bash)"`` or ``eval "$(/path/to/typo3cms autocomplete zsh)"``.
-If you only have one TYPO3 installation on a system, you can also put the above into your ``.profile`` file,
-so that the auto completion is active upon login.
-
-.. note::
-
-  The ``typo3cms`` command may show commands that are specific to the current TYPO3 installation.
-  However the static auto completion script that is generated contains only the commands of the TYPO3 installation,
-  for which it was issued. This means if you permanently install the script
-  generated for one TYPO3 installation, you may get unexpected results in another one.
-
-2. Dynamic auto complete
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-To generate an auto completion shell script, which extract the commands and option to be auto completed
-dynamically from the current TYPO3 installation, type ``/path/to/typo3cms autocomplete bash --dynamic`` (or ``/path/to/typo3cms autocomplete zsh --dynamic`` for zsh shell).
-
-To temporary activate auto complete in the current shell session, type ``eval "$(/path/to/typo3cms autocomplete bash --dynamic)"`` or ``eval "$(/path/to/typo3cms autocomplete zsh --dynamic)"``.
-You can also put the above into your ``.profile`` file, so that the auto completion is active upon login.
-
-This auto completion type is more flexible, but completion takes a little bit longer, as
-the list of completion possibilities is extracted dynamically upon invocation of the auto complete request (tab pressed).
-
-
-.. note::
-
-  Whether to use static or dynamic auto completion is up to you. Static is much faster,
-  so choose this, if performance is king for you. Dynamic is slower, but you don't have
-  to worry about different commands in different TYPO3 installations.
+.. _`autocomplete package`: https://github.com/bamarni/symfony-console-autocomplete
