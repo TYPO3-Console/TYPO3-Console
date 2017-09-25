@@ -93,20 +93,6 @@ class UncachedPackageManager extends PackageManager
     }
 
     /**
-     * Overload original method because the stupid TYPO3 core
-     * tries to sort packages by dependencies before *DEACTIVATING* a package
-     * In this case we do nothing now until this TYPO3 bug is fixed.
-     *
-     * @deprecated in 8.0 will be removed once 7.6 compatibility is removed
-     */
-    protected function sortAvailablePackagesByDependencies()
-    {
-        if ($this->forceSavePackageStates) {
-            parent::sortAvailablePackagesByDependencies();
-        }
-    }
-
-    /**
      * To enable writing of the package states file the package states
      * migration needs to override eventual failsafe blocks.
      * This will be used during installation process.
@@ -133,8 +119,6 @@ class UncachedPackageManager extends PackageManager
 
     /**
      * Workaround for non Composer mode
-     *
-     * @deprecated since 8.0 will be removed once 7.6 compatiblity is removed
      */
     protected function ensureClassLoadingInformationExists()
     {

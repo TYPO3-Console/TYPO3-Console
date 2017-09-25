@@ -80,8 +80,6 @@ class PersistenceIntegrityService
                 continue;
             }
             $processedTables[] = $tableName;
-            // @deprecated $uidList can be removed once TYPO3 7.6 support is removed
-            $uidList = [0];
             foreach ($records as $record) {
                 $this->callDelegateForEvent($delegate, 'willUpdateRecord', [$tableName, $record]);
 
@@ -91,8 +89,6 @@ class PersistenceIntegrityService
                     $refIndexObj->setWorkspaceId($record['t3ver_wsid']);
                 }
                 $result = $refIndexObj->updateRefIndexTable($tableName, $record['uid'], $dryRun);
-                // @deprecated $uidList can be removed once TYPO3 7.6 support is removed
-                $uidList[] = $record['uid'];
                 $recordCount++;
                 if ($result['addedNodes'] || $result['deletedNodes']) {
                     $errorMessage = 'Record ' . $tableName . ':' . $record['uid'];
@@ -107,7 +103,7 @@ class PersistenceIntegrityService
             }
             try {
                 // Searching lost indexes for this table:
-                $lostIndexCount = $this->persistenceContext->countLostIndexesOfRecordsInTable($tableName, $uidList);
+                $lostIndexCount = $this->persistenceContext->countLostIndexesOfRecordsInTable($tableName);
                 if ($lostIndexCount > 0) {
                     $errorMessage = 'Table ' . $tableName . ' has ' . $lostIndexCount;
                     if ($dryRun) {
@@ -118,7 +114,7 @@ class PersistenceIntegrityService
                     $errorCount++;
                     $this->delegateLog($delegate, 'notice', $errorMessage);
                     if (!$dryRun) {
-                        $this->persistenceContext->deleteLostIndexesOfRecordsInTable($tableName, $uidList);
+                        $this->persistenceContext->deleteLostIndexesOfRecordsInTable($tableName);
                     }
                 }
             } catch (TableDoesNotExistException $e) {
