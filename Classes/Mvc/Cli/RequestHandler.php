@@ -14,9 +14,9 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\ExtbaseCommand;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\HelpCommand;
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use TYPO3\CMS\Core\Console\CommandNameAlreadyInUseException;
 use TYPO3\CMS\Core\Console\RequestHandlerInterface;
@@ -38,7 +38,8 @@ class RequestHandler implements RequestHandlerInterface
     private $runLevel;
 
     /**
-     * Instance of the Symfony application
+     * Instance of our own Symfony application
+     *
      * @var Application
      */
     private $application;
@@ -61,7 +62,7 @@ class RequestHandler implements RequestHandlerInterface
     {
         $this->bootstrap = $bootstrap;
         $this->runLevel = $this->bootstrap->getEarlyInstance(RunLevel::class);
-        $this->application = new Application('TYPO3 Console', '5.0.0');
+        $this->application = new Application();
     }
 
     public function handleRequest(InputInterface $input)

@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Extbase\Mvc\Cli\Command;
@@ -25,13 +26,6 @@ use TYPO3\CMS\Extbase\Mvc\Cli\Command;
  */
 class HelpCommandController extends CommandController
 {
-    /**
-     * Current version number
-     *
-     * @var string
-     */
-    private $version = '5.0.0';
-
     /**
      * @var \Helhum\Typo3Console\Mvc\Cli\CommandManager
      * @inject
@@ -58,7 +52,7 @@ class HelpCommandController extends CommandController
     public function helpCommand($commandIdentifier = null, $raw = false)
     {
         if (!$raw) {
-            $this->outputLine('<info>TYPO3 Console</info> <comment>%s</comment>', [$this->version]);
+            $this->outputLine('<info>TYPO3 Console</info> <comment>%s</comment>', [Application::TYPO3_CONSOLE_VERSION]);
             $this->outputLine();
         }
 
