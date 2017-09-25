@@ -15,10 +15,6 @@ environment:
       PHP_VERSION: '7.1.1'
     - TYPO3_VERSION: '~8.7'
       PHP_VERSION: '7.0.9'
-    - TYPO3_VERSION: '~7.6'
-      PHP_VERSION: '7.1.1'
-    - TYPO3_VERSION: '~7.6'
-      PHP_VERSION: '7.0.9'
 
 matrix:
   fast_finish: true

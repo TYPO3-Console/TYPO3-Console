@@ -112,7 +112,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         $consoleComposerJson = str_replace('"name": "helhum/typo3-console"', '"name": "helhum/typo3-console-test"', $consoleComposerJson);
         file_put_contents($instancePath . '/typo3_console/composer.json', $consoleComposerJson);
         $this->executeComposerCommand(['config', 'repositories.console', '{"type": "path", "url": "typo3_console", "options": {"symlink": false}}']);
-        $output = $this->executeComposerCommand(['require', 'typo3/cms=^7.6.18', 'helhum/typo3-console-test=@dev']);
+        $output = $this->executeComposerCommand(['require', 'typo3/cms=^8.7.7', 'helhum/typo3-console-test=@dev']);
         $this->assertContains('Mirroring from typo3_console', $output);
         if (DIRECTORY_SEPARATOR === '\\') {
             $this->assertContains('Copied typo3 directory to document root', $output);

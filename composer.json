@@ -25,17 +25,17 @@
         "php": ">=7.0.0 <7.2",
         "helhum/typo3-console-plugin": "^2.0.2",
 
-        "typo3/cms-backend": "^7.6 || ^8.7.7",
-        "typo3/cms-core": "^7.6 || ^8.7.7",
-        "typo3/cms-extbase": "^7.6 || ^8.7.7",
-        "typo3/cms-extensionmanager": "^7.6 || ^8.7.7",
-        "typo3/cms-fluid": "^7.6 || ^8.7.7",
-        "typo3/cms-install": "^7.6 || ^8.7.7",
-        "typo3/cms-saltedpasswords": "^7.6 || ^8.7.7",
-        "typo3/cms-scheduler": "^7.6 || ^8.7.7",
+        "typo3/cms-backend": "^8.7.7",
+        "typo3/cms-core": "^8.7.7",
+        "typo3/cms-extbase": "^8.7.7",
+        "typo3/cms-extensionmanager": "^8.7.7",
+        "typo3/cms-fluid": "^8.7.7",
+        "typo3/cms-install": "^8.7.7",
+        "typo3/cms-saltedpasswords": "^8.7.7",
+        "typo3/cms-scheduler": "^8.7.7",
 
-        "symfony/console": "^2.7 || ^3.0",
-        "symfony/process": "^2.7 || ^3.0"
+        "symfony/console": "^3.2",
+        "symfony/process": "^3.2"
     },
     "require-dev": {
         "typo3-console/php-server-command": "^0.1.1",

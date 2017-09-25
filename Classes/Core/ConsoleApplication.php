@@ -91,8 +91,6 @@ class ConsoleApplication implements ApplicationInterface
         $this->typo3Branch = 8;
         if (!method_exists($this->bootstrap, 'setCacheHashOptions')) {
             $this->typo3Branch = 9;
-        } elseif (!method_exists($this->bootstrap, 'setRequestType')) {
-            $this->typo3Branch = 7;
         }
     }
 
@@ -102,6 +100,7 @@ class ConsoleApplication implements ApplicationInterface
     private function boot()
     {
         $this->defineBaseConstants();
+        $this->bootstrap->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
         $this->initializeCompatibilityLayer();
         $this->bootstrap->baseSetup();
         // I want to see deprecation messages
@@ -142,19 +141,6 @@ class ConsoleApplication implements ApplicationInterface
         define('TYPO3_MODE', 'BE');
         define('PATH_site', \TYPO3\CMS\Core\Utility\GeneralUtility::fixWindowsFilePath(getenv('TYPO3_PATH_ROOT')) . '/');
         define('PATH_thisScript', PATH_site . 'typo3/index.php');
-
-        if ($this->typo3Branch > 7) {
-            $this->bootstrap->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
-        } else {
-            // @deprecated can be removed once TYPO3 7 support is removed
-            define('TYPO3_cliMode', true);
-            define('TYPO3_REQUESTTYPE_FE', 1);
-            define('TYPO3_REQUESTTYPE_BE', 2);
-            define('TYPO3_REQUESTTYPE_CLI', 4);
-            define('TYPO3_REQUESTTYPE_AJAX', 8);
-            define('TYPO3_REQUESTTYPE_INSTALL', 16);
-            define('TYPO3_REQUESTTYPE', TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
-        }
     }
 
     /**
