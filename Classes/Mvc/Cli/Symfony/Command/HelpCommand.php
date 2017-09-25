@@ -1,5 +1,5 @@
 <?php
-namespace Helhum\Typo3Console\Symfony\Command;
+namespace Helhum\Typo3Console\Mvc\Cli\Symfony\Command;
 
 /*
  * This file is part of the TYPO3 Console project.

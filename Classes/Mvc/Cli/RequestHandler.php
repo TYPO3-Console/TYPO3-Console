@@ -14,8 +14,8 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
-use Helhum\Typo3Console\Symfony\Command\ExtbaseCommand;
-use Helhum\Typo3Console\Symfony\Command\HelpCommand;
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\ExtbaseCommand;
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\HelpCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use TYPO3\CMS\Core\Console\CommandNameAlreadyInUseException;
