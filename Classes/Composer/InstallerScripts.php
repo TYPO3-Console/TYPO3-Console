@@ -72,15 +72,10 @@ class InstallerScripts implements InstallerScriptsRegistration
         $content = preg_replace('/(\'version\' => )\'\d+\.\d+\.\d+/', '$1\'' . $version, $content);
         file_put_contents($extEmConfFile, $content);
 
-        $helpCommandFile = __DIR__ . '/../Command/HelpCommandController.php';
-        $content = file_get_contents($helpCommandFile);
-        $content = preg_replace('/(private \$version = )\'\d+\.\d+\.\d+/', '$1\'' . $version, $content);
-        file_put_contents($helpCommandFile, $content);
-
-        $dispatcherFile = __DIR__ . '/../Mvc/Cli/RequestHandler.php';
-        $content = file_get_contents($dispatcherFile);
-        $content = preg_replace('/(new Application\(\'TYPO3 Console\', )\'\d+\.\d+\.\d+/', '$1\'' . $version, $content);
-        file_put_contents($dispatcherFile, $content);
+        $applicationFile = __DIR__ . '/../Mvc/Cli/Symfony/Application.php';
+        $content = file_get_contents($applicationFile);
+        $content = preg_replace('/(const TYPO3_CONSOLE_VERSION = \')\d+\.\d+\.\d+/', 'const TYPO3_CONSOLE_VERSION = \'' . $version, $content);
+        file_put_contents($applicationFile, $content);
 
         $travisYmlFile = __DIR__ . '/../../.travis.yml';
         $content = file_get_contents($travisYmlFile);
