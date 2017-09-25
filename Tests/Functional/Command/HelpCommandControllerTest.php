@@ -37,40 +37,4 @@ class HelpCommandControllerTest extends AbstractCommandTest
         $output = $this->executeConsoleCommand('help');
         $this->assertContains('Usage:', $output);
     }
-
-    /**
-     * @test
-     */
-    public function autoCompleteDefaultsToBash()
-    {
-        $output = $this->executeConsoleCommand('autocomplete');
-        $this->assertContains('#!/usr/bin/env bash', $output);
-    }
-
-    /**
-     * @test
-     */
-    public function autoCompleteForBash()
-    {
-        $output = $this->executeConsoleCommand('autocomplete', ['shell' => 'bash']);
-        $this->assertContains('#!/usr/bin/env bash', $output);
-    }
-
-    /**
-     * @test
-     */
-    public function autoCompleteForZsh()
-    {
-        $output = $this->executeConsoleCommand('autocomplete', ['shell' => 'zsh']);
-        $this->assertContains('#!/usr/bin/env zsh', $output);
-    }
-
-    /**
-     * @test
-     * @expectedException \Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException
-     */
-    public function wrongShellMakesAutoCompleteFail()
-    {
-        $this->commandDispatcher->executeCommand('autocomplete', ['shell' => 'wrong']);
-    }
 }

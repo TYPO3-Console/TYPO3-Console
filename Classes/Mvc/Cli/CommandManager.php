@@ -65,9 +65,6 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
         if ($commandIdentifier === 'help') {
             $commandIdentifier = 'typo3_console:help:help';
         }
-        if ($commandIdentifier === 'autocomplete') {
-            $commandIdentifier = 'typo3_console:help:autocomplete';
-        }
         return parent::getCommandByIdentifier($commandIdentifier);
     }
 
@@ -79,9 +76,6 @@ class CommandManager extends \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
     {
         if ($command->getCommandIdentifier() === 'typo3_console:help:help') {
             return 'help';
-        }
-        if ($command->getCommandIdentifier() === 'typo3_console:help:autocomplete') {
-            return 'autocomplete';
         }
         return parent::getShortestIdentifierForCommand($command);
     }
