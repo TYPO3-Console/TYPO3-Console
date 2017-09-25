@@ -15,12 +15,12 @@ namespace Helhum\Typo3Console\Mvc\Controller;
 
 use Helhum\Typo3Console\Log\Writer\ConsoleWriter;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
+use Helhum\Typo3Console\Mvc\Cli\Response;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Authentication\AbstractUserAuthentication;
 use TYPO3\CMS\Core\Log\Logger;
 use TYPO3\CMS\Core\Log\LogLevel;
 use TYPO3\CMS\Extbase\Mvc\Cli\Request;
-use TYPO3\CMS\Extbase\Mvc\Cli\Response;
 use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandControllerInterface;
 use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentTypeException;
@@ -97,7 +97,6 @@ abstract class CommandController implements CommandControllerInterface
         $this->objectManager = $objectManager;
         $this->arguments = $this->objectManager->get(\TYPO3\CMS\Extbase\Mvc\Controller\Arguments::class);
         $this->userAuthentication = isset($GLOBALS['BE_USER']) ? $GLOBALS['BE_USER'] : null;
-        $this->output = $this->objectManager->get(\Helhum\Typo3Console\Mvc\Cli\ConsoleOutput::class);
     }
 
     /**
@@ -124,8 +123,12 @@ abstract class CommandController implements CommandControllerInterface
     public function processRequest(RequestInterface $request, ResponseInterface $response)
     {
         if (!$request instanceof Request) {
-            throw new UnsupportedRequestTypeException(sprintf('%s only supports command line requests – requests of type "%s" given.', get_class($this), get_class($request)), 1300787096);
+            throw new UnsupportedRequestTypeException(sprintf('%s only supports command line requests – requests of type "%s" given.', static::class, get_class($request)), 1300787096);
         }
+        if ($response instanceof Response) {
+            $output = $this->objectManager->get(ConsoleOutput::class, $response->getOutput(), $response->getInput());
+        }
+        $this->output = $output ?? $this->objectManager->get(ConsoleOutput::class);
 
         $this->request = $request;
         $this->request->setDispatched(true);

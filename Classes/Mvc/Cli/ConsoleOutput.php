@@ -13,7 +13,6 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  *
  */
 
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -67,16 +66,6 @@ class ConsoleOutput
     public function __construct(Output $output = null, Input $input = null)
     {
         $this->output = $output ?: new SymfonyConsoleOutput();
-        $this->output->getFormatter()->setStyle('b', new OutputFormatterStyle(null, null, ['bold']));
-        $this->output->getFormatter()->setStyle('i', new OutputFormatterStyle('black', 'white'));
-        $this->output->getFormatter()->setStyle('u', new OutputFormatterStyle(null, null, ['underscore']));
-        $this->output->getFormatter()->setStyle('em', new OutputFormatterStyle(null, null, ['reverse']));
-        $this->output->getFormatter()->setStyle('strike', new OutputFormatterStyle(null, null, ['conceal']));
-        $this->output->getFormatter()->setStyle('success', new OutputFormatterStyle('green'));
-        $this->output->getFormatter()->setStyle('warning', new OutputFormatterStyle('black', 'yellow'));
-        $this->output->getFormatter()->setStyle('ins', new OutputFormatterStyle('green'));
-        $this->output->getFormatter()->setStyle('del', new OutputFormatterStyle('red'));
-        $this->output->getFormatter()->setStyle('code', new OutputFormatterStyle(null, null, ['bold']));
         $this->input = $input;
     }
 
