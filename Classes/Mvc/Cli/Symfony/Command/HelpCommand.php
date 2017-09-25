@@ -90,6 +90,8 @@ class HelpCommand extends \Symfony\Component\Console\Command\HelpCommand
             $dispatcher = $objectManager->get(Dispatcher::class);
             $request = $objectManager->get(RequestBuilder::class)->build($args, $_SERVER['argv'][0]);
             $response = new Response();
+            $response->setInput($input);
+            $response->setOutput($output);
             $dispatcher->dispatch($request, $response);
         } else {
             // Any other symfony command should just show up the regular info

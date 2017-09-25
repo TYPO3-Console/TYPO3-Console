@@ -26,13 +26,13 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony\Command;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Helhum\Typo3Console\Mvc\Cli\Response;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Cli\RequestBuilder;
-use TYPO3\CMS\Extbase\Mvc\Cli\Response;
 use TYPO3\CMS\Extbase\Mvc\Dispatcher;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 
@@ -105,6 +105,8 @@ class ExtbaseCommand extends Command
 
         $request = $objectManager->get(RequestBuilder::class)->build($commandLine, $callingScript);
         $response = new Response();
+        $response->setInput($input);
+        $response->setOutput($output);
         $dispatcher->dispatch($request, $response);
 
         return $response->getExitCode();
