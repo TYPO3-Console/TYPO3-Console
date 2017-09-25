@@ -30,7 +30,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Core\Bootstrap;
 use TYPO3\CMS\Extbase\Mvc\Cli\RequestBuilder;
 use TYPO3\CMS\Extbase\Mvc\Cli\Response;
 use TYPO3\CMS\Extbase\Mvc\Dispatcher;
@@ -65,6 +64,7 @@ class HelpCommand extends \Symfony\Component\Console\Command\HelpCommand
     public function setCommand(Command $command)
     {
         $this->command = $command;
+        parent::setCommand($command);
     }
 
     /**
@@ -76,12 +76,7 @@ class HelpCommand extends \Symfony\Component\Console\Command\HelpCommand
             $this->command = $this->getApplication()->find($input->getArgument('command_name'));
         }
 
-        // Extbase help was explicitly called
-        if ($input->getArgument('command') === 'extbase:help' || $input->getArgument('command') === 'extbase:help:help') {
-            $_SERVER['argv'][1] = 'typo3_console:help:help';
-            $bootstrap = GeneralUtility::makeInstance(Bootstrap::class);
-            $bootstrap->run('', []);
-        } elseif ($this->command instanceof ExtbaseCommand) {
+        if ($this->command instanceof ExtbaseCommand) {
             // An extbase command was originally called, but is now required to show the help information
             // Ugly hack to modify 'argv' so the help command for a specific command is shown
             $args = ['help'];
@@ -91,9 +86,6 @@ class HelpCommand extends \Symfony\Component\Console\Command\HelpCommand
                 }
                 $args[] = $value;
             }
-//            $_SERVER['argv'] = $args;
-//            $_SERVER['argc'] = count($args);
-
             $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
             $dispatcher = $objectManager->get(Dispatcher::class);
             $request = $objectManager->get(RequestBuilder::class)->build($args, $_SERVER['argv'][0]);
