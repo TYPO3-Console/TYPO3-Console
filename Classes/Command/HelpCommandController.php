@@ -14,7 +14,6 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
-use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Extbase\Mvc\Cli\Command;
@@ -48,54 +47,9 @@ class HelpCommandController extends CommandController
      * @param string $commandIdentifier Identifier of a command for more details
      * @return void
      */
-    public function helpCommand($commandIdentifier = null)
+    public function helpCommand($commandIdentifier)
     {
-        $this->outputLine('<info>TYPO3 Console</info> <comment>%s</comment>', [Application::TYPO3_CONSOLE_VERSION]);
-        $this->outputLine();
-
-        if ($commandIdentifier === null) {
-            $this->displayHelpIndex();
-        } else {
-            try {
-                $command = $this->commandManager->getCommandByIdentifier($commandIdentifier);
-            } catch (\TYPO3\CMS\Extbase\Mvc\Exception\CommandException $exception) {
-                $this->outputLine($exception->getMessage());
-                return;
-            }
-            $this->displayHelpForCommand($command);
-        }
-    }
-
-    /**
-     */
-    protected function displayHelpIndex()
-    {
-        $this->buildCommandsIndex();
-        $this->outputLine('<comment>Usage:</comment>');
-        $this->outputLine('  command [options] [arguments]');
-        $this->outputLine();
-        $this->outputLine('<comment>Available commands:</comment>');
-
-        foreach ($this->commands as $shortCommandIdentifier => $command) {
-            $description = $command->getShortDescription();
-            $description = $this->wordWrap($description, 43);
-            $this->outputLine('%-2s<info>%-40s</info> %s', [' ', $shortCommandIdentifier, $description]);
-        }
-
-        $this->outputLine();
-        $this->outputLine('See <info>help</info> <command> for more information about a specific command.');
-        $this->outputLine();
-    }
-
-    /**
-     * Display help text for a single command
-     *
-     * @param \TYPO3\CMS\Extbase\Mvc\Cli\Command $command
-     * @return void
-     */
-    protected function displayHelpForCommand(\TYPO3\CMS\Extbase\Mvc\Cli\Command $command)
-    {
-        $this->outputLine($command->getShortDescription());
+        $command = $this->commandManager->getCommandByIdentifier($commandIdentifier);
         $commandArgumentDefinitions = $command->getArgumentDefinitions();
         $usage = '';
         $hasOptions = false;
@@ -103,11 +57,10 @@ class HelpCommandController extends CommandController
             if (!$commandArgumentDefinition->isRequired()) {
                 $hasOptions = true;
             } else {
-                $usage .= sprintf(' <%s>', strtolower(preg_replace('/([A-Z])/', ' $1', $commandArgumentDefinition->getName())));
+                $usage .= sprintf(' [<%s>]', strtolower(preg_replace('/([A-Z])/', '-$1', $commandArgumentDefinition->getName())));
             }
         }
-        $usage = $this->commandManager->getShortestIdentifierForCommand($command) . ($hasOptions ? ' [<options>]' : '') . $usage;
-        $this->outputLine();
+        $usage = $this->commandManager->getShortestIdentifierForCommand($command) . ($hasOptions ? ' [options]' : '') . $usage;
         $this->outputLine('<comment>Usage:</comment>');
         $this->outputLine('  ' . $usage);
         $argumentDescriptions = [];
@@ -149,8 +102,8 @@ class HelpCommandController extends CommandController
         if ($relatedCommandIdentifiers !== []) {
             $this->outputLine();
             $this->outputLine('<comment>Related Commands:</comment>');
-            foreach ($relatedCommandIdentifiers as $commandIdentifier) {
-                $command = $this->commandManager->getCommandByIdentifier($commandIdentifier);
+            foreach ($relatedCommandIdentifiers as $relatedIdentifier) {
+                $command = $this->commandManager->getCommandByIdentifier($relatedIdentifier);
                 $this->outputLine('%-2s%s (%s)', [' ', $this->commandManager->getShortestIdentifierForCommand($command), $command->getShortDescription()]);
             }
         }
