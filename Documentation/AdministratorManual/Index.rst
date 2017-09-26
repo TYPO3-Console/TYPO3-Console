@@ -48,7 +48,9 @@ this `TYPO3 distribution`_, which already provides TYPO3 Console integration.
 For the extension to work, it **must** be installed in the ``typo3conf/ext/`` directory **not** in any other possible extension location.
 This is the default location when downloading it from TER with the Extension Manager.
 
-The extension will automatically be activated and the ``typo3cms`` script will also copied to your TYPO3 root directory.
+The ``typo3cms`` script will be copied to your TYPO3 root directory, when you activate it.
+When you symlink the ``typo3cms`` script to a location of your preference, TYPO3 Console
+will work, even when it is not marked as active in the Extension Manager.
 
 .. _`TYPO3 distribution`: https://github.com/helhum/TYPO3-Distribution
 
