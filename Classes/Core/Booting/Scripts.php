@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Core\Booting;
 
 use Helhum\Typo3Console\Core\Cache\FakeDatabaseBackend;
 use Helhum\Typo3Console\Error\ErrorHandler;
+use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
 use TYPO3\CMS\Core\Cache\Backend\NullBackend;
 use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
 use TYPO3\CMS\Core\Cache\CacheManager;
@@ -123,7 +124,6 @@ class Scripts
         $cacheManager->setCacheConfigurations($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']);
         \TYPO3\CMS\Core\Utility\GeneralUtility::setSingletonInstance(\TYPO3\CMS\Core\Cache\CacheManager::class, $cacheManager);
         $bootstrap->setEarlyInstance(\TYPO3\CMS\Core\Cache\CacheManager::class, $cacheManager);
-        CompatibilityScripts::initializeCachingFramework($bootstrap);
     }
 
     /**
@@ -151,9 +151,26 @@ class Scripts
      */
     public static function initializeAuthenticatedOperations(Bootstrap $bootstrap)
     {
-        CompatibilityScripts::initializeAuthenticatedOperations($bootstrap);
+        $bootstrap->loadExtTables();
+        $bootstrap->initializeBackendUser(CommandLineUserAuthentication::class);
+        self::loadCommandLineBackendUser();
         // Global language object on CLI? rly? but seems to be needed by some scheduler tasks :(
         $bootstrap->initializeLanguageObject();
+    }
+
+    /**
+     * If the backend script is in CLI mode, it will try to load a backend user named _cli_lowlevel
+     *
+     * @throws \RuntimeException if a non-admin Backend user could not be loaded
+     */
+    private static function loadCommandLineBackendUser()
+    {
+        /** @var CommandLineUserAuthentication $backendUser */
+        $backendUser = $GLOBALS['BE_USER'];
+        if ($backendUser->user['uid']) {
+            throw new \RuntimeException('Another user was already loaded which is impossible in CLI mode!', 3);
+        }
+        $backendUser->authenticate();
     }
 
     /**
