@@ -47,7 +47,7 @@ class RequestHandler implements RequestHandlerInterface
     /**
      * @var string[]
      */
-    private $registeredCommandNames = ['help' => 'help'];
+    private $registeredCommandNames = [];
 
     private static $commandsToIgnore = [
         'extbase',
@@ -120,7 +120,6 @@ class RequestHandler implements RequestHandlerInterface
      */
     private function populateCommands()
     {
-        $this->application->add(new HelpCommand('help'));
         $this->registerCommandsFromCommandControllers();
 
         foreach ($this->bootstrap->getEarlyInstance(PackageManager::class)->getActivePackages() as $package) {

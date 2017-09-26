@@ -15,7 +15,10 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony;
  */
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\HelpCommand;
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\ListCommand;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -43,6 +46,16 @@ class Application extends BaseApplication
     public function isCommandAvailable(string $commandName): bool
     {
         return $this->runLevel->isCommandAvailable($commandName);
+    }
+
+    /**
+     * Gets the default commands that should always be available.
+     *
+     * @return Command[] An array of default Command instances
+     */
+    protected function getDefaultCommands()
+    {
+        return array(new HelpCommand(), new ListCommand());
     }
 
     protected function configureIO(InputInterface $input, OutputInterface $output)
