@@ -36,17 +36,56 @@ class ConsoleApplication implements ApplicationInterface
      */
     private $bootstrap;
 
-    /**
-     * @var int
-     */
-    private $typo3Branch;
-
     public function __construct(\Composer\Autoload\ClassLoader $classLoader)
     {
         $this->ensureRequiredEnvironment();
         $this->bootstrap = Bootstrap::getInstance();
         $this->bootstrap->initializeClassLoader($classLoader);
-        $this->detectTypo3Branch();
+        $this->initializeCompatibilityLayer();
+    }
+
+    /**
+     * Checks PHP sapi type and sets required PHP options
+     */
+    private function ensureRequiredEnvironment()
+    {
+        if (PHP_SAPI !== 'cli' || !isset($_SERVER['argc'], $_SERVER['argv'])) {
+            echo 'The command line must be executed with a cli PHP binary! The current PHP sapi type is "' . PHP_SAPI . '".' . PHP_EOL;
+            exit(1);
+        }
+        if (ini_get('memory_limit') !== '-1') {
+            @ini_set('memory_limit', '-1');
+        }
+        if (ini_get('max_execution_time') !== '0') {
+            @ini_set('max_execution_time', '0');
+        }
+    }
+
+    /**
+     * If detected TYPO3 version does not match the main supported version,
+     * overlay compatibility classes for the detected branch, by registering
+     * an autoloader and aliasing the compatibility class with the original class name.
+     */
+    private function initializeCompatibilityLayer()
+    {
+        $typo3Branch = 8;
+        if (!method_exists($this->bootstrap, 'setCacheHashOptions')) {
+            $typo3Branch = 9;
+        }
+        if ($typo3Branch === 8) {
+            return;
+        }
+        $compatibilityClassesPath = __DIR__ . '/../../Compatibility/LTS' . $typo3Branch;
+        $compatibilityNamespace = 'Helhum\\Typo3Console\\LTS' . $typo3Branch . '\\';
+        $classLoader = new ClassLoader();
+        $classLoader->addPsr4($compatibilityNamespace, $compatibilityClassesPath);
+        spl_autoload_register(function ($className) use ($classLoader, $compatibilityNamespace) {
+            $compatibilityClassName = str_replace('Helhum\\Typo3Console\\', $compatibilityNamespace, $className);
+            if ($file = $classLoader->findFile($compatibilityClassName)) {
+                require $file;
+                class_alias($compatibilityClassName, $className);
+            }
+        }, true, true);
     }
 
     /**
@@ -70,38 +109,12 @@ class ConsoleApplication implements ApplicationInterface
     }
 
     /**
-     * Checks PHP sapi type and sets required PHP options
-     */
-    private function ensureRequiredEnvironment()
-    {
-        if (PHP_SAPI !== 'cli' || !isset($_SERVER['argc'], $_SERVER['argv'])) {
-            echo 'The command line must be executed with a cli PHP binary! The current PHP sapi type is "' . PHP_SAPI . '".' . PHP_EOL;
-            exit(1);
-        }
-        if (ini_get('memory_limit') !== '-1') {
-            @ini_set('memory_limit', '-1');
-        }
-        if (ini_get('max_execution_time') !== '0') {
-            @ini_set('max_execution_time', '0');
-        }
-    }
-
-    private function detectTypo3Branch()
-    {
-        $this->typo3Branch = 8;
-        if (!method_exists($this->bootstrap, 'setCacheHashOptions')) {
-            $this->typo3Branch = 9;
-        }
-    }
-
-    /**
      * Bootstraps the minimal infrastructure, but does not execute any command
      */
     private function boot()
     {
         $this->defineBaseConstants();
         $this->bootstrap->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
-        $this->initializeCompatibilityLayer();
         $this->bootstrap->baseSetup();
         // I want to see deprecation messages
         error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
@@ -141,29 +154,6 @@ class ConsoleApplication implements ApplicationInterface
         define('TYPO3_MODE', 'BE');
         define('PATH_site', \TYPO3\CMS\Core\Utility\GeneralUtility::fixWindowsFilePath(getenv('TYPO3_PATH_ROOT')) . '/');
         define('PATH_thisScript', PATH_site . 'typo3/index.php');
-    }
-
-    /**
-     * If detected TYPO3 version does not match the main supported version,
-     * overlay compatibility classes for the detected branch, by registering
-     * an autoloader and aliasing the compatibility class with the original class name.
-     */
-    private function initializeCompatibilityLayer()
-    {
-        if ($this->typo3Branch === 8) {
-            return;
-        }
-        $compatibilityClassesPath = __DIR__ . '/../../Compatibility/LTS' . $this->typo3Branch;
-        $compatibilityNamespace = 'Helhum\\Typo3Console\\LTS' . $this->typo3Branch . '\\';
-        $classLoader = new ClassLoader();
-        $classLoader->addPsr4($compatibilityNamespace, $compatibilityClassesPath);
-        spl_autoload_register(function ($className) use ($classLoader, $compatibilityNamespace) {
-            $compatibilityClassName = str_replace('Helhum\\Typo3Console\\', $compatibilityNamespace, $className);
-            if ($file = $classLoader->findFile($compatibilityClassName)) {
-                require $file;
-                class_alias($compatibilityClassName, $className);
-            }
-        }, true, true);
     }
 
     /**

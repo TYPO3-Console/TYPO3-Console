@@ -13,7 +13,6 @@ namespace Helhum\Typo3Console\Core\Booting;
  *
  */
 
-use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
 use TYPO3\CMS\Core\Core\Bootstrap;
 
 class CompatibilityScripts
@@ -34,14 +33,6 @@ class CompatibilityScripts
     /**
      * @param Bootstrap $bootstrap
      */
-    public static function initializeCachingFramework(Bootstrap $bootstrap)
-    {
-        // noop for TYPO3 8
-    }
-
-    /**
-     * @param Bootstrap $bootstrap
-     */
     public static function initializeDatabaseConnection(Bootstrap $bootstrap)
     {
         $bootstrap->initializeTypo3DbGlobal();
@@ -53,30 +44,5 @@ class CompatibilityScripts
     public static function initializeExtensionConfiguration(Bootstrap $bootstrap)
     {
         $bootstrap->defineLoggingAndExceptionConstants();
-    }
-
-    /**
-     * @param Bootstrap $bootstrap
-     */
-    public static function initializeAuthenticatedOperations(Bootstrap $bootstrap)
-    {
-        $bootstrap->loadExtTables();
-        $bootstrap->initializeBackendUser(CommandLineUserAuthentication::class);
-        self::loadCommandLineBackendUser();
-    }
-
-    /**
-     * If the backend script is in CLI mode, it will try to load a backend user named _cli_lowlevel
-     *
-     * @throws \RuntimeException if a non-admin Backend user could not be loaded
-     */
-    private static function loadCommandLineBackendUser()
-    {
-        /** @var CommandLineUserAuthentication $backendUser */
-        $backendUser = $GLOBALS['BE_USER'];
-        if ($backendUser->user['uid']) {
-            throw new \RuntimeException('Another user was already loaded which is impossible in CLI mode!', 3);
-        }
-        $backendUser->authenticate();
     }
 }

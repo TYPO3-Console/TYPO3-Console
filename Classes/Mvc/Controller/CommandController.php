@@ -13,13 +13,26 @@ namespace Helhum\Typo3Console\Mvc\Controller;
  *
  */
 
+/*
+ * This file is part of the TYPO3 CMS project.
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
+
 use Helhum\Typo3Console\Log\Writer\ConsoleWriter;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Helhum\Typo3Console\Mvc\Cli\Response;
 use Psr\Log\LoggerInterface;
-use TYPO3\CMS\Core\Authentication\AbstractUserAuthentication;
 use TYPO3\CMS\Core\Log\Logger;
 use TYPO3\CMS\Core\Log\LogLevel;
+use TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition;
 use TYPO3\CMS\Extbase\Mvc\Cli\Request;
 use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandControllerInterface;
@@ -29,6 +42,8 @@ use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
 use TYPO3\CMS\Extbase\Mvc\Exception\UnsupportedRequestTypeException;
 use TYPO3\CMS\Extbase\Mvc\RequestInterface;
 use TYPO3\CMS\Extbase\Mvc\ResponseInterface;
+use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
+use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 
 /**
  * A controller which processes requests from the command line
@@ -53,11 +68,6 @@ abstract class CommandController implements CommandControllerInterface
     protected $arguments;
 
     /**
-     * @var ConsoleOutput
-     */
-    protected $output;
-
-    /**
      * Name of the command method
      *
      * @var string
@@ -73,30 +83,35 @@ abstract class CommandController implements CommandControllerInterface
     protected $requestAdminPermissions = false;
 
     /**
-     * @var AbstractUserAuthentication
-     */
-    protected $userAuthentication;
-
-    /**
-     * @var \TYPO3\CMS\Extbase\Reflection\ReflectionService
-     * @inject
+     * @var ReflectionService
      */
     protected $reflectionService;
 
     /**
-     * @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface
+     * @var ObjectManagerInterface
      */
     protected $objectManager;
 
     /**
-     * @param \TYPO3\CMS\Extbase\Object\ObjectManagerInterface $objectManager
-     * @return void
+     * @var ConsoleOutput
      */
-    public function injectObjectManager(\TYPO3\CMS\Extbase\Object\ObjectManagerInterface $objectManager)
+    protected $output;
+
+    /**
+     * @param \TYPO3\CMS\Extbase\Object\ObjectManagerInterface $objectManager
+     */
+    public function injectObjectManager(ObjectManagerInterface $objectManager)
     {
         $this->objectManager = $objectManager;
         $this->arguments = $this->objectManager->get(\TYPO3\CMS\Extbase\Mvc\Controller\Arguments::class);
-        $this->userAuthentication = isset($GLOBALS['BE_USER']) ? $GLOBALS['BE_USER'] : null;
+    }
+
+    /**
+     * @param \TYPO3\CMS\Extbase\Reflection\ReflectionService $reflectionService
+     */
+    public function injectReflectionService(ReflectionService $reflectionService)
+    {
+        $this->reflectionService = $reflectionService;
     }
 
     /**
@@ -104,7 +119,6 @@ abstract class CommandController implements CommandControllerInterface
      *
      * @param \TYPO3\CMS\Extbase\Mvc\RequestInterface $request The current request
      * @return bool true if this request type is supported, otherwise false
-     * @api
      */
     public function canProcessRequest(\TYPO3\CMS\Extbase\Mvc\RequestInterface $request)
     {
@@ -117,7 +131,6 @@ abstract class CommandController implements CommandControllerInterface
      * @param RequestInterface $request The request object
      * @param ResponseInterface $response The response, modified by this handler
      * @throws UnsupportedRequestTypeException if the controller doesn't support the current request type
-     * @return void
      * @api
      */
     public function processRequest(RequestInterface $request, ResponseInterface $response)
@@ -143,7 +156,8 @@ abstract class CommandController implements CommandControllerInterface
     /**
      * Resolves and checks the current command method name
      *
-     * Note: The resulting command method name might not have the correct case, which isn't a problem because PHP is case insensitive regarding method names.
+     * Note: The resulting command method name might not have the correct case, which isn't a problem because PHP is
+     * case insensitive regarding method names.
      *
      * @throws NoSuchCommandException
      * @return string Method name of the current command
@@ -162,7 +176,6 @@ abstract class CommandController implements CommandControllerInterface
      * method arguments found in the designated command method.
      *
      * @throws InvalidArgumentTypeException
-     * @return void
      */
     protected function initializeCommandMethodArguments()
     {
@@ -186,8 +199,6 @@ abstract class CommandController implements CommandControllerInterface
 
     /**
      * Maps arguments delivered by the request object to the local controller arguments.
-     *
-     * @return void
      */
     protected function mapRequestArgumentsToControllerArguments()
     {
@@ -202,7 +213,7 @@ abstract class CommandController implements CommandControllerInterface
                 continue;
             }
             $argumentValue = null;
-            $commandArgumentDefinition = $this->objectManager->get(\TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition::class, $argumentName, true, null);
+            $commandArgumentDefinition = $this->objectManager->get(CommandArgumentDefinition::class, $argumentName, true, null);
             while ($argumentValue === null) {
                 $argumentValue = $this->output->ask(sprintf('<comment>Please specify the required argument "%s":</comment> ', $commandArgumentDefinition->getDashedName()));
             }
@@ -220,7 +231,6 @@ abstract class CommandController implements CommandControllerInterface
      * @param string $controllerObjectName
      * @param array $arguments
      * @throws StopActionException
-     * @return void
      */
     protected function forward($commandName, $controllerObjectName = null, array $arguments = [])
     {
@@ -232,7 +242,7 @@ abstract class CommandController implements CommandControllerInterface
         $this->request->setArguments($arguments);
 
         $this->arguments->removeAll();
-        throw new StopActionException();
+        throw new StopActionException('forward', 1476107661);
     }
 
     /**
@@ -241,8 +251,6 @@ abstract class CommandController implements CommandControllerInterface
      * If the command returns a string, it is appended to the content in the
      * response object. If the command doesn't return anything and a valid
      * view exists, the view is rendered automatically.
-     *
-     * @return void
      */
     protected function callCommandMethod()
     {
@@ -250,53 +258,21 @@ abstract class CommandController implements CommandControllerInterface
         foreach ($this->arguments as $argument) {
             $preparedArguments[] = $argument->getValue();
         }
-        $originalRole = $this->ensureAdminRoleIfRequested();
         $commandResult = $this->{$this->commandMethodName}(...$preparedArguments);
-        $this->restoreUserRole($originalRole);
         if (is_string($commandResult) && $commandResult !== '') {
             $this->response->appendContent($commandResult);
         } elseif (is_object($commandResult) && method_exists($commandResult, '__toString')) {
-            $this->response->appendContent((string) $commandResult);
-        }
-    }
-
-    /**
-     * Set admin permissions for currently authenticated user if requested
-     * and returns the original state or NULL
-     *
-     * @return null|int
-     */
-    protected function ensureAdminRoleIfRequested()
-    {
-        if (!$this->requestAdminPermissions || !$this->userAuthentication || !isset($this->userAuthentication->user['admin'])) {
-            return null;
-        }
-        $originalRole = $this->userAuthentication->user['admin'];
-        $this->userAuthentication->user['admin'] = 1;
-        return $originalRole;
-    }
-
-    /**
-     * Restores the original user role
-     *
-     * @param null|int $originalRole
-     */
-    protected function restoreUserRole($originalRole)
-    {
-        if ($originalRole !== null) {
-            $this->userAuthentication->user['admin'] = $originalRole;
+            $this->response->appendContent((string)$commandResult);
         }
     }
 
     /**
      * Outputs specified text to the console window
      * You can specify arguments that will be passed to the text via sprintf
-     * @see http://www.php.net/sprintf
      *
+     * @see http://www.php.net/sprintf
      * @param string $text Text to output
      * @param array $arguments Optional arguments to use for sprintf
-     * @return void
-     * @api
      */
     protected function output($text, array $arguments = [])
     {
@@ -308,10 +284,7 @@ abstract class CommandController implements CommandControllerInterface
      *
      * @param string $text Text to output
      * @param array $arguments Optional arguments to use for sprintf
-     * @return void
      * @see output()
-     * @see outputLines()
-     * @api
      */
     protected function outputLine($text = '', array $arguments = [])
     {
@@ -325,9 +298,7 @@ abstract class CommandController implements CommandControllerInterface
      * @param string $text Text to output
      * @param array $arguments Optional arguments to use for sprintf
      * @param int $leftPadding The number of spaces to use for indentation
-     * @return void
      * @see outputLine()
-     * @api
      */
     protected function outputFormatted($text = '', array $arguments = [], $leftPadding = 0)
     {
@@ -335,19 +306,16 @@ abstract class CommandController implements CommandControllerInterface
     }
 
     /**
-     * Exits the CLI through the dispatcher and makes sure that the framework is properly shut down.
+     * Exits the CLI through the dispatcher
+     * An exit status code can be specified @see http://www.php.net/exit
      *
-     * If your command relies on functionality which is triggered through the Bootstrap
-     * shutdown (such as the persistence framework), you must use quit() instead of exit().
-     *
-     * @param int $exitCode Exit code to return on exit (see http://www.php.net/exit)
+     * @param int $exitCode Exit code to return on exit
      * @throws StopActionException
-     * @return void
      */
     protected function quit($exitCode = 0)
     {
         $this->response->setExitCode($exitCode);
-        throw new StopActionException();
+        throw new StopActionException('quit', 1476107681);
     }
 
     /**
@@ -355,7 +323,6 @@ abstract class CommandController implements CommandControllerInterface
      * Should be used for commands that flush code caches.
      *
      * @param int $exitCode Exit code to return on exit
-     * @return void
      */
     protected function sendAndExit($exitCode = 0)
     {
