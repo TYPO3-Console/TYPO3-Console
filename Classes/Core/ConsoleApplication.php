@@ -256,11 +256,10 @@ class ConsoleApplication implements ApplicationInterface
     {
         if (
             !is_array($commandConfiguration)
-            || count($commandConfiguration) !== 3
-            || !isset($commandConfiguration['controllers'], $commandConfiguration['runLevels'], $commandConfiguration['bootingSteps'])
-            || !is_array($commandConfiguration['controllers'])
-            || !is_array($commandConfiguration['runLevels'])
-            || !is_array($commandConfiguration['bootingSteps'])
+            || (isset($commandConfiguration['controllers']) && !is_array($commandConfiguration['controllers']))
+            || (isset($commandConfiguration['runLevels']) && !is_array($commandConfiguration['runLevels']))
+            || (isset($commandConfiguration['bootingSteps']) && !is_array($commandConfiguration['bootingSteps']))
+            || (isset($commandConfiguration['commands']) && !is_array($commandConfiguration['commands']))
         ) {
             throw new \RuntimeException($packageKey . ' defines invalid commands in Configuration/Console/Commands.php', 1461186959);
         }
