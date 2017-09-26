@@ -23,11 +23,11 @@
         exit(1);
     }
 
-    if (!class_exists(\Helhum\Typo3Console\Core\ConsoleApplication::class)) {
+    if (!class_exists(\Helhum\Typo3Console\Core\Kernel::class)) {
         // This require is needed so that the console works in non Composer mode,
         // where requiring the main autoload.php is not enough to load extension classes
-        require __DIR__ . '/../Classes/Core/ConsoleApplication.php';
+        require __DIR__ . '/../Classes/Core/Kernel.php';
     }
-    $application = new \Helhum\Typo3Console\Core\ConsoleApplication($classLoader);
-    $application->run();
+    $kernel = new \Helhum\Typo3Console\Core\Kernel($classLoader);
+    $kernel->run();
 })();
