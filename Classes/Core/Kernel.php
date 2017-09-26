@@ -18,7 +18,6 @@ use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Error\ExceptionHandler;
 use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 use Symfony\Component\Console\Input\ArgvInput;
-use TYPO3\CMS\Core\Core\ApplicationInterface;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
@@ -29,7 +28,7 @@ use TYPO3\CMS\Extbase\Mvc\Cli\Response;
 /**
  * @internal
  */
-class Kernel implements ApplicationInterface
+class Kernel
 {
     /**
      * @var Bootstrap
@@ -91,27 +90,8 @@ class Kernel implements ApplicationInterface
     /**
      * Bootstraps the minimal infrastructure, registers a request handler and
      * then passes control over to that request handler.
-     *
-     * @param callable|null $execute
      */
-    public function run(callable $execute = null)
-    {
-        $this->boot();
-
-        if ($execute !== null) {
-            call_user_func($execute);
-        }
-
-        $this->bootstrap->registerRequestHandlerImplementation(RequestHandler::class);
-        $this->bootstrap->handleRequest(new ArgvInput());
-
-        $this->shutdown();
-    }
-
-    /**
-     * Bootstraps the minimal infrastructure, but does not execute any command
-     */
-    private function boot()
+    public function handle()
     {
         $this->defineBaseConstants();
         $this->bootstrap->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
@@ -136,6 +116,11 @@ class Kernel implements ApplicationInterface
         set_exception_handler([$exceptionHandler, 'handleException']);
         $this->initializeCommandManager();
         $this->registerCommands();
+
+        $this->bootstrap->registerRequestHandlerImplementation(RequestHandler::class);
+        $this->bootstrap->handleRequest(new ArgvInput());
+
+        $this->shutdown();
     }
 
     private function shutdown()
