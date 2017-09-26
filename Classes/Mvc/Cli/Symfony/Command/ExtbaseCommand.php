@@ -56,7 +56,7 @@ class ExtbaseCommand extends Command
 
     public function isEnabled()
     {
-        if (!$this->application->hasAllCapabilities()
+        if (!$this->application->isFullyCapable()
             && in_array($this->getName(), [
                 // Although these commands are technically available
                 // they call other hidden commands in sub processes
@@ -69,7 +69,7 @@ class ExtbaseCommand extends Command
         ) {
             return false;
         }
-        return $this->application->isCommandAvailable($this->getName());
+        return $this->application->isCommandAvailable($this);
     }
 
     /**

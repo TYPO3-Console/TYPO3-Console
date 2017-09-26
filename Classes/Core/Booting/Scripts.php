@@ -67,13 +67,11 @@ class Scripts
         $bootstrap->baseSetup();
         // I want to see deprecation messages
         error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
-
-        self::initializePackageManagement($bootstrap);
-
         $exceptionHandler = new ExceptionHandler();
         set_exception_handler([$exceptionHandler, 'handleException']);
+
+        self::initializePackageManagement($bootstrap);
         self::initializeCommandManager($bootstrap);
-        self::registerCommands($bootstrap);
     }
 
     /**
@@ -101,73 +99,6 @@ class Scripts
         $commandManager = GeneralUtility::makeInstance(CommandManager::class);
         $bootstrap->setEarlyInstance(ExtbaseCommandManager::class, $commandManager);
         GeneralUtility::setSingletonInstance(ExtbaseCommandManager::class, $commandManager);
-    }
-
-    private static function registerCommands(Bootstrap $bootstrap)
-    {
-        foreach (self::getCommandConfigurations($bootstrap) as $packageKey => $commandConfiguration) {
-            self::registerCommandsFromConfiguration($bootstrap, $commandConfiguration, $packageKey);
-        }
-    }
-
-    /**
-     * @return array
-     */
-    private static function getCommandConfigurations(Bootstrap $bootstrap)
-    {
-        if (file_exists($commandConfigurationFile = __DIR__ . '/../../../Configuration/Console/AllCommands.php')) {
-            return require $commandConfigurationFile;
-        }
-        $commandConfigurationFiles = [];
-        /** @var PackageManager $packageManager */
-        $packageManager = $bootstrap->getEarlyInstance(PackageManager::class);
-        foreach ($packageManager->getActivePackages() as $package) {
-            $possibleCommandsFileName = $package->getPackagePath() . '/Configuration/Console/Commands.php';
-            if (!file_exists($possibleCommandsFileName)) {
-                continue;
-            }
-            $commandConfigurationFiles[$package->getPackageKey()] = require $possibleCommandsFileName;
-        }
-        return $commandConfigurationFiles;
-    }
-
-    /**
-     * @param $commandConfiguration
-     * @param $packageKey
-     */
-    private static function registerCommandsFromConfiguration(Bootstrap $bootstrap, $commandConfiguration, $packageKey)
-    {
-        self::ensureValidCommandsConfiguration($commandConfiguration, $packageKey);
-
-        foreach ($commandConfiguration['controllers'] as $controller) {
-            $bootstrap->getEarlyInstance(ExtbaseCommandManager::class)->registerCommandController($controller);
-        }
-        foreach ($commandConfiguration['runLevels'] as $commandIdentifier => $runLevel) {
-            $bootstrap->getEarlyInstance(RunLevel::class)->setRunLevelForCommand($commandIdentifier, $runLevel);
-        }
-        foreach ($commandConfiguration['bootingSteps'] as $commandIdentifier => $bootingSteps) {
-            foreach ((array)$bootingSteps as $bootingStep) {
-                $bootstrap->getEarlyInstance(RunLevel::class)->addBootingStepForCommand($commandIdentifier, $bootingStep);
-            }
-        }
-    }
-
-    /**
-     * @param mixed $commandConfiguration
-     * @param string $packageKey
-     * @throws \RuntimeException
-     */
-    private static function ensureValidCommandsConfiguration($commandConfiguration, $packageKey)
-    {
-        if (
-            !is_array($commandConfiguration)
-            || (isset($commandConfiguration['controllers']) && !is_array($commandConfiguration['controllers']))
-            || (isset($commandConfiguration['runLevels']) && !is_array($commandConfiguration['runLevels']))
-            || (isset($commandConfiguration['bootingSteps']) && !is_array($commandConfiguration['bootingSteps']))
-            || (isset($commandConfiguration['commands']) && !is_array($commandConfiguration['commands']))
-        ) {
-            throw new \RuntimeException($packageKey . ' defines invalid commands in Configuration/Console/Commands.php', 1461186959);
-        }
     }
 
     public static function disableCachesForObjectManagement()

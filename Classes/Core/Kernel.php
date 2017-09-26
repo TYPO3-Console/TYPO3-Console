@@ -15,11 +15,13 @@ namespace Helhum\Typo3Console\Core;
 
 use Composer\Autoload\ClassLoader;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
-use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
-use Symfony\Component\Console\Input\ArgvInput;
+use Helhum\Typo3Console\Mvc\Cli\CommandCollection;
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use TYPO3\CMS\Core\Core\Bootstrap;
-use TYPO3\CMS\Extbase\Mvc\Cli\Response;
+use TYPO3\CMS\Core\Package\PackageManager;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Cli\CommandManager;
 
 /**
  * @internal
@@ -111,26 +113,56 @@ class Kernel
     }
 
     /**
-     * Bootstraps the minimal infrastructure, registers a request handler and
-     * then passes control over to that request handler.
+     * This is useful to bootstrap the console application
+     * without actually executing a command (e.g. during composer install)
      *
-     * @param InputInterface $input
-     * @return Response
+     * @param string $runLevel
+     * @throws \InvalidArgumentException
      */
-    public function handle(InputInterface $input): Response
+    public function initialize(string $runLevel = RunLevel::LEVEL_ESSENTIAL)
     {
-        $this->bootstrap->setEarlyInstance(RunLevel::class, $this->runLevel);
-        $sequence = $this->runLevel->buildSequence(RunLevel::LEVEL_ESSENTIAL);
-        $sequence->invoke($this->bootstrap);
-
-        $this->bootstrap->registerRequestHandlerImplementation(RequestHandler::class);
-        $this->bootstrap->handleRequest($input);
-        return $this->bootstrap->getEarlyInstance(Response::class);
+        $this->runLevel->buildSequence($runLevel)->invoke($this->bootstrap);
     }
 
-    public function terminate(Response $response)
+    /**
+     * Handle the given command input and return the exit code of the called command
+     *
+     * @param InputInterface $input
+     * @throws \InvalidArgumentException
+     * @return int
+     */
+    public function handle(InputInterface $input): int
+    {
+        $this->initialize();
+
+        $commandRegistry = new CommandCollection(
+            $this->runLevel,
+            GeneralUtility::makeInstance(PackageManager::class),
+            GeneralUtility::makeInstance(CommandManager::class)
+        );
+
+        $application = new Application($this->runLevel);
+        $application->addCommands(iterator_to_array($commandRegistry));
+
+        $commandIdentifier = $input->getFirstArgument() ?: '';
+        if ($this->runLevel->isCommandAvailable($commandIdentifier)) {
+            $this->runLevel->buildSequenceForCommand($commandIdentifier)->invoke($this->bootstrap);
+            if ($application->isFullyCapable()) {
+                $application->addCommands($commandRegistry->addCommandControllerCommandsFromExtensions());
+            }
+        }
+
+        return $application->run($input);
+    }
+
+    /**
+     * Finish the current request and exit with the given exit code
+     *
+     * @param int $exitCode
+     */
+    public function terminate(int $exitCode = 0)
     {
         $this->bootstrap->shutdown();
-        exit($response->getExitCode());
+        exit($exitCode);
     }
 }

@@ -29,6 +29,6 @@
         require __DIR__ . '/../Classes/Core/Kernel.php';
     }
     $kernel = new \Helhum\Typo3Console\Core\Kernel($classLoader);
-    $response = $kernel->handle(new \Symfony\Component\Console\Input\ArgvInput());
-    $kernel->terminate($response);
+    $exitCode = $kernel->handle(new \Symfony\Component\Console\Input\ArgvInput());
+    $kernel->terminate($exitCode);
 })();
