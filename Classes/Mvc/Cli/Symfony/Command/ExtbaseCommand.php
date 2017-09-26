@@ -27,7 +27,8 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony\Command;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\Response;
-use Symfony\Component\Console\Application;
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
+use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -37,15 +38,39 @@ use TYPO3\CMS\Extbase\Mvc\Dispatcher;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 /**
- * Wrapper to wrap an Extbase command from a command controller into a Symfony Command
+ * Wrapper to turn an Extbase command from a command controller into a Symfony Command
  */
 class ExtbaseCommand extends Command
 {
     /**
-     * Extbase's command
+     * Extbase command
+     *
      * @var \TYPO3\CMS\Extbase\Mvc\Cli\Command
      */
-    protected $command;
+    private $command;
+
+    /**
+     * @var Application
+     */
+    private $application;
+
+    public function isEnabled()
+    {
+        if (!$this->application->hasAllCapabilities()
+            && in_array($this->getName(), [
+                // Although these commands are technically available
+                // they call other hidden commands in sub processes
+                // that need all capabilities. Therefore we disable these commands here.
+                // This can be removed, once the implement Symfony commands directly.
+                'upgrade:all',
+                'upgrade:list',
+                'upgrade:wizard',
+            ], true)
+        ) {
+            return false;
+        }
+        return $this->application->isCommandAvailable($this->getName());
+    }
 
     /**
      * Extbase has its own validation logic, so it is disabled in this place
@@ -70,10 +95,14 @@ class ExtbaseCommand extends Command
      * Also uses the setApplication call now, as $this->configure() is called
      * too early
      *
-     * @param Application $application An Application instance
+     * @param BaseApplication $application An Application instance
      */
-    public function setApplication(Application $application = null)
+    public function setApplication(BaseApplication $application = null)
     {
+        if ($application !== null && !$application instanceof Application) {
+            throw new \RuntimeException('Extbase commands only work with TYPO3 Console Applications', 1506381781);
+        }
+        $this->application = $application;
         parent::setApplication($application);
         $this->setDescription($this->command->getShortDescription());
         $this->setHelp($this->command->getDescription());

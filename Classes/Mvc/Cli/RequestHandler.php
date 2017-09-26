@@ -62,7 +62,7 @@ class RequestHandler implements RequestHandlerInterface
     {
         $this->bootstrap = $bootstrap;
         $this->runLevel = $this->bootstrap->getEarlyInstance(RunLevel::class);
-        $this->application = new Application();
+        $this->application = new Application($this->runLevel);
     }
 
     public function handleRequest(InputInterface $input)
@@ -70,18 +70,17 @@ class RequestHandler implements RequestHandlerInterface
         $commandIdentifier = $input->getFirstArgument() ?: '';
         $this->boot();
         $this->populateCommands();
-        if ($this->runLevel->isCommandAvailable($commandIdentifier)) {
+        if ($this->application->isCommandAvailable($commandIdentifier)) {
             $this->bootForCommand($commandIdentifier);
-            if ($this->runLevel->getMaximumAvailableRunLevel() === RunLevel::LEVEL_FULL) {
+            if ($this->application->hasAllCapabilities()) {
                 $this->registerCommandsFromCommandControllers(true);
             }
         }
         $exitCode = $this->application->run();
 
+        // Store the response for later use in ConsoleApplication
         $response = new Response();
         $response->setExitCode($exitCode);
-
-        // Store the response for later use in ConsoleApplication
         $this->bootstrap->setEarlyInstance(Response::class, $response);
     }
 
@@ -156,11 +155,10 @@ class RequestHandler implements RequestHandlerInterface
                                 1484486383
                             );
                         }
-                        if ($this->runLevel->getMaximumAvailableRunLevel() === RunLevel::LEVEL_COMPILE && !$this->runLevel->isCommandAvailable($commandName)) {
-                            continue;
-                        }
                         $command = GeneralUtility::makeInstance($commandConfig['class'], $commandName);
-                        $this->application->add($command);
+                        if ($this->application->isCommandAvailable($commandName)) {
+                            $this->application->add($command);
+                        }
                         $this->registeredCommandNames[$commandName] = $commandName;
                     }
                 }
@@ -198,9 +196,6 @@ class RequestHandler implements RequestHandlerInterface
             }
             if (isset($this->registeredCommandNames[$commandName])) {
                 throw new CommandNameAlreadyInUseException('Command "' . $commandName . '" registered by "' . explode(':', $fullCommandName)[0] . '" is already in use', 1484486383);
-            }
-            if ($this->runLevel->getMaximumAvailableRunLevel() === RunLevel::LEVEL_COMPILE && !$this->runLevel->isCommandAvailable($commandName)) {
-                continue;
             }
             $extbaseCommand = GeneralUtility::makeInstance(ExtbaseCommand::class, $commandName);
             $extbaseCommand->setExtbaseCommand($command);

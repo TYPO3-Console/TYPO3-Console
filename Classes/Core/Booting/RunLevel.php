@@ -261,16 +261,8 @@ class RunLevel
      */
     public function isCommandAvailable($commandIdentifier)
     {
-        $expectedRunLevel = $this->getRunlevelForCommand($commandIdentifier);
-        $availableRunlevel = $this->getMaximumAvailableRunLevel();
-        $isAvailable = true;
-        if ($availableRunlevel === self::LEVEL_COMPILE) {
-            if (in_array($expectedRunLevel, [self::LEVEL_FULL, self::LEVEL_MINIMAL], true)) {
-                $isAvailable = false;
-            }
-        }
-
-        return $isAvailable;
+        return $this->getMaximumAvailableRunLevel() === self::LEVEL_FULL
+            || $this->getRunlevelForCommand($commandIdentifier) === self::LEVEL_COMPILE;
     }
 
     /**

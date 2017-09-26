@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony;
  *
  */
 
+use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,9 +24,25 @@ class Application extends BaseApplication
 {
     const TYPO3_CONSOLE_VERSION = '5.0.0';
 
-    public function __construct()
+    /**
+     * @var RunLevel
+     */
+    private $runLevel;
+
+    public function __construct(RunLevel $runLevel)
     {
         parent::__construct('TYPO3 Console', self::TYPO3_CONSOLE_VERSION);
+        $this->runLevel = $runLevel;
+    }
+
+    public function hasAllCapabilities(): bool
+    {
+        return $this->runLevel->getMaximumAvailableRunLevel() === RunLevel::LEVEL_FULL;
+    }
+
+    public function isCommandAvailable(string $commandName): bool
+    {
+        return $this->runLevel->isCommandAvailable($commandName);
     }
 
     protected function configureIO(InputInterface $input, OutputInterface $output)
