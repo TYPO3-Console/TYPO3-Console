@@ -40,6 +40,7 @@ class Kernel
         $this->ensureRequiredEnvironment();
         $this->bootstrap = Bootstrap::getInstance();
         $this->bootstrap->initializeClassLoader($classLoader);
+        $this->initializeNonComposerClassLoading();
         $this->initializeCompatibilityLayer();
     }
 
@@ -58,6 +59,26 @@ class Kernel
         if (ini_get('max_execution_time') !== '0') {
             @ini_set('max_execution_time', '0');
         }
+    }
+
+    /**
+     * Register auto loading for our own classes in case we cannot rely on composer class loading.
+     */
+    private function initializeNonComposerClassLoading()
+    {
+        if ($this->bootstrap::usesComposerClassLoading()) {
+            return;
+        }
+        $classesPaths = [__DIR__ . '/../../Classes', __DIR__ . '/../../Resources/Private/ExtensionArtifacts/src/'];
+        $classLoader = new ClassLoader();
+        $classLoader->addPsr4('Helhum\\Typo3Console\\', $classesPaths);
+        spl_autoload_register(function ($className) use ($classLoader) {
+            if ($file = $classLoader->findFile($className)) {
+                require $file;
+            }
+        });
+        $pharFile = __DIR__ . '/../../Libraries/symfony-process.phar';
+        require 'phar://' . $pharFile . '/vendor/autoload.php';
     }
 
     /**
@@ -99,17 +120,7 @@ class Kernel
         // I want to see deprecation messages
         error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
 
-        $this->requireLibraries();
         $this->initializePackageManagement();
-
-        if (!class_exists(RunLevel::class)) {
-            echo sprintf('Could not initialize TYPO3 Console for TYPO3 in path %s.', PATH_site) . PHP_EOL;
-            echo 'This most likely happened because you have a console code checkout in typo3conf/ext/typo3_console,' . PHP_EOL;
-            echo 'but TYPO3 Console is not set up as extension. If you want to use it as extension,' . PHP_EOL;
-            echo 'please download it from https://typo3.org/extensions/repository/view/typo3_console' . PHP_EOL;
-            echo 'or install it properly using Composer.' . PHP_EOL;
-            exit(1);
-        }
 
         $this->bootstrap->setEarlyInstance(RunLevel::class, new RunLevel());
         $exceptionHandler = new ExceptionHandler();
@@ -142,16 +153,6 @@ class Kernel
     }
 
     /**
-     * Require libraries, in case TYPO3 is in non Composer mode
-     */
-    private function requireLibraries()
-    {
-        if (@file_exists($pharFile = dirname(dirname(__DIR__)) . '/Libraries/symfony-process.phar')) {
-            include 'phar://' . $pharFile . '/vendor/autoload.php';
-        }
-    }
-
-    /**
      * Initializes the package system and loads the package configuration and settings
      * provided by the packages.
      *
@@ -159,11 +160,6 @@ class Kernel
      */
     private function initializePackageManagement()
     {
-        // Make sure the package manager class is available
-        // the extension might not be active yet, but will be activated in this class
-        if (!Bootstrap::usesComposerClassLoading()) {
-            require __DIR__ . '/../Package/UncachedPackageManager.php';
-        }
         $packageManager = new \Helhum\Typo3Console\Package\UncachedPackageManager();
         $this->bootstrap->setEarlyInstance(\TYPO3\CMS\Core\Package\PackageManager::class, $packageManager);
         ExtensionManagementUtility::setPackageManager($packageManager);
