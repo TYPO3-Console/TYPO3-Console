@@ -4,8 +4,6 @@ return [
         \Helhum\Typo3Console\Command\HelpCommandController::class,
         \Helhum\Typo3Console\Command\CacheCommandController::class,
         \Helhum\Typo3Console\Command\BackendCommandController::class,
-        \Helhum\Typo3Console\Command\SchedulerCommandController::class,
-        \Helhum\Typo3Console\Command\CleanupCommandController::class,
         \Helhum\Typo3Console\Command\DocumentationCommandController::class,
         \Helhum\Typo3Console\Command\InstallCommandController::class,
         \Helhum\Typo3Console\Command\DatabaseCommandController::class,

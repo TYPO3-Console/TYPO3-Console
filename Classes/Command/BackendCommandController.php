@@ -20,53 +20,6 @@ use Helhum\Typo3Console\Mvc\Controller\CommandController;
  */
 class BackendCommandController extends CommandController
 {
-    /**
-     * Lock backend
-     *
-     * Deny backend access for <b>every</b> user (including admins).
-     *
-     * @param string $redirectUrl URL to redirect to when the backend is accessed
-     * @see typo3_console:backend:unlock
-     */
-    public function lockCommand($redirectUrl = null)
-    {
-        if (@is_file(PATH_typo3conf . 'LOCK_BACKEND')) {
-            $this->outputLine('<warning>Backend is already locked.</warning>');
-            $this->quit(0);
-        }
-        \TYPO3\CMS\Core\Utility\GeneralUtility::writeFile(PATH_typo3conf . 'LOCK_BACKEND', (string)$redirectUrl);
-        if (!@is_file(PATH_typo3conf . 'LOCK_BACKEND')) {
-            $this->outputLine('<error>Could not create lock file \'typo3conf/LOCK_BACKEND\'.</error>');
-            $this->quit(2);
-        } else {
-            $this->outputLine('<info>Backend has been locked. Access is denied for every user until it is unlocked again.</info>');
-            if ($redirectUrl !== null) {
-                $this->outputLine('Any access to the backend will be redirected to: \'' . $redirectUrl . '\'');
-            }
-        }
-    }
-
-    /**
-     * Unlock backend
-     *
-     * Allow backend access again (e.g. after having been locked with backend:lock command).
-     * @see typo3_console:backend:lock
-     */
-    public function unlockCommand()
-    {
-        if (!@is_file(PATH_typo3conf . 'LOCK_BACKEND')) {
-            $this->outputLine('<warning>Backend is already unlocked.</warning>');
-            $this->quit(0);
-        }
-        unlink(PATH_typo3conf . 'LOCK_BACKEND');
-        if (@is_file(PATH_typo3conf . 'LOCK_BACKEND')) {
-            $this->outputLine('<error>Could not remove lock file \'typo3conf/LOCK_BACKEND\'.</error>');
-            $this->quit(2);
-        } else {
-            $this->outputLine('<info>Backend lock is removed. User can now access the backend again.</info>');
-        }
-    }
-
     const LOCK_TYPE_UNLOCKED = 0;
     const LOCK_TYPE_ADMIN = 2;
 
@@ -118,7 +71,7 @@ class BackendCommandController extends CommandController
     /**
      * Checks whether the value can be set in LocalConfiguration.php and exits with error code if not.
      */
-    protected function ensureConfigValueModifiable()
+    private function ensureConfigValueModifiable()
     {
         if (!$this->configurationService->localIsActive('BE/adminOnly')) {
             $this->outputLine('<error>The configuration value BE/adminOnly is not modifiable. Is it forced to a value in Additional Configuration?</error>');
