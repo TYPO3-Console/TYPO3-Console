@@ -29,5 +29,5 @@
         require __DIR__ . '/../Classes/Core/Kernel.php';
     }
     $kernel = new \Helhum\Typo3Console\Core\Kernel($classLoader);
-    $kernel->run();
+    $kernel->handle();
 })();
