@@ -41,8 +41,19 @@ class PopulateCommandConfiguration implements InstallerScript
             /** @var \Composer\Package\PackageInterface $package */
             list($package, $installPath) = $item;
             $installPath = ($installPath ?: $basePath);
-            if (file_exists($commandConfigurationFile = $installPath . '/Configuration/Console/Commands.php')) {
-                $commandConfiguration[$package->getName()] = require $commandConfigurationFile;
+            $packageName = $package->getName();
+            if ($packageName === 'typo3/cms') {
+                foreach (glob($installPath . '/typo3/sysext/*/') as $installPath) {
+                    $packageName = basename($installPath);
+                    $extensionConfig = $this->getConfigFromPackage($installPath);
+                    if (!empty($extensionConfig)) {
+                        $commandConfiguration[$packageName] = $extensionConfig;
+                    }
+                }
+            }
+            $packageConfig = $this->getConfigFromPackage($installPath);
+            if (!empty($packageConfig)) {
+                $commandConfiguration[$packageName] = $packageConfig;
             }
         }
         $success = file_put_contents(
@@ -66,5 +77,21 @@ class PopulateCommandConfiguration implements InstallerScript
         $autoLoadGenerator = $composer->getAutoloadGenerator();
         $localRepo = $composer->getRepositoryManager()->getLocalRepository();
         return $autoLoadGenerator->buildPackageMap($composer->getInstallationManager(), $mainPackage, $localRepo->getCanonicalPackages());
+    }
+
+    /**
+     * @param $installPath
+     * @return mixed
+     */
+    private function getConfigFromPackage($installPath)
+    {
+        $commandConfiguration = [];
+        if (file_exists($commandConfigurationFile = $installPath . '/Configuration/Console/Commands.php')) {
+            $commandConfiguration = require $commandConfigurationFile;
+        }
+        if (file_exists($commandConfigurationFile = $installPath . '/Configuration/Commands.php')) {
+            $commandConfiguration['commands'] = require $commandConfigurationFile;
+        }
+        return $commandConfiguration;
     }
 }
