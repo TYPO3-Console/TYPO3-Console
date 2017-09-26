@@ -26,14 +26,10 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony\Command;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Helhum\Typo3Console\Mvc\Cli\Response;
+use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Mvc\Cli\RequestBuilder;
-use TYPO3\CMS\Extbase\Mvc\Dispatcher;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 /**
  * Extends the help command of Symfony to show the specific help for Extbase commands
@@ -75,31 +71,14 @@ class HelpCommand extends \Symfony\Component\Console\Command\HelpCommand
         if (null === $this->command) {
             $this->command = $this->getApplication()->find($input->getArgument('command_name'));
         }
-
         if ($this->command instanceof ExtbaseCommand) {
             // An Extbase command was originally called, but is now required to show the help information
-            // Ugly hack to modify 'argv' so the help command for a specific command is shown
-            $args = ['help', $this->command->getName()];
-            foreach ($_SERVER['argv'] as $k => $value) {
-                if ($k < 2 || $value === '--help' || $value === '-h' || $value === 'help') {
-                    continue;
-                }
-                $args[] = $value;
-            }
-
             if ($isRaw = $input->getOption('raw')) {
                 $output->setDecorated(false);
             }
-
-            $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-            $dispatcher = $objectManager->get(Dispatcher::class);
-            $request = $objectManager->get(RequestBuilder::class)->build($args, $_SERVER['argv'][0]);
-            $response = new Response();
-            $response->setInput($input);
-            $response->setOutput($output);
-            $dispatcher->dispatch($request, $response);
+            (new RequestHandler())->handle([$input->getFirstArgument(), 'help', $this->command->getName()], $input, $output);
         } else {
-            // Any other symfony command should just show up the regular info
+            // Any other Symfony command should just show up the regular info
             parent::execute($input, $output);
         }
     }

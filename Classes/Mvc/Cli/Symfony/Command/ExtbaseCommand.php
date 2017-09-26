@@ -26,16 +26,12 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony\Command;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Helhum\Typo3Console\Mvc\Cli\Response;
+use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Mvc\Cli\RequestBuilder;
-use TYPO3\CMS\Extbase\Mvc\Dispatcher;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 /**
  * Wrapper to turn an Extbase command from a command controller into a Symfony Command
@@ -117,27 +113,7 @@ class ExtbaseCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // help command by default
-        if ($_SERVER['argc'] === 1) {
-            $_SERVER['argc'] = 2;
-            $_SERVER['argv'][] = 'help';
-        }
-
-        $commandLine = $_SERVER['argv'];
-        $callingScript = array_shift($commandLine);
-        if ($callingScript !== $_SERVER['_']) {
-            $callingScript = $_SERVER['_'] . ' ' . $callingScript;
-        }
-
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $dispatcher = $objectManager->get(Dispatcher::class);
-
-        $request = $objectManager->get(RequestBuilder::class)->build($commandLine, $callingScript);
-        $response = new Response();
-        $response->setInput($input);
-        $response->setOutput($output);
-        $dispatcher->dispatch($request, $response);
-
+        $response = (new RequestHandler())->handle($_SERVER['argv'], $input, $output);
         return $response->getExitCode();
     }
 }
