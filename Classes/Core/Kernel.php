@@ -29,7 +29,7 @@ use TYPO3\CMS\Extbase\Mvc\Cli\Response;
 /**
  * @internal
  */
-class ConsoleApplication implements ApplicationInterface
+class Kernel implements ApplicationInterface
 {
     /**
      * @var Bootstrap

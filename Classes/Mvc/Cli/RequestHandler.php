@@ -78,7 +78,7 @@ class RequestHandler implements RequestHandlerInterface
         }
         $exitCode = $this->application->run();
 
-        // Store the response for later use in ConsoleApplication
+        // Store the response for later use in Kernel
         $response = new Response();
         $response->setExitCode($exitCode);
         $this->bootstrap->setEarlyInstance(Response::class, $response);
