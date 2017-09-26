@@ -19,10 +19,14 @@ use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\HelpCommand;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\ListCommand;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Represents the complete console application
+ */
 class Application extends BaseApplication
 {
     const TYPO3_CONSOLE_VERSION = '5.0.0';
@@ -38,26 +42,61 @@ class Application extends BaseApplication
         $this->runLevel = $runLevel;
     }
 
-    public function hasAllCapabilities(): bool
+    /**
+     * Whether the application can run all commands
+     * It will return false when TYPO3 is not fully set up yet,
+     * e.g. directly after a composer install
+     *
+     * @return bool
+     */
+    public function isFullyCapable(): bool
     {
         return $this->runLevel->getMaximumAvailableRunLevel() === RunLevel::LEVEL_FULL;
     }
 
-    public function isCommandAvailable(string $commandName): bool
+    /**
+     * Checks if the given command can be executed in current application state
+     *
+     * @param Command $command
+     * @return bool
+     */
+    public function isCommandAvailable(Command $command): bool
     {
-        return $this->runLevel->isCommandAvailable($commandName);
+        return $this->runLevel->isCommandAvailable($command->getName());
+    }
+
+    /**
+     * Add commands, but check their availability against
+     * the current application state before doing so
+     *
+     * @param iterable $commands
+     */
+    public function addCommandsIfAvailable(iterable $commands)
+    {
+        foreach ($commands as $command) {
+            if ($this->isCommandAvailable($command)) {
+                $this->add($command);
+            }
+        }
     }
 
     /**
      * Gets the default commands that should always be available.
      *
+     * @throws LogicException
      * @return Command[] An array of default Command instances
      */
-    protected function getDefaultCommands()
+    protected function getDefaultCommands(): array
     {
-        return array(new HelpCommand(), new ListCommand());
+        return [new HelpCommand(), new ListCommand()];
     }
 
+    /**
+     * Add default set of styles to the output
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
     protected function configureIO(InputInterface $input, OutputInterface $output)
     {
         parent::configureIO($input, $output);
