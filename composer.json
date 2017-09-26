@@ -64,7 +64,8 @@
     },
     "replace": {
         "typo3_console": "self.version",
-        "typo3-ter/typo3-console": "self.version"
+        "typo3-ter/typo3-console": "self.version",
+        "typo3/cms-cli": "*"
     },
     "config": {
         "vendor-dir": ".Build/vendor",
