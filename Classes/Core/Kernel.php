@@ -15,14 +15,10 @@ namespace Helhum\Typo3Console\Core;
 
 use Composer\Autoload\ClassLoader;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
-use Helhum\Typo3Console\Error\ExceptionHandler;
 use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\InputInterface;
 use TYPO3\CMS\Core\Core\Bootstrap;
-use TYPO3\CMS\Core\Package\PackageManager;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Mvc\Cli\CommandManager;
 use TYPO3\CMS\Extbase\Mvc\Cli\Response;
 
 /**
@@ -35,6 +31,11 @@ class Kernel
      */
     private $bootstrap;
 
+    /**
+     * @var RunLevel
+     */
+    private $runLevel;
+
     public function __construct(\Composer\Autoload\ClassLoader $classLoader)
     {
         $this->ensureRequiredEnvironment();
@@ -42,6 +43,7 @@ class Kernel
         $this->bootstrap->initializeClassLoader($classLoader);
         $this->initializeNonComposerClassLoading();
         $this->initializeCompatibilityLayer();
+        $this->runLevel = new RunLevel();
     }
 
     /**
@@ -111,138 +113,24 @@ class Kernel
     /**
      * Bootstraps the minimal infrastructure, registers a request handler and
      * then passes control over to that request handler.
+     *
+     * @param InputInterface $input
+     * @return Response
      */
-    public function handle()
+    public function handle(InputInterface $input): Response
     {
-        $this->defineBaseConstants();
-        $this->bootstrap->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
-        $this->bootstrap->baseSetup();
-        // I want to see deprecation messages
-        error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
-
-        $this->initializePackageManagement();
-
-        $this->bootstrap->setEarlyInstance(RunLevel::class, new RunLevel());
-        $exceptionHandler = new ExceptionHandler();
-        set_exception_handler([$exceptionHandler, 'handleException']);
-        $this->initializeCommandManager();
-        $this->registerCommands();
+        $this->bootstrap->setEarlyInstance(RunLevel::class, $this->runLevel);
+        $sequence = $this->runLevel->buildSequence(RunLevel::LEVEL_ESSENTIAL);
+        $sequence->invoke($this->bootstrap);
 
         $this->bootstrap->registerRequestHandlerImplementation(RequestHandler::class);
-        $this->bootstrap->handleRequest(new ArgvInput());
-
-        $this->shutdown();
+        $this->bootstrap->handleRequest($input);
+        return $this->bootstrap->getEarlyInstance(Response::class);
     }
 
-    private function shutdown()
+    public function terminate(Response $response)
     {
-        /** @var Response $response */
-        $response = $this->bootstrap->getEarlyInstance(Response::class);
         $this->bootstrap->shutdown();
         exit($response->getExitCode());
-    }
-
-    /**
-     * Define constants and variables
-     */
-    private function defineBaseConstants()
-    {
-        define('TYPO3_MODE', 'BE');
-        define('PATH_site', \TYPO3\CMS\Core\Utility\GeneralUtility::fixWindowsFilePath(getenv('TYPO3_PATH_ROOT')) . '/');
-        define('PATH_thisScript', PATH_site . 'typo3/index.php');
-    }
-
-    /**
-     * Initializes the package system and loads the package configuration and settings
-     * provided by the packages.
-     *
-     * @return void
-     */
-    private function initializePackageManagement()
-    {
-        $packageManager = new \Helhum\Typo3Console\Package\UncachedPackageManager();
-        $this->bootstrap->setEarlyInstance(\TYPO3\CMS\Core\Package\PackageManager::class, $packageManager);
-        ExtensionManagementUtility::setPackageManager($packageManager);
-        $dependencyResolver = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Package\DependencyResolver::class);
-        $dependencyResolver->injectDependencyOrderingService(
-            GeneralUtility::makeInstance(\TYPO3\CMS\Core\Service\DependencyOrderingService::class)
-        );
-        $packageManager->injectDependencyResolver($dependencyResolver);
-        $packageManager->init();
-        GeneralUtility::setSingletonInstance(\TYPO3\CMS\Core\Package\PackageManager::class, $packageManager);
-    }
-
-    private function initializeCommandManager()
-    {
-        $commandManager = GeneralUtility::makeInstance(\Helhum\Typo3Console\Mvc\Cli\CommandManager::class);
-        $this->bootstrap->setEarlyInstance(CommandManager::class, $commandManager);
-        GeneralUtility::setSingletonInstance(CommandManager::class, $commandManager);
-    }
-
-    private function registerCommands()
-    {
-        foreach ($this->getCommandConfigurations() as $packageKey => $commandConfiguration) {
-            $this->registerCommandsFromConfiguration($commandConfiguration, $packageKey);
-        }
-    }
-
-    /**
-     * @return array
-     */
-    private function getCommandConfigurations()
-    {
-        if (file_exists($commandConfigurationFile = __DIR__ . '/../../Configuration/Console/AllCommands.php')) {
-            return require $commandConfigurationFile;
-        }
-        $commandConfigurationFiles = [];
-        /** @var PackageManager $packageManager */
-        $packageManager = $this->bootstrap->getEarlyInstance(PackageManager::class);
-        foreach ($packageManager->getActivePackages() as $package) {
-            $possibleCommandsFileName = $package->getPackagePath() . '/Configuration/Console/Commands.php';
-            if (!file_exists($possibleCommandsFileName)) {
-                continue;
-            }
-            $commandConfigurationFiles[$package->getPackageKey()] = require $possibleCommandsFileName;
-        }
-        return $commandConfigurationFiles;
-    }
-
-    /**
-     * @param $commandConfiguration
-     * @param $packageKey
-     */
-    private function registerCommandsFromConfiguration($commandConfiguration, $packageKey)
-    {
-        $this->ensureValidCommandsConfiguration($commandConfiguration, $packageKey);
-
-        foreach ($commandConfiguration['controllers'] as $controller) {
-            $this->bootstrap->getEarlyInstance(CommandManager::class)->registerCommandController($controller);
-        }
-        foreach ($commandConfiguration['runLevels'] as $commandIdentifier => $runLevel) {
-            $this->bootstrap->getEarlyInstance(RunLevel::class)->setRunLevelForCommand($commandIdentifier, $runLevel);
-        }
-        foreach ($commandConfiguration['bootingSteps'] as $commandIdentifier => $bootingSteps) {
-            foreach ((array)$bootingSteps as $bootingStep) {
-                $this->bootstrap->getEarlyInstance(RunLevel::class)->addBootingStepForCommand($commandIdentifier, $bootingStep);
-            }
-        }
-    }
-
-    /**
-     * @param mixed $commandConfiguration
-     * @param string $packageKey
-     * @throws \RuntimeException
-     */
-    private function ensureValidCommandsConfiguration($commandConfiguration, $packageKey)
-    {
-        if (
-            !is_array($commandConfiguration)
-            || (isset($commandConfiguration['controllers']) && !is_array($commandConfiguration['controllers']))
-            || (isset($commandConfiguration['runLevels']) && !is_array($commandConfiguration['runLevels']))
-            || (isset($commandConfiguration['bootingSteps']) && !is_array($commandConfiguration['bootingSteps']))
-            || (isset($commandConfiguration['commands']) && !is_array($commandConfiguration['commands']))
-        ) {
-            throw new \RuntimeException($packageKey . ' defines invalid commands in Configuration/Console/Commands.php', 1461186959);
-        }
     }
 }
