@@ -15,13 +15,19 @@ namespace Helhum\Typo3Console\Core\Booting;
 
 use Helhum\Typo3Console\Core\Cache\FakeDatabaseBackend;
 use Helhum\Typo3Console\Error\ErrorHandler;
+use Helhum\Typo3Console\Error\ExceptionHandler;
+use Helhum\Typo3Console\Mvc\Cli\CommandManager;
+use Helhum\Typo3Console\Package\UncachedPackageManager;
 use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
 use TYPO3\CMS\Core\Cache\Backend\NullBackend;
 use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Command\HelpCommandController;
+use TYPO3\CMS\Extbase\Mvc\Cli\CommandManager as ExtbaseCommandManager;
 use TYPO3\CMS\Extensionmanager\Command\ExtensionCommandController;
 
 class Scripts
@@ -36,6 +42,7 @@ class Scripts
      */
     public static function initializeConfigurationManagement(Bootstrap $bootstrap)
     {
+        self::baseSetup($bootstrap);
         $bootstrap->populateLocalConfiguration();
         if (empty($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'])) {
             $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] = [];
@@ -48,6 +55,119 @@ class Scripts
         }, null, $bootstrap)();
         CompatibilityScripts::initializeConfigurationManagement($bootstrap);
         self::disableCachesForObjectManagement();
+    }
+
+    private static function baseSetup(Bootstrap $bootstrap)
+    {
+        define('TYPO3_MODE', 'BE');
+        define('PATH_site', \TYPO3\CMS\Core\Utility\GeneralUtility::fixWindowsFilePath(getenv('TYPO3_PATH_ROOT')) . '/');
+        define('PATH_thisScript', PATH_site . 'typo3/index.php');
+
+        $bootstrap->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
+        $bootstrap->baseSetup();
+        // I want to see deprecation messages
+        error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
+
+        self::initializePackageManagement($bootstrap);
+
+        $exceptionHandler = new ExceptionHandler();
+        set_exception_handler([$exceptionHandler, 'handleException']);
+        self::initializeCommandManager($bootstrap);
+        self::registerCommands($bootstrap);
+    }
+
+    /**
+     * Initializes the package system and loads the package configuration and settings
+     * provided by the packages.
+     *
+     * @return void
+     */
+    private static function initializePackageManagement(Bootstrap $bootstrap)
+    {
+        $packageManager = new UncachedPackageManager();
+        $bootstrap->setEarlyInstance(PackageManager::class, $packageManager);
+        ExtensionManagementUtility::setPackageManager($packageManager);
+        $dependencyResolver = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Package\DependencyResolver::class);
+        $dependencyResolver->injectDependencyOrderingService(
+            GeneralUtility::makeInstance(\TYPO3\CMS\Core\Service\DependencyOrderingService::class)
+        );
+        $packageManager->injectDependencyResolver($dependencyResolver);
+        $packageManager->init();
+        GeneralUtility::setSingletonInstance(PackageManager::class, $packageManager);
+    }
+
+    private static function initializeCommandManager(Bootstrap $bootstrap)
+    {
+        $commandManager = GeneralUtility::makeInstance(CommandManager::class);
+        $bootstrap->setEarlyInstance(ExtbaseCommandManager::class, $commandManager);
+        GeneralUtility::setSingletonInstance(ExtbaseCommandManager::class, $commandManager);
+    }
+
+    private static function registerCommands(Bootstrap $bootstrap)
+    {
+        foreach (self::getCommandConfigurations($bootstrap) as $packageKey => $commandConfiguration) {
+            self::registerCommandsFromConfiguration($bootstrap, $commandConfiguration, $packageKey);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    private static function getCommandConfigurations(Bootstrap $bootstrap)
+    {
+        if (file_exists($commandConfigurationFile = __DIR__ . '/../../../Configuration/Console/AllCommands.php')) {
+            return require $commandConfigurationFile;
+        }
+        $commandConfigurationFiles = [];
+        /** @var PackageManager $packageManager */
+        $packageManager = $bootstrap->getEarlyInstance(PackageManager::class);
+        foreach ($packageManager->getActivePackages() as $package) {
+            $possibleCommandsFileName = $package->getPackagePath() . '/Configuration/Console/Commands.php';
+            if (!file_exists($possibleCommandsFileName)) {
+                continue;
+            }
+            $commandConfigurationFiles[$package->getPackageKey()] = require $possibleCommandsFileName;
+        }
+        return $commandConfigurationFiles;
+    }
+
+    /**
+     * @param $commandConfiguration
+     * @param $packageKey
+     */
+    private static function registerCommandsFromConfiguration(Bootstrap $bootstrap, $commandConfiguration, $packageKey)
+    {
+        self::ensureValidCommandsConfiguration($commandConfiguration, $packageKey);
+
+        foreach ($commandConfiguration['controllers'] as $controller) {
+            $bootstrap->getEarlyInstance(ExtbaseCommandManager::class)->registerCommandController($controller);
+        }
+        foreach ($commandConfiguration['runLevels'] as $commandIdentifier => $runLevel) {
+            $bootstrap->getEarlyInstance(RunLevel::class)->setRunLevelForCommand($commandIdentifier, $runLevel);
+        }
+        foreach ($commandConfiguration['bootingSteps'] as $commandIdentifier => $bootingSteps) {
+            foreach ((array)$bootingSteps as $bootingStep) {
+                $bootstrap->getEarlyInstance(RunLevel::class)->addBootingStepForCommand($commandIdentifier, $bootingStep);
+            }
+        }
+    }
+
+    /**
+     * @param mixed $commandConfiguration
+     * @param string $packageKey
+     * @throws \RuntimeException
+     */
+    private static function ensureValidCommandsConfiguration($commandConfiguration, $packageKey)
+    {
+        if (
+            !is_array($commandConfiguration)
+            || (isset($commandConfiguration['controllers']) && !is_array($commandConfiguration['controllers']))
+            || (isset($commandConfiguration['runLevels']) && !is_array($commandConfiguration['runLevels']))
+            || (isset($commandConfiguration['bootingSteps']) && !is_array($commandConfiguration['bootingSteps']))
+            || (isset($commandConfiguration['commands']) && !is_array($commandConfiguration['commands']))
+        ) {
+            throw new \RuntimeException($packageKey . ' defines invalid commands in Configuration/Console/Commands.php', 1461186959);
+        }
     }
 
     public static function disableCachesForObjectManagement()

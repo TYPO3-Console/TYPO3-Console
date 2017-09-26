@@ -68,7 +68,6 @@ class RequestHandler implements RequestHandlerInterface
     public function handleRequest(InputInterface $input)
     {
         $commandIdentifier = $input->getFirstArgument() ?: '';
-        $this->boot();
         $this->populateCommands();
         if ($this->application->isCommandAvailable($commandIdentifier)) {
             $this->bootForCommand($commandIdentifier);
@@ -76,21 +75,12 @@ class RequestHandler implements RequestHandlerInterface
                 $this->registerCommandsFromCommandControllers(true);
             }
         }
-        $exitCode = $this->application->run();
+        $exitCode = $this->application->run($input);
 
         // Store the response for later use in Kernel
         $response = new Response();
         $response->setExitCode($exitCode);
         $this->bootstrap->setEarlyInstance(Response::class, $response);
-    }
-
-    /**
-     * Executes essential booting steps to be able to accumulate commands
-     */
-    private function boot()
-    {
-        $sequence = $this->runLevel->buildSequence(RunLevel::LEVEL_ESSENTIAL);
-        $sequence->invoke($this->bootstrap);
     }
 
     /**
