@@ -113,7 +113,12 @@ class ExtbaseCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $response = (new RequestHandler())->handle($_SERVER['argv'], $input, $output);
+        // The command was found by Application, but it could be that a short name
+        // is specified, which would not be detected by the Extbase code.
+        // Therefore we enforce the full command name here.
+        $argv = $_SERVER['argv'];
+        $argv[1] = $this->getName();
+        $response = (new RequestHandler())->handle($argv, $input, $output);
         return $response->getExitCode();
     }
 }
