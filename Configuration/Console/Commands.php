@@ -33,4 +33,13 @@ return [
         'typo3_console:install:defaultconfiguration' => ['helhum.typo3console:database'],
         'typo3_console:database:updateschema' => ['helhum.typo3console:database'],
     ],
+    'replace' => [
+        'extbase',
+        '_extbase_help',
+        '_core_command',
+        'backend:backend:lock',
+        'backend:backend:unlock',
+        'help:help',
+        'referenceindex:update',
+    ],
 ];

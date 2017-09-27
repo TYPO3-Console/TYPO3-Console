@@ -30,21 +30,19 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class CommandCollection implements \IteratorAggregate
 {
     /**
-     * Skip reading these commands, as we provide
-     * better compatible versions on our own
-     *
-     * @var array
-     */
-    private static $typo3CommandsToIgnore = [
-        'extbase',
-        '_extbase_help',
-        '_core_command',
-    ];
-
-    /**
      * @var BaseCommand[]
      */
     private $commands;
+
+    /**
+     * @var array
+     */
+    private $commandConfigurations = [];
+
+    /**
+     * @var array
+     */
+    private $replaces = [];
 
     /**
      * @var RunLevel
@@ -90,7 +88,7 @@ class CommandCollection implements \IteratorAggregate
     public function addCommandControllerCommandsFromExtensions()
     {
         $this->populateCommands();
-        return $this->populateFromCommandControllers(true);
+        return $this->populateCommandControllerCommands(true);
     }
 
     private function populateCommands()
@@ -98,9 +96,36 @@ class CommandCollection implements \IteratorAggregate
         if ($this->commands) {
             return;
         }
-        $this->registerCommandsFromCommandControllers();
-        $this->populateFromCommandControllers();
-        $this->populateFromConfigurationFiles();
+        $this->initializeConfiguration();
+        $this->populateCommandControllerCommands();
+        $this->populateNativeCommands();
+    }
+
+    private function initializeConfiguration()
+    {
+        foreach ($this->getCommandConfigurations() as $packageKey => $commandConfiguration) {
+            $this->ensureValidCommandsConfiguration($commandConfiguration, $packageKey);
+            if (isset($commandConfiguration['replace'])) {
+                $this->replaces = array_merge($this->replaces, $commandConfiguration['replace']);
+            }
+            if (isset($commandConfiguration['controllers'])) {
+                foreach ($commandConfiguration['controllers'] as $controller) {
+                    $this->commandManager->registerCommandController($controller);
+                }
+            }
+            if (isset($commandConfiguration['runLevels'])) {
+                foreach ($commandConfiguration['runLevels'] as $commandIdentifier => $runLevel) {
+                    $this->runLevel->setRunLevelForCommand($commandIdentifier, $runLevel);
+                }
+            }
+            if (isset($commandConfiguration['bootingSteps'])) {
+                foreach ($commandConfiguration['bootingSteps'] as $commandIdentifier => $bootingSteps) {
+                    foreach ((array)$bootingSteps as $bootingStep) {
+                        $this->runLevel->addBootingStepForCommand($commandIdentifier, $bootingStep);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -108,23 +133,20 @@ class CommandCollection implements \IteratorAggregate
      * @throws CommandNameAlreadyInUseException
      * @return BaseCommand[]
      */
-    private function populateFromCommandControllers($onlyNew = false): array
+    private function populateCommandControllerCommands($onlyNew = false): array
     {
         $registeredCommands = [];
         foreach ($this->commandManager->getAvailableCommands($onlyNew) as $commandDefinition) {
-            $commandName = $this->commandManager->getShortestIdentifierForCommand($commandDefinition);
-            $fullCommandName = $commandDefinition->getCommandIdentifier();
-            if ($fullCommandName === 'typo3_console:help:help') {
-                continue;
+            $commandIdentifier = $commandDefinition->getCommandIdentifier();
+            $shortIdentifier = explode(':', $commandIdentifier, 2)[1];
+            $commandName = $this->getFinalCommandName(
+                $shortIdentifier,
+                $commandIdentifier
+            );
+            if ($commandName) {
+                $extbaseCommand = GeneralUtility::makeInstance(CommandControllerCommand::class, $commandName, $commandDefinition);
+                $this->commands[$commandName] = $registeredCommands[$commandName] = $extbaseCommand;
             }
-            if (isset($this->commands[$commandName])) {
-                $commandName = $fullCommandName;
-            }
-            if (isset($this->commands[$commandName])) {
-                throw new CommandNameAlreadyInUseException('Command "' . $commandName . '" registered by "' . explode(':', $fullCommandName)[0] . '" is already in use', 1484486383);
-            }
-            $extbaseCommand = GeneralUtility::makeInstance(CommandControllerCommand::class, $commandName, $commandDefinition);
-            $registeredCommands[$commandName] = $this->commands[$commandName] = $extbaseCommand;
         }
 
         return $registeredCommands;
@@ -135,62 +157,64 @@ class CommandCollection implements \IteratorAggregate
      *
      * @throws CommandNameAlreadyInUseException
      */
-    private function populateFromConfigurationFiles()
+    private function populateNativeCommands()
     {
         foreach ($this->getCommandConfigurations() as $packageName => $configuration) {
             if (empty($configuration['commands'])) {
                 continue;
             }
             foreach ($configuration['commands'] as $commandName => $commandConfig) {
-                if (in_array($commandName, self::$typo3CommandsToIgnore, true)) {
-                    continue;
+                $commandName = $this->getFinalCommandName(
+                    $commandName,
+                    $packageName . ':' . $commandName
+                );
+                if ($commandName) {
+                    $command = GeneralUtility::makeInstance($commandConfig['class'], $commandName);
+                    $this->commands[$commandName] = $command;
                 }
-                if (isset($this->commands[$commandName])) {
-                    $commandName = $packageName . ':' . $commandName;
-                }
-                if (isset($this->commands[$commandName])) {
-                    throw new CommandNameAlreadyInUseException(
-                        'Command "' . $commandName . '" registered by "' . $package->getPackageKey() . '" is already in use',
-                        1506442316
-                    );
-                }
-                $command = GeneralUtility::makeInstance($commandConfig['class'], $commandName);
-                $this->commands[$commandName] = $command;
             }
         }
     }
 
-    private function registerCommandsFromCommandControllers()
+    private function getFinalCommandName(string $commandName, string $alternativeCommandName): string
     {
-        foreach ($this->getCommandConfigurations() as $packageKey => $commandConfiguration) {
-            $this->registerCommandsFromConfiguration($commandConfiguration, $packageKey);
+        $finalCommandName = $commandName;
+        if (in_array($commandName, $this->replaces, true)
+            || in_array($alternativeCommandName, $this->replaces, true)
+        ) {
+            return '';
         }
+        if (isset($this->commands[$commandName])) {
+            $finalCommandName = $alternativeCommandName;
+        }
+        if (isset($this->commands[$finalCommandName])) {
+            throw new CommandNameAlreadyInUseException('Command "' . $finalCommandName . '" registered by "' . explode(':', $alternativeCommandName)[0] . '" is already in use', 1506531326);
+        }
+        return $finalCommandName;
     }
 
     /**
      * @return array
      */
-    private function getCommandConfigurations()
+    private function getCommandConfigurations(): array
     {
+        if (!empty($this->commandConfigurations)) {
+            return $this->commandConfigurations;
+        }
         if (file_exists($commandConfigurationFile = __DIR__ . '/../../../Configuration/Console/AllCommands.php')) {
             return require $commandConfigurationFile;
         }
-        $commandConfigurationFiles = [];
         foreach ($this->packageManager->getActivePackages() as $package) {
             $installPath = $package->getPackagePath();
             $packageConfig = $this->getConfigFromPackage($installPath);
             if (!empty($packageConfig)) {
-                $commandConfiguration[$package->getPackageKey()] = $packageConfig;
+                $this->commandConfigurations[$package->getPackageKey()] = $packageConfig;
             }
         }
-        return $commandConfigurationFiles;
+        return $this->commandConfigurations;
     }
 
-    /**
-     * @param $installPath
-     * @return mixed
-     */
-    private function getConfigFromPackage($installPath)
+    private function getConfigFromPackage(string $installPath): array
     {
         $commandConfiguration = [];
         if (file_exists($commandConfigurationFile = $installPath . '/Configuration/Console/Commands.php')) {
@@ -200,33 +224,6 @@ class CommandCollection implements \IteratorAggregate
             $commandConfiguration['commands'] = require $commandConfigurationFile;
         }
         return $commandConfiguration;
-    }
-
-    /**
-     * @param $commandConfiguration
-     * @param $packageKey
-     */
-    private function registerCommandsFromConfiguration($commandConfiguration, $packageKey)
-    {
-        $this->ensureValidCommandsConfiguration($commandConfiguration, $packageKey);
-
-        if (isset($commandConfiguration['controllers'])) {
-            foreach ($commandConfiguration['controllers'] as $controller) {
-                $this->commandManager->registerCommandController($controller);
-            }
-        }
-        if (isset($commandConfiguration['runLevels'])) {
-            foreach ($commandConfiguration['runLevels'] as $commandIdentifier => $runLevel) {
-                $this->runLevel->setRunLevelForCommand($commandIdentifier, $runLevel);
-            }
-        }
-        if (isset($commandConfiguration['bootingSteps'])) {
-            foreach ($commandConfiguration['bootingSteps'] as $commandIdentifier => $bootingSteps) {
-                foreach ((array)$bootingSteps as $bootingStep) {
-                    $this->runLevel->addBootingStepForCommand($commandIdentifier, $bootingStep);
-                }
-            }
-        }
     }
 
     /**
@@ -242,6 +239,7 @@ class CommandCollection implements \IteratorAggregate
             || (isset($commandConfiguration['runLevels']) && !is_array($commandConfiguration['runLevels']))
             || (isset($commandConfiguration['bootingSteps']) && !is_array($commandConfiguration['bootingSteps']))
             || (isset($commandConfiguration['commands']) && !is_array($commandConfiguration['commands']))
+            || (isset($commandConfiguration['replace']) && !is_array($commandConfiguration['replace']))
         ) {
             throw new \RuntimeException($packageKey . ' defines invalid commands in Configuration/Console/Commands.php', 1461186959);
         }
