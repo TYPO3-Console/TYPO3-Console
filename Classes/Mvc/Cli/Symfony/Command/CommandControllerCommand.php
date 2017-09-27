@@ -32,23 +32,28 @@ use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\CMS\Extbase\Mvc\Cli\Command as CommandDefinition;
 
 /**
- * Wrapper to turn an Extbase command from a command controller into a Symfony Command
+ * Wrapper to turn a command controller commands into a Symfony Command
  */
-class ExtbaseCommand extends Command
+class CommandControllerCommand extends Command
 {
     /**
-     * Extbase command
-     *
-     * @var \TYPO3\CMS\Extbase\Mvc\Cli\Command
+     * @var CommandDefinition
      */
-    private $command;
+    private $commandDefinition;
 
     /**
      * @var Application
      */
     private $application;
+
+    public function __construct($name, CommandDefinition $commandDefinition)
+    {
+        $this->commandDefinition = $commandDefinition;
+        parent::__construct($name);
+    }
 
     public function isEnabled()
     {
@@ -74,22 +79,13 @@ class ExtbaseCommand extends Command
     protected function configure()
     {
         $this->ignoreValidationErrors();
-    }
-
-    /**
-     * Sets the extbase command to be used for fetching the description etc.
-     *
-     * @param \TYPO3\CMS\Extbase\Mvc\Cli\Command $command
-     */
-    public function setExtbaseCommand(\TYPO3\CMS\Extbase\Mvc\Cli\Command $command)
-    {
-        $this->command = $command;
+        $this->setDescription($this->commandDefinition->getShortDescription());
+        $this->setHelp($this->commandDefinition->getDescription());
     }
 
     /**
      * Sets the application instance for this command.
-     * Also uses the setApplication call now, as $this->configure() is called
-     * too early
+     * It is used later for isEnabled()
      *
      * @param BaseApplication $application An Application instance
      */
@@ -100,8 +96,6 @@ class ExtbaseCommand extends Command
         }
         $this->application = $application;
         parent::setApplication($application);
-        $this->setDescription($this->command->getShortDescription());
-        $this->setHelp($this->command->getDescription());
     }
 
     /**
@@ -120,5 +114,10 @@ class ExtbaseCommand extends Command
         $argv[1] = $this->getName();
         $response = (new RequestHandler())->handle($argv, $input, $output);
         return $response->getExitCode();
+    }
+
+    public function isHidden()
+    {
+        return $this->commandDefinition->isInternal();
     }
 }
