@@ -25,33 +25,6 @@ Extension *typo3_console*
 -------------------------
 
 
-.. _`Command Reference: typo3_console backend:lock`:
-
-``backend:lock``
-****************
-
-**Lock backend**
-
-Deny backend access for **every** user (including admins).
-
-
-
-Options
-^^^^^^^
-
-``--redirect-url``
-  URL to redirect to when the backend is accessed
-
-
-
-Related commands
-^^^^^^^^^^^^^^^^
-
-``backend:unlock``
-  Unlock backend
-
-
-
 .. _`Command Reference: typo3_console backend:lockforeditors`:
 
 ``backend:lockforeditors``
@@ -71,27 +44,6 @@ Related commands
 
 ``backend:unlockforeditors``
   Unlock backend for editors
-
-
-
-.. _`Command Reference: typo3_console backend:unlock`:
-
-``backend:unlock``
-******************
-
-**Unlock backend**
-
-Allow backend access again (e.g. after having been locked with backend:lock command).
-
-
-
-
-
-Related commands
-^^^^^^^^^^^^^^^^
-
-``backend:lock``
-  Lock backend
 
 
 
@@ -207,33 +159,6 @@ Options
 Lists all registered cache groups.
 
 
-
-
-
-
-
-.. _`Command Reference: typo3_console cleanup:updatereferenceindex`:
-
-``cleanup:updatereferenceindex``
-********************************
-
-**Update reference index**
-
-Updates reference index to ensure data integrity
-
-**Example:** ``typo3cms cleanup:updatereferenceindex --dry-run --verbose``
-
-
-
-Options
-^^^^^^^
-
-``--dry-run``
-  If set, index is only checked without performing any action
-``--verbose``
-  Whether or not to output results
-``--show-progress``
-  Whether or not to output a progress bar
 
 
 
@@ -901,31 +826,6 @@ Options
   Site Name
 ``--site-setup-type``
   Can be either ``no`` (which unsurprisingly does nothing at all) or ``site`` (which creates an empty root page and setup)
-
-
-
-
-
-.. _`Command Reference: typo3_console scheduler:run`:
-
-``scheduler:run``
-*****************
-
-**Run scheduler**
-
-Executes tasks that are registered in the scheduler module.
-
-**Example:** ``typo3cms scheduler:run 42 --force``
-
-
-
-Options
-^^^^^^^
-
-``--task-id``
-  Uid of the task that should be executed (instead of all scheduled tasks)
-``--force``
-  The execution can be forced with this flag. The task will then be executed even if it is not scheduled for execution yet. Only works, when a task is specified.
 
 
 

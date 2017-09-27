@@ -154,7 +154,7 @@ class CommandCollection implements \IteratorAggregate
                 }
                 if (isset($this->commands[$commandName])) {
                     throw new CommandNameAlreadyInUseException(
-                        'Command "' . $commandName . '" registered by "' . $package->getPackageKey() . '" is already in use',
+                        'Command "' . $commandName . '" registered by "' . $packageName . '" is already in use',
                         1506442316
                     );
                 }
