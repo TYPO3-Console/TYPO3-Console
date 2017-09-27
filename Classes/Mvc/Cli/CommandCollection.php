@@ -15,7 +15,7 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
-use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\ExtbaseCommand;
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\CommandControllerCommand;
 use Symfony\Component\Console\Command\Command as BaseCommand;
 use TYPO3\CMS\Core\Console\CommandNameAlreadyInUseException;
 use TYPO3\CMS\Core\Package\PackageManager;
@@ -111,9 +111,9 @@ class CommandCollection implements \IteratorAggregate
     private function populateFromCommandControllers($onlyNew = false): array
     {
         $registeredCommands = [];
-        foreach ($this->commandManager->getAvailableCommands($onlyNew) as $command) {
-            $commandName = $this->commandManager->getShortestIdentifierForCommand($command);
-            $fullCommandName = $command->getCommandIdentifier();
+        foreach ($this->commandManager->getAvailableCommands($onlyNew) as $commandDefinition) {
+            $commandName = $this->commandManager->getShortestIdentifierForCommand($commandDefinition);
+            $fullCommandName = $commandDefinition->getCommandIdentifier();
             if ($fullCommandName === 'typo3_console:help:help') {
                 continue;
             }
@@ -123,11 +123,7 @@ class CommandCollection implements \IteratorAggregate
             if (isset($this->commands[$commandName])) {
                 throw new CommandNameAlreadyInUseException('Command "' . $commandName . '" registered by "' . explode(':', $fullCommandName)[0] . '" is already in use', 1484486383);
             }
-            $extbaseCommand = GeneralUtility::makeInstance(ExtbaseCommand::class, $commandName);
-            $extbaseCommand->setExtbaseCommand($command);
-            if ($command->isInternal()) {
-                $extbaseCommand->setHidden(true);
-            }
+            $extbaseCommand = GeneralUtility::makeInstance(CommandControllerCommand::class, $commandName, $commandDefinition);
             $registeredCommands[$commandName] = $this->commands[$commandName] = $extbaseCommand;
         }
 

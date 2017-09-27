@@ -71,7 +71,7 @@ class HelpCommand extends \Symfony\Component\Console\Command\HelpCommand
         if (null === $this->command) {
             $this->command = $this->getApplication()->find($input->getArgument('command_name'));
         }
-        if ($this->command instanceof ExtbaseCommand) {
+        if ($this->command instanceof CommandControllerCommand) {
             // An Extbase command was originally called, but is now required to show the help information
             if ($isRaw = $input->getOption('raw')) {
                 $output->setDecorated(false);
