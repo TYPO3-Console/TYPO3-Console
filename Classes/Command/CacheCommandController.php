@@ -122,7 +122,7 @@ class CacheCommandController extends CommandController
             $this->outputLine('Flushed all caches for group(s): "' . implode('","', $groups) . '".');
         } catch (NoSuchCacheGroupException $e) {
             $this->outputLine($e->getMessage());
-            $this->sendAndExit(1);
+            $this->quit(1);
         }
     }
 
@@ -147,7 +147,7 @@ class CacheCommandController extends CommandController
             }
         } catch (NoSuchCacheGroupException $e) {
             $this->outputLine($e->getMessage());
-            $this->sendAndExit(1);
+            $this->quit(1);
         }
     }
 

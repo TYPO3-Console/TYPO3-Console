@@ -62,7 +62,7 @@ class DocumentationCommandController extends CommandController implements Single
         } catch (Service\Exception $exception) {
             $this->outputLine('An error occurred while trying to generate the XSD schema:');
             $this->outputLine('%s', [$exception->getMessage()]);
-            $this->sendAndExit(1);
+            $this->quit(1);
         }
         if ($targetFile === null) {
             echo $xsdSchema;

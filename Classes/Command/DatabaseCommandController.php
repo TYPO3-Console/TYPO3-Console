@@ -79,7 +79,7 @@ class DatabaseCommandController extends CommandController
             $expandedSchemaUpdateTypes = SchemaUpdateType::expandSchemaUpdateTypes($schemaUpdateTypes);
         } catch (InvalidEnumerationValueException $e) {
             $this->outputLine(sprintf('<error>%s</error>', $e->getMessage()));
-            $this->sendAndExit(1);
+            $this->quit(1);
         }
 
         $result = $this->schemaService->updateSchema($expandedSchemaUpdateTypes, $dryRun);

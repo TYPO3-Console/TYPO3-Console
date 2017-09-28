@@ -323,11 +323,12 @@ abstract class CommandController implements CommandControllerInterface
      * Should be used for commands that flush code caches.
      *
      * @param int $exitCode Exit code to return on exit
+     * @deprecated Will be removed with 6.0.0
      */
     protected function sendAndExit($exitCode = 0)
     {
-        $this->response->send();
-        exit($exitCode);
+        $this->outputLine('<warning>Using sendAndExit() has been deprecated. Please use quit() instead.</warning>');
+        $this->quit($exitCode);
     }
 
     /**
