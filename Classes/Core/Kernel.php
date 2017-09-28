@@ -142,13 +142,13 @@ class Kernel
         );
 
         $application = new Application($this->runLevel);
-        $application->addCommands(iterator_to_array($commandRegistry));
+        $application->addCommandsIfAvailable($commandRegistry);
 
         $commandIdentifier = $input->getFirstArgument() ?: '';
         if ($this->runLevel->isCommandAvailable($commandIdentifier)) {
             $this->runLevel->buildSequenceForCommand($commandIdentifier)->invoke($this->bootstrap);
             if ($application->isFullyCapable()) {
-                $application->addCommands($commandRegistry->addCommandControllerCommandsFromExtensions());
+                $application->addCommandsIfAvailable($commandRegistry->addCommandControllerCommandsFromExtensions());
             }
         }
 

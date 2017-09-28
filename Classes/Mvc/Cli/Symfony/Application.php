@@ -71,7 +71,7 @@ class Application extends BaseApplication
      *
      * @param iterable $commands
      */
-    public function addCommandsIfAvailable(iterable $commands)
+    public function addCommandsIfAvailable(/* iterable */ $commands)
     {
         foreach ($commands as $command) {
             if ($this->isCommandAvailable($command)) {
