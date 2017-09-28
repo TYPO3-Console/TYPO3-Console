@@ -13,13 +13,16 @@ namespace Helhum\Typo3Console\Command;
  *
  */
 
+use Helhum\Typo3Console\Install\CliSetupRequestHandler;
 use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Helhum\Typo3Console\Install\PackageStatesGenerator;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
+use Helhum\Typo3Console\Mvc\Cli\CommandManager;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageInterface;
+use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 
 /**
  * Alpha version of a setup command controller
@@ -32,12 +35,6 @@ class InstallCommandController extends CommandController
      * @inject
      */
     protected $packageManager;
-
-    /**
-     * @var \Helhum\Typo3Console\Install\CliSetupRequestHandler
-     * @inject
-     */
-    protected $cliSetupRequestHandler;
 
     /**
      * @var \Helhum\Typo3Console\Install\InstallStepActionExecutor
@@ -91,7 +88,15 @@ class InstallCommandController extends CommandController
             $this->ensureInstallationPossible($nonInteractive, $force);
         }
         $skipExtensionSetup |= !Bootstrap::usesComposerClassLoading();
-        $this->cliSetupRequestHandler->setup(!$nonInteractive, $this->request->getArguments(), $skipExtensionSetup);
+
+        $cliSetupRequestHandler = new CliSetupRequestHandler(
+            $this->objectManager,
+            $this->objectManager->get(CommandManager::class),
+            $this->objectManager->get(ReflectionService::class),
+            CommandDispatcher::createFromCommandRun(),
+            $this->output
+        );
+        $cliSetupRequestHandler->setup(!$nonInteractive, $this->request->getArguments(), $skipExtensionSetup);
 
         $this->outputLine();
         $this->outputLine('<i>Successfully installed TYPO3 CMS!</i>');
