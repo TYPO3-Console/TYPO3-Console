@@ -26,6 +26,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Descriptor\ApplicationDescription;
 use Symfony\Component\Console\Descriptor\Descriptor;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -197,19 +198,85 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
         return preg_replace('/\s*[\r\n]\s*/', "\n" . str_repeat(' ', $indent), $wrapped);
     }
 
+    // Copied private methods
+
     /**
-     * Helper method to work around private method limitations in parent class
-     * This avoids copying code that does not need to be changed.
+     * Formats input option/argument default value.
      *
-     * @param $methodName
-     * @param array $arguments
-     * @return mixed
+     * @param mixed $default
+     *
+     * @return string
      */
-    public function __call($methodName, array $arguments)
+    private function formatDefaultValue($default)
     {
-        $reflection = new \ReflectionClass(static::class);
-        $method = $reflection->getMethod($methodName);
-        $method->setAccessible(true);
-        return $method->invokeArgs($this, $arguments);
+        if (is_string($default)) {
+            $default = OutputFormatter::escape($default);
+        } elseif (is_array($default)) {
+            foreach ($default as $key => $value) {
+                if (is_string($value)) {
+                    $default[$key] = OutputFormatter::escape($value);
+                }
+            }
+        }
+
+        return str_replace('\\\\', '\\', json_encode($default, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    private function writeText($content, array $options = [])
+    {
+        $this->write(
+            isset($options['raw_text']) && $options['raw_text'] ? strip_tags($content) : $content,
+            isset($options['raw_output']) ? !$options['raw_output'] : true
+        );
+    }
+
+    /**
+     * @param (Command|string)[] $commands
+     *
+     * @return int
+     */
+    private function getColumnWidth(array $commands)
+    {
+        $widths = [];
+
+        foreach ($commands as $command) {
+            if ($command instanceof Command) {
+                $widths[] = Helper::strlen($command->getName());
+                foreach ($command->getAliases() as $alias) {
+                    $widths[] = Helper::strlen($alias);
+                }
+            } else {
+                $widths[] = Helper::strlen($command);
+            }
+        }
+
+        return $widths ? max($widths) + 2 : 0;
+    }
+
+    /**
+     * @param InputOption[] $options
+     *
+     * @return int
+     */
+    private function calculateTotalWidthForOptions($options)
+    {
+        $totalWidth = 0;
+        foreach ($options as $option) {
+            // "-" + shortcut + ", --" + name
+            $nameLength = 1 + max(Helper::strlen($option->getShortcut()), 1) + 4 + Helper::strlen($option->getName());
+
+            if ($option->acceptValue()) {
+                $valueLength = 1 + Helper::strlen($option->getName()); // = + value
+                $valueLength += $option->isValueOptional() ? 2 : 0; // [ + ]
+
+                $nameLength += $valueLength;
+            }
+            $totalWidth = max($totalWidth, $nameLength);
+        }
+
+        return $totalWidth;
     }
 }

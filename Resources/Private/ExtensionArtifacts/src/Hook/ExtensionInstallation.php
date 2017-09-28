@@ -102,11 +102,10 @@ class ExtensionInstallation
         $proxyFileContent = str_replace(
             'require __DIR__ . \'/typo3cms.php\';',
             '// In non Composer mode we\'re copied into TYPO3 web root
-putenv(\'TYPO3_PATH_ROOT=\' . __DIR__);
 require __DIR__ . \'/typo3conf/ext/typo3_console/Scripts/typo3cms.php\';',
             $proxyFileContent
         );
-        $success = @file_put_contents($proxyFileContent, $fullTargetPath);
+        $success = file_put_contents($fullTargetPath, $proxyFileContent);
 
         if ($success && !$this->isWindowsOs()) {
             $success = @chmod($fullTargetPath, 0755);
