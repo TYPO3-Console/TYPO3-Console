@@ -41,5 +41,6 @@ return [
         'backend:backend:unlock',
         'help:help',
         'referenceindex:update',
+        'scheduler:scheduler:run',
     ],
 ];

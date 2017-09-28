@@ -922,10 +922,12 @@ Executes tasks that are registered in the scheduler module.
 Options
 ^^^^^^^
 
-``--task-id``
+``--task``
   Uid of the task that should be executed (instead of all scheduled tasks)
 ``--force``
   The execution can be forced with this flag. The task will then be executed even if it is not scheduled for execution yet. Only works, when a task is specified.
+``--task-id``
+  Deprecated option (same as --task)
 
 
 
