@@ -137,15 +137,15 @@ class CommandCollection implements \IteratorAggregate
     {
         $registeredCommands = [];
         foreach ($this->commandManager->getAvailableCommands($onlyNew) as $commandDefinition) {
-            $commandIdentifier = $commandDefinition->getCommandIdentifier();
-            $shortIdentifier = explode(':', $commandIdentifier, 2)[1];
+            $fullCommandIdentifier = $commandDefinition->getCommandIdentifier();
+            $baseCommandIdentifier = explode(':', $fullCommandIdentifier, 2)[1];
             $commandName = $this->getFinalCommandName(
-                $shortIdentifier,
-                $commandIdentifier
+                $baseCommandIdentifier,
+                $fullCommandIdentifier
             );
             if ($commandName) {
-                $extbaseCommand = GeneralUtility::makeInstance(CommandControllerCommand::class, $commandName, $commandDefinition);
-                $this->commands[$commandName] = $registeredCommands[$commandName] = $extbaseCommand;
+                $commandControllerCommand = GeneralUtility::makeInstance(CommandControllerCommand::class, $commandName, $commandDefinition);
+                $this->add($commandControllerCommand, $fullCommandIdentifier);
             }
         }
 
@@ -163,16 +163,29 @@ class CommandCollection implements \IteratorAggregate
             if (empty($configuration['commands'])) {
                 continue;
             }
-            foreach ($configuration['commands'] as $commandName => $commandConfig) {
+            foreach ($configuration['commands'] as $baseCommandIdentifier => $commandConfig) {
+                $fullCommandIdentifier = $packageName . ':' . $baseCommandIdentifier;
                 $commandName = $this->getFinalCommandName(
-                    $commandName,
-                    $packageName . ':' . $commandName
+                    $baseCommandIdentifier,
+                    $fullCommandIdentifier
                 );
                 if ($commandName) {
+                    /** @var BaseCommand $command */
                     $command = GeneralUtility::makeInstance($commandConfig['class'], $commandName);
-                    $this->commands[$commandName] = $command;
+                    // No aliases for native commands (they can define their own aliases)
+                    $this->add($command, $commandName);
                 }
             }
+        }
+    }
+
+    private function add(BaseCommand $command, $fullCommandIdentifier)
+    {
+        $commandName = $command->getName();
+        $this->commands[$commandName] = $command;
+        if ($commandName !== $fullCommandIdentifier) {
+            // @deprecated in 5.0 will be removed in 6.0
+            $this->commands[$commandName]->setAliases([$fullCommandIdentifier]);
         }
     }
 

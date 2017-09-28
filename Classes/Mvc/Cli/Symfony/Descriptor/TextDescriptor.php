@@ -175,8 +175,7 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
                     $this->writeText("\n");
                     $spacingWidth = $width - Helper::strlen($name);
                     $command = $commands[$name];
-                    $commandAliases = $name === $command->getName() ? $this->getCommandAliasesText($command) : '';
-                    $this->writeText(sprintf('  <info>%s</info>%s%s', $name, str_repeat(' ', $spacingWidth), $commandAliases . $this->wordWrap($command->getDescription(), $indent, $maxWidth)), $options);
+                    $this->writeText(sprintf('  <info>%s</info>%s%s', $name, str_repeat(' ', $spacingWidth), $this->wordWrap($command->getDescription(), $indent, $maxWidth)), $options);
                 }
             }
 

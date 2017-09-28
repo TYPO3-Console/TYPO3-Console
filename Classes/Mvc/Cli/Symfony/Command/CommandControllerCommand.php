@@ -107,6 +107,12 @@ class CommandControllerCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // @deprecated in 5.0 will be removed in 6.0
+        $givenCommandName = $input->getArgument('command');
+        if ($givenCommandName !== $this->getName()) {
+            $output->writeln('<warning>Specifying the full command name has been deprecated.</warning>');
+            $output->writeln(sprintf('<warning>Please use "%s" as command name instead.</warning>', $this->getName()));
+        }
         // The command was found by Application, but it could be that a short name
         // is specified, which would not be detected by the Extbase code.
         // Therefore we enforce the full command name here.
