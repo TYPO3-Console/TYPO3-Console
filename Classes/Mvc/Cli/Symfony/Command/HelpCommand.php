@@ -27,9 +27,12 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony\Command;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Terminal;
 
 /**
  * Extends the help command of Symfony to show the specific help for Extbase commands
@@ -53,7 +56,8 @@ class HelpCommand extends \Symfony\Component\Console\Command\HelpCommand
     }
 
     /**
-     * Sets the command.
+     * We must ge hold of the command instance here, as the property is private
+     * in the parent class.
      *
      * @param Command $command The command to set
      */
@@ -65,12 +69,14 @@ class HelpCommand extends \Symfony\Component\Console\Command\HelpCommand
 
     /**
      * {@inheritdoc}
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (null === $this->command) {
+        if ($this->command === null) {
             $this->command = $this->getApplication()->find($input->getArgument('command_name'));
         }
+
         if ($this->command instanceof CommandControllerCommand) {
             // An Extbase command was originally called, but is now required to show the help information
             if ($isRaw = $input->getOption('raw')) {
@@ -79,7 +85,14 @@ class HelpCommand extends \Symfony\Component\Console\Command\HelpCommand
             (new RequestHandler())->handle([$input->getFirstArgument(), 'help', $this->command->getName()], $input, $output);
         } else {
             // Any other Symfony command should just show up the regular info
-            parent::execute($input, $output);
+            $helper = new DescriptorHelper();
+            $helper->register('txt', new TextDescriptor());
+            $helper->describe($output, $this->command, [
+                'format' => $input->getOption('format'),
+                'raw_text' => $input->getOption('raw'),
+                'screen_width' => (new Terminal())->getWidth() - 4,
+            ]);
         }
+        $this->command = null;
     }
 }

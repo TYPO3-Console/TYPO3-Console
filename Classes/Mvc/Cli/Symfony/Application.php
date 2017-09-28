@@ -16,9 +16,9 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony;
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\HelpCommand;
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\ListCommand;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Command\ListCommand;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
