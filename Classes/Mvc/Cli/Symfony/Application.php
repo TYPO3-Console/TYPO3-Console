@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony;
  */
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\CommandControllerCommand;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\HelpCommand;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\ListCommand;
 use Symfony\Component\Console\Application as BaseApplication;
@@ -74,7 +75,7 @@ class Application extends BaseApplication
     public function addCommandsIfAvailable(/* iterable */ $commands)
     {
         foreach ($commands as $command) {
-            if ($this->isCommandAvailable($command)) {
+            if ($command instanceof CommandControllerCommand || $this->isCommandAvailable($command)) {
                 $this->add($command);
             }
         }
