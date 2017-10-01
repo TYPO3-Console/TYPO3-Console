@@ -68,6 +68,7 @@ class CacheService implements SingletonInterface
     public function flush($force = false)
     {
         $this->ensureDatabaseIsInitialized();
+        $this->reEnableCoreCaches();
         if ($force) {
             $this->forceFlushCoreFileAndDatabaseCaches();
         }
