@@ -26,13 +26,13 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony\Command;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Helhum\Typo3Console\Mvc\Cli\Command as CommandDefinition;
 use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Extbase\Mvc\Cli\Command as CommandDefinition;
 
 /**
  * Wrapper to turn a command controller commands into a Symfony Command
@@ -101,6 +101,11 @@ class CommandControllerCommand extends Command
         parent::setApplication($application);
     }
 
+    public function getSynopsis($short = false)
+    {
+        return sprintf('%s %s', $this->getName(), $this->commandDefinition->getSynopsis($short));
+    }
+
     /**
      * Executes the command to find any Extbase command
      *
@@ -112,7 +117,7 @@ class CommandControllerCommand extends Command
     {
         // @deprecated in 5.0 will be removed in 6.0
         $givenCommandName = $input->getArgument('command');
-        if ($givenCommandName !== $this->getName()) {
+        if ($givenCommandName === $this->getAliases()[0]) {
             $output->writeln('<warning>Specifying the full command name has been deprecated.</warning>');
             $output->writeln(sprintf('<warning>Please use "%s" as command name instead.</warning>', $this->getName()));
         }
@@ -125,7 +130,7 @@ class CommandControllerCommand extends Command
         return $response->getExitCode();
     }
 
-    public function isHidden()
+    public function isHidden(): bool
     {
         return $this->commandDefinition->isInternal();
     }

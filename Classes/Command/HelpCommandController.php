@@ -14,9 +14,9 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
+use Helhum\Typo3Console\Mvc\Cli\Command;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Core\Bootstrap;
-use TYPO3\CMS\Extbase\Mvc\Cli\Command;
 
 /**
  * A Command Controller which provides help for available commands
@@ -51,18 +51,8 @@ class HelpCommandController extends CommandController
     {
         $command = $this->commandManager->getCommandByIdentifier($commandIdentifier);
         $commandArgumentDefinitions = $command->getArgumentDefinitions();
-        $usage = '';
-        $hasOptions = false;
-        foreach ($commandArgumentDefinitions as $commandArgumentDefinition) {
-            if (!$commandArgumentDefinition->isRequired()) {
-                $hasOptions = true;
-            } else {
-                $usage .= sprintf(' [<%s>]', strtolower(preg_replace('/([A-Z])/', '-$1', $commandArgumentDefinition->getName())));
-            }
-        }
-        $usage = $this->commandManager->getShortestIdentifierForCommand($command) . ($hasOptions ? ' [options]' : '') . $usage;
         $this->outputLine('<comment>Usage:</comment>');
-        $this->outputLine('  ' . $usage);
+        $this->outputLine('  ' . $this->commandManager->getShortestIdentifierForCommand($command) . ' ' . $command->getSynopsis(true));
         $argumentDescriptions = [];
         $optionDescriptions = [];
         if ($command->hasArguments()) {
@@ -70,7 +60,7 @@ class HelpCommandController extends CommandController
                 $argumentDescription = $commandArgumentDefinition->getDescription();
                 $argumentDescription = $this->wordWrap($argumentDescription, 23);
                 if ($commandArgumentDefinition->isRequired()) {
-                    $argumentDescriptions[] = vsprintf('  <info>%-20s</info> %s', [$commandArgumentDefinition->getDashedName(), $argumentDescription]);
+                    $argumentDescriptions[] = vsprintf('  <info>%-20s</info> %s', [$commandArgumentDefinition->getName(), $argumentDescription]);
                 } else {
                     $optionDescriptions[] = vsprintf('  <info>%-20s</info> %s', [$commandArgumentDefinition->getDashedName(), $argumentDescription]);
                 }
