@@ -29,6 +29,42 @@ class CacheCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
+    public function cacheCanBeFlushedWhenNotSetUp()
+    {
+        $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
+        $localConfFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        rename($packageStatesFile, $packageStatesFile . '_');
+        rename($localConfFile, $localConfFile . '_');
+        try {
+            $output = $this->executeConsoleCommand('cache:flush');
+            $this->assertSame('Flushed all file caches.', $output);
+        } finally {
+            rename($packageStatesFile . '_', $packageStatesFile);
+            rename($localConfFile . '_', $localConfFile);
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function cacheCanBeFlushedAsFilesOnlyWhenNotSetUp()
+    {
+        $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
+        $localConfFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        rename($packageStatesFile, $packageStatesFile . '_');
+        rename($localConfFile, $localConfFile . '_');
+        try {
+            $output = $this->executeConsoleCommand('cache:flush', ['--files-only' => true]);
+            $this->assertSame('Flushed all file caches.', $output);
+        } finally {
+            rename($packageStatesFile . '_', $packageStatesFile);
+            rename($localConfFile . '_', $localConfFile);
+        }
+    }
+
+    /**
+     * @test
+     */
     public function cacheCanBeForceFlushedFlushed()
     {
         $output = $this->executeConsoleCommand('cache:flush', ['--force' => true]);
