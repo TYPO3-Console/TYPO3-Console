@@ -55,29 +55,30 @@ class CacheCommandController extends CommandController
     public function flushCommand($force = false, $filesOnly = false)
     {
         $exitCode = 0;
-        if (!$filesOnly) {
-            try {
-                $this->cacheService->flush($force);
-                $this->commandDispatcher->executeCommand('cache:flushcomplete');
-            } catch (\Throwable $e) {
-                $exitCode = 1;
-                $filesOnly = true;
-            }
+        if (!$this->applicationIsFullyCapable()) {
+            $filesOnly = true;
         }
         if ($filesOnly) {
             $this->cacheService->flushFileCaches($force);
             $this->commandDispatcher->executeCommand('cache:flushcomplete', ['--files-only' => true]);
-        }
-
-        if (isset($e)) {
-            $this->outputLine('<error>Flushing caches failed with error:</error>');
-            $this->outputLine('<error>"%s"</error>', [$e->getMessage()]);
-            $this->outputLine('<warning>Falling back to flushing file caches only.</warning>');
-            $this->outputLine('<warning>Use "--files-only" option to get rid of this warning"</warning>');
+        } else {
+            $this->cacheService->flush($force);
+            $this->commandDispatcher->executeCommand('cache:flushcomplete');
         }
 
         $this->outputLine('%slushed all %scaches.', [$force ? 'Force f' : 'F', $filesOnly ? 'file ' : '']);
         $this->quit($exitCode);
+    }
+
+    /**
+     * Check if we have all mandatory files to assume we have a fully configured / installed TYPO3
+     *
+     * @return bool
+     * @deprecated can be removed once this is converted into a native Symfony command. We can use the Application API then.
+     */
+    private function applicationIsFullyCapable(): bool
+    {
+        return file_exists(PATH_site . 'typo3conf/PackageStates.php') && file_exists(PATH_site . 'typo3conf/LocalConfiguration.php');
     }
 
     /**

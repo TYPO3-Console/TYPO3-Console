@@ -29,9 +29,45 @@ class CacheCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
+    public function cacheCanBeFlushedWhenNotSetUp()
+    {
+        $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
+        $localConfFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        rename($packageStatesFile, $packageStatesFile . '_');
+        rename($localConfFile, $localConfFile . '_');
+        try {
+            $output = $this->executeConsoleCommand('cache:flush');
+            $this->assertSame('Flushed all file caches.', $output);
+        } finally {
+            rename($packageStatesFile . '_', $packageStatesFile);
+            rename($localConfFile . '_', $localConfFile);
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function cacheCanBeFlushedAsFilesOnlyWhenNotSetUp()
+    {
+        $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
+        $localConfFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        rename($packageStatesFile, $packageStatesFile . '_');
+        rename($localConfFile, $localConfFile . '_');
+        try {
+            $output = $this->executeConsoleCommand('cache:flush', ['--files-only']);
+            $this->assertSame('Flushed all file caches.', $output);
+        } finally {
+            rename($packageStatesFile . '_', $packageStatesFile);
+            rename($localConfFile . '_', $localConfFile);
+        }
+    }
+
+    /**
+     * @test
+     */
     public function cacheCanBeForceFlushedFlushed()
     {
-        $output = $this->executeConsoleCommand('cache:flush', ['--force' => true]);
+        $output = $this->executeConsoleCommand('cache:flush', ['--force']);
         $this->assertSame('Force flushed all caches.', $output);
     }
 
@@ -40,7 +76,7 @@ class CacheCommandControllerTest extends AbstractCommandTest
      */
     public function fileCachesCanBeFlushed()
     {
-        $output = $this->executeConsoleCommand('cache:flush', ['--files-only' => true]);
+        $output = $this->executeConsoleCommand('cache:flush', ['--files-only']);
         $this->assertSame('Flushed all file caches.', $output);
     }
 
@@ -49,7 +85,7 @@ class CacheCommandControllerTest extends AbstractCommandTest
      */
     public function fileCachesCanBeForceFlushedFlushed()
     {
-        $output = $this->executeConsoleCommand('cache:flush', ['--files-only' => true, '--force' => true]);
+        $output = $this->executeConsoleCommand('cache:flush', ['--files-only', '--force']);
         $this->assertSame('Force flushed all file caches.', $output);
     }
 
