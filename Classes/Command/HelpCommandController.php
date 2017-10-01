@@ -26,7 +26,7 @@ use TYPO3\CMS\Extbase\Mvc\Cli\Command;
 class HelpCommandController extends CommandController
 {
     /**
-     * @var \Helhum\Typo3Console\Mvc\Cli\CommandManager
+     * @var \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
      * @inject
      */
     protected $commandManager;

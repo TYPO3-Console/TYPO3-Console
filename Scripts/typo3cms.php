@@ -7,7 +7,7 @@
         // Console is a dependency, thus located in vendor/helhum/typo3-console
         $classLoader = require $autoLoadFile;
     } elseif (file_exists($autoLoadFile = realpath(($rootPath = dirname(dirname(dirname(dirname(__DIR__))))) . '/typo3') . '/../vendor/autoload.php')) {
-        // Console is extension, but TYPO3_PATH_ROOT was not set, because binary is symlinked, so set it here
+        // Console is extension
         putenv('TYPO3_PATH_ROOT=' . $rootPath);
         $classLoader = require $autoLoadFile;
     } else {

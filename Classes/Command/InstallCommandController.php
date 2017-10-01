@@ -17,11 +17,11 @@ use Helhum\Typo3Console\Install\CliSetupRequestHandler;
 use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Helhum\Typo3Console\Install\PackageStatesGenerator;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
-use Helhum\Typo3Console\Mvc\Cli\CommandManager;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageInterface;
+use TYPO3\CMS\Extbase\Mvc\Cli\CommandManager;
 use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 
 /**
