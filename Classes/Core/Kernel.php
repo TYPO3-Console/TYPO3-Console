@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Core;
 
 use Composer\Autoload\ClassLoader;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
+use Helhum\Typo3Console\Core\Booting\Scripts;
 use Helhum\Typo3Console\Mvc\Cli\CommandCollection;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,6 +23,7 @@ use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Cli\CommandManager;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 /**
  * @internal
@@ -38,13 +40,16 @@ class Kernel
      */
     private $runLevel;
 
+    /**
+     * @var bool
+     */
+    private $initialized = false;
+
     public function __construct(\Composer\Autoload\ClassLoader $classLoader)
     {
         $this->ensureRequiredEnvironment();
         $this->bootstrap = Bootstrap::getInstance();
         $this->bootstrap->initializeClassLoader($classLoader);
-        $this->initializeNonComposerClassLoading();
-        $this->initializeCompatibilityLayer();
         $this->runLevel = new RunLevel($this->bootstrap);
     }
 
@@ -119,9 +124,17 @@ class Kernel
      * @param string $runLevel
      * @throws \InvalidArgumentException
      */
-    public function initialize(string $runLevel = RunLevel::LEVEL_ESSENTIAL)
+    public function initialize(string $runLevel = null)
     {
-        $this->runLevel->runSequence($runLevel);
+        if (!$this->initialized) {
+            $this->initializeNonComposerClassLoading();
+            $this->initializeCompatibilityLayer();
+            Scripts::baseSetup($this->bootstrap);
+            $this->initialized = true;
+        }
+        if ($runLevel !== null) {
+            $this->runLevel->runSequence($runLevel);
+        }
     }
 
     /**
@@ -138,20 +151,15 @@ class Kernel
 
         $commandRegistry = new CommandCollection(
             $this->runLevel,
-            GeneralUtility::makeInstance(PackageManager::class),
-            GeneralUtility::makeInstance(CommandManager::class)
+            GeneralUtility::makeInstance(PackageManager::class)
         );
 
         $application = new Application($this->runLevel);
         $application->addCommandsIfAvailable($commandRegistry);
 
         $commandIdentifier = $input->getFirstArgument() ?: '';
-        if ($this->runLevel->isCommandAvailable($commandIdentifier)) {
-            $this->runLevel->runSequenceForCommand($commandIdentifier);
-            if ($application->isFullyCapable()) {
-                $application->addCommandsIfAvailable($commandRegistry->addCommandControllerCommandsFromExtensions());
-            }
-        }
+        $this->runLevel->runSequenceForCommand($commandIdentifier);
+        $application->addCommandsIfAvailable($commandRegistry->addCommandControllerCommands(GeneralUtility::makeInstance(ObjectManager::class)->get(CommandManager::class)));
 
         return $application->run($input);
     }

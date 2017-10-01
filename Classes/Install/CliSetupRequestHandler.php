@@ -15,10 +15,10 @@ namespace Helhum\Typo3Console\Install;
 
 use Helhum\Typo3Console\Command\InstallCommandController;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
-use Helhum\Typo3Console\Mvc\Cli\CommandManager;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use TYPO3\CMS\Extbase\Mvc\Cli\Command;
 use TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition;
+use TYPO3\CMS\Extbase\Mvc\Cli\CommandManager;
 use TYPO3\CMS\Extbase\Mvc\Controller\Argument;
 use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
 use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentTypeException;

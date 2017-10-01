@@ -16,7 +16,6 @@ namespace Helhum\Typo3Console\Core\Booting;
 use Helhum\Typo3Console\Core\Cache\FakeDatabaseBackend;
 use Helhum\Typo3Console\Error\ErrorHandler;
 use Helhum\Typo3Console\Error\ExceptionHandler;
-use Helhum\Typo3Console\Mvc\Cli\CommandManager;
 use Helhum\Typo3Console\Package\UncachedPackageManager;
 use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
 use TYPO3\CMS\Core\Cache\Backend\NullBackend;
@@ -26,9 +25,6 @@ use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Command\HelpCommandController;
-use TYPO3\CMS\Extbase\Mvc\Cli\CommandManager as ExtbaseCommandManager;
-use TYPO3\CMS\Extensionmanager\Command\ExtensionCommandController;
 
 class Scripts
 {
@@ -42,11 +38,7 @@ class Scripts
      */
     public static function initializeConfigurationManagement(Bootstrap $bootstrap)
     {
-        self::baseSetup($bootstrap);
         $bootstrap->populateLocalConfiguration();
-        if (empty($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'])) {
-            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] = [];
-        }
         \Closure::bind(function () use ($bootstrap) {
             if (!Bootstrap::usesComposerClassLoading()) {
                 $bootstrap->initializeRuntimeActivatedPackagesFromConfiguration();
@@ -57,7 +49,7 @@ class Scripts
         self::disableCachesForObjectManagement();
     }
 
-    private static function baseSetup(Bootstrap $bootstrap)
+    public static function baseSetup(Bootstrap $bootstrap)
     {
         define('TYPO3_MODE', 'BE');
         define('PATH_site', \TYPO3\CMS\Core\Utility\GeneralUtility::fixWindowsFilePath(getenv('TYPO3_PATH_ROOT')) . '/');
@@ -71,7 +63,6 @@ class Scripts
         set_exception_handler([$exceptionHandler, 'handleException']);
 
         self::initializePackageManagement($bootstrap);
-        self::initializeCommandManager($bootstrap);
     }
 
     /**
@@ -92,12 +83,6 @@ class Scripts
         $packageManager->injectDependencyResolver($dependencyResolver);
         $packageManager->init();
         GeneralUtility::setSingletonInstance(PackageManager::class, $packageManager);
-    }
-
-    private static function initializeCommandManager(Bootstrap $bootstrap)
-    {
-        $commandManager = GeneralUtility::makeInstance(CommandManager::class);
-        GeneralUtility::setSingletonInstance(ExtbaseCommandManager::class, $commandManager);
     }
 
     public static function disableCachesForObjectManagement()

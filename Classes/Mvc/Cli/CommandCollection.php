@@ -20,6 +20,7 @@ use Symfony\Component\Console\Command\Command as BaseCommand;
 use TYPO3\CMS\Core\Console\CommandNameAlreadyInUseException;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Cli\CommandManager;
 
 /**
  * Represents a collection of commands
@@ -33,6 +34,11 @@ class CommandCollection implements \IteratorAggregate
      * @var BaseCommand[]
      */
     private $commands;
+
+    /**
+     * @var array
+     */
+    private $commandControllerClasses = [];
 
     /**
      * @var array
@@ -54,16 +60,10 @@ class CommandCollection implements \IteratorAggregate
      */
     private $packageManager;
 
-    /**
-     * @var CommandManager
-     */
-    private $commandManager;
-
-    public function __construct(RunLevel $runLevel, PackageManager $packageManager, CommandManager $commandManager)
+    public function __construct(RunLevel $runLevel, PackageManager $packageManager = null)
     {
         $this->runLevel = $runLevel;
         $this->packageManager = $packageManager;
-        $this->commandManager = $commandManager;
     }
 
     /**
@@ -78,17 +78,15 @@ class CommandCollection implements \IteratorAggregate
     }
 
     /**
-     * Add commands that are registered in TYPO3_CONF_VARS
-     *
-     * Needs to be called after ext_localconf.php files from extensions have been loaded
+     * Add command controller commands
      *
      * @throws \TYPO3\CMS\Core\Console\CommandNameAlreadyInUseException
      * @return BaseCommand[]
      */
-    public function addCommandControllerCommandsFromExtensions()
+    public function addCommandControllerCommands(CommandManager $commandManager): array
     {
         $this->populateCommands();
-        return $this->populateCommandControllerCommands(true);
+        return $this->populateCommandControllerCommands($commandManager);
     }
 
     private function populateCommands()
@@ -97,7 +95,6 @@ class CommandCollection implements \IteratorAggregate
             return;
         }
         $this->initializeConfiguration();
-        $this->populateCommandControllerCommands();
         $this->populateNativeCommands();
     }
 
@@ -109,9 +106,7 @@ class CommandCollection implements \IteratorAggregate
                 $this->replaces = array_merge($this->replaces, $commandConfiguration['replace']);
             }
             if (isset($commandConfiguration['controllers'])) {
-                foreach ($commandConfiguration['controllers'] as $controller) {
-                    $this->commandManager->registerCommandController($controller);
-                }
+                $this->commandControllerClasses = array_merge($this->commandControllerClasses, $commandConfiguration['controllers']);
             }
             if (isset($commandConfiguration['runLevels'])) {
                 foreach ($commandConfiguration['runLevels'] as $commandIdentifier => $runLevel) {
@@ -129,14 +124,15 @@ class CommandCollection implements \IteratorAggregate
     }
 
     /**
-     * @param bool $onlyNew
-     * @throws CommandNameAlreadyInUseException
-     * @return BaseCommand[]
+     * @param CommandManager $commandManager
+     * @return array
      */
-    private function populateCommandControllerCommands($onlyNew = false): array
+    private function populateCommandControllerCommands(CommandManager $commandManager): array
     {
         $registeredCommands = [];
-        foreach ($this->commandManager->getAvailableCommands($onlyNew) as $commandDefinition) {
+        $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] = $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] ?? [];
+        $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] = array_merge($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'], $this->commandControllerClasses);
+        foreach ($commandManager->getAvailableCommands() as $commandDefinition) {
             $fullCommandIdentifier = $commandDefinition->getCommandIdentifier();
             $baseCommandIdentifier = explode(':', $fullCommandIdentifier, 2)[1];
             $commandName = $this->getFinalCommandName(
@@ -146,6 +142,7 @@ class CommandCollection implements \IteratorAggregate
             if ($commandName) {
                 $commandControllerCommand = GeneralUtility::makeInstance(CommandControllerCommand::class, $commandName, $commandDefinition);
                 $this->add($commandControllerCommand, $fullCommandIdentifier);
+                $registeredCommands[] = $commandControllerCommand;
             }
         }
 
