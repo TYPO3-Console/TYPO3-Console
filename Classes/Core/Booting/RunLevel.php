@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Core\Booting;
 
 /*
@@ -13,6 +14,8 @@ namespace Helhum\Typo3Console\Core\Booting;
  *
  */
 
+use TYPO3\CMS\Core\Core\Bootstrap;
+
 class RunLevel
 {
     const LEVEL_ESSENTIAL = 'buildEssentialSequence';
@@ -23,19 +26,29 @@ class RunLevel
     /**
      * @var array
      */
-    protected $commandOptions = [];
+    private $commandOptions = [];
 
     /**
      * @var array
      */
-    protected $executedSteps = [];
+    private $executedSteps = [];
+
+    /**
+     * @var Bootstrap
+     */
+    private $bootstrap;
+
+    public function __construct(Bootstrap $bootstrap)
+    {
+        $this->bootstrap = $bootstrap;
+    }
 
     /**
      * @param string $commandIdentifier
      * @param string $runLevel
-     * @api
+     * @internal
      */
-    public function setRunLevelForCommand($commandIdentifier, $runLevel)
+    public function setRunLevelForCommand(string $commandIdentifier, string $runLevel)
     {
         if (!isset($this->commandOptions[$commandIdentifier]['runLevel'])) {
             $this->commandOptions[$commandIdentifier]['runLevel'] = $runLevel;
@@ -43,11 +56,11 @@ class RunLevel
     }
 
     /**
-     * @param $commandIdentifier
+     * @param string $commandIdentifier
      * @param string $stepIdentifier
      * @internal
      */
-    public function addBootingStepForCommand($commandIdentifier, $stepIdentifier)
+    public function addBootingStepForCommand(string $commandIdentifier, string $stepIdentifier)
     {
         if (!isset($this->commandOptions[$commandIdentifier]['addSteps'][$stepIdentifier])) {
             $this->commandOptions[$commandIdentifier]['addSteps'][$stepIdentifier] = $stepIdentifier;
@@ -55,11 +68,11 @@ class RunLevel
     }
 
     /**
-     * @param $commandIdentifier
+     * @param string $commandIdentifier
      * @param string $stepIdentifier
      * @internal
      */
-    public function removeBootingStepForCommand($commandIdentifier, $stepIdentifier)
+    public function removeBootingStepForCommand(string $commandIdentifier, string $stepIdentifier)
     {
         if (!isset($this->commandOptions[$commandIdentifier]['removeSteps'])) {
             $this->commandOptions[$commandIdentifier]['removeSteps'][$stepIdentifier] = $stepIdentifier;
@@ -68,12 +81,56 @@ class RunLevel
 
     /**
      * @param string $commandIdentifier
-     * @return Sequence
+     * @throws \InvalidArgumentException
      * @internal
      */
-    public function buildSequenceForCommand($commandIdentifier)
+    public function runSequenceForCommand(string $commandIdentifier)
     {
-        $sequence = $this->buildSequence($this->getRunlevelForCommand($commandIdentifier));
+        $this->buildSequenceForCommand($commandIdentifier)->invoke($this->bootstrap);
+    }
+
+    /**
+     * @param string $runLevel
+     * @internal
+     * @throws \InvalidArgumentException
+     */
+    public function runSequence(string $runLevel)
+    {
+        $this->buildSequence($runLevel)->invoke($this->bootstrap);
+    }
+
+    /**
+     * Check if we have all mandatory files to assume we have a fully configured / installed TYPO3
+     *
+     * @return string
+     */
+    public function getMaximumAvailableRunLevel(): string
+    {
+        if (!file_exists(PATH_site . 'typo3conf/PackageStates.php') || !file_exists(PATH_site . 'typo3conf/LocalConfiguration.php')) {
+            return self::LEVEL_COMPILE;
+        }
+
+        return self::LEVEL_FULL;
+    }
+
+    /**
+     * @param string $commandIdentifier
+     * @return bool
+     */
+    public function isCommandAvailable($commandIdentifier): bool
+    {
+        return $this->getMaximumAvailableRunLevel() === self::LEVEL_FULL
+            || $this->getRunLevelForCommand($commandIdentifier) === self::LEVEL_COMPILE;
+    }
+
+    /**
+     * @param string $commandIdentifier
+     * @throws \InvalidArgumentException
+     * @return Sequence
+     */
+    private function buildSequenceForCommand(string $commandIdentifier): Sequence
+    {
+        $sequence = $this->buildSequence($this->getRunLevelForCommand($commandIdentifier));
         $this->addStepsForCommand($sequence, $commandIdentifier);
         $this->removeStepsForCommand($sequence, $commandIdentifier);
 
@@ -86,9 +143,8 @@ class RunLevel
      * @param string $runLevel
      * @throws \InvalidArgumentException
      * @return Sequence
-     * @internal
      */
-    public function buildSequence($runLevel)
+    private function buildSequence(string $runLevel): Sequence
     {
         if (is_callable([$this, $runLevel])) {
             return $this->{$runLevel}($runLevel);
@@ -102,7 +158,7 @@ class RunLevel
      * @param string $identifier
      * @return Sequence
      */
-    protected function buildEssentialSequence($identifier)
+    private function buildEssentialSequence(string $identifier): Sequence
     {
         $sequence = new Sequence($identifier);
         $this->addStep($sequence, 'helhum.typo3console:coreconfiguration');
@@ -118,7 +174,7 @@ class RunLevel
      *
      * @return Sequence
      */
-    protected function buildCompiletimeSequence()
+    private function buildCompiletimeSequence(): Sequence
     {
         $sequence = $this->buildEssentialSequence(self::LEVEL_COMPILE);
 
@@ -142,7 +198,7 @@ class RunLevel
      * @param string $identifier
      * @return Sequence
      */
-    protected function buildBasicRuntimeSequence($identifier = self::LEVEL_MINIMAL)
+    private function buildBasicRuntimeSequence(string $identifier = self::LEVEL_MINIMAL): Sequence
     {
         $sequence = $this->buildEssentialSequence($identifier);
 
@@ -156,7 +212,7 @@ class RunLevel
      *
      * @return Sequence
      */
-    protected function buildExtendedRuntimeSequence()
+    private function buildExtendedRuntimeSequence(): Sequence
     {
         $sequence = $this->buildBasicRuntimeSequence(self::LEVEL_FULL);
 
@@ -173,7 +229,7 @@ class RunLevel
      * @param Sequence $sequence
      * @param string $stepIdentifier
      */
-    protected function addStep($sequence, $stepIdentifier)
+    private function addStep(Sequence $sequence, string $stepIdentifier)
     {
         if (!empty($this->executedSteps[$stepIdentifier])) {
             $sequence->addStep(new Step($stepIdentifier, function () {
@@ -224,14 +280,12 @@ class RunLevel
         }
     }
 
-    // COMMAND RELATED
-
     /**
      * @param string $commandIdentifier
      * @return string
      * @internal
      */
-    public function getRunlevelForCommand($commandIdentifier)
+    private function getRunLevelForCommand(string $commandIdentifier): string
     {
         if ($commandIdentifier === '' || $commandIdentifier === 'help') {
             return $this->getMaximumAvailableRunLevel();
@@ -241,35 +295,11 @@ class RunLevel
     }
 
     /**
-     * Check if we have all mandatory files to assume we have a fully configured / installed TYPO3
-     *
-     * @return bool
-     */
-    public function getMaximumAvailableRunLevel()
-    {
-        if (!file_exists(PATH_site . 'typo3conf/PackageStates.php') || !file_exists(PATH_site . 'typo3conf/LocalConfiguration.php')) {
-            return self::LEVEL_COMPILE;
-        }
-
-        return self::LEVEL_FULL;
-    }
-
-    /**
-     * @param string $commandIdentifier
-     * @return bool
-     */
-    public function isCommandAvailable($commandIdentifier)
-    {
-        return $this->getMaximumAvailableRunLevel() === self::LEVEL_FULL
-            || $this->getRunlevelForCommand($commandIdentifier) === self::LEVEL_COMPILE;
-    }
-
-    /**
      * @param Sequence $sequence
      * @param string $commandIdentifier
      * @internal
      */
-    protected function addStepsForCommand($sequence, $commandIdentifier)
+    private function addStepsForCommand(Sequence $sequence, string $commandIdentifier)
     {
         $options = $this->getOptionsForCommand($commandIdentifier);
         if (isset($options['addSteps'])) {
@@ -284,7 +314,7 @@ class RunLevel
      * @param string $commandIdentifier
      * @internal
      */
-    protected function removeStepsForCommand($sequence, $commandIdentifier)
+    private function removeStepsForCommand(Sequence $sequence, string $commandIdentifier)
     {
         $options = $this->getOptionsForCommand($commandIdentifier);
         if (isset($options['removeSteps'])) {
@@ -295,10 +325,10 @@ class RunLevel
     }
 
     /**
-     * @param $commandIdentifier
-     * @return mixed
+     * @param string $commandIdentifier
+     * @return array|null
      */
-    protected function getOptionsForCommand($commandIdentifier)
+    private function getOptionsForCommand(string $commandIdentifier)
     {
         $commandIdentifierParts = explode(':', $commandIdentifier);
         if (count($commandIdentifierParts) < 2 || count($commandIdentifierParts) > 3) {

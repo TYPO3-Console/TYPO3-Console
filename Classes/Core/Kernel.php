@@ -45,7 +45,7 @@ class Kernel
         $this->bootstrap->initializeClassLoader($classLoader);
         $this->initializeNonComposerClassLoading();
         $this->initializeCompatibilityLayer();
-        $this->runLevel = new RunLevel();
+        $this->runLevel = new RunLevel($this->bootstrap);
     }
 
     /**
@@ -121,7 +121,7 @@ class Kernel
      */
     public function initialize(string $runLevel = RunLevel::LEVEL_ESSENTIAL)
     {
-        $this->runLevel->buildSequence($runLevel)->invoke($this->bootstrap);
+        $this->runLevel->runSequence($runLevel);
     }
 
     /**
@@ -129,6 +129,7 @@ class Kernel
      *
      * @param InputInterface $input
      * @throws \InvalidArgumentException
+     * @throws \Exception
      * @return int
      */
     public function handle(InputInterface $input): int
@@ -146,7 +147,7 @@ class Kernel
 
         $commandIdentifier = $input->getFirstArgument() ?: '';
         if ($this->runLevel->isCommandAvailable($commandIdentifier)) {
-            $this->runLevel->buildSequenceForCommand($commandIdentifier)->invoke($this->bootstrap);
+            $this->runLevel->runSequenceForCommand($commandIdentifier);
             if ($application->isFullyCapable()) {
                 $application->addCommandsIfAvailable($commandRegistry->addCommandControllerCommandsFromExtensions());
             }
