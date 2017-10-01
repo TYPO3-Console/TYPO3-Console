@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Mvc\Cli;
 
 /*
@@ -51,6 +52,26 @@ class Command
     protected $reflectionService;
 
     /**
+     * @var CommandArgumentDefinition[]
+     */
+    private $argumentDefinitions;
+
+    /**
+     * @var CommandArgumentDefinition[]
+     */
+    private $requiredArguments = [];
+
+    /**
+     * @var CommandArgumentDefinition[]
+     */
+    private $options = [];
+
+    /**
+     * @var string[]
+     */
+    private $synopsis;
+
+    /**
      * @param \TYPO3\CMS\Extbase\Reflection\ReflectionService $reflectionService
      */
     public function injectReflectionService(\TYPO3\CMS\Extbase\Reflection\ReflectionService $reflectionService)
@@ -59,13 +80,11 @@ class Command
     }
 
     /**
-     * Constructor
-     *
      * @param string $controllerClassName Class name of the controller providing the command
      * @param string $controllerCommandName Command name, i.e. the method name of the command, without the "Command" suffix
      * @throws \InvalidArgumentException
      */
-    public function __construct($controllerClassName, $controllerCommandName)
+    public function __construct(string $controllerClassName, string $controllerCommandName)
     {
         $this->controllerClassName = $controllerClassName;
         $this->controllerCommandName = $controllerCommandName;
@@ -97,7 +116,7 @@ class Command
     /**
      * @return string
      */
-    public function getControllerClassName()
+    public function getControllerClassName(): string
     {
         return $this->controllerClassName;
     }
@@ -105,7 +124,7 @@ class Command
     /**
      * @return string
      */
-    public function getControllerCommandName()
+    public function getControllerCommandName(): string
     {
         return $this->controllerCommandName;
     }
@@ -115,7 +134,7 @@ class Command
      *
      * @return string The command identifier for this command, following the pattern extensionname:controllername:commandname
      */
-    public function getCommandIdentifier()
+    public function getCommandIdentifier(): string
     {
         return $this->commandIdentifier;
     }
@@ -125,7 +144,7 @@ class Command
      *
      * @return string
      */
-    public function getExtensionName()
+    public function getExtensionName(): string
     {
         return $this->extensionName;
     }
@@ -135,7 +154,7 @@ class Command
      *
      * @return string A short description
      */
-    public function getShortDescription()
+    public function getShortDescription(): string
     {
         $lines = explode(LF, $this->getCommandMethodReflection()->getDescription());
         return !empty($lines) ? trim($lines[0]) : '<no description available>';
@@ -148,7 +167,7 @@ class Command
      *
      * @return string A longer description of this command
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         $lines = explode(LF, $this->getCommandMethodReflection()->getDescription());
         array_shift($lines);
@@ -163,13 +182,51 @@ class Command
     }
 
     /**
-     * Returns TRUE if this command expects required and/or optional arguments, otherwise FALSE
+     * Returns true if this command expects required and/or optional arguments, otherwise false
      *
      * @return bool
      */
-    public function hasArguments()
+    public function hasArguments(): bool
     {
         return !empty($this->getCommandMethodReflection()->getParameters());
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasOptions(): bool
+    {
+        return count($this->getOptions()) > 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasRequiredArguments(): bool
+    {
+        return count($this->getRequiredArguments()) > 0;
+    }
+
+    /**
+     * @return CommandArgumentDefinition[]
+     */
+    public function getRequiredArguments(): array
+    {
+        if ($this->argumentDefinitions === null) {
+            $this->getArgumentDefinitions();
+        }
+        return $this->requiredArguments;
+    }
+
+    /**
+     * @return CommandArgumentDefinition[]
+     */
+    public function getOptions(): array
+    {
+        if ($this->argumentDefinitions === null) {
+            $this->getArgumentDefinitions();
+        }
+        return $this->options;
     }
 
     /**
@@ -177,14 +234,17 @@ class Command
      * information about required/optional arguments of this command.
      * If the command does not expect any arguments, an empty array is returned
      *
-     * @return \TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition[]
+     * @return CommandArgumentDefinition[]
      */
-    public function getArgumentDefinitions()
+    public function getArgumentDefinitions(): array
     {
-        if (!$this->hasArguments()) {
-            return [];
+        if ($this->argumentDefinitions !== null) {
+            return $this->argumentDefinitions;
         }
-        $commandArgumentDefinitions = [];
+        if (!$this->hasArguments()) {
+            return $this->argumentDefinitions = [];
+        }
+        $this->argumentDefinitions = [];
         $commandMethodReflection = $this->getCommandMethodReflection();
         $annotations = $commandMethodReflection->getTagsValues();
         $commandParameters = $this->reflectionService->getMethodParameters($this->controllerClassName, $this->controllerCommandName . 'Command');
@@ -192,11 +252,56 @@ class Command
         foreach ($commandParameters as $commandParameterName => $commandParameterDefinition) {
             $explodedAnnotation = preg_split('/\s+/', $annotations['param'][$i], 3);
             $description = !empty($explodedAnnotation[2]) ? $explodedAnnotation[2] : '';
+            $dataType = $commandParameterDefinition['type'] ?? 'null';
+            if ($commandParameterDefinition['array']) {
+                $dataType = 'array';
+            }
             $required = $commandParameterDefinition['optional'] !== true;
-            $commandArgumentDefinitions[] = new \TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition($commandParameterName, $required, $description);
+            $argumentDefinition = new CommandArgumentDefinition($commandParameterName, $required, $description, $dataType);
+            if ($required) {
+                $this->requiredArguments[] = $argumentDefinition;
+            } else {
+                $this->options[] = $argumentDefinition;
+            }
+            $this->argumentDefinitions[] = $argumentDefinition;
             $i++;
         }
-        return $commandArgumentDefinitions;
+        return $this->argumentDefinitions;
+    }
+
+    /**
+     * Get synopsis for this command, either short or long
+     *
+     * @param bool $short
+     * @return string
+     */
+    public function getSynopsis($short = false): string
+    {
+        $key = $short ? 'short' : 'long';
+        if (isset($this->synopsis[$key])) {
+            return $this->synopsis[$key];
+        }
+
+        $elements = [];
+        if ($short && $this->hasOptions()) {
+            $elements[] = '[options]';
+        } elseif (!$short) {
+            foreach ($this->getOptions() as $argumentDefinition) {
+                $value = '';
+                if ($argumentDefinition->acceptsValue()) {
+                    $value = ' ' . strtoupper($argumentDefinition->getOptionName());
+                }
+                $elements[] = sprintf('[%s%s]', $argumentDefinition->getDashedName(), $value);
+            }
+        }
+        if (count($elements) && $this->hasRequiredArguments()) {
+            $elements[] = '[--]';
+        }
+        foreach ($this->getRequiredArguments() as $argumentDefinition) {
+            $elements[] = '<' . $argumentDefinition->getName() . '>';
+        }
+
+        return $this->synopsis[$key] = implode(' ', $elements);
     }
 
     /**
