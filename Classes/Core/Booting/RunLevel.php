@@ -210,7 +210,7 @@ class RunLevel
 
             // Part of full runtime
             case 'helhum.typo3console:enablecorecaches':
-                $sequence->addStep(new Step('helhum.typo3console:enablecorecaches', [Scripts::class, 'reEnableOriginalCoreCaches']), 'helhum.typo3console:database');
+                $sequence->addStep(new Step('helhum.typo3console:enablecorecaches', [Scripts::class, 'reEnableOriginalCoreCaches']), 'helhum.typo3console:extensionconfiguration');
                 break;
             // @deprecated can be removed if TYPO3 8 support is removed
             case 'helhum.typo3console:database':

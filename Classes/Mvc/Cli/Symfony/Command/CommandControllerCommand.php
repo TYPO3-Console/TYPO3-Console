@@ -70,6 +70,9 @@ class CommandControllerCommand extends Command
         ) {
             return false;
         }
+        if ($this->getName() === 'cache:flushcomplete') {
+            return true;
+        }
         return $this->application->isCommandAvailable($this);
     }
 
