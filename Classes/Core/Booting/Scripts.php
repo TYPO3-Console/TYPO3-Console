@@ -97,7 +97,6 @@ class Scripts
     private static function initializeCommandManager(Bootstrap $bootstrap)
     {
         $commandManager = GeneralUtility::makeInstance(CommandManager::class);
-        $bootstrap->setEarlyInstance(ExtbaseCommandManager::class, $commandManager);
         GeneralUtility::setSingletonInstance(ExtbaseCommandManager::class, $commandManager);
     }
 
