@@ -95,32 +95,39 @@ class CommandControllerCommand extends Command
         $this->setDescription($this->commandDefinition->getShortDescription());
         $this->setHelp($this->commandDefinition->getDescription());
 
+        $strict = $this->commandDefinition->shouldValidateInputStrict();
+        if (!$strict) {
+            // @deprecated in 5.0 will be removed in 6.0
+            $this->ignoreValidationErrors();
+        }
         $applicationDefinition = $this->getApplicationDefinition();
-        foreach ($this->commandDefinition->getRequiredArguments() as $requiredArgument) {
-            $argumentName = $requiredArgument->getName();
-            if ($applicationDefinition->hasArgument($argumentName)) {
+        foreach ($this->commandDefinition->getArguments() as $argument) {
+            $argumentName = $argument->getName();
+            if (!$strict && $applicationDefinition->hasArgument($argumentName)) {
                 // That is most likely the "command" argument
                 // We append the full command identifier so we don't get an exception from Symfony
                 $argumentName .= '_' . $this->commandDefinition->getCommandIdentifier();
             }
             $this->addArgument(
                 $argumentName,
-                // OPTIONAL for compatibility
-                // @deprecated in 5.0 will be changed to REQUIRED in 6.0
-                InputArgument::OPTIONAL,
-                $requiredArgument->getDescription()
+                $strict && $argument->isRequired() ? InputArgument::REQUIRED : InputArgument::OPTIONAL,
+                $argument->getDescription()
             );
+
+            if ($strict) {
+                continue;
+            }
             // Fallback option for compatibility but only in case no other option with same name is defined already
             // @deprecated in 5.0 will be removed in 6.0
-            if ($applicationDefinition->hasOption($requiredArgument->getOptionName())) {
+            if ($applicationDefinition->hasOption($argument->getOptionName())) {
                 // Option is globally defined already, so we can skip here
                 continue;
             }
             $this->addOption(
-                $requiredArgument->getOptionName(),
+                $argument->getOptionName(),
                 null,
                 InputOption::VALUE_REQUIRED,
-                $requiredArgument->getDescription()
+                $argument->getDescription()
             );
         }
         foreach ($this->commandDefinition->getOptions() as $option) {
@@ -134,7 +141,7 @@ class CommandControllerCommand extends Command
                     null,
                     // VALUE_OPTIONAL for compatibility
                     // @deprecated in 5.0 will be changed to VALUE_NONE in 6.0
-                    InputOption::VALUE_OPTIONAL,
+                    $strict ? InputOption::VALUE_NONE : InputOption::VALUE_OPTIONAL,
                     $option->getDescription()
                 );
             } else {
@@ -146,7 +153,11 @@ class CommandControllerCommand extends Command
                     $option->getDefaultValue()
                 );
             }
-            // Fallback argument for compatibility
+
+            if ($strict) {
+                continue;
+            }
+            // Fallback to argument for compatibility
             // @deprecated in 5.0 will be removed in 6.0
             $this->addArgument(
                 $option->getName(),
@@ -206,12 +217,7 @@ class CommandControllerCommand extends Command
             $output->writeln('<warning>Specifying the full command name has been deprecated.</warning>');
             $output->writeln(sprintf('<warning>Please use "%s" as command name instead.</warning>', $this->getName()));
         }
-        // The command was found by Application, but it could be that a short name
-        // is specified, which would not be detected by the Extbase code.
-        // Therefore we enforce the full command name here.
-        $argv = $_SERVER['argv'];
-        $argv[1] = $this->getName();
-        $response = (new RequestHandler())->handle($argv, $input, $output);
+        $response = (new RequestHandler())->handle($this->commandDefinition, $input, $output);
         return $response->getExitCode();
     }
 

@@ -21,6 +21,6 @@
         require __DIR__ . '/../Classes/Core/Kernel.php';
     }
     $kernel = new \Helhum\Typo3Console\Core\Kernel($classLoader);
-    $exitCode = $kernel->handle(new \Symfony\Component\Console\Input\ArgvInput());
+    $exitCode = $kernel->handle(new \Helhum\Typo3Console\Mvc\Cli\Symfony\Input\ArgvInput());
     $kernel->terminate($exitCode);
 })();

@@ -14,14 +14,12 @@ namespace Helhum\Typo3Console\Install;
  */
 
 use Helhum\Typo3Console\Command\InstallCommandController;
+use Helhum\Typo3Console\Mvc\Cli\Command;
+use Helhum\Typo3Console\Mvc\Cli\CommandArgumentDefinition;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
-use TYPO3\CMS\Extbase\Mvc\Cli\Command;
-use TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition;
 use TYPO3\CMS\Extbase\Mvc\Cli\CommandManager;
-use TYPO3\CMS\Extbase\Mvc\Controller\Argument;
 use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
-use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentTypeException;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 
@@ -160,7 +158,6 @@ class CliSetupRequestHandler
      */
     protected function dispatchAction($actionName)
     {
-        $arguments = $this->getCommandMethodArguments($actionName . 'Command');
         $command = $this->objectManager->get(Command::class, InstallCommandController::class, $actionName);
         $loopCounter = 0;
         do {
@@ -173,23 +170,21 @@ class CliSetupRequestHandler
                 return;
             }
             $actionArguments = [];
-            /** @var CommandArgumentDefinition $argumentDefinition */
             foreach ($command->getArgumentDefinitions() as $argumentDefinition) {
-                $isPasswordArgument = strpos(strtolower($argumentDefinition->getName()), 'password') !== false;
-                $argument = $arguments->getArgument($argumentDefinition->getName());
+                $isPasswordArgument = strpos($argumentDefinition->getOptionName(), 'password') !== false;
+                $isRequired = $this->isArgumentRequired($argumentDefinition);
                 if (isset($this->givenRequestArguments[$argumentDefinition->getName()])) {
-                    $actionArguments[$argumentDefinition->getName()] = $this->givenRequestArguments[$argumentDefinition->getName()];
+                    $this->setActionArgument($actionArguments, $this->givenRequestArguments[$argumentDefinition->getName()], $argumentDefinition);
                 } else {
                     if (!$this->interactiveSetup) {
-                        if ($this->isArgumentRequired($argument)) {
-                            throw new \RuntimeException(sprintf('Argument "%s" is not set, but is required and user interaction has been disabled!', $argument->getName()), 1405273316);
+                        if ($isRequired) {
+                            throw new \RuntimeException(sprintf('Argument "%s" is not set, but is required and user interaction has been disabled!', $argumentDefinition->getName()), 1405273316);
                         }
                         continue;
                     }
                     $argumentValue = null;
                     do {
-                        $defaultValue = $argument->getDefaultValue();
-                        $isRequired = $this->isArgumentRequired($argument);
+                        $defaultValue = $argumentDefinition->getDefaultValue();
                         if ($isPasswordArgument) {
                             $argumentValue = $this->output->askHiddenResponse(
                                 sprintf(
@@ -197,7 +192,7 @@ class CliSetupRequestHandler
                                     $argumentDefinition->getDescription()
                                 )
                             );
-                        } elseif (is_bool($argument->getValue())) {
+                        } elseif (!$argumentDefinition->acceptsValue()) {
                             $argumentValue = (int)$this->output->askConfirmation(
                                 sprintf(
                                     '<comment>%s (%s):</comment> ',
@@ -215,8 +210,8 @@ class CliSetupRequestHandler
                                 )
                             );
                         }
-                    } while ($this->isArgumentRequired($argument) && $argumentValue === null);
-                    $actionArguments[$argumentDefinition->getName()] = $argumentValue !== null ? $argumentValue : $argument->getDefaultValue();
+                    } while ($isRequired && $argumentValue === null);
+                    $this->setActionArgument($actionArguments, $argumentValue !== null ? $argumentValue : $argumentDefinition->getDefaultValue(), $argumentDefinition);
                 }
             }
             $response = $this->executeActionWithArguments($actionName, $actionArguments);
@@ -244,7 +239,7 @@ class CliSetupRequestHandler
      */
     private function checkIfActionNeedsExecution($actionName)
     {
-        return $this->executeActionWithArguments('actionNeedsExecution', ['actionName' => $actionName]);
+        return $this->executeActionWithArguments('actionNeedsExecution', [$actionName]);
     }
 
     /**
@@ -267,40 +262,27 @@ class CliSetupRequestHandler
     }
 
     /**
-     * @param Argument $argument
+     * @param CommandArgumentDefinition $argumentDefinition
      * @return bool
      */
-    private function isArgumentRequired(Argument $argument)
+    private function isArgumentRequired(CommandArgumentDefinition $argumentDefinition): bool
     {
-        return $argument->isRequired() || $argument->getDefaultValue() === 'required';
+        return $argumentDefinition->isRequired() || $argumentDefinition->getDefaultValue() === 'required';
     }
 
-    /**
-     * Initializes the arguments array of this controller by creating an empty argument object for each of the
-     * method arguments found in the designated command method.
-     *
-     * @param string $commandMethodName
-     * @throws InvalidArgumentTypeException
-     * @return Arguments
-     */
-    private function getCommandMethodArguments($commandMethodName)
+    private function setActionArgument(&$currentActionArguments, $value, CommandArgumentDefinition $argumentDefinition)
     {
-        $arguments = $this->objectManager->get(\TYPO3\CMS\Extbase\Mvc\Controller\Arguments::class);
-        $methodParameters = $this->reflectionService->getMethodParameters(self::INSTALL_COMMAND_CONTROLLER_CLASS, $commandMethodName);
-        foreach ($methodParameters as $parameterName => $parameterInfo) {
-            $dataType = null;
-            if (isset($parameterInfo['type'])) {
-                $dataType = $parameterInfo['type'];
-            } elseif ($parameterInfo['array']) {
-                $dataType = 'array';
+        if ($argumentDefinition->isRequired()) {
+            $currentActionArguments[] = $value;
+        } else {
+            if ($argumentDefinition->acceptsValue()) {
+                $currentActionArguments[$argumentDefinition->getDashedName()] = $value;
+            } else {
+                $value = (bool)$value;
+                if ($value) {
+                    $currentActionArguments[] = $argumentDefinition->getDashedName();
+                }
             }
-            if ($dataType === null) {
-                throw new InvalidArgumentTypeException(sprintf('The argument type for parameter $%s of method %s->%s() could not be detected.', $parameterName, self::INSTALL_COMMAND_CONTROLLER_CLASS, $commandMethodName), 1306755296);
-            }
-            $defaultValue = (isset($parameterInfo['defaultValue']) ? $parameterInfo['defaultValue'] : null);
-            $arguments->addNewArgument($parameterName, $dataType, ($parameterInfo['optional'] === false), $defaultValue);
         }
-
-        return $arguments;
     }
 }

@@ -72,6 +72,7 @@ class DatabaseCommandController extends CommandController
      * @param array $schemaUpdateTypes List of schema update types (default: "safe")
      * @param bool $verbose If set, database queries performed are shown in output
      * @param bool $dryRun If set the updates are only collected and shown, but not executed
+     * @definition Argument(name=schemaUpdateTypes)
      */
     public function updateSchemaCommand(array $schemaUpdateTypes = ['safe'], $verbose = false, $dryRun = false)
     {

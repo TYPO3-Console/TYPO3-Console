@@ -126,11 +126,12 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
 
         if ($command instanceof CommandControllerCommand) {
             $definitions = [];
-            foreach ($command->getCommandDefinition()->getRequiredArguments() as $requiredArgument) {
+            foreach ($command->getCommandDefinition()->getArguments() as $argument) {
                 $definitions[] = new InputArgument(
-                    $requiredArgument->getName(),
-                    InputArgument::REQUIRED,
-                    $requiredArgument->getDescription()
+                    $argument->getName(),
+                    $argument->isRequired() ? InputArgument::REQUIRED : InputArgument::OPTIONAL,
+                    $argument->getDescription(),
+                    $argument->isRequired() ? null : $argument->getDefaultValue()
                 );
             }
             foreach ($command->getCommandDefinition()->getOptions() as $option) {

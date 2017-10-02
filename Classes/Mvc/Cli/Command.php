@@ -47,6 +47,11 @@ class Command
     protected $extensionName;
 
     /**
+     * @var bool
+     */
+    private $validateStrict = false;
+
+    /**
      * @var \TYPO3\CMS\Extbase\Reflection\ReflectionService
      */
     protected $reflectionService;
@@ -59,7 +64,7 @@ class Command
     /**
      * @var CommandArgumentDefinition[]
      */
-    private $requiredArguments = [];
+    private $arguments = [];
 
     /**
      * @var CommandArgumentDefinition[]
@@ -70,6 +75,11 @@ class Command
      * @var string[]
      */
     private $synopsis;
+
+    /**
+     * @var array
+     */
+    private $argumentNames = [];
 
     /**
      * @param \TYPO3\CMS\Extbase\Reflection\ReflectionService $reflectionService
@@ -204,18 +214,18 @@ class Command
      */
     public function hasRequiredArguments(): bool
     {
-        return count($this->getRequiredArguments()) > 0;
+        return count($this->getArguments()) > 0;
     }
 
     /**
      * @return CommandArgumentDefinition[]
      */
-    public function getRequiredArguments(): array
+    public function getArguments(): array
     {
         if ($this->argumentDefinitions === null) {
             $this->getArgumentDefinitions();
         }
-        return $this->requiredArguments;
+        return $this->arguments;
     }
 
     /**
@@ -227,6 +237,17 @@ class Command
             $this->getArgumentDefinitions();
         }
         return $this->options;
+    }
+
+    /**
+     * @return bool
+     */
+    public function shouldValidateInputStrict(): bool
+    {
+        if ($this->argumentDefinitions === null) {
+            $this->getArgumentDefinitions();
+        }
+        return $this->validateStrict;
     }
 
     /**
@@ -247,6 +268,9 @@ class Command
         $this->argumentDefinitions = [];
         $commandMethodReflection = $this->getCommandMethodReflection();
         $annotations = $commandMethodReflection->getTagsValues();
+        if (!empty($annotations['definition'])) {
+            $this->parseDefinitions($annotations['definition']);
+        }
         $commandParameters = $this->reflectionService->getMethodParameters($this->controllerClassName, $this->controllerCommandName . 'Command');
         $i = 0;
         foreach ($commandParameters as $commandParameterName => $commandParameterDefinition) {
@@ -259,8 +283,8 @@ class Command
             $default = $commandParameterDefinition['defaultValue'] ?? null;
             $required = $commandParameterDefinition['optional'] !== true;
             $argumentDefinition = new CommandArgumentDefinition($commandParameterName, $required, $description, $dataType, $default);
-            if ($required) {
-                $this->requiredArguments[] = $argumentDefinition;
+            if ($required || in_array($commandParameterName, $this->argumentNames, true)) {
+                $this->arguments[] = $argumentDefinition;
             } else {
                 $this->options[] = $argumentDefinition;
             }
@@ -268,6 +292,37 @@ class Command
             $i++;
         }
         return $this->argumentDefinitions;
+    }
+
+    /**
+     * Very simple parsing of a @definition annotations on command methods.
+     *
+     * @param array $definitions Definition tags on command controller command methods
+     */
+    private function parseDefinitions(array $definitions)
+    {
+        foreach ($definitions as $definition) {
+            $definition = preg_replace('/\s/', '', $definition);
+
+            $instructions = explode(',', $definition);
+            foreach ($instructions as $instruction) {
+                preg_match('/^([a-zA-Z]*)\(([^)]*)\)$/', $instruction, $matches);
+                list(, $name, $options) = $matches;
+                if ($name === 'Validate' && $options === 'strict=true') {
+                    $this->validateStrict = true;
+                    continue;
+                }
+                if ($name === 'Argument') {
+                    foreach (explode(',', $options) as $argumentOption) {
+                        if (strpos($argumentOption, 'name=') === false) {
+                            continue;
+                        }
+                        $argumentName = str_replace('name=', '', $argumentOption);
+                        $this->argumentNames[] = $argumentName;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -298,7 +353,7 @@ class Command
         if (count($elements) && $this->hasRequiredArguments()) {
             $elements[] = '[--]';
         }
-        foreach ($this->getRequiredArguments() as $argumentDefinition) {
+        foreach ($this->getArguments() as $argumentDefinition) {
             $elements[] = '<' . $argumentDefinition->getName() . '>';
         }
 
