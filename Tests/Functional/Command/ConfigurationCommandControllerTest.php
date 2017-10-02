@@ -96,7 +96,7 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     {
         $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
         $oldPassword = $config['BE']['installToolPassword'];
-        $this->executeConsoleCommand('configuration:remove', ['--path' => 'BE/installToolPassword', '--force' => true]);
+        $this->executeConsoleCommand('configuration:remove', ['--paths' => 'BE/installToolPassword', '--force' => true]);
         $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
         $this->assertArrayNotHasKey('installToolPassword', $config['BE']);
         $this->executeConsoleCommand('configuration:set', ['--path' => 'BE/installToolPassword', '--value' => $oldPassword]);

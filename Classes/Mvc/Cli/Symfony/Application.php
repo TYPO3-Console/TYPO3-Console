@@ -37,7 +37,7 @@ class Application extends BaseApplication
      */
     private $runLevel;
 
-    public function __construct(RunLevel $runLevel)
+    public function __construct(RunLevel $runLevel = null)
     {
         parent::__construct('TYPO3 Console', self::TYPO3_CONSOLE_VERSION);
         $this->runLevel = $runLevel;

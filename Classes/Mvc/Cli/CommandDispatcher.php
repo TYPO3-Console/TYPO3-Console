@@ -151,7 +151,10 @@ class CommandDispatcher
         $processBuilder->setInput($input);
 
         foreach ($arguments as $argumentName => $argumentValue) {
-            if (strpos($argumentName, '--') === 0) {
+            if (is_int($argumentName)) {
+                $dashedName = $argumentValue;
+                $argumentValue = null;
+            } elseif (strpos($argumentName, '--') === 0) {
                 $dashedName = $argumentName;
             } else {
                 $dashedName = ucfirst($argumentName);
