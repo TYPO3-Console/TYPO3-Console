@@ -44,6 +44,7 @@ class UpgradeCommandController extends CommandController
      *
      * @param array $extensionKeys Extension keys to check. Separate multiple extension keys with comma.
      * @param string $typo3Version TYPO3 version to check against. Defaults to current TYPO3 version.
+     * @definition Argument(name=extensionKeys)
      */
     public function checkExtensionConstraintsCommand(array $extensionKeys = [], $typo3Version = TYPO3_version)
     {
