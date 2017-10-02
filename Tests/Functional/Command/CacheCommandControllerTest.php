@@ -94,7 +94,7 @@ class CacheCommandControllerTest extends AbstractCommandTest
      */
     public function cacheGroupsCanBeFlushed()
     {
-        $output = $this->executeConsoleCommand('cache:flushgroups', ['--groups' => 'pages']);
+        $output = $this->executeConsoleCommand('cache:flushgroups', ['pages']);
         $this->assertSame('Flushed all caches for group(s): "pages".', $output);
     }
 
@@ -104,7 +104,7 @@ class CacheCommandControllerTest extends AbstractCommandTest
     public function invalidGroupsMakesCommandFail()
     {
         try {
-            $this->commandDispatcher->executeCommand('cache:flushgroups', ['--groups' => 'foo']);
+            $this->commandDispatcher->executeCommand('cache:flushgroups', ['foo']);
         } catch (FailedSubProcessCommandException $e) {
             $this->assertSame(1, $e->getExitCode());
             $this->assertContains('Invalid cache groups "foo".', $e->getOutputMessage());
@@ -125,7 +125,7 @@ class CacheCommandControllerTest extends AbstractCommandTest
      */
     public function cacheTagsCanBeFlushed()
     {
-        $output = $this->executeConsoleCommand('cache:flushtags', ['--tags' => 'foo']);
+        $output = $this->executeConsoleCommand('cache:flushtags', ['foo']);
         $this->assertSame('Flushed caches by tags "foo".', $output);
     }
 
@@ -134,7 +134,7 @@ class CacheCommandControllerTest extends AbstractCommandTest
      */
     public function cacheTagsAndGroupsCanBeFlushed()
     {
-        $output = $this->executeConsoleCommand('cache:flushtags', ['--tags' => 'foo', '--groups' => 'pages']);
+        $output = $this->executeConsoleCommand('cache:flushtags', ['foo', '--groups' => 'pages']);
         $this->assertSame('Flushed caches by tags "foo" in groups: "pages".', $output);
     }
 }

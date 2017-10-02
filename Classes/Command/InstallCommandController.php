@@ -140,7 +140,7 @@ class InstallCommandController extends CommandController
 
         try {
             // Make sure file caches are empty after generating package states file
-            CommandDispatcher::createFromCommandRun()->executeCommand('cache:flush', ['--files-only' => true]);
+            CommandDispatcher::createFromCommandRun()->executeCommand('cache:flush', ['--files-only']);
         } catch (FailedSubProcessCommandException $e) {
             // Ignore errors here.
             // They might be triggered from extensions accessing db or having other things

@@ -293,7 +293,7 @@ class UpgradeHandling
     public function executeInSubProcess($command, array $arguments = [], array &$messages = [])
     {
         $messages = $this->ensureUpgradeIsPossible();
-        return @unserialize($this->commandDispatcher->executeCommand('upgrade:subprocess', ['command' => $command, 'arguments' => serialize($arguments)]));
+        return @unserialize($this->commandDispatcher->executeCommand('upgrade:subprocess', [$command, serialize($arguments)]));
     }
 
     /**
@@ -318,7 +318,7 @@ class UpgradeHandling
             $this->silentConfigurationUpgrade->executeSilentConfigurationUpgradesIfNeeded();
             // TODO: Check what we can do here to get TYPO3 9 support for this feature
             if (class_exists(DatabaseCharsetUpdate::class)) {
-                $this->commandDispatcher->executeCommand('upgrade:wizard', ['identifier' => DatabaseCharsetUpdate::class]);
+                $this->commandDispatcher->executeCommand('upgrade:wizard', [DatabaseCharsetUpdate::class]);
             }
             $this->commandDispatcher->executeCommand('cache:flush');
             $this->commandDispatcher->executeCommand('database:updateschema');

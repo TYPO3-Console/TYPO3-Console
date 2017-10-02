@@ -177,7 +177,7 @@ Arguments
 
 Flushes caches by tags, optionally only caches in specified groups.
 
-**Example:** ``typo3cms cache:flushtags news_123 pages,all``
+**Example:** ``typo3cms cache:flushtags news_123 --groups pages,all``
 
 Arguments
 ^^^^^^^^^
@@ -360,9 +360,9 @@ Options
 
 Shows local configuration option value by path.
 Shows the value which is stored in LocalConfiguration.php.
-Note that this value could be overridden. Use ``typo3cms configuration:show [path]`` to see if this is the case.
+Note that this value could be overridden. Use ``typo3cms configuration:show <path>`` to see if this is the case.
 
-**Example:** ``typo3cms configuration:showLocal DB``
+**Example:** ``typo3cms configuration:showlocal DB``
 
 Arguments
 ^^^^^^^^^
@@ -964,7 +964,7 @@ Options
 **Check TYPO3 version constraints of extensions**
 
 This command is especially useful **before** switching sources to a new TYPO3 version.
-I checks the version constraints of all third party extensions against a given TYPO3 version.
+It checks the version constraints of all third party extensions against a given TYPO3 version.
 It therefore relies on the constraints to be correct.
 
 

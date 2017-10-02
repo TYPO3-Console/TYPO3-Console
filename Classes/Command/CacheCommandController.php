@@ -60,7 +60,7 @@ class CacheCommandController extends CommandController
         }
         if ($filesOnly) {
             $this->cacheService->flushFileCaches($force);
-            $this->commandDispatcher->executeCommand('cache:flushcomplete', ['--files-only' => true]);
+            $this->commandDispatcher->executeCommand('cache:flushcomplete', ['--files-only']);
         } else {
             $this->cacheService->flush($force);
             $this->commandDispatcher->executeCommand('cache:flushcomplete');
@@ -132,7 +132,7 @@ class CacheCommandController extends CommandController
      *
      * Flushes caches by tags, optionally only caches in specified groups.
      *
-     * <b>Example:</b> <code>typo3cms cache:flushtags news_123 pages,all</code>
+     * <b>Example:</b> <code>typo3cms cache:flushtags news_123 --groups pages,all</code>
      *
      * @param array $tags Array of tags (specified as comma separated values) to flush.
      * @param array $groups Optional array of groups (specified as comma separated values) for which to flush tags. If no group is specified, caches of all groups are flushed.

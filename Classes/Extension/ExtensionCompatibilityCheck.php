@@ -66,13 +66,13 @@ class ExtensionCompatibilityCheck
                 // There is not need to check core extensions
                 continue;
             }
-            $isCompatible = @\json_decode($this->commandDispatcher->executeCommand('upgrade:checkextensioncompatibility', ['--extension-key' => $package->getPackageKey(), '--config-only' => true]));
+            $isCompatible = @\json_decode($this->commandDispatcher->executeCommand('upgrade:checkextensioncompatibility', [$package->getPackageKey(), '--config-only']));
             if (!$isCompatible) {
                 $this->packageManager->deactivatePackage($package->getPackageKey());
                 $failedPackages[] = $package->getPackageKey();
                 continue;
             }
-            $isCompatible = @\json_decode($this->commandDispatcher->executeCommand('upgrade:checkextensioncompatibility', ['--extension-key' => $package->getPackageKey()]));
+            $isCompatible = @\json_decode($this->commandDispatcher->executeCommand('upgrade:checkextensioncompatibility', [$package->getPackageKey()]));
             if (!$isCompatible) {
                 $this->packageManager->deactivatePackage($package->getPackageKey());
                 $failedPackages[] = $package->getPackageKey();

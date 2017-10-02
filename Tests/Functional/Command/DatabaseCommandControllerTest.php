@@ -32,7 +32,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
      */
     public function allUpdatesCanBePerformedWhenSpecified()
     {
-        $output = $this->executeConsoleCommand('database:updateschema', ['--schema-update-types' => '*', '--verbose' => true]);
+        $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
         $this->assertContains('No schema updates were performed for update types:', $output);
         $this->assertContains('"field.add", "field.change", "field.prefix", "field.drop", "table.add", "table.change", "table.prefix", "table.drop"', $output);
     }
@@ -43,31 +43,31 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     public function addingAndRemovingFieldsAndTablesIncludingVerbositySwitchWork()
     {
         $this->installFixtureExtensionCode('ext_test');
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default' => true]);
+        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
 
-        $output = $this->executeConsoleCommand('database:updateschema', ['--schema-update-types' => '*', '--verbose' => true]);
+        $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
 
         $this->assertContains('The following database schema updates were performed:', $output);
         $this->assertContains('Change fields', $output);
         $this->assertContains('Add tables', $output);
 
         $this->removeFixtureExtensionCode('ext_test');
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default' => true]);
+        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
 
-        $output = $this->executeConsoleCommand('database:updateschema', ['--schema-update-types' => '*', '--verbose' => true]);
+        $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
 
         $this->assertContains('The following database schema updates were performed:', $output);
         $this->assertContains('SQL Statements ', $output);
         $this->assertContains('Change fields', $output);
         $this->assertContains('Prefix tables', $output);
 
-        $output = $this->executeConsoleCommand('database:updateschema', ['--schema-update-types' => '*']);
+        $output = $this->executeConsoleCommand('database:updateschema', ['*']);
 
         $this->assertContains('The following database schema updates were performed:', $output);
         $this->assertNotContains('SQL Statements ', $output);
         $this->assertContains('Drop tables', $output);
 
-        $output = $this->executeConsoleCommand('database:updateschema', ['--schema-update-types' => '*', '--verbose' => true]);
+        $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
 
         $this->assertContains('No schema updates were performed for update types:', $output);
     }
@@ -80,7 +80,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
         $this->backupDatabase();
         $this->executeMysqlQuery('DROP DATABASE ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
         $this->executeMysqlQuery('CREATE DATABASE ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
-        $output = $this->executeConsoleCommand('database:updateschema', ['--schema-update-types' => '*']);
+        $output = $this->executeConsoleCommand('database:updateschema', ['*']);
         $this->assertContains('The following database schema updates were performed:', $output);
         $this->restoreDatabase();
     }
@@ -91,23 +91,23 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     public function schemaUpdateShowsErrorMessageIfTheyOccur()
     {
         $this->installFixtureExtensionCode('ext_broken_sql');
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default' => true]);
+        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
         try {
-            $output = $this->commandDispatcher->executeCommand('database:updateschema', ['--schema-update-types' => '*']);
+            $output = $this->commandDispatcher->executeCommand('database:updateschema', ['*']);
         } catch (FailedSubProcessCommandException $e) {
             $output = $e->getOutputMessage();
         }
         $this->assertContains('The following errors occurred:', $output);
         $this->assertNotContains('SQL Statement', $output);
         try {
-            $output = $this->commandDispatcher->executeCommand('database:updateschema', ['--schema-update-types' => '*', '--verbose' => true]);
+            $output = $this->commandDispatcher->executeCommand('database:updateschema', ['*', '--verbose']);
         } catch (FailedSubProcessCommandException $e) {
             $output = $e->getOutputMessage();
         }
         $this->assertContains('The following errors occurred:', $output);
         $this->assertContains('SQL Statement', $output);
         $this->removeFixtureExtensionCode('ext_broken_sql');
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default' => true]);
+        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
     }
 
     /**
