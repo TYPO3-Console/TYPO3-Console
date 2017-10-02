@@ -55,6 +55,14 @@ class CommandControllerCommand extends Command
         parent::__construct($name);
     }
 
+    /**
+     * @return CommandDefinition
+     */
+    public function getCommandDefinition(): CommandDefinition
+    {
+        return $this->commandDefinition;
+    }
+
     public function isEnabled()
     {
         if (!$this->application->isFullyCapable()
