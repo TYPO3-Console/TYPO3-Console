@@ -53,19 +53,26 @@ class CommandArgumentDefinition
     private $dataType;
 
     /**
+     * @var mixed
+     */
+    private $defaultValue;
+
+    /**
      * Constructor
      *
      * @param string $name name of the command argument (= parameter name)
      * @param bool $required defines whether this argument is required or optional
      * @param string $description description of the argument
      * @param string $dataType data type (boolean, string or array)
+     * @param mixed $defaultValue
      */
-    public function __construct($name, $required, $description, $dataType)
+    public function __construct($name, $required, $description, $dataType, $defaultValue = null)
     {
         $this->name = $name;
         $this->required = $required;
         $this->description = $description;
         $this->dataType = $dataType;
+        $this->defaultValue = $defaultValue;
     }
 
     /**
@@ -118,6 +125,14 @@ class CommandArgumentDefinition
     public function getDataType(): string
     {
         return $this->dataType;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDefaultValue()
+    {
+        return $this->defaultValue;
     }
 
     /**

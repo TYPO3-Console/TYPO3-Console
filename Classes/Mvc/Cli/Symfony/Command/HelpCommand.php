@@ -26,7 +26,6 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony\Command;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\DescriptorHelper;
@@ -77,22 +76,14 @@ class HelpCommand extends \Symfony\Component\Console\Command\HelpCommand
             $this->command = $this->getApplication()->find($input->getArgument('command_name'));
         }
 
-        if ($this->command instanceof CommandControllerCommand) {
-            // An Extbase command was originally called, but is now required to show the help information
-            if ($isRaw = $input->getOption('raw')) {
-                $output->setDecorated(false);
-            }
-            (new RequestHandler())->handle([$input->getFirstArgument(), 'help', $this->command->getName()], $input, $output);
-        } else {
-            // Any other Symfony command should just show up the regular info
-            $helper = new DescriptorHelper();
-            $helper->register('txt', new TextDescriptor());
-            $helper->describe($output, $this->command, [
-                'format' => $input->getOption('format'),
-                'raw_text' => $input->getOption('raw'),
-                'screen_width' => (new Terminal())->getWidth() - 4,
-            ]);
-        }
+        $helper = new DescriptorHelper();
+        // Add our own descriptor
+        $helper->register('txt', new TextDescriptor());
+        $helper->describe($output, $this->command, [
+            'format' => $input->getOption('format'),
+            'raw_text' => $input->getOption('raw'),
+            'screen_width' => (new Terminal())->getWidth() - 4,
+        ]);
         $this->command = null;
     }
 }

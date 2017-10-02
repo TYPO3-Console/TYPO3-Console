@@ -22,6 +22,7 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony\Descriptor;
  * file that was distributed with this source code.
  */
 
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\CommandControllerCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Descriptor\ApplicationDescription;
@@ -104,6 +105,70 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
             $default,
             $option->isArray() ? '<comment> (multiple values allowed)</comment>' : ''
         ), $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     */
+    protected function describeCommand(Command $command, array $options = [])
+    {
+        $command->getSynopsis(true);
+        $command->getSynopsis(false);
+        $command->mergeApplicationDefinition(false);
+
+        $this->writeText('<comment>Usage:</comment>', $options);
+        foreach (array_merge([$command->getSynopsis(true)], $command->getAliases(), $command->getUsages()) as $usage) {
+            $this->writeText("\n");
+            $this->writeText('  ' . $usage, $options);
+        }
+        $this->writeText("\n");
+
+        if ($command instanceof CommandControllerCommand) {
+            $definitions = [];
+            foreach ($command->getCommandDefinition()->getRequiredArguments() as $requiredArgument) {
+                $definitions[] = new InputArgument(
+                    $requiredArgument->getName(),
+                    InputArgument::REQUIRED,
+                    $requiredArgument->getDescription()
+                );
+            }
+            foreach ($command->getCommandDefinition()->getOptions() as $option) {
+                if (!$option->acceptsValue()) {
+                    $definitions[] = new InputOption(
+                        $option->getOptionName(),
+                        null,
+                        InputOption::VALUE_NONE,
+                        $option->getDescription()
+                    );
+                } else {
+                    $definitions[] = new InputOption(
+                        $option->getOptionName(),
+                        null,
+                        InputOption::VALUE_REQUIRED,
+                        $option->getDescription(),
+                        $option->getDefaultValue()
+                    );
+                }
+            }
+            $definition = new InputDefinition($definitions);
+        } else {
+            $definition = $command->getNativeDefinition();
+        }
+
+        if ($definition->getOptions() || $definition->getArguments()) {
+            $this->writeText("\n");
+            $this->describeInputDefinition($definition, $options);
+            $this->writeText("\n");
+        }
+
+        if ($help = $command->getProcessedHelp()) {
+            $this->writeText("\n");
+            $this->writeText('<comment>Help:</comment>', $options);
+            $this->writeText("\n");
+            $this->writeText('  ' . str_replace("\n", "\n  ", $help), $options);
+            $this->writeText("\n");
+        }
     }
 
     /**

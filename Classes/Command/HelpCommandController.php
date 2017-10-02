@@ -13,10 +13,7 @@ namespace Helhum\Typo3Console\Command;
  *
  */
 
-use Helhum\Typo3Console\Core\Booting\RunLevel;
-use Helhum\Typo3Console\Mvc\Cli\Command;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
-use TYPO3\CMS\Core\Core\Bootstrap;
 
 /**
  * A Command Controller which provides help for available commands
@@ -25,17 +22,6 @@ use TYPO3\CMS\Core\Core\Bootstrap;
  */
 class HelpCommandController extends CommandController
 {
-    /**
-     * @var \TYPO3\CMS\Extbase\Mvc\Cli\CommandManager
-     * @inject
-     */
-    protected $commandManager;
-
-    /**
-     * @var Command[]
-     */
-    protected $commands = [];
-
     /**
      * Help
      *
@@ -49,55 +35,7 @@ class HelpCommandController extends CommandController
      */
     public function helpCommand($commandIdentifier)
     {
-        $command = $this->commandManager->getCommandByIdentifier($commandIdentifier);
-        $commandArgumentDefinitions = $command->getArgumentDefinitions();
-        $this->outputLine('<comment>Usage:</comment>');
-        $this->outputLine('  ' . $this->commandManager->getShortestIdentifierForCommand($command) . ' ' . $command->getSynopsis(true));
-        $argumentDescriptions = [];
-        $optionDescriptions = [];
-        if ($command->hasArguments()) {
-            foreach ($commandArgumentDefinitions as $commandArgumentDefinition) {
-                $argumentDescription = $commandArgumentDefinition->getDescription();
-                $argumentDescription = $this->wordWrap($argumentDescription, 23);
-                if ($commandArgumentDefinition->isRequired()) {
-                    $argumentDescriptions[] = vsprintf('  <info>%-20s</info> %s', [$commandArgumentDefinition->getName(), $argumentDescription]);
-                } else {
-                    $optionDescriptions[] = vsprintf('  <info>%-20s</info> %s', [$commandArgumentDefinition->getDashedName(), $argumentDescription]);
-                }
-            }
-        }
-        if (count($argumentDescriptions) > 0) {
-            $this->outputLine();
-            $this->outputLine('<comment>Arguments:</comment>');
-            foreach ($argumentDescriptions as $argumentDescription) {
-                $this->outputLine($argumentDescription);
-            }
-        }
-        if (count($optionDescriptions) > 0) {
-            $this->outputLine();
-            $this->outputLine('<comment>Options:</comment>');
-            foreach ($optionDescriptions as $optionDescription) {
-                $this->outputLine($optionDescription);
-            }
-        }
-        if ($command->getDescription() !== '') {
-            $this->outputLine();
-            $this->outputLine('<comment>Help:</comment>');
-            $descriptionLines = explode(chr(10), $command->getDescription());
-            foreach ($descriptionLines as $descriptionLine) {
-                $this->outputLine('%-2s%s', [' ', $descriptionLine]);
-            }
-        }
-        $relatedCommandIdentifiers = $command->getRelatedCommandIdentifiers();
-        if ($relatedCommandIdentifiers !== []) {
-            $this->outputLine();
-            $this->outputLine('<comment>Related Commands:</comment>');
-            foreach ($relatedCommandIdentifiers as $relatedIdentifier) {
-                $command = $this->commandManager->getCommandByIdentifier($relatedIdentifier);
-                $this->outputLine('%-2s%s (%s)', [' ', $this->commandManager->getShortestIdentifierForCommand($command), $command->getShortDescription()]);
-            }
-        }
-        $this->outputLine();
+        // Intentionally empty for now (until command reference can render Symfony commands)
     }
 
     /**
@@ -117,47 +55,8 @@ class HelpCommandController extends CommandController
             }
         }
         $this->outputLine();
-        $this->outputLine('See <info>help</info> for an overview of all available commands');
+        $this->outputLine('See <info>list</info> for an overview of all available commands');
         $this->outputLine('or <info>help</info> <command> for a detailed description of the corresponding command.');
         $this->quit(1);
-    }
-
-    /**
-     * Builds an index of available commands. For each of them a Command object is
-     * added to the commands array of this class.
-     *
-     * @return void
-     */
-    protected function buildCommandsIndex()
-    {
-        $availableCommands = $this->commandManager->getAvailableCommands();
-        $runLevel = Bootstrap::getInstance()->getEarlyInstance(RunLevel::class);
-
-        foreach ($availableCommands as $command) {
-            if ($command->isInternal()) {
-                continue;
-            }
-
-            $shortCommandIdentifier = $this->commandManager->getShortestIdentifierForCommand($command);
-
-            if ($runLevel->getMaximumAvailableRunLevel() === RunLevel::LEVEL_COMPILE && !$runLevel->isCommandAvailable($shortCommandIdentifier)) {
-                continue;
-            }
-
-            $this->commands[$shortCommandIdentifier] = $command;
-        }
-
-        ksort($this->commands);
-    }
-
-    /**
-     * @param string $stringToWrap
-     * @param int $indent
-     * @return string
-     */
-    protected function wordWrap($stringToWrap, $indent)
-    {
-        $formatter = $this->output->getSymfonyConsoleOutput()->getFormatter();
-        return wordwrap($formatter->format($stringToWrap), $this->output->getMaximumLineLength() - $indent, PHP_EOL . str_repeat(' ', $indent), true);
     }
 }
