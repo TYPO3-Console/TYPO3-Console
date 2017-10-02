@@ -31,7 +31,10 @@ use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -89,9 +92,83 @@ class CommandControllerCommand extends Command
      */
     protected function configure()
     {
-        $this->ignoreValidationErrors();
         $this->setDescription($this->commandDefinition->getShortDescription());
         $this->setHelp($this->commandDefinition->getDescription());
+
+        $applicationDefinition = $this->getApplicationDefinition();
+        foreach ($this->commandDefinition->getRequiredArguments() as $requiredArgument) {
+            $argumentName = $requiredArgument->getName();
+            if ($applicationDefinition->hasArgument($argumentName)) {
+                // That is most likely the "command" argument
+                // We append the full command identifier so we don't get an exception from Symfony
+                $argumentName .= '_' . $this->commandDefinition->getCommandIdentifier();
+            }
+            $this->addArgument(
+                $argumentName,
+                // OPTIONAL for compatibility
+                // @deprecated in 5.0 will be changed to REQUIRED in 6.0
+                InputArgument::OPTIONAL,
+                $requiredArgument->getDescription()
+            );
+            // Fallback option for compatibility but only in case no other option with same name is defined already
+            // @deprecated in 5.0 will be removed in 6.0
+            if ($applicationDefinition->hasOption($requiredArgument->getOptionName())) {
+                // Option is globally defined already, so we can skip here
+                continue;
+            }
+            $this->addOption(
+                $requiredArgument->getOptionName(),
+                null,
+                InputOption::VALUE_REQUIRED,
+                $requiredArgument->getDescription()
+            );
+        }
+        foreach ($this->commandDefinition->getOptions() as $option) {
+            if ($applicationDefinition->hasOption($option->getOptionName())) {
+                // Option is globally defined already, so we can skip here
+                continue;
+            }
+            if (!$option->acceptsValue()) {
+                $this->addOption(
+                    $option->getOptionName(),
+                    null,
+                    // VALUE_OPTIONAL for compatibility
+                    // @deprecated in 5.0 will be changed to VALUE_NONE in 6.0
+                    InputOption::VALUE_OPTIONAL,
+                    $option->getDescription()
+                );
+            } else {
+                $this->addOption(
+                    $option->getOptionName(),
+                    null,
+                    InputOption::VALUE_REQUIRED,
+                    $option->getDescription(),
+                    $option->getDefaultValue()
+                );
+            }
+            // Fallback argument for compatibility
+            // @deprecated in 5.0 will be removed in 6.0
+            $this->addArgument(
+                $option->getName(),
+                InputArgument::OPTIONAL,
+                $option->getDescription(),
+                $option->getDefaultValue()
+            );
+        }
+    }
+
+    /**
+     * During configure, we don't have an application object yet,
+     * so we create a fake one, just to get the default definitions.
+     *
+     * @return InputDefinition
+     */
+    private function getApplicationDefinition()
+    {
+        if ($this->application === null) {
+            return (new Application())->getDefinition();
+        }
+        return $this->getApplication()->getDefinition();
     }
 
     /**
