@@ -39,7 +39,7 @@ class UpgradeCommandController extends CommandController
      * Check TYPO3 version constraints of extensions
      *
      * This command is especially useful **before** switching sources to a new TYPO3 version.
-     * I checks the version constraints of all third party extensions against a given TYPO3 version.
+     * It checks the version constraints of all third party extensions against a given TYPO3 version.
      * It therefore relies on the constraints to be correct.
      *
      * @param array $extensionKeys Extension keys to check. Separate multiple extension keys with comma.
@@ -144,14 +144,14 @@ class UpgradeCommandController extends CommandController
      * This is where the hard work happens in a fully bootstrapped TYPO3
      * It will be called as sub process
      *
-     * @param string $command
+     * @param string $upgradeCommand
      * @param string $arguments Serialized arguments
      * @internal
      */
-    public function subProcessCommand($command, $arguments)
+    public function subProcessCommand($upgradeCommand, $arguments)
     {
         $arguments = unserialize($arguments, ['allowed_classes' => false]);
-        $result = $this->upgradeHandling->$command(...$arguments);
+        $result = $this->upgradeHandling->$upgradeCommand(...$arguments);
         $this->output(serialize($result));
     }
 

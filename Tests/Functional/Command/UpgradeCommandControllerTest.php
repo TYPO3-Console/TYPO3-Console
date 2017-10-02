@@ -43,14 +43,14 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     public function checkExtensionConstraintsReturnsErrorCodeOnFailure()
     {
         $this->installFixtureExtensionCode('ext_test');
-        $this->executeConsoleCommand('extension:activate', ['--extension-keys' => 'ext_test']);
+        $this->executeConsoleCommand('extension:activate', ['ext_test']);
         try {
             $this->commandDispatcher->executeCommand('upgrade:checkextensionconstraints', ['--typo3-version' => '3.6.0']);
         } catch (FailedSubProcessCommandException $e) {
             $this->assertSame(1, $e->getExitCode());
             $this->assertContains('"ext_test" requires TYPO3 versions 4.5.0', $e->getOutputMessage());
         }
-        $this->executeConsoleCommand('extension:deactivate', ['--extension-keys' => 'ext_test']);
+        $this->executeConsoleCommand('extension:deactivate', ['ext_test']);
         $this->removeFixtureExtensionCode('ext_test');
     }
 
@@ -59,7 +59,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
      */
     public function checkExtensionConstraintsIssuesWarningForInvalidExtensionKeys()
     {
-        $output = $this->executeConsoleCommand('upgrade:checkextensionconstraints', ['--extension-keys' => 'foo,bar']);
+        $output = $this->executeConsoleCommand('upgrade:checkextensionconstraints', ['foo,bar']);
         $this->assertContains('Extension "foo" is not found in the system', $output);
         $this->assertContains('Extension "bar" is not found in the system', $output);
     }
@@ -122,7 +122,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         $output = $this->executeConsoleCommand(
             'install:setup',
             [
-                '--non-interactive' => true,
+                '--non-interactive',
                 '--database-user-name' => getenv('TYPO3_INSTALL_DB_USER'),
                 '--database-user-password' => getenv('TYPO3_INSTALL_DB_PASSWORD'),
                 '--database-host-name' => 'localhost',

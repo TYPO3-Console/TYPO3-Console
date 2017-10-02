@@ -128,9 +128,9 @@ class ConfigurationCommandController extends CommandController implements Single
      *
      * Shows local configuration option value by path.
      * Shows the value which is stored in LocalConfiguration.php.
-     * Note that this value could be overridden. Use <code>typo3cms configuration:show [path]</code> to see if this is the case.
+     * Note that this value could be overridden. Use <code>typo3cms configuration:show <path></code> to see if this is the case.
      *
-     * <b>Example:</b> <code>typo3cms configuration:showLocal DB</code>
+     * <b>Example:</b> <code>typo3cms configuration:showlocal DB</code>
      *
      * @param string $path Path to local system configuration
      * @param bool $json If set, the configuration is shown as JSON

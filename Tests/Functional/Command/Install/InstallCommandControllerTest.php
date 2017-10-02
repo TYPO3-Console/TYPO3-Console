@@ -38,8 +38,8 @@ class InstallCommandControllerTest extends AbstractCommandTest
         $output = $this->executeConsoleCommand(
             'install:setup',
             [
-                '--non-interactive' => true,
-                '--skip-extension-setup' => true,
+                '--non-interactive',
+                '--skip-extension-setup',
                 '--database-user-name' => getenv('TYPO3_INSTALL_DB_USER'),
                 '--database-user-password' => getenv('TYPO3_INSTALL_DB_PASSWORD'),
                 '--database-host-name' => 'localhost',
@@ -66,7 +66,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
         $output = $this->executeConsoleCommand(
             'install:setup',
             [
-                '--non-interactive' => true,
+                '--non-interactive',
                 '--database-user-name' => getenv('TYPO3_INSTALL_DB_USER'),
                 '--database-user-password' => getenv('TYPO3_INSTALL_DB_PASSWORD'),
                 '--database-host-name' => 'localhost',
@@ -98,9 +98,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
     {
         $indexFile = getenv('TYPO3_PATH_ROOT') . '/typo3temp/index.html';
         @unlink($indexFile);
-        $this->executeConsoleCommand(
-            'install:fixfolderstructure'
-        );
+        $this->executeConsoleCommand('install:fixfolderstructure');
         $this->assertTrue(file_exists($indexFile));
     }
 
@@ -111,9 +109,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
     {
         $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
         @unlink($packageStatesFile);
-        $this->executeConsoleCommand(
-            'install:generatepackagestates'
-        );
+        $this->executeConsoleCommand('install:generatepackagestates');
         $this->assertTrue(file_exists($packageStatesFile));
         $packageConfig = require $packageStatesFile;
         if ($packageConfig['version'] === 5) {
@@ -131,7 +127,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
         $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
         copy($packageStatesFile, $packageStatesFile . '_');
         @unlink($packageStatesFile);
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default' => true]);
+        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
         $this->assertTrue(file_exists($packageStatesFile));
         $packageConfig = require $packageStatesFile;
         copy($packageStatesFile . '_', $packageStatesFile);
