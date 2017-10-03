@@ -263,9 +263,10 @@ class InstallCommandController extends CommandController
      *
      * @param bool $useExistingDatabase Use already existing database?
      * @param string $databaseName Name of the database
+     * @definition Argument(name=databaseName)
      * @internal
      */
-    public function databaseSelectCommand($useExistingDatabase = false, $databaseName = 'required')
+    public function databaseSelectCommand($useExistingDatabase = false, $databaseName = '')
     {
         $selectType = $useExistingDatabase ? 'existing' : 'new';
         $this->executeActionWithArguments('databaseSelect', ['type' => $selectType, $selectType => $databaseName]);
