@@ -17,6 +17,7 @@ namespace Helhum\Typo3Console\Mvc\Cli;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use TYPO3\CMS\Extbase\Reflection\MethodReflection;
 
 /**
  * Represents a Command
@@ -39,7 +40,7 @@ class Command
     protected $commandIdentifier;
 
     /**
-     * @var \TYPO3\CMS\Extbase\Reflection\MethodReflection
+     * @var MethodReflection
      */
     protected $commandMethodReflection;
 
@@ -49,11 +50,6 @@ class Command
      * @var string
      */
     protected $extensionName;
-
-    /**
-     * @var bool
-     */
-    private $validateStrict = false;
 
     /**
      * @var \TYPO3\CMS\Extbase\Reflection\ReflectionService
@@ -79,6 +75,11 @@ class Command
      * @var string[]
      */
     private $synopsis;
+
+    /**
+     * @var array
+     */
+    private $commandMethodDefinitions = null;
 
     /**
      * @var array
@@ -254,10 +255,7 @@ class Command
      */
     public function shouldValidateInputStrict(): bool
     {
-        if ($this->argumentDefinitions === null) {
-            $this->getArgumentDefinitions();
-        }
-        return $this->validateStrict;
+        return !empty($this->getCommandMethodDefinitions()['Validate'][0]['strict']);
     }
 
     /**
@@ -278,11 +276,9 @@ class Command
         $this->argumentDefinitions = [];
         $commandMethodReflection = $this->getCommandMethodReflection();
         $annotations = $commandMethodReflection->getTagsValues();
-        if (!empty($annotations['definition'])) {
-            $this->parseDefinitions($annotations['definition']);
-        }
         $commandParameters = $this->reflectionService->getMethodParameters($this->controllerClassName, $this->controllerCommandName . 'Command');
         $i = 0;
+        $argumentNames = $this->getDefinedArgumentNames();
         foreach ($commandParameters as $commandParameterName => $commandParameterDefinition) {
             $explodedAnnotation = preg_split('/\s+/', $annotations['param'][$i], 3);
             $description = !empty($explodedAnnotation[2]) ? $explodedAnnotation[2] : '';
@@ -292,7 +288,7 @@ class Command
             }
             $default = $commandParameterDefinition['defaultValue'] ?? null;
             $required = $commandParameterDefinition['optional'] !== true;
-            $isArgument = $required || in_array($commandParameterName, $this->argumentNames, true);
+            $isArgument = $required || in_array($commandParameterName, $argumentNames, true);
             $argumentDefinition = new CommandArgumentDefinition($commandParameterName, $required, $description, $dataType, $default, $isArgument);
             if ($isArgument) {
                 $this->arguments[] = $argumentDefinition;
@@ -386,35 +382,65 @@ class Command
         return $this->inputDefinitions[$key] = $definitions;
     }
 
+    private function getDefinedArgumentNames(): array
+    {
+        if (empty($definedArguments = $this->getCommandMethodDefinitions()['Argument'])) {
+            return [];
+        }
+        $argumentNames = [];
+        foreach ($definedArguments as $definedArgument) {
+            if (!empty($definedArgument['name'])) {
+                $argumentNames[$definedArgument['name']] = $definedArgument['name'];
+            }
+        }
+        return $argumentNames;
+    }
+
+    private function getCommandMethodDefinitions(): array
+    {
+        if ($this->commandMethodDefinitions !== null) {
+            return $this->commandMethodDefinitions;
+        }
+        $this->commandMethodDefinitions = [];
+        $commandMethodReflection = $this->getCommandMethodReflection();
+        $annotations = $commandMethodReflection->getTagsValues();
+        if (!empty($annotations['definition'])) {
+            $this->commandMethodDefinitions = $this->parseDefinitions($annotations['definition']);
+        }
+        return $this->commandMethodDefinitions;
+    }
+
     /**
      * Very simple parsing of a @definition annotations on command methods.
      *
-     * @param array $definitions Definition tags on command controller command methods
+     * @param array $definitionAnnotations Definition tags on command controller command methods
+     * @throws \InvalidArgumentException
+     * @return array
      */
-    private function parseDefinitions(array $definitions)
+    private function parseDefinitions(array $definitionAnnotations): array
     {
-        foreach ($definitions as $definition) {
-            $definition = preg_replace('/\s/', '', $definition);
-
-            $instructions = explode(',', $definition);
+        $definitions = [];
+        foreach ($definitionAnnotations as $annotation) {
+            $annotation = preg_replace('/\s/', '', $annotation);
+            $instructions = explode(',', $annotation);
             foreach ($instructions as $instruction) {
                 preg_match('/^([a-zA-Z]*)\(([^)]*)\)$/', $instruction, $matches);
-                list(, $name, $options) = $matches;
-                if ($name === 'Validate' && $options === 'strict=true') {
-                    $this->validateStrict = true;
-                    continue;
-                }
-                if ($name === 'Argument') {
-                    foreach (explode(',', $options) as $argumentOption) {
-                        if (strpos($argumentOption, 'name=') === false) {
-                            continue;
-                        }
-                        $argumentName = str_replace('name=', '', $argumentOption);
-                        $this->argumentNames[] = $argumentName;
-                    }
-                }
+                list(, $name, $optionsString) = $matches;
+                $options = $this->parseOptions($optionsString);
+                $definitions[$name][] = $options;
             }
         }
+        return $definitions;
+    }
+
+    private function parseOptions(string $optionsString): array
+    {
+        $options = [];
+        foreach (explode(',', $optionsString) as $argumentOption) {
+            list($name, $value) = explode('=', $argumentOption);
+            $options[$name] = $value;
+        }
+        return $options;
     }
 
     /**
@@ -459,7 +485,7 @@ class Command
      *
      * @return bool
      */
-    public function isInternal()
+    public function isInternal(): bool
     {
         return $this->getCommandMethodReflection()->isTaggedWith('internal');
     }
@@ -469,7 +495,7 @@ class Command
      *
      * @return bool
      */
-    public function isCliOnly()
+    public function isCliOnly(): bool
     {
         return $this->getCommandMethodReflection()->isTaggedWith('cli');
     }
@@ -481,7 +507,7 @@ class Command
      *
      * @return bool
      */
-    public function isFlushingCaches()
+    public function isFlushingCaches(): bool
     {
         return $this->getCommandMethodReflection()->isTaggedWith('flushesCaches');
     }
@@ -490,9 +516,10 @@ class Command
      * Returns an array of command identifiers which were specified in the "@see"
      * annotation of a command method.
      *
+     * @throws \ReflectionException
      * @return array
      */
-    public function getRelatedCommandIdentifiers()
+    public function getRelatedCommandIdentifiers(): array
     {
         $commandMethodReflection = $this->getCommandMethodReflection();
         if (!$commandMethodReflection->isTaggedWith('see')) {
@@ -508,12 +535,13 @@ class Command
     }
 
     /**
-     * @return \TYPO3\CMS\Extbase\Reflection\MethodReflection
+     * @throws \ReflectionException
+     * @return MethodReflection
      */
-    protected function getCommandMethodReflection()
+    protected function getCommandMethodReflection(): MethodReflection
     {
         if ($this->commandMethodReflection === null) {
-            $this->commandMethodReflection = new \TYPO3\CMS\Extbase\Reflection\MethodReflection($this->controllerClassName, $this->controllerCommandName . 'Command');
+            $this->commandMethodReflection = new MethodReflection($this->controllerClassName, $this->controllerCommandName . 'Command');
         }
         return $this->commandMethodReflection;
     }

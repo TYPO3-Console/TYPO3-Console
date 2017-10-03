@@ -57,3 +57,6 @@ finder:
     - ".Build"
     - "Documentation"
     - "Libraries"
+  not-name:
+    - "ext_emconf.php"
+    - "AllCommands.php"

@@ -76,4 +76,5 @@ return PhpCsFixer\Config::create()
             ->exclude('Documentation')
             ->exclude('Libraries')
             ->notName('ext_emconf.php')
+            ->notName('AllCommands.php')
     );
