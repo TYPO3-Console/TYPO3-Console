@@ -14,6 +14,10 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  *
  */
 
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
+
 /**
  * Represents a Command
  */
@@ -80,6 +84,11 @@ class Command
      * @var array
      */
     private $argumentNames = [];
+
+    /**
+     * @var array
+     */
+    private $inputDefinitions;
 
     /**
      * @param \TYPO3\CMS\Extbase\Reflection\ReflectionService $reflectionService
@@ -241,6 +250,7 @@ class Command
 
     /**
      * @return bool
+     * @deprecated in 5.0 will be removed in 6.0
      */
     public function shouldValidateInputStrict(): bool
     {
@@ -292,6 +302,87 @@ class Command
             $i++;
         }
         return $this->argumentDefinitions;
+    }
+
+    public function getInputDefinitions(bool $strict = null): array
+    {
+        if ($strict === null) {
+            $strict = $this->shouldValidateInputStrict();
+        }
+        $key = $strict ? 'strict' : 'relaxed';
+
+        if (!empty($this->inputDefinitions[$key])) {
+            return $this->inputDefinitions[$key];
+        }
+
+        $applicationDefinition = (new Application())->getDefinition();
+        $definitions = [];
+        foreach ($this->getArguments() as $argument) {
+            $argumentName = $argument->getName();
+            if (!$strict && $applicationDefinition->hasArgument($argumentName)) {
+                // That is most likely the "command" argument
+                // We append the full command identifier so we don't get an exception from Symfony
+                $argumentName .= '_' . $this->getCommandIdentifier();
+            }
+            $definitions[] = new InputArgument(
+                $argumentName,
+                $strict && $argument->isRequired() ? InputArgument::REQUIRED : InputArgument::OPTIONAL,
+                $argument->getDescription(),
+                $strict && $argument->isRequired() ? null : $argument->getDefaultValue()
+            );
+
+            if ($strict) {
+                continue;
+            }
+            // Fallback option for compatibility but only in case no other option with same name is defined already
+            // @deprecated in 5.0 will be removed in 6.0
+            if ($applicationDefinition->hasOption($argument->getOptionName())) {
+                // Option is globally defined already, so we can skip here
+                continue;
+            }
+            $definitions[] = new InputOption(
+                $argument->getOptionName(),
+                null,
+                InputOption::VALUE_REQUIRED,
+                $argument->getDescription()
+            );
+        }
+        foreach ($this->getOptions() as $option) {
+            if ($applicationDefinition->hasOption($option->getOptionName())) {
+                // Option is globally defined already, so we can skip here
+                continue;
+            }
+            if (!$option->acceptsValue()) {
+                $definitions[] = new InputOption(
+                    $option->getOptionName(),
+                    null,
+                    $strict ? InputOption::VALUE_NONE : InputOption::VALUE_OPTIONAL,
+                    $option->getDescription()
+                );
+            } else {
+                $definitions[] = new InputOption(
+                    $option->getOptionName(),
+                    null,
+                    InputOption::VALUE_REQUIRED,
+                    $option->getDescription(),
+                    $option->getDefaultValue()
+                );
+            }
+
+            if ($strict) {
+                continue;
+            }
+            // Fallback to argument for compatibility
+            // @deprecated in 5.0 will be removed in 6.0
+            $definitions[] = new InputArgument(
+                $option->getName(),
+                InputArgument::OPTIONAL,
+                $option->getDescription(),
+                $option->getDefaultValue()
+            );
+        }
+
+        return $this->inputDefinitions[$key] = $definitions;
     }
 
     /**

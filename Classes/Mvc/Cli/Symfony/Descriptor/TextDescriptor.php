@@ -125,34 +125,7 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
         $this->writeText("\n");
 
         if ($command instanceof CommandControllerCommand) {
-            $definitions = [];
-            foreach ($command->getCommandDefinition()->getArguments() as $argument) {
-                $definitions[] = new InputArgument(
-                    $argument->getName(),
-                    $argument->isRequired() ? InputArgument::REQUIRED : InputArgument::OPTIONAL,
-                    $argument->getDescription(),
-                    $argument->isRequired() ? null : $argument->getDefaultValue()
-                );
-            }
-            foreach ($command->getCommandDefinition()->getOptions() as $option) {
-                if (!$option->acceptsValue()) {
-                    $definitions[] = new InputOption(
-                        $option->getOptionName(),
-                        null,
-                        InputOption::VALUE_NONE,
-                        $option->getDescription()
-                    );
-                } else {
-                    $definitions[] = new InputOption(
-                        $option->getOptionName(),
-                        null,
-                        InputOption::VALUE_REQUIRED,
-                        $option->getDescription(),
-                        $option->getDefaultValue()
-                    );
-                }
-            }
-            $definition = new InputDefinition($definitions);
+            $definition = new InputDefinition($command->getCommandDefinition()->getInputDefinitions(true));
         } else {
             $definition = $command->getNativeDefinition();
         }
