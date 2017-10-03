@@ -58,6 +58,11 @@ class CommandArgumentDefinition
     private $defaultValue;
 
     /**
+     * @var null
+     */
+    private $isArgument;
+
+    /**
      * Constructor
      *
      * @param string $name name of the command argument (= parameter name)
@@ -65,14 +70,16 @@ class CommandArgumentDefinition
      * @param string $description description of the argument
      * @param string $dataType data type (boolean, string or array)
      * @param mixed $defaultValue
+     * @param bool|null $isArgument
      */
-    public function __construct($name, $required, $description, $dataType, $defaultValue = null)
+    public function __construct(string $name, bool $required, string $description, string $dataType, $defaultValue = null, bool $isArgument = null)
     {
         $this->name = $name;
         $this->required = $required;
         $this->description = $description;
         $this->dataType = $dataType;
         $this->defaultValue = $defaultValue;
+        $this->isArgument = $isArgument;
     }
 
     /**
@@ -101,6 +108,14 @@ class CommandArgumentDefinition
         $dashedName = ucfirst($this->name);
         $dashedName = preg_replace('/([A-Z][a-z0-9]+)/', '$1-', $dashedName);
         return strtolower(substr($dashedName, 0, -1));
+    }
+
+    /**
+     * @return null
+     */
+    public function isArgument()
+    {
+        return $this->required || $this->isArgument === true;
     }
 
     /**

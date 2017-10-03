@@ -19,7 +19,6 @@ use Helhum\Typo3Console\Mvc\Cli\CommandArgumentDefinition;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use TYPO3\CMS\Extbase\Mvc\Cli\CommandManager;
-use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 
@@ -90,6 +89,7 @@ class CliSetupRequestHandler
      * @param ReflectionService $reflectionService
      * @param CommandDispatcher $commandDispatcher
      * @param ConsoleOutput $output
+     * @param CliMessageRenderer $messageRenderer
      */
     public function __construct(
         ObjectManagerInterface $objectManager,
@@ -172,7 +172,7 @@ class CliSetupRequestHandler
             $actionArguments = [];
             foreach ($command->getArgumentDefinitions() as $argumentDefinition) {
                 $isPasswordArgument = strpos($argumentDefinition->getOptionName(), 'password') !== false;
-                $isRequired = $this->isArgumentRequired($argumentDefinition);
+                $isRequired = $argumentDefinition->isArgument();
                 if (isset($this->givenRequestArguments[$argumentDefinition->getName()])) {
                     $this->setActionArgument($actionArguments, $this->givenRequestArguments[$argumentDefinition->getName()], $argumentDefinition);
                 } else {
@@ -261,18 +261,9 @@ class CliSetupRequestHandler
         return $response;
     }
 
-    /**
-     * @param CommandArgumentDefinition $argumentDefinition
-     * @return bool
-     */
-    private function isArgumentRequired(CommandArgumentDefinition $argumentDefinition): bool
-    {
-        return $argumentDefinition->isRequired() || $argumentDefinition->getDefaultValue() === 'required';
-    }
-
     private function setActionArgument(&$currentActionArguments, $value, CommandArgumentDefinition $argumentDefinition)
     {
-        if ($argumentDefinition->isRequired()) {
+        if ($argumentDefinition->isArgument()) {
             $currentActionArguments[] = $value;
         } else {
             if ($argumentDefinition->acceptsValue()) {

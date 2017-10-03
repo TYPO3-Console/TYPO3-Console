@@ -292,8 +292,9 @@ class Command
             }
             $default = $commandParameterDefinition['defaultValue'] ?? null;
             $required = $commandParameterDefinition['optional'] !== true;
-            $argumentDefinition = new CommandArgumentDefinition($commandParameterName, $required, $description, $dataType, $default);
-            if ($required || in_array($commandParameterName, $this->argumentNames, true)) {
+            $isArgument = $required || in_array($commandParameterName, $this->argumentNames, true);
+            $argumentDefinition = new CommandArgumentDefinition($commandParameterName, $required, $description, $dataType, $default, $isArgument);
+            if ($isArgument) {
                 $this->arguments[] = $argumentDefinition;
             } else {
                 $this->options[] = $argumentDefinition;
