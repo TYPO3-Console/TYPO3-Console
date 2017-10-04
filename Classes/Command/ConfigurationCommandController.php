@@ -41,7 +41,7 @@ class ConfigurationCommandController extends CommandController implements Single
      * For this command to succeed, the configuration option(s) must be in
      * LocalConfiguration.php and not be overridden elsewhere.
      *
-     * <b>Example:</b> <code>typo3cms configuration:remove DB,EXT/EXTCONF/realurl</code>
+     * <b>Example:</b> <code>%command.full_name% configuration:remove DB,EXT/EXTCONF/realurl</code>
      *
      * @param array $paths Path to system configuration that should be removed. Multiple paths can be specified separated by comma
      * @param bool $force If set, does not ask for confirmation
@@ -75,7 +75,7 @@ class ConfigurationCommandController extends CommandController implements Single
      * If the currently active configuration differs from the value in LocalConfiguration.php
      * the difference between these values is shown.
      *
-     * <b>Example:</b> <code>typo3cms configuration:show DB</code>
+     * <b>Example:</b> <code>%command.full_name% configuration:show DB</code>
      *
      * @param string $path Path to system configuration option
      */
@@ -108,7 +108,7 @@ class ConfigurationCommandController extends CommandController implements Single
      * Shows active system configuration by path.
      * Shows the configuration value that is currently effective, no matter where and how it is set.
      *
-     * <b>Example:</b> <code>typo3cms configuration:showActive DB --json</code>
+     * <b>Example:</b> <code>%command.full_name% configuration:showActive DB --json</code>
      *
      * @param string $path Path to system configuration
      * @param bool $json If set, the configuration is shown as JSON
@@ -128,9 +128,9 @@ class ConfigurationCommandController extends CommandController implements Single
      *
      * Shows local configuration option value by path.
      * Shows the value which is stored in LocalConfiguration.php.
-     * Note that this value could be overridden. Use <code>typo3cms configuration:show <path></code> to see if this is the case.
+     * Note that this value could be overridden. Use <code>%command.full_name% configuration:show <path></code> to see if this is the case.
      *
-     * <b>Example:</b> <code>typo3cms configuration:showlocal DB</code>
+     * <b>Example:</b> <code>%command.full_name% configuration:showlocal DB</code>
      *
      * @param string $path Path to local system configuration
      * @param bool $json If set, the configuration is shown as JSON
@@ -151,7 +151,7 @@ class ConfigurationCommandController extends CommandController implements Single
      *
      * Set system configuration option value by path.
      *
-     * <b>Example:</b> <code>typo3cms configuration:set SYS/fileCreateMask 0664</code>
+     * <b>Example:</b> <code>%command.full_name% configuration:set SYS/fileCreateMask 0664</code>
      *
      * @param string $path Path to system configuration
      * @param string $value Value for system configuration

@@ -43,7 +43,7 @@ export TYPO3_INSTALL_DB_DBNAME=my_console_test_db
 ```
 
 Before you submit a pull request with a new or changed command,
-make sure you run `Scripts/typo3cms commandreference:render` beforehand
+make sure you run `Scripts/typo3console commandreference:render` beforehand
 and include the changes in the PR
 
 Contributing policy
