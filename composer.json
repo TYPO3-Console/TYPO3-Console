@@ -39,7 +39,7 @@
     },
     "require-dev": {
         "typo3-console/php-server-command": "^0.1.1",
-        "typo3-console/create-reference-command": "^1.0",
+        "typo3-console/create-reference-command": "^2.0",
         "typo3/cms": "^8.7.7",
         "symfony/filesystem": "^3.2",
         "nimut/testing-framework": "^1.0",
@@ -72,7 +72,7 @@
         "bin-dir": ".Build/bin"
     },
     "bin": [
-        "Scripts/typo3cms"
+        "Scripts/typo3console"
     ],
     "scripts": {
         "set-version": [

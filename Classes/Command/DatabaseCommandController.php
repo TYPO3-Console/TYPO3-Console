@@ -67,7 +67,7 @@ class DatabaseCommandController extends CommandController
      *
      * To avoid shell matching all types with wildcards should be quoted.
      *
-     * <b>Example:</b> <code>typo3cms database:updateschema "*.add,*.change"</code>
+     * <b>Example:</b> <code>%command.full_name% database:updateschema "*.add,*.change"</code>
      *
      * @param array $schemaUpdateTypes List of schema update types (default: "safe")
      * @param bool $verbose If set, database queries performed are shown in output
@@ -114,9 +114,9 @@ class DatabaseCommandController extends CommandController
      * The mysql binary must be available in the path for this command to work.
      * This obviously only works when MySQL is used as DBMS.
      *
-     * <b>Example (import):</b> <code>ssh remote.server '/path/to/typo3cms database:export' | typo3cms database:import</code>
-     * <b>Example (select):</b> <code>echo 'SELECT username from be_users WHERE admin=1;' | typo3cms database:import</code>
-     * <b>Example (interactive):</b> <code>typo3cms database:import --interactive</code>
+     * <b>Example (import):</b> <code>ssh remote.server '/path/to/%command.full_name% database:export' | %command.full_name% database:import</code>
+     * <b>Example (select):</b> <code>echo 'SELECT username from be_users WHERE admin=1;' | %command.full_name% database:import</code>
+     * <b>Example (interactive):</b> <code>%command.full_name% database:import --interactive</code>
      *
      * <warning>This command passes the plain text database password to the command line process.</warning>
      * This means, that users that have the permission to observe running processes,
@@ -150,7 +150,7 @@ class DatabaseCommandController extends CommandController
      *
      * A comma-separated list of tables can be passed to exclude from the export:
      *
-     * <b>Example:</b> <code>typo3cms database:export --exclude-tables be_sessions,fe_sessions,sys_log</code>
+     * <b>Example:</b> <code>%command.full_name% database:export --exclude-tables be_sessions,fe_sessions,sys_log</code>
      *
      * <warning>This command passes the plain text database password to the command line process.</warning>
      * This means, that users that have the permission to observe running processes,

@@ -28,7 +28,7 @@ class HelpCommandController extends CommandController
      * Display help for a command
      *
      * The help command displays help for a given command:
-     * typo3cms help <command identifier>
+     * %command.full_name% help <command identifier>
      *
      * @param string $commandIdentifier Identifier of a command for more details
      * @return void

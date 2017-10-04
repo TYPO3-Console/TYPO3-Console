@@ -93,7 +93,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     {
         $this->consoleRootPath = getenv('TYPO3_PATH_COMPOSER_ROOT');
         $this->typo3RootPath = getenv('TYPO3_PATH_ROOT');
-        $this->commandDispatcher = CommandDispatcher::createFromTestRun($instancePath . '/vendor/helhum/typo3-console-test/Scripts/typo3cms');
+        $this->commandDispatcher = CommandDispatcher::createFromTestRun($instancePath . '/vendor/helhum/typo3-console-test/Scripts/typo3console');
         if (!is_dir($instancePath)) {
             mkdir($instancePath);
         }

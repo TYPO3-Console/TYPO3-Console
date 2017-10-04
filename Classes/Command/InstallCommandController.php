@@ -121,7 +121,7 @@ class InstallCommandController extends CommandController
      *
      * This updates your composer.json and composer.lock without any other changes.
      *
-     * <b>Example:</b> <code>typo3cms install:generatepackagestates</code>
+     * <b>Example:</b> <code>%command.full_name% install:generatepackagestates</code>
      *
      * @param array $frameworkExtensions TYPO3 system extensions that should be marked as active. Extension keys separated by comma.
      * @param bool $activateDefault If true, <code>typo3/cms</code> extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
@@ -174,7 +174,7 @@ class InstallCommandController extends CommandController
      *
      * This command creates the required folder structure needed for TYPO3 including extensions.
      * It is recommended to be executed <b>after</b> executing
-     * <code>typo3cms install:generatepackagestates</code>, to ensure proper generation of
+     * <code>%command.full_name% install:generatepackagestates</code>, to ensure proper generation of
      * required folders for all active extensions.
      *
      * @see typo3_console:install:generatepackagestates

@@ -53,7 +53,7 @@ before_script:
 
 script:
   # This fails when command reference is not up to date
-  - typo3cms commandreference:render > /dev/null 2>&1 && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
+  - typo3console commandreference:render > /dev/null 2>&1 && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
   - >
     echo "Running php lint…";
     find . -name \*.php ! -path "./.Build/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;;
