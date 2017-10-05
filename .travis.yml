@@ -6,19 +6,13 @@ branches:
     - develop
     - /^([0-9]+\.){1,2}(x|[0-9]+)$/
 
-matrix:
-  fast_finish: true
-  include:
-    - php: 7.1
-      env: TYPO3_VERSION=^8.7
-    - php: 7.0
-      env: TYPO3_VERSION=^8.7
-    - php: 7.0
-      env: TYPO3_VERSION="dev-master as 8.7.7"
-    - php: 7.1
-      env: TYPO3_VERSION="dev-master as 8.7.7"
-  allow_failures:
-    - env: TYPO3_VERSION="dev-master as 8.7.7"
+php:
+  - 7.1
+  - 7.0
+
+env:
+  - TYPO3_VERSION=^8.7
+  - TYPO3_VERSION="dev-master as 8.7.7"
 
 cache:
   directories:
@@ -61,24 +55,29 @@ script:
   - >
     echo "Running unit and functional tests…";
     .Build/bin/phpunit;
+jobs:
+  fast_finish: true
+  allow_failures:
+    - env: TYPO3_VERSION="dev-master as 8.7.7"
+  include:
+    - stage: deploy to ter
+      php: 7.1
+      install: skip
+      before_script: skip
+      script:
+        - |
+          if [ -n "$TRAVIS_TAG" ] && [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
+            echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n";
+            # Cleanup before we upload
+            composer require --dev typo3/cms ^8.7 --update-with-dependencies
+            composer require --dev helhum/ter-client dev-master
+            git reset --hard HEAD && git clean -fx
 
-after_script:
-  - >
-    if [ -n "$TRAVIS_TAG" ] && [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
-      echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n"
-      curl -sSL https://raw.githubusercontent.com/alrra/travis-after-all/1.4.4/lib/travis-after-all.js | node
-      if [ $? -eq 0 ]; then
-        # Cleanup before we upload
-        composer require --dev typo3/cms ^8.7 --update-with-dependencies
-        composer require --dev helhum/ter-client dev-master
-        git reset --hard HEAD && git clean -fx
+            # Build extension files
+            composer extension-release
 
-        # Build extension files
-        composer extension-release
-
-        # Upload
-        TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
-        echo "Uploading release ${TRAVIS_TAG} to TER"
-        .Build/bin/ter-client upload typo3_console . -u "$TYPO3_ORG_USERNAME" -p "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
-      fi;
-    fi;
+            # Upload
+            TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
+            echo "Uploading release ${TRAVIS_TAG} to TER"
+            .Build/bin/ter-client upload typo3_console . -u "$TYPO3_ORG_USERNAME" -p "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
+          fi;
