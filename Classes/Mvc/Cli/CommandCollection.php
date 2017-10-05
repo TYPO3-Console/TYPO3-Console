@@ -91,9 +91,10 @@ class CommandCollection implements \IteratorAggregate
 
     private function populateCommands()
     {
-        if ($this->commands) {
+        if ($this->commands !== null) {
             return;
         }
+        $this->commands = [];
         $this->initializeConfiguration();
         $this->populateNativeCommands();
     }
