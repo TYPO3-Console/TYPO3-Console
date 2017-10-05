@@ -219,10 +219,14 @@ class ExtensionCommandController extends CommandController
      * This is a one way command with no way back. Don't blame anybody if this command destroys your data.
      * <comment>Handle with care!</comment>
      *
+     * This command is deprecated.
+     * Instead of adding extensions and then removing them, just don't add them in the first place.
+     *
      * @param bool $force The option has to be specified, otherwise nothing happens
      */
     public function removeInactiveCommand($force = false)
     {
+        $this->outputLine('<warning>This command is deprecated and will be removed with TYPO3 Console 6.0</warning>');
         if ($force) {
             $activePackages = $this->packageManager->getActivePackages();
             $this->packageManager->scanAvailablePackages();
