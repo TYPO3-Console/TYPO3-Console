@@ -154,7 +154,8 @@ class Kernel
             GeneralUtility::makeInstance(PackageManager::class)
         );
 
-        $application = new Application($this->runLevel, Bootstrap::usesComposerClassLoading());
+        $composerMode = !getenv('CONSOLE_NON_COMPOSER_TEST') && Bootstrap::usesComposerClassLoading();
+        $application = new Application($this->runLevel, $composerMode);
         $application->addCommandsIfAvailable($commandRegistry);
 
         $commandIdentifier = $input->getFirstArgument() ?: '';

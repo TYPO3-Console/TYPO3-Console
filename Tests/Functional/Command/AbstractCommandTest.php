@@ -190,10 +190,10 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
         return $process->getOutput() . $process->getErrorOutput();
     }
 
-    protected function executeConsoleCommand($command, array $arguments = [])
+    protected function executeConsoleCommand($command, array $arguments = [], array $environment = [])
     {
         try {
-            return $this->commandDispatcher->executeCommand($command, $arguments);
+            return $this->commandDispatcher->executeCommand($command, $arguments, $environment);
         } catch (FailedSubProcessCommandException $e) {
             $this->fail(sprintf('Console command "%s" failed with message: "%s", output: "%s"', $e->getCommandLine(), $e->getErrorMessage(), $e->getOutputMessage()));
         }

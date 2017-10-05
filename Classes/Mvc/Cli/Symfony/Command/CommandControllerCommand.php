@@ -70,6 +70,8 @@ class CommandControllerCommand extends Command
             && in_array($this->getName(), [
                 // Remove commands than don't make sense when application is composer managed
                 'extension:dumpautoload',
+                'extension:activate',
+                'extension:deactivate',
             ], true)
         ) {
             return false;
