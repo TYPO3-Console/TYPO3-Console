@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Mvc\Cli\Symfony\Command;
 
 /*
@@ -63,14 +64,14 @@ class CommandControllerCommand extends Command
         return $this->commandDefinition;
     }
 
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         if (!$this->application->isFullyCapable()
             && in_array($this->getName(), [
                 // Although these commands are technically available
                 // they call other hidden commands in sub processes
                 // that need all capabilities. Therefore we disable these commands here.
-                // This can be removed, once the implement Symfony commands directly.
+                // This can be removed, once they implement Symfony commands directly.
                 'upgrade:all',
                 'upgrade:list',
                 'upgrade:wizard',
@@ -107,7 +108,7 @@ class CommandControllerCommand extends Command
     public function setApplication(BaseApplication $application = null)
     {
         if ($application !== null && !$application instanceof Application) {
-            throw new \RuntimeException('Extbase commands only work with TYPO3 Console Applications', 1506381781);
+            throw new \RuntimeException('Command controller commands only work with TYPO3 Console Applications', 1506381781);
         }
         $this->application = $application;
         parent::setApplication($application);
@@ -130,7 +131,7 @@ class CommandControllerCommand extends Command
         // @deprecated in 5.0 will be removed in 6.0
         $givenCommandName = $input->getArgument('command');
         if ($givenCommandName === $this->getAliases()[0]) {
-            $output->writeln('<warning>Specifying the full command name has been deprecated.</warning>');
+            $output->writeln('<warning>Specifying the full command name is deprecated.</warning>');
             $output->writeln(sprintf('<warning>Please use "%s" as command name instead.</warning>', $this->getName()));
         }
         $response = (new RequestHandler())->handle($this->commandDefinition, $input, $output);

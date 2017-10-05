@@ -327,7 +327,7 @@ abstract class CommandController implements CommandControllerInterface
      */
     protected function sendAndExit($exitCode = 0)
     {
-        $this->outputLine('<warning>Using sendAndExit() has been deprecated. Please use quit() instead.</warning>');
+        $this->outputLine('<warning>Using sendAndExit() is deprecated. Please use quit() instead.</warning>');
         $this->quit($exitCode);
     }
 
