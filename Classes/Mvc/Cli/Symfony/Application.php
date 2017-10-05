@@ -37,10 +37,16 @@ class Application extends BaseApplication
      */
     private $runLevel;
 
-    public function __construct(RunLevel $runLevel = null)
+    /**
+     * @var bool
+     */
+    private $composerManaged;
+
+    public function __construct(RunLevel $runLevel = null, bool $composerManaged = true)
     {
         parent::__construct('TYPO3 Console', self::TYPO3_CONSOLE_VERSION);
         $this->runLevel = $runLevel;
+        $this->composerManaged = $composerManaged;
     }
 
     /**
@@ -53,6 +59,17 @@ class Application extends BaseApplication
     public function isFullyCapable(): bool
     {
         return $this->runLevel->getMaximumAvailableRunLevel() === RunLevel::LEVEL_FULL;
+    }
+
+    /**
+     * Whether this application is composer managed.
+     * Can be used to enable or disable commands or arguments/ options
+     *
+     * @return bool
+     */
+    public function isComposerManaged(): bool
+    {
+        return $this->composerManaged;
     }
 
     /**

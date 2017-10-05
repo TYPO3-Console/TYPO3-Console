@@ -75,7 +75,7 @@ class Kernel
      */
     private function initializeNonComposerClassLoading()
     {
-        if ($this->bootstrap::usesComposerClassLoading()) {
+        if (Bootstrap::usesComposerClassLoading()) {
             return;
         }
         $classesPaths = [__DIR__ . '/../../Classes', __DIR__ . '/../../Resources/Private/ExtensionArtifacts/src/'];
@@ -154,7 +154,7 @@ class Kernel
             GeneralUtility::makeInstance(PackageManager::class)
         );
 
-        $application = new Application($this->runLevel);
+        $application = new Application($this->runLevel, Bootstrap::usesComposerClassLoading());
         $application->addCommandsIfAvailable($commandRegistry);
 
         $commandIdentifier = $input->getFirstArgument() ?: '';
