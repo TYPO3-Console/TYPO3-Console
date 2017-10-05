@@ -129,11 +129,6 @@ class InstallCommandController extends CommandController
      */
     public function generatePackageStatesCommand(array $frameworkExtensions = [], $activateDefault = false, array $excludedExtensions = [])
     {
-        $ranFromComposerPlugin = getenv('TYPO3_CONSOLE_PLUGIN_RUN') || !getenv('TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES');
-        if (!$ranFromComposerPlugin && Bootstrap::usesComposerClassLoading()) {
-            $this->output->outputLine('<warning>This command is now always automatically executed after Composer has written the autoload information.</warning>');
-            $this->output->outputLine('<warning>It is therefore deprecated to be used in Composer mode.</warning>');
-        }
         $frameworkExtensions = $frameworkExtensions ?: explode(',', (string)getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS'));
         $packageStatesGenerator = new PackageStatesGenerator($this->packageManager);
         $activatedExtensions = $packageStatesGenerator->generate($frameworkExtensions, $activateDefault, $excludedExtensions);
