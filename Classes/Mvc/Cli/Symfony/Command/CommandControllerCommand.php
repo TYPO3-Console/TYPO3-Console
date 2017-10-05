@@ -66,6 +66,14 @@ class CommandControllerCommand extends Command
 
     public function isEnabled(): bool
     {
+        if ($this->application->isComposerManaged()
+            && in_array($this->getName(), [
+                // Remove commands than don't make sense when application is composer managed
+                'extension:dumpautoload',
+            ], true)
+        ) {
+            return false;
+        }
         if (!$this->application->isFullyCapable()
             && in_array($this->getName(), [
                 // Although these commands are technically available

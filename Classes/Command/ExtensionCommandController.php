@@ -263,13 +263,8 @@ class ExtensionCommandController extends CommandController
      */
     public function dumpAutoloadCommand()
     {
-        if (Bootstrap::usesComposerClassLoading()) {
-            $this->output->outputLine('<error>Class loading information is managed by Composer. Use "composer dump-autoload" command to update the information.</error>');
-            $this->quit(1);
-        } else {
-            ClassLoadingInformation::dumpClassLoadingInformation();
-            $this->output->outputLine('Class Loading information has been updated.');
-        }
+        ClassLoadingInformation::dumpClassLoadingInformation();
+        $this->output->outputLine('Class Loading information has been updated.');
     }
 
     /**
