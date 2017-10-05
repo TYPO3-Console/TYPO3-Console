@@ -32,7 +32,6 @@
         "typo3/cms-extensionmanager": "^7.6 || ^8.7",
         "typo3/cms-fluid": "^7.6 || ^8.7",
         "typo3/cms-install": "^7.6 || ^8.7",
-        "typo3/cms-saltedpasswords": "^7.6 || ^8.7",
         "typo3/cms-scheduler": "^7.6 || ^8.7",
 
         "symfony/console": "^2.7 || ^3.0",
