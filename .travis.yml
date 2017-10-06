@@ -6,22 +6,6 @@ branches:
     - develop
     - /^([0-9]+\.){1,2}(x|[0-9]+)$/
 
-matrix:
-  fast_finish: true
-  include:
-    - php: 7.1
-      env: TYPO3_VERSION=^8.7
-    - php: 7.0
-      env: TYPO3_VERSION=^8.7
-    - php: 7.1
-      env: TYPO3_VERSION=^7.6
-    - php: 7.0
-      env: TYPO3_VERSION=^7.6
-    - php: 5.6
-      env: TYPO3_VERSION=^7.6
-    - php: 5.5
-      env: TYPO3_VERSION=^7.6
-
 cache:
   directories:
     - $HOME/.composer/cache
@@ -65,23 +49,47 @@ script:
     echo "Running unit and functional tests…";
     .Build/bin/phpunit;
 
-after_script:
-  - >
-    if [ -n "$TRAVIS_TAG" ] && [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
-      echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n"
-      curl -sSL https://raw.githubusercontent.com/alrra/travis-after-all/1.4.4/lib/travis-after-all.js | node
-      if [ $? -eq 0 ]; then
-        # Cleanup before we upload
-        composer require --dev typo3/cms ^8.7 --update-with-dependencies
-        composer require --dev helhum/ter-client dev-master
-        git reset --hard HEAD && git clean -fx
+jobs:
+  fast_finish: true
+  include:
+    - stage: test
+      php: 7.1
+      env: TYPO3_VERSION=^8.7
+    - stage: test
+      php: 7.0
+      env: TYPO3_VERSION=^8.7
+    - stage: test
+      php: 7.1
+      env: TYPO3_VERSION=^7.6
+    - stage: test
+      php: 7.0
+      env: TYPO3_VERSION=^7.6
+    - stage: test
+      php: 5.6
+      env: TYPO3_VERSION=^7.6
+    - stage: test
+      php: 5.5
+      env: TYPO3_VERSION=^7.6
 
-        # Build extension files
-        composer extension-release
+    - stage: publish in ter
+      php: 7.1
+      env: TYPO3_VERSION=
+      install: skip
+      before_script: skip
+      script:
+        - |
+          if [ -n "$TRAVIS_TAG" ] && [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
+            echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n";
+            # Cleanup before we upload
+            composer require --dev typo3/cms ^8.7
+            composer require --dev helhum/ter-client dev-master
+            git reset --hard HEAD && git clean -fx
 
-        # Upload
-        TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
-        echo "Uploading release ${TRAVIS_TAG} to TER"
-        .Build/bin/ter-client upload typo3_console . -u "$TYPO3_ORG_USERNAME" -p "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
-      fi;
-    fi;
+            # Build extension files
+            composer extension-release
+
+            # Upload
+            TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
+            echo "Uploading release ${TRAVIS_TAG} to TER"
+            .Build/bin/ter-client upload typo3_console . -u "$TYPO3_ORG_USERNAME" -p "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
+          fi;
