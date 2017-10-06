@@ -30,7 +30,7 @@ class HelpCommandController extends CommandController
      *
      * @var string
      */
-    private $version = '4.9.1';
+    private $version = '4.9.2';
 
     /**
      * @var \Helhum\Typo3Console\Mvc\Cli\CommandManager
