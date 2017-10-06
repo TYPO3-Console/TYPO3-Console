@@ -60,8 +60,9 @@ jobs:
   allow_failures:
     - env: TYPO3_VERSION="dev-master as 8.7.7"
   include:
-    - stage: deploy to ter
+    - stage: publish in ter
       php: 7.1
+      env: TYPO3_VERSION=
       install: skip
       before_script: skip
       script:
