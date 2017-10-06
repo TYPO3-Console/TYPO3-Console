@@ -19,6 +19,11 @@ cache:
   directories:
     - $HOME/.composer/cache
 
+addons:
+  apt:
+    packages:
+      - parallel
+
 notifications:
   email:
     - typo3@helhum.io
