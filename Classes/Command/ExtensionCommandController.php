@@ -17,7 +17,6 @@ use Helhum\Typo3Console\Extension\ExtensionSetup;
 use Helhum\Typo3Console\Extension\ExtensionSetupResultRenderer;
 use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
-use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\ClassLoadingInformation;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -63,19 +62,14 @@ class ExtensionCommandController extends CommandController
      * Activates one or more extensions by key.
      * Marks extensions as active, sets them up and clears caches for every activated extension.
      *
+     * This command is only available in non composer mode.
+     *
      * @param array $extensionKeys Extension keys to activate. Separate multiple extension keys with comma.
      * @param bool $verbose Whether or not to output results
      * @throws \TYPO3\CMS\Extensionmanager\Exception\ExtensionManagerException
      */
     public function activateCommand(array $extensionKeys, $verbose = false)
     {
-        if (getenv('TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES') && Bootstrap::usesComposerClassLoading()) {
-            $this->output->outputLine('<warning>This command has been deprecated to be used in composer mode, as it might lead to unexpected results</warning>');
-            $this->output->outputLine('<warning>The PackageStates.php file that tracks which extension should be active,</warning>');
-            $this->output->outputLine('<warning>is now generated automatically when installing the console with composer.</warning>');
-            $this->output->outputLine('<warning>To set up all active extensions correctly, please use the extension:setupactive command</warning>');
-        }
-
         $this->emitPackagesMayHaveChangedSignal();
         $activatedExtensions = [];
         $extensionsToSetUp = [];
@@ -110,18 +104,13 @@ class ExtensionCommandController extends CommandController
      * Deactivates one or more extensions by key.
      * Marks extensions as inactive in the system and clears caches for every deactivated extension.
      *
+     * This command is only available in non composer mode.
+     *
      * @param array $extensionKeys Extension keys to deactivate. Separate multiple extension keys with comma.
      * @throws \TYPO3\CMS\Extensionmanager\Exception\ExtensionManagerException
      */
     public function deactivateCommand(array $extensionKeys)
     {
-        if (getenv('TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES') && Bootstrap::usesComposerClassLoading()) {
-            $this->output->outputLine('<warning>This command has been deprecated to be used in composer mode, as it might lead to unexpected results</warning>');
-            $this->output->outputLine('<warning>The PackageStates.php file that tracks which extension should be active,</warning>');
-            $this->output->outputLine('<warning>is now generated automatically when installing the console with composer.</warning>');
-            $this->output->outputLine('<warning>To set up all active extensions correctly, please use the extension:setupactive command</warning>');
-        }
-
         foreach ($extensionKeys as $extensionKey) {
             $this->extensionInstaller->uninstall($extensionKey);
         }
@@ -219,10 +208,14 @@ class ExtensionCommandController extends CommandController
      * This is a one way command with no way back. Don't blame anybody if this command destroys your data.
      * <comment>Handle with care!</comment>
      *
+     * This command is deprecated.
+     * Instead of adding extensions and then removing them, just don't add them in the first place.
+     *
      * @param bool $force The option has to be specified, otherwise nothing happens
      */
     public function removeInactiveCommand($force = false)
     {
+        $this->outputLine('<warning>This command is deprecated and will be removed with TYPO3 Console 6.0</warning>');
         if ($force) {
             $activePackages = $this->packageManager->getActivePackages();
             $this->packageManager->scanAvailablePackages();
@@ -255,17 +248,12 @@ class ExtensionCommandController extends CommandController
      * This command is only needed during development. The extension manager takes care
      * creating or updating this info properly during extension (de-)activation.
      *
-     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
+     * This command is only available in non composer mode.
      */
     public function dumpAutoloadCommand()
     {
-        if (Bootstrap::usesComposerClassLoading()) {
-            $this->output->outputLine('<error>Class loading information is managed by Composer. Use "composer dump-autoload" command to update the information.</error>');
-            $this->quit(1);
-        } else {
-            ClassLoadingInformation::dumpClassLoadingInformation();
-            $this->output->outputLine('Class Loading information has been updated.');
-        }
+        ClassLoadingInformation::dumpClassLoadingInformation();
+        $this->output->outputLine('Class Loading information has been updated.');
     }
 
     /**

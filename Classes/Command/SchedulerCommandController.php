@@ -41,7 +41,7 @@ class SchedulerCommandController extends CommandController
     {
         if ($taskId !== null) {
             // @deprecated in 5.0 will be removed in 6.0
-            $this->outputLine('<warning>Using --task-id has been deprecated. Please use --task instead.</warning>');
+            $this->outputLine('<warning>Using --task-id is deprecated. Please use --task instead.</warning>');
             $task = $taskId;
         }
         if ($task !== null) {
