@@ -52,7 +52,6 @@ script:
   - >
     echo "Running php lint…";
     find . -name \*.php ! -path "./.Build/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;;
-    git checkout Classes/Composer/InstallerScript;
   - >
     echo "Running unit and functional tests…";
     .Build/bin/phpunit;
