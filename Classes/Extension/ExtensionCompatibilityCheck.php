@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Extension;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
+use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use TYPO3\CMS\Core\Package\PackageManager;
 
 class ExtensionCompatibilityCheck
@@ -66,13 +67,26 @@ class ExtensionCompatibilityCheck
                 // There is not need to check core extensions
                 continue;
             }
-            $isCompatible = @\json_decode($this->commandDispatcher->executeCommand('upgrade:checkextensioncompatibility', ['--extension-key' => $package->getPackageKey(), '--config-only' => true]));
+            try {
+                $isCompatible = @\json_decode($this->commandDispatcher->executeCommand('upgrade:checkextensioncompatibility', ['--extension-key' => $package->getPackageKey(), '--config-only' => true]));
+            } catch (FailedSubProcessCommandException $e) {
+                // For PHP < 7 we must fail gracefully here
+                $isCompatible = false;
+            }
+
             if (!$isCompatible) {
                 $this->packageManager->deactivatePackage($package->getPackageKey());
                 $failedPackages[] = $package->getPackageKey();
                 continue;
             }
-            $isCompatible = @\json_decode($this->commandDispatcher->executeCommand('upgrade:checkextensioncompatibility', ['--extension-key' => $package->getPackageKey()]));
+
+            try {
+                $isCompatible = @\json_decode($this->commandDispatcher->executeCommand('upgrade:checkextensioncompatibility', ['--extension-key' => $package->getPackageKey()]));
+            } catch (FailedSubProcessCommandException $e) {
+                // For PHP < 7 we must fail gracefully here
+                $isCompatible = false;
+            }
+
             if (!$isCompatible) {
                 $this->packageManager->deactivatePackage($package->getPackageKey());
                 $failedPackages[] = $package->getPackageKey();
