@@ -10,9 +10,14 @@ cache:
   directories:
     - $HOME/.composer/cache
 
+addons:
+  apt:
+    packages:
+      - parallel
+
 notifications:
   email:
-    - helmut@typo3.org
+    - typo3@helhum.io
 
 before_install:
   - |
