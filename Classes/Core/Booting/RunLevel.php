@@ -233,6 +233,7 @@ class RunLevel
     {
         if (!empty($this->executedSteps[$stepIdentifier])) {
             $sequence->addStep(new Step($stepIdentifier, function () {
+                // Don't do anything again, step has been executed already
             }));
             return;
         }
