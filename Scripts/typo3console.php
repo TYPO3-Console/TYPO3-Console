@@ -1,15 +1,15 @@
 <?php
 (function () {
-    if (file_exists($autoLoadFile = dirname(__DIR__) . '/.Build/vendor/autoload.php')) {
+    if (file_exists($rootAutoLoadFile = dirname(__DIR__) . '/.Build/vendor/autoload.php')) {
         // Console is root package, thus vendor folder is .Build/vendor
-        $classLoader = require $autoLoadFile;
-    } elseif (file_exists($autoLoadFile = dirname(dirname(dirname(__DIR__))) . '/autoload.php')) {
+        $classLoader = require $rootAutoLoadFile;
+    } elseif (file_exists($vendorAutoLoadFile = dirname(dirname(dirname(__DIR__))) . '/autoload.php')) {
         // Console is a dependency, thus located in vendor/helhum/typo3-console
-        $classLoader = require $autoLoadFile;
-    } elseif (file_exists($autoLoadFile = realpath(($rootPath = dirname(dirname(dirname(dirname(__DIR__))))) . '/typo3') . '/../vendor/autoload.php')) {
+        $classLoader = require $vendorAutoLoadFile;
+    } elseif (file_exists($typo3AutoLoadFile = realpath(($rootPath = dirname(dirname(dirname(dirname(__DIR__))))) . '/typo3') . '/../vendor/autoload.php')) {
         // Console is extension
         putenv('TYPO3_PATH_ROOT=' . $rootPath);
-        $classLoader = require $autoLoadFile;
+        $classLoader = require $typo3AutoLoadFile;
     } else {
         echo 'Could not find autoload.php file. Is TYPO3_PATH_ROOT specified correctly?' . PHP_EOL;
         exit(1);
