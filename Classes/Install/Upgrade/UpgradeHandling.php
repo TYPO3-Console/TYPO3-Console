@@ -96,7 +96,7 @@ class UpgradeHandling
 
     /**
      * @param UpgradeWizardFactory|null $factory
-     * @param UpgradeWizardExecutor $executor
+     * @param UpgradeWizardExecutor|null $executor
      * @param UpgradeWizardList|null $upgradeWizardList
      * @param SilentConfigurationUpgrade|null $silentConfigurationUpgrade
      * @param CommandDispatcher|null $commandDispatcher
@@ -116,7 +116,7 @@ class UpgradeHandling
         ExtensionConstraintCheck $extensionConstraintCheck = null,
         ExtensionCompatibilityCheck $extensionCompatibilityCheck = null
     ) {
-        $this->factory = new UpgradeWizardFactory();
+        $this->factory = $factory ?: new UpgradeWizardFactory();
         $this->executor = $executor ?: new UpgradeWizardExecutor($this->factory);
         $this->upgradeWizardList = $upgradeWizardList ?: new UpgradeWizardList();
         $this->silentConfigurationUpgrade = $silentConfigurationUpgrade ?: new SilentConfigurationUpgrade();
