@@ -108,10 +108,10 @@ class SchedulerCommandController extends CommandController
         if ($this->scheduler->isValidTaskObject($task)) {
             try {
                 $this->scheduler->executeTask($task);
-            } catch (\Exception $e) {
+            } finally {
+                // Record the run in the system registry
+                $this->scheduler->recordLastRun('cli-by-id');
             }
-            // Record the run in the system registry
-            $this->scheduler->recordLastRun('cli-by-id');
         }
     }
 }
