@@ -203,10 +203,8 @@ class Scripts
     /**
      * Provide cleaned implementation of TYPO3 core classes.
      * Can only be called *after* extension configuration is loaded (needs extbase configuration)!
-     *
-     * @param Bootstrap $bootstrap
      */
-    public static function provideCleanClassImplementations(Bootstrap $bootstrap)
+    public static function provideCleanClassImplementations()
     {
         self::overrideImplementation(\TYPO3\CMS\Extbase\Command\HelpCommandController::class, \Helhum\Typo3Console\Command\HelpCommandController::class);
         self::overrideImplementation(\TYPO3\CMS\Extbase\Mvc\Cli\Command::class, \Helhum\Typo3Console\Mvc\Cli\Command::class);

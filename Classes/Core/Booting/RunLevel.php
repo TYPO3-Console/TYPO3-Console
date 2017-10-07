@@ -339,7 +339,6 @@ class RunLevel
         }
 
         if (count($commandIdentifierParts) === 3) {
-            $currentCommandPackageName = $commandIdentifierParts[0];
             $currentCommandControllerName = $commandIdentifierParts[1];
             $currentCommandName = $commandIdentifierParts[2];
         } else {
@@ -348,7 +347,7 @@ class RunLevel
         }
 
         foreach ($this->commandOptions as $fullControllerIdentifier => $commandRegistry) {
-            list($packageKey, $controllerName, $commandName) = explode(':', $fullControllerIdentifier);
+            list(, $controllerName, $commandName) = explode(':', $fullControllerIdentifier);
             if ($controllerName === $currentCommandControllerName && $commandName === $currentCommandName) {
                 return $this->commandOptions[$fullControllerIdentifier];
             }

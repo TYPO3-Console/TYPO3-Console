@@ -84,7 +84,7 @@ class CleanupCommandController extends CommandController
             );
             $delegate->subscribeEvent(
                 'operationHasEnded',
-                function () use ($output, $dryRun) {
+                function () use ($output) {
                     $output->progressFinish();
                 }
             );
