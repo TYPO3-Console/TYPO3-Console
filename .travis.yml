@@ -20,30 +20,13 @@ notifications:
   email:
     - typo3@helhum.io
 
-# Build matrix
-php:
-  - 7.1
-  - 7.0
-env:
-  - TYPO3_VERSION=^8.7
-  - TYPO3_VERSION="dev-master as 8.7.7"
-
 # This is executed for all stages
 before_install:
-  - export COMPOSER_ROOT_VERSION=5.0.0
-
-# Only for test stage
-before_script:
-  - export PATH="$PATH:./Scripts"
   - if php -i | grep -q xdebug; then phpenv config-rm xdebug.ini; fi
-  - >
-    if [ -n "$TRAVIS_TAG" ]; then
-      composer set-version $TRAVIS_TAG
-      # If this fails, we forgot to update version numbers before tagging the release
-      test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
-    fi
-  - composer extension-create-libs && ls -la Libraries/*.phar | grep -v ^-rwx
-  - git clean -dffx
+
+install:
+  - export PATH="$PATH:./Scripts"
+  - export COMPOSER_ROOT_VERSION=5.0.0
   - composer require typo3/cms="$TYPO3_VERSION"
   - git checkout composer.json
 
@@ -51,9 +34,6 @@ before_script:
 script:
   # This fails when command reference is not up to date
   - typo3console commandreference:render > /dev/null 2>&1 && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
-  - >
-    echo "Running php lint…";
-    find . -name \*.php ! -path "./.Build/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;;
   - >
     echo "Running unit and functional tests…";
     .Build/bin/phpunit;
@@ -64,9 +44,49 @@ jobs:
   allow_failures:
     - env: TYPO3_VERSION="dev-master as 8.7.7"
   include:
+    - &lint
+      stage: test
+      php: 7.1
+      env: PHP Lint
+      before_install: skip
+      install: skip
+      before_script: skip
+      script:
+        - find . -name \*.php ! -path "./.Build/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;;
+    - <<: *lint
+      php: 7.0
+
+    - stage: test
+      php: 7.1
+      env: TYPO3_VERSION=^8.7
+    - stage: test
+      php: 7.0
+      env: TYPO3_VERSION=^8.7
+    - stage: test
+      php: 7.1
+      env: TYPO3_VERSION="dev-master as 8.7.7"
+    - stage: test
+      php: 7.0
+      env: TYPO3_VERSION="dev-master as 8.7.7"
+
+    - stage: test
+      php: 7.1
+      env: Consistency checks
+      before_install: skip
+      install: skip
+      before_script: skip
+      script:
+        - >
+          if [ -n "$TRAVIS_TAG" ]; then
+            composer set-version $TRAVIS_TAG
+            test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
+          fi
+        - composer extension-create-libs && ls -la Libraries/*.phar | grep -v ^-rwx
+        - git clean -dffx
+
     - stage: publish in ter
       php: 7.1
-      env: TYPO3_VERSION=
+      before_install: skip
       install: skip
       before_script: skip
       script:
@@ -74,7 +94,7 @@ jobs:
           if [ -n "$TRAVIS_TAG" ] && [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
             echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n";
             # Install requirements
-            composer require --dev typo3/cms ^8.7 --update-with-dependencies
+            composer require --dev typo3/cms ^8.7
             composer require --dev helhum/ter-client dev-master
             # Cleanup before we upload
             git reset --hard HEAD && git clean -fx
