@@ -84,11 +84,6 @@ class Command
     /**
      * @var array
      */
-    private $argumentNames = [];
-
-    /**
-     * @var array
-     */
     private $inputDefinitions;
 
     /**
