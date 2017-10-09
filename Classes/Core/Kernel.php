@@ -122,7 +122,8 @@ class Kernel
      * without actually executing a command (e.g. during composer install)
      *
      * @param string $runLevel
-     * @throws \InvalidArgumentException
+     * @throws \Helhum\Typo3Console\Exception
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      */
     public function initialize(string $runLevel = null)
     {
@@ -141,8 +142,8 @@ class Kernel
      * Handle the given command input and return the exit code of the called command
      *
      * @param InputInterface $input
-     * @throws \InvalidArgumentException
-     * @throws \Exception
+     * @throws \Helhum\Typo3Console\Exception
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      * @return int
      */
     public function handle(InputInterface $input): int

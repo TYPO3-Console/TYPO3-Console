@@ -63,7 +63,6 @@ class ConsoleWriter extends AbstractWriter
      * Writes the log record
      *
      * @param \TYPO3\CMS\Core\Log\LogRecord $record Log record
-     * @throws \Exception
      * @return \TYPO3\CMS\Core\Log\Writer\WriterInterface $this
      */
     public function writeLog(\TYPO3\CMS\Core\Log\LogRecord $record)
@@ -72,6 +71,7 @@ class ConsoleWriter extends AbstractWriter
             $this->wrapMessage(vsprintf($record->getMessage(), $record->getData()), $record->getLevel()),
             true
         );
+        return $this;
     }
 
     protected function wrapMessage($message, $level)

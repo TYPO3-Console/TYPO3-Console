@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use TYPO3\CMS\Extbase\Reflection\MethodReflection;
@@ -97,7 +98,7 @@ class Command
     /**
      * @param string $controllerClassName Class name of the controller providing the command
      * @param string $controllerCommandName Command name, i.e. the method name of the command, without the "Command" suffix
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function __construct(string $controllerClassName, string $controllerCommandName)
     {
@@ -112,13 +113,13 @@ class Command
         }
         $numberOfClassNameParts = count($classNameParts);
         if ($numberOfClassNameParts < 3) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'Controller class names must at least consist of three parts: vendor, extension name and command controller name.',
                 1438782187
             );
         }
         if (strpos($classNameParts[$numberOfClassNameParts - 1], 'CommandController') === false) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'Invalid controller class name "' . $controllerClassName . '". Class name must end with "CommandController" (e.g. Vendor\ExtensionName\Command\MySimpleCommandController).',
                 1305100019
             );
@@ -409,7 +410,7 @@ class Command
      * Very simple parsing of a @definition annotations on command methods.
      *
      * @param array $definitionAnnotations Definition tags on command controller command methods
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return array
      */
     private function parseDefinitions(array $definitionAnnotations): array

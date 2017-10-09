@@ -18,6 +18,7 @@ use Helhum\Typo3Console\Mvc\Cli\Command;
 use Helhum\Typo3Console\Mvc\Cli\CommandArgumentDefinition;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
+use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Extbase\Mvc\Cli\CommandManager;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 use TYPO3\CMS\Extbase\Reflection\ReflectionService;
@@ -154,7 +155,7 @@ class CliSetupRequestHandler
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentTypeException
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\NoSuchArgumentException
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\NoSuchCommandException
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     protected function dispatchAction($actionName)
     {
@@ -178,7 +179,7 @@ class CliSetupRequestHandler
                 } else {
                     if (!$this->interactiveSetup) {
                         if ($isRequired) {
-                            throw new \RuntimeException(sprintf('Argument "%s" is not set, but is required and user interaction has been disabled!', $argumentDefinition->getName()), 1405273316);
+                            throw new RuntimeException(sprintf('Argument "%s" is not set, but is required and user interaction has been disabled!', $argumentDefinition->getName()), 1405273316);
                         }
                         continue;
                     }
@@ -226,7 +227,7 @@ class CliSetupRequestHandler
             }
 
             if ($loopCounter > 10) {
-                throw new \RuntimeException('Tried to dispatch "' . $actionName . '" ' . $loopCounter . ' times.', 1405269518);
+                throw new RuntimeException('Tried to dispatch "' . $actionName . '" ' . $loopCounter . ' times.', 1405269518);
             }
         } while (!empty($messages));
     }

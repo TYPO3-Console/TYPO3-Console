@@ -108,7 +108,7 @@ class PersistenceContext implements PersistenceContextInterface
 
     /**
      * @param string $tableName
-     * @throws \InvalidArgumentException
+     * @throws \Helhum\Typo3Console\Service\Persistence\TableDoesNotExistException
      * @return bool
      */
     public function deleteLostIndexesOfRecordsInTable($tableName)
