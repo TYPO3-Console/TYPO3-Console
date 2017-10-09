@@ -34,7 +34,6 @@ class CopyTypo3Directory implements InstallerScript
 
     /**
      * @param ScriptEvent $event
-     * @throws \RuntimeException
      * @return bool
      * @internal
      */

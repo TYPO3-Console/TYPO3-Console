@@ -38,10 +38,10 @@ class ExceptionHandler
     /**
      * Formats and echoes the exception for the command line.
      *
-     * @param \Exception|\Throwable $exception The exception object
+     * @param \Throwable $exception The exception object
      * @return void
      */
-    public function handleException($exception)
+    public function handleException(\Throwable $exception)
     {
         $this->renderException($exception);
 
@@ -52,9 +52,9 @@ class ExceptionHandler
     /**
      * Renders Exception with trace and nested exceptions with trace.
      *
-     * @param \Exception|\Throwable $exception
+     * @param \Throwable $exception
      */
-    protected function renderException($exception)
+    protected function renderException(\Throwable $exception)
     {
         if (getenv('TYPO3_CONSOLE_SUB_PROCESS')) {
             $this->output->getErrorOutput()->write(\json_encode($this->serializeException($exception)));
@@ -78,10 +78,10 @@ class ExceptionHandler
     /**
      * Output formatted exception.
      *
-     * @param \Exception|\Throwable $exception
+     * @param \Throwable $exception
      * @param int $level
      */
-    protected function outputException($exception, $level = 0)
+    protected function outputException(\Throwable $exception, $level = 0)
     {
         $exceptionCodeNumber = ($exception->getCode() > 0) ? '#' . $exception->getCode() . ': ' : '';
         $exceptionClass = get_class($exception);
@@ -133,9 +133,9 @@ class ExceptionHandler
     /**
      * Output formatted trace.
      *
-     * @param \Exception|\Throwable $exception
+     * @param \Throwable $exception
      */
-    protected function outputTrace($exception)
+    protected function outputTrace(\Throwable $exception)
     {
         $this->output->writeln('<comment>Exception trace:</comment>');
         $backtraceSteps = $exception->getTrace();
@@ -192,10 +192,10 @@ class ExceptionHandler
     }
 
     /**
-     * @param \Exception|\Throwable $exception
+     * @param \Throwable $exception
      * @return array|null
      */
-    private function serializeException($exception)
+    private function serializeException(\Throwable $exception)
     {
         $serializedException = null;
         if ($exception) {

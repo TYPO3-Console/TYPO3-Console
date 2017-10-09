@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Core\Booting;
  *
  */
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use TYPO3\CMS\Core\Core\Bootstrap;
 
 class RunLevel
@@ -81,7 +82,7 @@ class RunLevel
 
     /**
      * @param string $commandIdentifier
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @internal
      */
     public function runSequenceForCommand(string $commandIdentifier)
@@ -92,7 +93,7 @@ class RunLevel
     /**
      * @param string $runLevel
      * @internal
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function runSequence(string $runLevel)
     {
@@ -125,7 +126,7 @@ class RunLevel
 
     /**
      * @param string $commandIdentifier
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return Sequence
      */
     private function buildSequenceForCommand(string $commandIdentifier): Sequence
@@ -141,7 +142,7 @@ class RunLevel
      * Builds the sequence for the given run level
      *
      * @param string $runLevel
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return Sequence
      */
     private function buildSequence(string $runLevel): Sequence
@@ -149,7 +150,7 @@ class RunLevel
         if (is_callable([$this, $runLevel])) {
             return $this->{$runLevel}($runLevel);
         }
-        throw new \InvalidArgumentException('Invalid run level "' . $runLevel . '"', 1402075492);
+        throw new InvalidArgumentException('Invalid run level "' . $runLevel . '"', 1402075492);
     }
 
     /**
@@ -228,6 +229,7 @@ class RunLevel
     /**
      * @param Sequence $sequence
      * @param string $stepIdentifier
+     * @throws InvalidArgumentException
      */
     private function addStep(Sequence $sequence, string $stepIdentifier)
     {
@@ -277,7 +279,7 @@ class RunLevel
                 break;
 
             default:
-                throw new \InvalidArgumentException('ERROR: cannot find step for identifier "' . $stepIdentifier . '"', 1402075819);
+                throw new InvalidArgumentException('ERROR: cannot find step for identifier "' . $stepIdentifier . '"', 1402075819);
         }
     }
 

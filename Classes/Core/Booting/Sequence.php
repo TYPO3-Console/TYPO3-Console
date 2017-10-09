@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Core\Booting;
  *
  */
 
+use Helhum\Typo3Console\Exception;
 use TYPO3\CMS\Core\Core\Bootstrap;
 
 /**
@@ -59,7 +60,7 @@ class Sequence
      * Removes all occurrences of the specified step from this sequence
      *
      * @param string $stepIdentifier
-     * @throws \Exception
+     * @throws Exception
      * @return void
      */
     public function removeStep($stepIdentifier)
@@ -75,7 +76,7 @@ class Sequence
             }
         }
         if ($removedOccurrences === 0) {
-            throw new \Exception(sprintf('Cannot remove sequence step with identifier "%s" because no such step exists in the given sequence.', $stepIdentifier), 1322591669);
+            throw new Exception(sprintf('Cannot remove sequence step with identifier "%s" because no such step exists in the given sequence.', $stepIdentifier), 1322591669);
         }
     }
 

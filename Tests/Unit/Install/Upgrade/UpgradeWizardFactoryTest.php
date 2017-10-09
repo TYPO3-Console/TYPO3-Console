@@ -77,7 +77,7 @@ class UpgradeWizardFactoryTest extends UnitTestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Symfony\Component\Console\Exception\RuntimeException
      * @expectedExceptionCode 1491914890
      * @test
      */

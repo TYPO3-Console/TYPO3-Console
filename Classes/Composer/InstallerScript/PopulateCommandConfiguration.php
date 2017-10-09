@@ -27,7 +27,6 @@ class PopulateCommandConfiguration implements InstallerScript
      * Called from Composer
      *
      * @param ScriptEvent $event
-     * @throws \RuntimeException
      * @return bool
      * @internal
      */

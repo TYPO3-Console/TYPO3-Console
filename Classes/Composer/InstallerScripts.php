@@ -19,6 +19,7 @@ use Composer\Script\Event as ScriptEvent;
 use Composer\Semver\Constraint\EmptyConstraint;
 use Helhum\Typo3Console\Composer\InstallerScript\CopyTypo3Directory;
 use Helhum\Typo3Console\Composer\InstallerScript\PopulateCommandConfiguration;
+use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Composer\Plugin\Core\InstallerScripts\AutoloadConnector;
 use TYPO3\CMS\Composer\Plugin\Core\InstallerScripts\WebDirectory;
 use TYPO3\CMS\Composer\Plugin\Core\InstallerScriptsRegistration;
@@ -54,13 +55,13 @@ class InstallerScripts implements InstallerScriptsRegistration
     /**
      * @param ScriptEvent $event
      * @internal
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public static function setVersion(ScriptEvent $event)
     {
         $version = $event->getArguments()[0];
         if (!preg_match('/\d+\.\d+\.\d+/', $version)) {
-            throw new \RuntimeException('No valid version number provided!', 1468672604);
+            throw new RuntimeException('No valid version number provided!', 1468672604);
         }
         $docConfigFile = __DIR__ . '/../../Documentation/Settings.yml';
         $content = file_get_contents($docConfigFile);

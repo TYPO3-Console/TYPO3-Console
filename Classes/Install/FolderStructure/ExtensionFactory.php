@@ -46,7 +46,6 @@ class ExtensionFactory extends DefaultFactory
     /**
      * Get default structure object hierarchy
      *
-     * @throws \InvalidArgumentException
      * @throws \TYPO3\CMS\Install\FolderStructure\Exception\RootNodeException
      * @throws \TYPO3\CMS\Install\FolderStructure\Exception\InvalidArgumentException
      * @return StructureFacade

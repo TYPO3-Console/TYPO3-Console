@@ -17,6 +17,7 @@ namespace Helhum\Typo3Console\Mvc\Cli;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\CommandControllerCommand;
 use Symfony\Component\Console\Command\Command as BaseCommand;
+use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Core\Console\CommandNameAlreadyInUseException;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -240,7 +241,7 @@ class CommandCollection implements \IteratorAggregate
     /**
      * @param mixed $commandConfiguration
      * @param string $packageKey
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     private function ensureValidCommandsConfiguration($commandConfiguration, $packageKey)
     {
@@ -252,7 +253,7 @@ class CommandCollection implements \IteratorAggregate
             || (isset($commandConfiguration['commands']) && !is_array($commandConfiguration['commands']))
             || (isset($commandConfiguration['replace']) && !is_array($commandConfiguration['replace']))
         ) {
-            throw new \RuntimeException($packageKey . ' defines invalid commands in Configuration/Console/Commands.php', 1461186959);
+            throw new RuntimeException($packageKey . ' defines invalid commands in Configuration/Console/Commands.php', 1461186959);
         }
     }
 }

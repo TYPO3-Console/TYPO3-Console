@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Install\Upgrade;
  *
  */
 
+use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Install\Updates\AbstractUpdate;
@@ -49,6 +50,7 @@ class UpgradeWizardFactory
      * Creates instance of an upgrade wizard
      *
      * @param string $identifier The identifier or class name of an upgrade wizard
+     * @throws RuntimeException
      * @return AbstractUpdate Newly instantiated upgrade wizard
      */
     public function create($identifier)
@@ -57,7 +59,7 @@ class UpgradeWizardFactory
             && empty($className = $this->wizardRegistry['TYPO3\\CMS\\Install\\Updates\\' . $identifier])
             && !class_exists($className = $identifier)
         ) {
-            throw new \RuntimeException(sprintf('Upgrade wizard "%s" not found', $identifier), 1491914890);
+            throw new RuntimeException(sprintf('Upgrade wizard "%s" not found', $identifier), 1491914890);
         }
         /** @var AbstractUpdate $upgradeWizard */
         $upgradeWizard = $this->objectManager->get($className);

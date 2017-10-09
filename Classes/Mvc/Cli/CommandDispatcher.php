@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 use Composer\Script\Event as ScriptEvent;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
 
@@ -48,6 +49,7 @@ class CommandDispatcher
      * @param ScriptEvent $event
      * @param ProcessBuilder $processBuilder
      * @param PhpExecutableFinder $phpFinder
+     * @throws RuntimeException
      * @return CommandDispatcher
      */
     public static function createFromComposerRun(ScriptEvent $event, ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
@@ -65,7 +67,7 @@ class CommandDispatcher
             }
         }
         if (!isset($typo3CommandPath)) {
-            throw new \RuntimeException('The "typo3console" binary could not be found.', 1494778973);
+            throw new RuntimeException('The "typo3console" binary could not be found.', 1494778973);
         }
         $processBuilder = $processBuilder ?: new ProcessBuilder();
         $processBuilder->addEnvironmentVariables(['TYPO3_CONSOLE_PLUGIN_RUN' => true]);
@@ -80,13 +82,13 @@ class CommandDispatcher
      *
      * @param ProcessBuilder $processBuilder
      * @param PhpExecutableFinder $phpFinder
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @return self
      */
     public static function createFromCommandRun(ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
     {
         if (!isset($_SERVER['argv'][0]) && strpos($_SERVER['argv'][0], 'typo3console') === false) {
-            throw new \RuntimeException('Tried to create typo3 command runner from wrong context', 1484945065);
+            throw new RuntimeException('Tried to create typo3 command runner from wrong context', 1484945065);
         }
         $typo3CommandPath = $_SERVER['argv'][0];
         return self::create($typo3CommandPath, $processBuilder, $phpFinder);
@@ -98,12 +100,13 @@ class CommandDispatcher
      * Just use the method without arguments for best results
      *
      * @param string|null $typo3CommandPath
+     * @throws RuntimeException
      * @return CommandDispatcher
      */
     public static function createFromTestRun($typo3CommandPath = null)
     {
         if (!isset($_SERVER['argv'][0]) && strpos($_SERVER['argv'][0], 'phpunit') === false) {
-            throw new \RuntimeException('Tried to create typo3console command runner from wrong context', 1493570522);
+            throw new RuntimeException('Tried to create typo3console command runner from wrong context', 1493570522);
         }
         $typo3CommandPath = $typo3CommandPath ?: dirname(dirname(dirname(__DIR__))) . '/Scripts/typo3console';
         return self::create($typo3CommandPath);
@@ -115,7 +118,7 @@ class CommandDispatcher
      * @param string $typo3CommandPath Absolute path to the typo3console binary
      * @param ProcessBuilder $processBuilder
      * @param PhpExecutableFinder $phpFinder
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @return self
      */
     public static function create($typo3CommandPath, ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
@@ -123,7 +126,7 @@ class CommandDispatcher
         $processBuilder = $processBuilder ?: new ProcessBuilder();
         $phpFinder = $phpFinder ?: new PhpExecutableFinder();
         if (!($php = $phpFinder->find())) {
-            throw new \RuntimeException('The "php" binary could not be found.', 1485128615);
+            throw new RuntimeException('The "php" binary could not be found.', 1485128615);
         }
         $processBuilder->setPrefix($php);
         $processBuilder->add($typo3CommandPath);

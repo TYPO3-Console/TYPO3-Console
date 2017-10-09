@@ -17,6 +17,7 @@ use Helhum\Typo3Console\Core\Cache\FakeDatabaseBackend;
 use Helhum\Typo3Console\Error\ErrorHandler;
 use Helhum\Typo3Console\Error\ExceptionHandler;
 use Helhum\Typo3Console\Package\UncachedPackageManager;
+use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
 use TYPO3\CMS\Core\Cache\Backend\NullBackend;
 use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
@@ -188,14 +189,14 @@ class Scripts
     /**
      * If the backend script is in CLI mode, it will try to load a backend user named _cli_lowlevel
      *
-     * @throws \RuntimeException if a non-admin Backend user could not be loaded
+     * @throws RuntimeException if a non-admin Backend user could not be loaded
      */
     private static function loadCommandLineBackendUser()
     {
         /** @var CommandLineUserAuthentication $backendUser */
         $backendUser = $GLOBALS['BE_USER'];
         if ($backendUser->user['uid']) {
-            throw new \RuntimeException('Another user was already loaded which is impossible in CLI mode!', 3);
+            throw new RuntimeException('Another user was already loaded which is impossible in CLI mode!', 3);
         }
         $backendUser->authenticate();
     }

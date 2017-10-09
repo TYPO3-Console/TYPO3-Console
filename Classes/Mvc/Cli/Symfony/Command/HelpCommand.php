@@ -69,6 +69,7 @@ class HelpCommand extends \Symfony\Component\Console\Command\HelpCommand
     /**
      * {@inheritdoc}
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @throws \Symfony\Component\Console\Exception\CommandNotFoundException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

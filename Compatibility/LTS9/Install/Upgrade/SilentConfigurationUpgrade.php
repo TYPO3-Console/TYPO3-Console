@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\LTS9\Install\Upgrade;
  *
  */
 
+use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Service\Exception\ConfigurationChangedException;
@@ -38,7 +39,7 @@ class SilentConfigurationUpgrade
      * Call silent upgrade class, redirect to self if configuration was changed.
      *
      * @throws \UnexpectedValueException
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function executeSilentConfigurationUpgradesIfNeeded()
     {
@@ -56,7 +57,7 @@ class SilentConfigurationUpgrade
                 $redirect = true;
                 $this->configurationManager->exportConfiguration();
                 if ($count > 20) {
-                    throw new \RuntimeException('Too many loops when silently upgrading configuration', 1493897404, $e);
+                    throw new RuntimeException('Too many loops when silently upgrading configuration', 1493897404, $e);
                 }
             }
         } while ($redirect === true);

@@ -32,6 +32,7 @@ use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -114,11 +115,12 @@ class CommandControllerCommand extends Command
      * It is used later for isEnabled()
      *
      * @param BaseApplication $application An Application instance
+     * @throws RuntimeException
      */
     public function setApplication(BaseApplication $application = null)
     {
         if ($application !== null && !$application instanceof Application) {
-            throw new \RuntimeException('Command controller commands only work with TYPO3 Console Applications', 1506381781);
+            throw new RuntimeException('Command controller commands only work with TYPO3 Console Applications', 1506381781);
         }
         $this->application = $application;
         parent::setApplication($application);

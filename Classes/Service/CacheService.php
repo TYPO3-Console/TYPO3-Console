@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\Service;
 use Helhum\Typo3Console\Core\Booting\CompatibilityScripts;
 use Helhum\Typo3Console\Core\Booting\Scripts;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
+use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Cache\Backend\SimpleFileBackend;
 use TYPO3\CMS\Core\Cache\CacheManager;
@@ -251,13 +252,15 @@ class CacheService implements SingletonInterface
 
     /**
      * Create a data handler instance from global state (with user being admin)
+     *
      * @internal
+     * @throws RuntimeException
      * @return DataHandler
      */
     private static function createDataHandlerFromGlobals()
     {
         if (empty($GLOBALS['BE_USER']) || !$GLOBALS['BE_USER'] instanceof BackendUserAuthentication) {
-            throw new \RuntimeException('No backend user initialized. flushCachesWithDataHandler needs fully initialized TYPO3', 1477066610);
+            throw new RuntimeException('No backend user initialized. flushCachesWithDataHandler needs fully initialized TYPO3', 1477066610);
         }
         $user = clone $GLOBALS['BE_USER'];
         $user->admin = 1;
