@@ -82,5 +82,10 @@ class InstallerScripts implements InstallerScriptsRegistration
         $content = file_get_contents($travisYmlFile);
         $content = preg_replace('/(export COMPOSER_ROOT_VERSION)=\d+\.\d+\.\d+/', '$1=' . $version, $content);
         file_put_contents($travisYmlFile, $content);
+
+        $sonarConfigFile = __DIR__ . '/../../sonar-project.properties';
+        $content = file_get_contents($sonarConfigFile);
+        $content = preg_replace('/(sonar.projectVersion)=\d+\.\d+\.\d+/', '$1=' . $version, $content);
+        file_put_contents($sonarConfigFile, $content);
     }
 }
