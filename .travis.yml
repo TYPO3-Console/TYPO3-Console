@@ -92,6 +92,17 @@ jobs:
         - composer extension-create-libs && ls -la Libraries/*.phar | grep -v ^-rwx
         - git clean -dffx
 
+    - stage: test
+      env: Sonar code scanner
+      before_install: skip
+      install: skip
+      before_script:
+      script:
+        - >
+          if [ -n "$SONAR_TOKEN" ]; then
+            sonar-scanner
+          fi
+
     - stage: publish in ter
       php: 7.1
       before_install: skip
@@ -115,13 +126,3 @@ jobs:
             echo "Uploading release ${TRAVIS_TAG} to TER"
             .Build/bin/ter-client upload typo3_console . -u "$TYPO3_ORG_USERNAME" -p "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
           fi;
-
-    - stage: sonar code scanner
-      before_install: skip
-      install: skip
-      before_script:
-      script:
-        - >
-          if [ -n "$SONAR_TOKEN" ]; then
-            sonar-scanner
-          fi
