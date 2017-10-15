@@ -47,6 +47,7 @@ class Application extends BaseApplication
         parent::__construct('TYPO3 Console', self::TYPO3_CONSOLE_VERSION);
         $this->runLevel = $runLevel;
         $this->composerManaged = $composerManaged;
+        $this->setAutoExit(false);
     }
 
     /**
