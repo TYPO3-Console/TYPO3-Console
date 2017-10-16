@@ -28,10 +28,10 @@ class ExceptionRenderer
     public function render(\Throwable $exception, OutputInterface $output)
     {
         if (getenv('TYPO3_CONSOLE_SUB_PROCESS')) {
-            $output->write(\json_encode($this->serializeException($exception)));
+            $output->write(\json_encode($this->serializeException($exception)), false, OutputInterface::VERBOSITY_QUIET);
             return;
         }
-        $output->writeln('');
+        $output->writeln('', OutputInterface::VERBOSITY_QUIET);
         do {
             $this->outputException($exception, $output);
             if ($output->isVerbose()) {
@@ -40,8 +40,8 @@ class ExceptionRenderer
             }
             $exception = $exception->getPrevious();
             if ($exception) {
-                $output->writeln('');
-                $output->writeln('<comment>Caused by:</comment>');
+                $output->writeln('', OutputInterface::VERBOSITY_QUIET);
+                $output->writeln('<comment>Caused by:</comment>', OutputInterface::VERBOSITY_QUIET);
             }
         } while ($exception);
     }
@@ -64,10 +64,10 @@ class ExceptionRenderer
         $exceptionTitle = $exception->getMessage();
 
         $maxLength = max([strlen($title), strlen($exceptionTitle)]);
-        $output->writeln($this->padMessage('', $maxLength));
-        $output->writeln($this->padMessage($title, $maxLength));
-        $output->writeln($this->padMessage($exceptionTitle, $maxLength));
-        $output->writeln($this->padMessage('', $maxLength));
+        $output->writeln($this->padMessage('', $maxLength), OutputInterface::VERBOSITY_QUIET);
+        $output->writeln($this->padMessage($title, $maxLength), OutputInterface::VERBOSITY_QUIET);
+        $output->writeln($this->padMessage($exceptionTitle, $maxLength), OutputInterface::VERBOSITY_QUIET);
+        $output->writeln($this->padMessage('', $maxLength), OutputInterface::VERBOSITY_QUIET);
 
         if ($output->isVerbose()) {
             if ($exceptionCodeNumber) {
@@ -183,8 +183,8 @@ class ExceptionRenderer
                 'trace' => $this->getTrace($exception),
                 'previous' => $this->serializeException($exception->getPrevious()),
                 'commandline' => $commandLine ?? null,
-                'output' =>  $outputMessage ?? null,
-                'error' =>  $errorMessage ?? null,
+                'output' => $outputMessage ?? null,
+                'error' => $errorMessage ?? null,
             ];
         }
         return $serializedException;
