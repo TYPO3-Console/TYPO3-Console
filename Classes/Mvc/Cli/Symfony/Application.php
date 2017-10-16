@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony;
  */
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
+use Helhum\Typo3Console\Error\ExceptionRenderer;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\CommandControllerCommand;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\HelpCommand;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\ListCommand;
@@ -97,6 +98,11 @@ class Application extends BaseApplication
                 $this->add($command);
             }
         }
+    }
+
+    public function renderException(\Exception $exception, OutputInterface $output)
+    {
+        (new ExceptionRenderer())->render($exception, $output, $this);
     }
 
     /**
