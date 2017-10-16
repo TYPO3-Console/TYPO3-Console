@@ -68,7 +68,9 @@ class ExceptionRenderer
         $output->writeln($this->padMessage($title, $maxLength));
         $output->writeln($this->padMessage($exceptionTitle, $maxLength));
         $output->writeln($this->padMessage('', $maxLength));
-        if ($exception instanceof FailedSubProcessCommandException) {
+        if ($exception instanceof FailedSubProcessCommandException
+            || ($exception instanceof SubProcessException && $exception->getCommandLine())
+        ) {
             $output->writeln('');
             $output->writeln('<comment>Command line:</comment>');
             $output->writeln($exception->getCommandLine());
@@ -127,7 +129,7 @@ class ExceptionRenderer
      * @param string $fileName
      * @return string
      */
-    private function getPossibleShortenedFileName($fileName)
+    private function getPossibleShortenedFileName($fileName): string
     {
         $pathPrefixes = [];
         if (getenv('TYPO3_PATH_COMPOSER_ROOT')) {
@@ -160,6 +162,9 @@ class ExceptionRenderer
                 $backtraceSteps = $exception->getTrace();
                 $line = $backtraceSteps[1]['line'];
                 $file = $backtraceSteps[1]['file'];
+                $commandLine = $exception->getCommandLine();
+                $outputMessage = $exception->getOutputMessage();
+                $errorMessage = $exception->getErrorMessage();
             }
             $serializedException = [
                 'class' => $exceptionClass,
@@ -169,6 +174,9 @@ class ExceptionRenderer
                 'code' => $exception->getCode(),
                 'trace' => $this->getTrace($exception),
                 'previous' => $this->serializeException($exception->getPrevious()),
+                'commandline' => $commandLine ?? null,
+                'output' =>  $outputMessage ?? null,
+                'error' =>  $errorMessage ?? null,
             ];
         }
         return $serializedException;
