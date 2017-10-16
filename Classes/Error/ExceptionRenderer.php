@@ -31,8 +31,8 @@ class ExceptionRenderer
             $output->write(\json_encode($this->serializeException($exception)));
             return;
         }
+        $output->writeln('');
         do {
-            $output->writeln('');
             $this->outputException($exception, $output);
             if ($output->isVerbose()) {
                 $output->writeln('');
@@ -54,35 +54,43 @@ class ExceptionRenderer
      */
     private function outputException(\Throwable $exception, OutputInterface $output)
     {
-        $exceptionCodeNumber = ($exception->getCode() > 0) ? '#' . $exception->getCode() . ': ' : '';
+        $exceptionCodeNumber = $exception->getCode() > 0 ? $exception->getCode() : '';
         $exceptionClass = get_class($exception);
         if ($exception instanceof SubProcessException) {
             $exceptionClass = $exception->getPreviousExceptionClass();
         }
 
         $title = sprintf('[ %s ]', $exceptionClass);
-        $exceptionTitle = sprintf('%s%s', $exceptionCodeNumber, $exception->getMessage());
+        $exceptionTitle = $exception->getMessage();
 
         $maxLength = max([strlen($title), strlen($exceptionTitle)]);
         $output->writeln($this->padMessage('', $maxLength));
         $output->writeln($this->padMessage($title, $maxLength));
         $output->writeln($this->padMessage($exceptionTitle, $maxLength));
         $output->writeln($this->padMessage('', $maxLength));
-        if ($exception instanceof FailedSubProcessCommandException
-            || ($exception instanceof SubProcessException && $exception->getCommandLine())
-        ) {
-            $output->writeln('');
-            $output->writeln('<comment>Command line:</comment>');
-            $output->writeln($exception->getCommandLine());
-            if ($exception->getOutputMessage()) {
+
+        if ($output->isVerbose()) {
+            if ($exceptionCodeNumber) {
                 $output->writeln('');
-                $output->writeln('<comment>Command output:</comment>');
-                $output->writeln($exception->getOutputMessage());
+                $output->writeln(sprintf('<comment>Exception code:</comment> <info>%s</info>', $exceptionCodeNumber));
             }
-            if ($exception->getErrorMessage()) {
+
+            if ($exception instanceof FailedSubProcessCommandException
+                || ($exception instanceof SubProcessException && $exception->getCommandLine())
+            ) {
                 $output->writeln('');
-                $output->writeln('<comment>Command error output:</comment>');
-                $output->writeln($exception->getErrorMessage());
+                $output->writeln('<comment>Command line:</comment>');
+                $output->writeln($exception->getCommandLine());
+                if ($exception->getOutputMessage()) {
+                    $output->writeln('');
+                    $output->writeln('<comment>Command output:</comment>');
+                    $output->writeln($exception->getOutputMessage());
+                }
+                if ($exception->getErrorMessage()) {
+                    $output->writeln('');
+                    $output->writeln('<comment>Command error output:</comment>');
+                    $output->writeln($exception->getErrorMessage());
+                }
             }
         }
     }
