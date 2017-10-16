@@ -167,7 +167,7 @@ class ExceptionRenderer
      * @param \Throwable $exception
      * @return array|null
      */
-    private function serializeException(\Throwable $exception)
+    private function serializeException(\Throwable $exception = null)
     {
         $serializedException = null;
         if ($exception) {
