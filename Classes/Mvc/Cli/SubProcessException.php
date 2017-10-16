@@ -38,14 +38,42 @@ class SubProcessException extends \Exception
      */
     private $previousExceptionFile;
 
-    public function __construct($previousExceptionClass, $previousExceptionMessage, $previousExceptionCode, $previousExceptionTrace, $previousExceptionLine, $previousExceptionFile, $previousExceptionData = null)
-    {
+    /**
+     * @var string|null
+     */
+    private $previousExceptionCommandLine;
+
+    /**
+     * @var string|null
+     */
+    private $previousExceptionOutputMessage;
+
+    /**
+     * @var string|null
+     */
+    private $previousExceptionErrorMessage;
+
+    public function __construct(
+        $previousExceptionClass,
+        $previousExceptionMessage,
+        $previousExceptionCode,
+        $previousExceptionTrace,
+        $previousExceptionLine,
+        $previousExceptionFile,
+        $previousExceptionData = null,
+        $previousExceptionCommandLine = null,
+        $previousExceptionOutputMessage = null,
+        $previousExceptionErrorMessage = null
+    ) {
         $previousException = $previousExceptionData ? self::createFromArray($previousExceptionData) : null;
         parent::__construct($previousExceptionMessage, $previousExceptionCode, $previousException);
         $this->previousExceptionClass = $previousExceptionClass;
         $this->previousExceptionTrace = $previousExceptionTrace;
         $this->previousExceptionLine = $previousExceptionLine;
         $this->previousExceptionFile = $previousExceptionFile;
+        $this->previousExceptionCommandLine = $previousExceptionCommandLine;
+        $this->previousExceptionOutputMessage = $previousExceptionOutputMessage;
+        $this->previousExceptionErrorMessage = $previousExceptionErrorMessage;
     }
 
     public static function createFromArray($previousExceptionData)
@@ -57,7 +85,10 @@ class SubProcessException extends \Exception
             $previousExceptionData['trace'],
             $previousExceptionData['line'],
             $previousExceptionData['file'],
-            $previousExceptionData['previous']
+            $previousExceptionData['previous'],
+            $previousExceptionData['commandline'],
+            $previousExceptionData['output'],
+            $previousExceptionData['error']
         );
     }
 
@@ -91,5 +122,29 @@ class SubProcessException extends \Exception
     public function getPreviousExceptionFile()
     {
         return $this->previousExceptionFile;
+    }
+
+    /**
+     * @return null
+     */
+    public function getCommandLine()
+    {
+        return $this->previousExceptionCommandLine;
+    }
+
+    /**
+     * @return null
+     */
+    public function getOutputMessage()
+    {
+        return $this->previousExceptionOutputMessage;
+    }
+
+    /**
+     * @return null
+     */
+    public function getErrorMessage()
+    {
+        return $this->previousExceptionErrorMessage;
     }
 }
