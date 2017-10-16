@@ -16,10 +16,23 @@ namespace Helhum\Typo3Console\Error;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Helhum\Typo3Console\Mvc\Cli\SubProcessException;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Terminal;
 
 class ExceptionRenderer
 {
+    /**
+     * @var Terminal
+     */
+    private $terminal;
+
+    public function __construct(Terminal $terminal = null)
+    {
+        $this->terminal = $terminal ?: new Terminal();
+    }
+
     /**
      * Renders Exception with trace and nested exceptions with trace.
      *
@@ -37,12 +50,11 @@ class ExceptionRenderer
         do {
             $this->outputException($exception, $output);
             if ($output->isVerbose()) {
-                $output->writeln('');
                 $this->outputTrace($exception, $output);
+                $output->writeln('');
             }
             $exception = $exception->getPrevious();
             if ($exception) {
-                $output->writeln('', OutputInterface::VERBOSITY_QUIET);
                 $output->writeln('<comment>Caused by:</comment>', OutputInterface::VERBOSITY_QUIET);
             }
         } while ($exception);
@@ -65,38 +77,82 @@ class ExceptionRenderer
         }
 
         $title = sprintf('[ %s ]', $exceptionClass);
-        $exceptionTitle = $exception->getMessage();
 
-        $maxLength = max([strlen($title), strlen($exceptionTitle)]);
-        $output->writeln($this->padMessage('', $maxLength), OutputInterface::VERBOSITY_QUIET);
-        $output->writeln($this->padMessage($title, $maxLength), OutputInterface::VERBOSITY_QUIET);
-        $output->writeln($this->padMessage($exceptionTitle, $maxLength), OutputInterface::VERBOSITY_QUIET);
-        $output->writeln($this->padMessage('', $maxLength), OutputInterface::VERBOSITY_QUIET);
+        $messageLength = Helper::strlen($title);
+        $maxWidth = $this->terminal->getWidth() ? $this->terminal->getWidth() - 1 : PHP_INT_MAX;
+
+        $lines = [];
+        foreach (preg_split('/\r?\n/', trim($exception->getMessage())) as $line) {
+            foreach ($this->splitStringByWidth($line, $maxWidth - 4) as $splitLine) {
+                $lines[] = $splitLine;
+                $messageLength = max(Helper::strlen($splitLine), $messageLength);
+            }
+        }
+
+        $messages = [];
+        $messages[] = $emptyLine = $this->padMessage('', $messageLength);
+        $messages[] = $this->padMessage($title, $messageLength);
+        foreach ($lines as $line) {
+            $messages[] = $this->padMessage(OutputFormatter::escape($line), $messageLength);
+        }
+        $messages[] = $emptyLine;
+        $messages[] = '';
+        $output->writeln($messages, OutputInterface::VERBOSITY_QUIET);
 
         if ($output->isVerbose()) {
             if ($exceptionCodeNumber) {
-                $output->writeln('');
                 $output->writeln(sprintf('<comment>Exception code:</comment> <info>%s</info>', $exceptionCodeNumber));
+                $output->writeln('');
             }
 
             if ($exception instanceof FailedSubProcessCommandException
                 || ($exception instanceof SubProcessException && $exception->getCommandLine())
             ) {
-                $output->writeln('');
                 $output->writeln('<comment>Command line:</comment>');
                 $output->writeln($exception->getCommandLine());
+                $output->writeln('');
                 if ($exception->getOutputMessage()) {
-                    $output->writeln('');
                     $output->writeln('<comment>Command output:</comment>');
                     $output->writeln($exception->getOutputMessage());
+                    $output->writeln('');
                 }
                 if ($exception->getErrorMessage()) {
-                    $output->writeln('');
                     $output->writeln('<comment>Command error output:</comment>');
                     $output->writeln($exception->getErrorMessage());
+                    $output->writeln('');
                 }
             }
         }
+    }
+
+    private function splitStringByWidth($string, $width)
+    {
+        // str_split is not suitable for multi-byte characters, we should use preg_split to get char array properly.
+        // additionally, array_slice() is not enough as some character has doubled width.
+        // we need a function to split string not by character count but by string width
+        if (false === $encoding = mb_detect_encoding($string, null, true)) {
+            return str_split($string, $width);
+        }
+
+        $utf8String = mb_convert_encoding($string, 'utf8', $encoding);
+        $lines = [];
+        $line = '';
+        foreach (preg_split('//u', $utf8String) as $char) {
+            // test if $char could be appended to current line
+            if (mb_strwidth($line . $char, 'utf8') <= $width) {
+                $line .= $char;
+                continue;
+            }
+            // if not, push current line to array and make new line
+            $lines[] = str_pad($line, $width);
+            $line = $char;
+        }
+
+        $lines[] = count($lines) ? str_pad($line, $width) : $line;
+
+        mb_convert_variables($encoding, 'utf8', $lines);
+
+        return $lines;
     }
 
     /**
@@ -133,7 +189,6 @@ class ExceptionRenderer
         }, null, Application::class)();
 
         if ($runningCommand !== null) {
-            $output->writeln('', OutputInterface::VERBOSITY_QUIET);
             $output->writeln(sprintf('<info>%s</info>', sprintf($runningCommand->getSynopsis(), $application->getName())), OutputInterface::VERBOSITY_QUIET);
             $output->writeln('', OutputInterface::VERBOSITY_QUIET);
         }
@@ -146,9 +201,9 @@ class ExceptionRenderer
      * @param int $maxLength
      * @return string
      */
-    private function padMessage($message, $maxLength)
+    private function padMessage($message, $maxLength): string
     {
-        return '<error> ' . $message . str_pad('', $maxLength - strlen($message), ' ') . ' </error>';
+        return '<error>  ' . $message . str_pad('', $maxLength - strlen($message), ' ') . '  </error>';
     }
 
     /**
