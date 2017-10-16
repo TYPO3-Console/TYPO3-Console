@@ -1,9 +1,6 @@
 language: php
 sudo: required
 addons:
-  apt:
-    packages:
-      - parallel
   sonarcloud:
     organization: "helhum-github"
     branches:
@@ -60,7 +57,7 @@ jobs:
       install: skip
       before_script: skip
       script:
-        - find . -name \*.php ! -path "./.Build/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;;
+        - errors=$(find . -name \*.php ! -path "./.Build/*" -exec php -d display_errors=stderr -l {} 2>&1 >/dev/null \;) && echo "$errors" && test -z "$errors"
     - <<: *lint
       php: 7.0
 
