@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Error;
 
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Helhum\Typo3Console\Mvc\Cli\SubProcessException;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ExceptionRenderer
@@ -24,8 +25,9 @@ class ExceptionRenderer
      *
      * @param \Throwable $exception
      * @param OutputInterface $output
+     * @param Application|null $application
      */
-    public function render(\Throwable $exception, OutputInterface $output)
+    public function render(\Throwable $exception, OutputInterface $output, Application $application = null)
     {
         if (getenv('TYPO3_CONSOLE_SUB_PROCESS')) {
             $output->write(\json_encode($this->serializeException($exception)), false, OutputInterface::VERBOSITY_QUIET);
@@ -44,6 +46,8 @@ class ExceptionRenderer
                 $output->writeln('<comment>Caused by:</comment>', OutputInterface::VERBOSITY_QUIET);
             }
         } while ($exception);
+
+        $this->outputSynopsis($output, $application);
     }
 
     /**
@@ -116,6 +120,22 @@ class ExceptionRenderer
             if (isset($backtraceSteps[$index]['file'])) {
                 $output->writeln('   ' . $this->getPossibleShortenedFileName($backtraceSteps[$index]['file']) . (isset($backtraceSteps[$index]['line']) ? ':' . $backtraceSteps[$index]['line'] : ''));
             }
+        }
+    }
+
+    private function outputSynopsis(OutputInterface $output, Application $application = null)
+    {
+        if (!$application || getenv('TYPO3_CONSOLE_SUB_PROCESS')) {
+            return;
+        }
+        \Closure::bind(function () use (&$runningCommand, $application) {
+            $runningCommand = $application->runningCommand;
+        }, null, Application::class)();
+
+        if ($runningCommand !== null) {
+            $output->writeln('', OutputInterface::VERBOSITY_QUIET);
+            $output->writeln(sprintf('<info>%s</info>', sprintf($runningCommand->getSynopsis(), $application->getName())), OutputInterface::VERBOSITY_QUIET);
+            $output->writeln('', OutputInterface::VERBOSITY_QUIET);
         }
     }
 
