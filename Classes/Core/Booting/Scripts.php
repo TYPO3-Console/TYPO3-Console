@@ -58,8 +58,8 @@ class Scripts
 
         $bootstrap->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
         $bootstrap->baseSetup();
-        // I want to see deprecation messages
-        error_reporting(E_ALL & ~(E_STRICT | E_NOTICE));
+        // Mute notices
+        error_reporting(E_ALL & ~E_NOTICE);
         $exceptionHandler = new ExceptionHandler();
         set_exception_handler([$exceptionHandler, 'handleException']);
 
@@ -115,10 +115,6 @@ class Scripts
         $errorHandler = new ErrorHandler();
         $errorHandler->setExceptionalErrors([E_WARNING, E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_RECOVERABLE_ERROR]);
         set_error_handler([$errorHandler, 'handleError']);
-        ini_set('display_errors', 1);
-        if (((bool)ini_get('display_errors') && strtolower(ini_get('display_errors')) !== 'on' && strtolower(ini_get('display_errors')) !== '1') || !(bool)ini_get('display_errors')) {
-            echo 'WARNING: Fatal errors will be suppressed due to your PHP config. You should consider enabling display_errors in your php.ini file!' . chr(10);
-        }
     }
 
     /**

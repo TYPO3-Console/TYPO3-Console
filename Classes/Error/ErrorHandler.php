@@ -14,8 +14,7 @@ namespace Helhum\Typo3Console\Error;
  */
 
 /**
- * Global error handler for Flow
- *
+ * Global error handler for TYPO3 Console
  */
 class ErrorHandler
 {
