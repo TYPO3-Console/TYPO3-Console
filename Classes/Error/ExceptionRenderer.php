@@ -31,19 +31,19 @@ class ExceptionRenderer
             $output->write(\json_encode($this->serializeException($exception)));
             return;
         }
-        $output->writeln('');
-        $this->outputException($exception, $output);
-        $output->writeln('');
-        $this->outputTrace($exception, $output);
-        $previousException = $exception;
-        $level = 0;
-        while (($previousException = $previousException->getPrevious()) !== null) {
-            $level++;
+        do {
             $output->writeln('');
-            $this->outputException($previousException, $output, $level);
-            $output->writeln('');
-            $this->outputTrace($previousException, $output);
-        }
+            $this->outputException($exception, $output);
+            if ($output->isVerbose()) {
+                $output->writeln('');
+                $this->outputTrace($exception, $output);
+            }
+            $exception = $exception->getPrevious();
+            if ($exception) {
+                $output->writeln('');
+                $output->writeln('<comment>Caused by:</comment>');
+            }
+        } while ($exception);
     }
 
     /**
@@ -51,39 +51,22 @@ class ExceptionRenderer
      *
      * @param \Throwable $exception
      * @param OutputInterface $output
-     * @param int $level
      */
-    private function outputException(\Throwable $exception, OutputInterface $output, $level = 0)
+    private function outputException(\Throwable $exception, OutputInterface $output)
     {
         $exceptionCodeNumber = ($exception->getCode() > 0) ? '#' . $exception->getCode() . ': ' : '';
         $exceptionClass = get_class($exception);
-        $line = $exception->getLine();
-        $file = $exception->getFile();
         if ($exception instanceof SubProcessException) {
-            if ($level > 1) {
-                $exceptionClass = str_replace('Sub-process exception: ', sprintf('Sub-process exception (%d): ', $level), $exception->getPreviousExceptionClass());
-            } else {
-                $exceptionClass = 'Sub-process exception: ' . $exception->getPreviousExceptionClass();
-            }
-            $line = $exception->getPreviousExceptionLine();
-            $file = $exception->getPreviousExceptionFile();
-        } elseif ($exception instanceof FailedSubProcessCommandException) {
-            $backtraceSteps = $exception->getTrace();
-            $line = $backtraceSteps[1]['line'];
-            $file = $backtraceSteps[1]['file'];
+            $exceptionClass = $exception->getPreviousExceptionClass();
         }
 
         $title = sprintf('[ %s ]', $exceptionClass);
         $exceptionTitle = sprintf('%s%s', $exceptionCodeNumber, $exception->getMessage());
-        $exceptionFile = sprintf('thrown in file %s', $this->getPossibleShortenedFileName($file));
-        $exceptionLine = sprintf('in line %s', $line);
 
-        $maxLength = max([strlen($title), strlen($exceptionTitle), strlen($exceptionFile), strlen($exceptionLine)]);
+        $maxLength = max([strlen($title), strlen($exceptionTitle)]);
         $output->writeln($this->padMessage('', $maxLength));
         $output->writeln($this->padMessage($title, $maxLength));
         $output->writeln($this->padMessage($exceptionTitle, $maxLength));
-        $output->writeln($this->padMessage($exceptionFile, $maxLength));
-        $output->writeln($this->padMessage($exceptionLine, $maxLength));
         $output->writeln($this->padMessage('', $maxLength));
         if ($exception instanceof FailedSubProcessCommandException) {
             $output->writeln('');
@@ -110,12 +93,7 @@ class ExceptionRenderer
     private function outputTrace(\Throwable $exception, OutputInterface $output)
     {
         $output->writeln('<comment>Exception trace:</comment>');
-        $backtraceSteps = $exception->getTrace();
-        if ($exception instanceof SubProcessException) {
-            $backtraceSteps = $exception->getPreviousExceptionTrace();
-        } elseif ($exception instanceof FailedSubProcessCommandException) {
-            array_shift($backtraceSteps);
-        }
+        $backtraceSteps = $this->getTrace($exception);
         foreach ($backtraceSteps as $index => $step) {
             $traceLine = '#' . $index . ' ';
             if (isset($backtraceSteps[$index]['class'])) {
@@ -175,7 +153,7 @@ class ExceptionRenderer
             $line = $exception->getLine();
             $file = $exception->getFile();
             if ($exception instanceof SubProcessException) {
-                $exceptionClass = 'Sub-process exception: ' . $exception->getPreviousExceptionClass();
+                $exceptionClass = $exception->getPreviousExceptionClass();
                 $line = $exception->getPreviousExceptionLine();
                 $file = $exception->getPreviousExceptionFile();
             } elseif ($exception instanceof FailedSubProcessCommandException) {
@@ -189,10 +167,29 @@ class ExceptionRenderer
                 'file' => $file,
                 'message' => $exception->getMessage(),
                 'code' => $exception->getCode(),
-                'trace' => $exception->getTrace(),
+                'trace' => $this->getTrace($exception),
                 'previous' => $this->serializeException($exception->getPrevious()),
             ];
         }
         return $serializedException;
+    }
+
+    private function getTrace(\Throwable $exception): array
+    {
+        $backtraceSteps = $exception->getTrace();
+        if ($exception instanceof SubProcessException) {
+            $backtraceSteps = $exception->getPreviousExceptionTrace();
+        } elseif ($exception instanceof FailedSubProcessCommandException) {
+            array_shift($backtraceSteps);
+        } else {
+            array_unshift($backtraceSteps, [
+                'function' => '',
+                'file' => $exception->getFile() ?: 'n/a',
+                'line' => $exception->getLine() ?: 'n/a',
+                'args' => [],
+            ]);
+        }
+
+        return $backtraceSteps;
     }
 }
