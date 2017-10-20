@@ -53,16 +53,39 @@ class UpgradeWizardFactory
      */
     public function create($identifier)
     {
+        /** @var AbstractUpdate $upgradeWizard */
+        $upgradeWizard = $this->objectManager->get($this->getClassNameFromIdentifier($identifier));
+        $upgradeWizard->setIdentifier($identifier);
+
+        return $upgradeWizard;
+    }
+
+    /**
+     * @param string $identifier
+     * @throws \RuntimeException
+     * @return string
+     */
+    public function getClassNameFromIdentifier($identifier)
+    {
         if (empty($className = $this->wizardRegistry[$identifier])
             && empty($className = $this->wizardRegistry['TYPO3\\CMS\\Install\\Updates\\' . $identifier])
             && !class_exists($className = $identifier)
         ) {
             throw new \RuntimeException(sprintf('Upgrade wizard "%s" not found', $identifier), 1491914890);
         }
-        /** @var AbstractUpdate $upgradeWizard */
-        $upgradeWizard = $this->objectManager->get($className);
-        $upgradeWizard->setIdentifier($identifier);
+        return $className;
+    }
 
-        return $upgradeWizard;
+    public function getShortIdentifier($classNameOrIdentifier)
+    {
+        if (!empty($className = $this->wizardRegistry[$classNameOrIdentifier])
+            || !empty($className = $this->wizardRegistry['TYPO3\\CMS\\Install\\Updates\\' . $classNameOrIdentifier])
+        ) {
+            $classNameOrIdentifier = $className;
+        }
+        if ($identifier = array_search($classNameOrIdentifier, $this->wizardRegistry, true)) {
+            return str_replace('TYPO3\\CMS\\Install\\Updates\\', '', $identifier);
+        }
+        throw new \RuntimeException(sprintf('Upgrade wizard "%s" not found', $classNameOrIdentifier), 1508495588);
     }
 }

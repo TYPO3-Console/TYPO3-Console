@@ -70,7 +70,9 @@ class UpgradeWizardList
             $availableUpgradeWizards = [];
             foreach ($this->wizardRegistry as $identifier => $className) {
                 $updateObject = $this->factory->create($identifier);
-                $availableUpgradeWizards[$identifier] = [
+                $shortIdentifier = $this->factory->getShortIdentifier($identifier);
+                $availableUpgradeWizards[$shortIdentifier] = [
+                    'className' => $className,
                     'title' => $updateObject->getTitle(),
                     'done' => false,
                 ];
@@ -78,9 +80,9 @@ class UpgradeWizardList
                 if ($this->registry->get('installUpdate', $className, false)
                     || !$updateObject->checkForUpdate($explanation)
                 ) {
-                    $availableUpgradeWizards[$identifier]['done'] = true;
+                    $availableUpgradeWizards[$shortIdentifier]['done'] = true;
                 }
-                $availableUpgradeWizards[$identifier]['explanation'] = html_entity_decode(strip_tags($explanation));
+                $availableUpgradeWizards[$shortIdentifier]['explanation'] = html_entity_decode(strip_tags($explanation));
             }
             $this->listCache = $availableUpgradeWizards;
         }

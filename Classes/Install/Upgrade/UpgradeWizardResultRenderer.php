@@ -23,16 +23,15 @@ class UpgradeWizardResultRenderer
     /**
      * Renders a table for upgrade wizards
      *
-     * @param UpgradeWizardResult[] $upgradeWizardResult
+     * @param UpgradeWizardResult[] $upgradeWizardResults
      * @param ConsoleOutput $output
      */
-    public function render(array $upgradeWizardResult, ConsoleOutput $output)
+    public function render(array $upgradeWizardResults, ConsoleOutput $output)
     {
-        if (empty($upgradeWizardResult)) {
+        if (empty($upgradeWizardResults)) {
             return;
         }
-        foreach ($upgradeWizardResult as $identifier => $result) {
-            $identifier = str_replace('TYPO3\\CMS\\Install\\Updates\\', '', $identifier);
+        foreach ($upgradeWizardResults as $identifier => $result) {
             $output->outputLine();
             if (!$result->hasPerformed()) {
                 $output->outputLine('<warning>Skipped upgrade wizard "%s" because it was not scheduled for execution or marked as done.</warning>', [$identifier]);

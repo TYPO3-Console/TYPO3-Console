@@ -91,4 +91,61 @@ class UpgradeWizardFactoryTest extends UnitTestCase
         $subject = new UpgradeWizardFactory($objectManagerProphecy->reveal(), $registryFixture);
         $subject->create('foo');
     }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionCode 1508495588
+     * @test
+     */
+    public function throwsExceptionForInvalidIdentifierWhenFetchingShortIdentifier()
+    {
+        $registryFixture = [
+            'TYPO3\\CMS\\Install\\Updates\\FooUpgrade' => 'TYPO3\\CMS\\Install\\Updates\\FooUpgrade',
+        ];
+        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
+
+        $subject = new UpgradeWizardFactory($objectManagerProphecy->reveal(), $registryFixture);
+        $subject->getShortIdentifier('foo');
+    }
+
+    public function shortIdentifierCanBeDeterminedDataProvider()
+    {
+        return [
+            'Core class name' => [
+                'TYPO3\\CMS\\Install\\Updates\\FooUpgrade',
+                'FooUpgrade',
+            ],
+            'Core short identifier' => [
+                'FooUpgrade',
+                'FooUpgrade',
+            ],
+            'Other class name' => [
+                'Helhum\\Install\\Updates\\BarUpgrade',
+                'bar',
+            ],
+            'Other class name not shortened' => [
+                'Helhum\\Install\\Updates\\FooUpgrade',
+                'Helhum\\Install\\Updates\\FooUpgrade',
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider shortIdentifierCanBeDeterminedDataProvider
+     * @param string $identifierOrClassName
+     * @param string $expectedIdentifier
+     */
+    public function shortIdentifierCanBeDetermined($identifierOrClassName, $expectedIdentifier)
+    {
+        $registryFixture = [
+            'TYPO3\\CMS\\Install\\Updates\\FooUpgrade' => 'TYPO3\\CMS\\Install\\Updates\\FooUpgrade',
+            'bar' => 'Helhum\\Install\\Updates\\BarUpgrade',
+            'Helhum\\Install\\Updates\\FooUpgrade' => 'Helhum\\Install\\Updates\\FooUpgrade',
+        ];
+        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
+
+        $subject = new UpgradeWizardFactory($objectManagerProphecy->reveal(), $registryFixture);
+        $this->assertSame($expectedIdentifier, $subject->getShortIdentifier($identifierOrClassName));
+    }
 }
