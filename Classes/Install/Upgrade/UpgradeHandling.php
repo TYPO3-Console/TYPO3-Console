@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Install\Upgrade;
 
 /*
@@ -90,17 +91,6 @@ class UpgradeHandling
      */
     private static $extensionWizardArguments = [['name' => 'install', 'type' => 'bool', 'default' => '0']];
 
-    /**
-     * @param UpgradeWizardFactory|null $factory
-     * @param UpgradeWizardExecutor|null $executor
-     * @param UpgradeWizardList|null $upgradeWizardList
-     * @param SilentConfigurationUpgrade|null $silentConfigurationUpgrade
-     * @param CommandDispatcher|null $commandDispatcher
-     * @param ConfigurationService|null $configurationService
-     * @param PackageManager|null $packageManager
-     * @param ExtensionConstraintCheck|null $extensionConstraintCheck
-     * @param ExtensionCompatibilityCheck|null $extensionCompatibilityCheck
-     */
     public function __construct(
         UpgradeWizardFactory $factory = null,
         UpgradeWizardExecutor $executor = null,
@@ -123,24 +113,12 @@ class UpgradeHandling
         $this->extensionCompatibilityCheck = $extensionCompatibilityCheck ?: new ExtensionCompatibilityCheck($this->packageManager, $this->commandDispatcher);
     }
 
-    /**
-     * @param string $identifier
-     * @param array $rawArguments
-     * @param bool $force
-     * @return UpgradeWizardResult
-     */
-    public function executeWizard($identifier, array $rawArguments = [], $force = false)
+    public function executeWizard(string $identifier, array $rawArguments = [], bool $force = false): UpgradeWizardResult
     {
         return $this->executor->executeWizard($identifier, $rawArguments, $force);
     }
 
-    /**
-     * @param array $arguments
-     * @param ConsoleOutput $consoleOutput
-     * @param array &$messages
-     * @return array
-     */
-    public function executeAll(array $arguments, ConsoleOutput $consoleOutput, array &$messages = [])
+    public function executeAll(array $arguments, ConsoleOutput $consoleOutput, array &$messages = []): array
     {
         $consoleOutput->progressStart(rand(6, 9));
         $consoleOutput->progressAdvance();
@@ -196,13 +174,7 @@ class UpgradeHandling
         return $results;
     }
 
-    /**
-     * @param string $identifier
-     * @param string $argumentName
-     * @param array $arguments
-     * @return bool
-     */
-    private function wizardHasArgument($identifier, $argumentName, array $arguments)
+    private function wizardHasArgument(string $identifier, string $argumentName, array $arguments): bool
     {
         foreach ($arguments as $argument) {
             if (strpos($argument, sprintf('%s[%s]', $identifier, $argumentName)) !== false) {
@@ -215,10 +187,7 @@ class UpgradeHandling
         return false;
     }
 
-    /**
-     * @return array
-     */
-    public function listWizards()
+    public function listWizards(): array
     {
         return [
             'scheduled' => $this->upgradeWizardList->listWizards(),
@@ -226,42 +195,22 @@ class UpgradeHandling
         ];
     }
 
-    /**
-     * @param string $extensionKey
-     * @param string $typo3Version
-     *
-     * @throws \TYPO3\CMS\Core\Package\Exception\UnknownPackageException
-     * @return string
-     */
-    public function matchExtensionConstraints($extensionKey, $typo3Version)
+    public function matchExtensionConstraints(string $extensionKey, string $typo3Version): string
     {
         return $this->extensionConstraintCheck->matchConstraints($this->packageManager->getPackage($extensionKey), $typo3Version);
     }
 
-    /**
-     * @param string $typo3Version
-     *
-     * @return array
-     */
-    public function matchAllExtensionConstraints($typo3Version)
+    public function matchAllExtensionConstraints(string $typo3Version): array
     {
         return $this->extensionConstraintCheck->matchAllConstraints($this->packageManager->getActivePackages(), $typo3Version);
     }
 
-    /**
-     * @param string $extensionKey
-     * @param bool $configOnly
-     * @return bool
-     */
-    public function isCompatible($extensionKey, $configOnly = false)
+    public function isCompatible(string $extensionKey, bool $configOnly = false): bool
     {
         return $this->extensionCompatibilityCheck->isCompatible($extensionKey, $configOnly);
     }
 
-    /**
-     * @return array Array of extension keys of not compatible extensions
-     */
-    public function findIncompatible()
+    public function findIncompatible(): array
     {
         return $this->extensionCompatibilityCheck->findIncompatible();
     }

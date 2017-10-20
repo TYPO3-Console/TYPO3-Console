@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Install\Upgrade;
 
 /*
@@ -53,7 +54,7 @@ class UpgradeWizardFactory
      * @throws RuntimeException
      * @return AbstractUpdate Newly instantiated upgrade wizard
      */
-    public function create($identifier)
+    public function create(string $identifier): AbstractUpdate
     {
         /** @var AbstractUpdate $upgradeWizard */
         $upgradeWizard = $this->objectManager->get($this->getClassNameFromIdentifier($identifier));
@@ -64,10 +65,10 @@ class UpgradeWizardFactory
 
     /**
      * @param string $identifier
-     * @throws \Symfony\Component\Console\Exception\RuntimeException
+     * @throws RuntimeException
      * @return string
      */
-    public function getClassNameFromIdentifier($identifier)
+    public function getClassNameFromIdentifier(string $identifier): string
     {
         if (empty($className = $this->wizardRegistry[$identifier])
             && empty($className = $this->wizardRegistry['TYPO3\\CMS\\Install\\Updates\\' . $identifier])
@@ -78,7 +79,12 @@ class UpgradeWizardFactory
         return $className;
     }
 
-    public function getShortIdentifier($classNameOrIdentifier)
+    /**
+     * @param string $classNameOrIdentifier
+     * @throws RuntimeException
+     * @return string
+     */
+    public function getShortIdentifier(string $classNameOrIdentifier): string
     {
         if (!empty($className = $this->wizardRegistry[$classNameOrIdentifier])
             || !empty($className = $this->wizardRegistry['TYPO3\\CMS\\Install\\Updates\\' . $classNameOrIdentifier])

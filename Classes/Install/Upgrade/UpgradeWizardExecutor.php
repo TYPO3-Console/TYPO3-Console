@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Install\Upgrade;
 
 /*
@@ -32,13 +33,7 @@ class UpgradeWizardExecutor
         $this->factory = $factory ?: new UpgradeWizardFactory();
     }
 
-    /**
-     * @param string $identifier
-     * @param array $rawArguments
-     * @param bool $force
-     * @return UpgradeWizardResult
-     */
-    public function executeWizard($identifier, array $rawArguments = [], $force = false)
+    public function executeWizard(string $identifier, array $rawArguments = [], bool $force = false): UpgradeWizardResult
     {
         $upgradeWizard = $this->factory->create($identifier);
 
@@ -72,17 +67,13 @@ class UpgradeWizardExecutor
         return new UpgradeWizardResult($hasPerformed, $dbQueries, [$message]);
     }
 
-    /**
-     * @param string $identifier
-     * @return bool
-     */
-    public function wizardNeedsExecution($identifier)
+    public function wizardNeedsExecution(string $identifier): bool
     {
         $upgradeWizard = $this->factory->create($identifier);
         return $upgradeWizard->shouldRenderWizard();
     }
 
-    private function processRawArguments($identifier, array $rawArguments = [])
+    private function processRawArguments(string $identifier, array $rawArguments = [])
     {
         $processedArguments = [];
         foreach ($rawArguments as $argument) {
