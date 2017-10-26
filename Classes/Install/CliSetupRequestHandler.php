@@ -19,9 +19,9 @@ use Helhum\Typo3Console\Mvc\Cli\CommandArgumentDefinition;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Symfony\Component\Console\Exception\RuntimeException;
-use TYPO3\CMS\Extbase\Mvc\Cli\CommandManager;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
-use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 
 /**
  * This class acts as facade for the install tool step actions.
@@ -34,12 +34,7 @@ class CliSetupRequestHandler
     /**
      * @var ObjectManagerInterface
      */
-    protected $objectManager;
-
-    /**
-     * @var CommandManager
-     */
-    protected $commandManager;
+    private $objectManager;
 
     /**
      * @var CommandDispatcher
@@ -47,14 +42,9 @@ class CliSetupRequestHandler
     private $commandDispatcher;
 
     /**
-     * @var ReflectionService
-     */
-    protected $reflectionService;
-
-    /**
      * @var array List of necessary installation steps. Order is important!
      */
-    protected $installationActions = [
+    private $installationActions = [
         'environmentAndFolders',
         'databaseConnect',
         'databaseSelect',
@@ -65,7 +55,7 @@ class CliSetupRequestHandler
     /**
      * @var ConsoleOutput
      */
-    protected $output;
+    private $output;
 
     /**
      * @var CliMessageRenderer
@@ -75,36 +65,22 @@ class CliSetupRequestHandler
     /**
      * @var array
      */
-    protected $givenRequestArguments = [];
+    private $givenRequestArguments = [];
 
     /**
      * @var bool
      */
-    protected $interactiveSetup = true;
+    private $interactiveSetup = true;
 
-    /**
-     * CliSetupRequestHandler constructor.
-     *
-     * @param ObjectManagerInterface $objectManager
-     * @param CommandManager $commandManager
-     * @param ReflectionService $reflectionService
-     * @param CommandDispatcher $commandDispatcher
-     * @param ConsoleOutput $output
-     * @param CliMessageRenderer $messageRenderer
-     */
     public function __construct(
-        ObjectManagerInterface $objectManager,
-        CommandManager $commandManager,
-        ReflectionService $reflectionService,
-        CommandDispatcher $commandDispatcher = null,
         ConsoleOutput $output = null,
+        CommandDispatcher $commandDispatcher = null,
+        ObjectManagerInterface $objectManager = null,
         CliMessageRenderer $messageRenderer = null
     ) {
-        $this->objectManager = $objectManager;
-        $this->commandManager = $commandManager;
-        $this->reflectionService = $reflectionService;
-        $this->commandDispatcher = $commandDispatcher ?: CommandDispatcher::createFromCommandRun();
         $this->output = $output ?: new ConsoleOutput();
+        $this->commandDispatcher = $commandDispatcher ?: CommandDispatcher::createFromCommandRun();
+        $this->objectManager = $objectManager ?: GeneralUtility::makeInstance(ObjectManager::class);
         $this->messageRenderer = $messageRenderer ?: new CliMessageRenderer($this->output);
     }
 
