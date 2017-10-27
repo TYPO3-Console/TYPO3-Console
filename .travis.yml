@@ -101,13 +101,14 @@ jobs:
           fi
 
     - stage: publish in ter
+      if: tag IS present
       php: 7.1
       before_install: skip
       install: skip
       before_script: skip
       script:
         - |
-          if [ -n "$TRAVIS_TAG" ] && [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
+          if [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
             echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n";
             # Install requirements
             composer require --dev typo3/cms ^8.7
