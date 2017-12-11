@@ -87,40 +87,34 @@ jobs:
             test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
           fi
         - composer extension-create-libs && ls -la Libraries/*.phar | grep -v ^-rwx
-        - git clean -dffx
 
-    - stage: test
-      env: Sonar code scanner
+    - stage: sonar code scanner
+      if: type = push AND env(SONAR_TOKEN) IS present
       before_install: skip
       install: skip
       before_script:
       script:
-        - >
-          if [ -n "$SONAR_TOKEN" ]; then
-            sonar-scanner
-          fi
+        - sonar-scanner
 
     - stage: publish in ter
-      if: tag IS present
+      if: tag IS present AND env(TYPO3_ORG_USERNAME) IS present AND env(TYPO3_ORG_PASSWORD) IS present
       php: 7.1
       before_install: skip
       install: skip
       before_script: skip
       script:
         - |
-          if [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
-            echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n";
-            # Install requirements
-            composer require --dev typo3/cms ^8.7
-            composer require --dev helhum/ter-client dev-master
-            # Cleanup before we upload
-            git reset --hard HEAD && git clean -fx
+          echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n";
+          # Install requirements
+          composer require --dev typo3/cms ^8.7
+          composer require --dev helhum/ter-client dev-master
+          # Cleanup before we upload
+          git reset --hard HEAD && git clean -fx
 
-            # Build extension files
-            composer extension-release
+          # Build extension files
+          composer extension-release
 
-            # Upload
-            TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
-            echo "Uploading release ${TRAVIS_TAG} to TER"
-            .Build/bin/ter-client upload typo3_console . -u "$TYPO3_ORG_USERNAME" -p "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
-          fi;
+          # Upload
+          TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
+          echo "Uploading release ${TRAVIS_TAG} to TER"
+          .Build/bin/ter-client upload typo3_console . -u "$TYPO3_ORG_USERNAME" -p "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
