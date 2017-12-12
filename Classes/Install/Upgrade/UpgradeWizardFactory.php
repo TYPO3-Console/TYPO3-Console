@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Install\Upgrade;
 
 /*
@@ -53,7 +54,21 @@ class UpgradeWizardFactory
      * @throws RuntimeException
      * @return AbstractUpdate Newly instantiated upgrade wizard
      */
-    public function create($identifier)
+    public function create(string $identifier): AbstractUpdate
+    {
+        /** @var AbstractUpdate $upgradeWizard */
+        $upgradeWizard = $this->objectManager->get($this->getClassNameFromIdentifier($identifier));
+        $upgradeWizard->setIdentifier($identifier);
+
+        return $upgradeWizard;
+    }
+
+    /**
+     * @param string $identifier
+     * @throws RuntimeException
+     * @return string
+     */
+    public function getClassNameFromIdentifier(string $identifier): string
     {
         if (empty($className = $this->wizardRegistry[$identifier])
             && empty($className = $this->wizardRegistry['TYPO3\\CMS\\Install\\Updates\\' . $identifier])
@@ -61,10 +76,24 @@ class UpgradeWizardFactory
         ) {
             throw new RuntimeException(sprintf('Upgrade wizard "%s" not found', $identifier), 1491914890);
         }
-        /** @var AbstractUpdate $upgradeWizard */
-        $upgradeWizard = $this->objectManager->get($className);
-        $upgradeWizard->setIdentifier($identifier);
+        return $className;
+    }
 
-        return $upgradeWizard;
+    /**
+     * @param string $classNameOrIdentifier
+     * @throws RuntimeException
+     * @return string
+     */
+    public function getShortIdentifier(string $classNameOrIdentifier): string
+    {
+        if (!empty($className = $this->wizardRegistry[$classNameOrIdentifier])
+            || !empty($className = $this->wizardRegistry['TYPO3\\CMS\\Install\\Updates\\' . $classNameOrIdentifier])
+        ) {
+            $classNameOrIdentifier = $className;
+        }
+        if ($identifier = array_search($classNameOrIdentifier, $this->wizardRegistry, true)) {
+            return str_replace('TYPO3\\CMS\\Install\\Updates\\', '', $identifier);
+        }
+        throw new RuntimeException(sprintf('Upgrade wizard "%s" not found', $classNameOrIdentifier), 1508495588);
     }
 }

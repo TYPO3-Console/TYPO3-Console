@@ -42,12 +42,12 @@ class UpgradeWizardListRenderer
         $tableRows = [];
         foreach ($upgradeWizardList as $identifier => $info) {
             $row = [
-                str_replace('TYPO3\\CMS\\Install\\Updates\\', '', $identifier),
+                $identifier,
                 wordwrap($info['title'], 40),
             ];
             if ($verbose) {
                 $row = [
-                    str_replace('TYPO3\\CMS\\Install\\Updates\\', '', $identifier),
+                    $identifier,
                     wordwrap($info['explanation'], 40),
                 ];
             }
