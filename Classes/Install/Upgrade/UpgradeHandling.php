@@ -22,6 +22,7 @@ use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Install\Updates\AbstractDownloadExtensionUpdate;
 use TYPO3\CMS\Install\Updates\DatabaseCharsetUpdate;
 
 /**
@@ -87,12 +88,7 @@ class UpgradeHandling
      *
      * @var array
      */
-    private static $wizardsWithArguments = [
-        'DbalAndAdodbExtractionUpdate' => [['name' => 'install', 'type' => 'bool', 'default' => '0']],
-        'compatibility6Extension' => [['name' => 'install', 'type' => 'bool', 'default' => '0']],
-        'compatibility7Extension' => [['name' => 'install', 'type' => 'bool', 'default' => '0']],
-        'rtehtmlareaExtension' => [['name' => 'install', 'type' => 'bool', 'default' => '0']],
-    ];
+    private static $extensionWizardArguments = [['name' => 'install', 'type' => 'bool', 'default' => '0']];
 
     /**
      * @param UpgradeWizardFactory|null $factory
@@ -140,33 +136,25 @@ class UpgradeHandling
 
     /**
      * @param array $arguments
-     * @param ConsoleOutput|null $consoleOutput
+     * @param ConsoleOutput $consoleOutput
      * @param array &$messages
      * @return array
      */
-    public function executeAll(array $arguments, ConsoleOutput $consoleOutput = null, array &$messages = [])
+    public function executeAll(array $arguments, ConsoleOutput $consoleOutput, array &$messages = [])
     {
-        if ($consoleOutput) {
-            $consoleOutput->progressStart(rand(6, 9));
-            $consoleOutput->progressAdvance();
-        }
+        $consoleOutput->progressStart(rand(6, 9));
+        $consoleOutput->progressAdvance();
 
         $wizards = $this->executeInSubProcess('listWizards', [], $messages);
 
-        if ($consoleOutput) {
-            $consoleOutput->progressStart(count($wizards['scheduled']) + 2);
-        }
+        $consoleOutput->progressStart(count($wizards['scheduled']) + 2);
 
         $results = [];
         if (!empty($wizards['scheduled'])) {
-            foreach ($wizards['scheduled'] as $identifier => $_) {
-                if ($consoleOutput) {
-                    $consoleOutput->progressAdvance();
-                }
-                $shortIdentifier = str_replace('TYPO3\\CMS\\Install\\Updates\\', '', $identifier);
-                if ($consoleOutput && isset(self::$wizardsWithArguments[$shortIdentifier])
-                ) {
-                    foreach (self::$wizardsWithArguments[$shortIdentifier] as $argumentDefinition) {
+            foreach ($wizards['scheduled'] as $shortIdentifier => $wizardOptions) {
+                $consoleOutput->progressAdvance();
+                if (is_subclass_of($wizardOptions['className'], AbstractDownloadExtensionUpdate::class)) {
+                    foreach (self::$extensionWizardArguments as $argumentDefinition) {
                         $argumentName = $argumentDefinition['name'];
                         $argumentDefault = $argumentDefinition['default'];
                         if ($this->wizardHasArgument($shortIdentifier, $argumentName, $arguments)) {
@@ -175,10 +163,14 @@ class UpgradeHandling
                         // In composer mode, skip all install extension wizards!
                         if (ConsoleBootstrap::usesComposerClassLoading()) {
                             $arguments[] = sprintf('%s[%s]=%s', $shortIdentifier, $argumentName, $argumentDefault);
+                            $messages[] = '<warning>Wizard "' . $shortIdentifier . '" was not executed but only marked as executed due to composer mode.</warning>';
+                            // We currently only handle one argument type
                         } elseif ($argumentDefinition['type'] === 'bool') {
-                            $wizard = $this->factory->create($shortIdentifier);
+                            $wizard = $this->factory->create($wizardOptions['className']);
                             $consoleOutput->outputLine(PHP_EOL . PHP_EOL . '<info>' . $wizard->getTitle() . '</info>' . PHP_EOL);
-                            $consoleOutput->outputLine(implode(PHP_EOL, array_filter(array_map('trim', explode(chr(10), html_entity_decode(strip_tags($wizard->getUserInput(''))))))));
+                            if (is_callable([$wizard, 'getUserInput'])) {
+                                $consoleOutput->outputLine(implode(PHP_EOL, array_filter(array_map('trim', explode(chr(10), html_entity_decode(strip_tags($wizard->getUserInput(''))))))));
+                            }
                             $consoleOutput->outputLine();
                             $arguments[] = sprintf(
                                 '%s[%s]=%s',
@@ -189,19 +181,17 @@ class UpgradeHandling
                         }
                     }
                 }
-                $results[$identifier] = $this->executeInSubProcess('executeWizard', [$identifier, $arguments], $messages);
+                $wizardMessages = [];
+                $results[$shortIdentifier] = $this->executeInSubProcess('executeWizard', [$shortIdentifier, $arguments], $wizardMessages);
+                $messages = array_merge($messages, $wizardMessages);
             }
         }
 
-        if ($consoleOutput) {
-            $consoleOutput->progressAdvance();
-        }
+        $consoleOutput->progressAdvance();
 
         $this->commandDispatcher->executeCommand('database:updateschema');
 
-        if ($consoleOutput) {
-            $consoleOutput->progressFinish();
-        }
+        $consoleOutput->progressFinish();
 
         return $results;
     }
@@ -214,14 +204,12 @@ class UpgradeHandling
      */
     private function wizardHasArgument($identifier, $argumentName, array $arguments)
     {
-        if (isset(self::$wizardsWithArguments[$identifier])) {
-            foreach ($arguments as $argument) {
-                if (strpos($argument, sprintf('%s[%s]', $identifier, $argumentName)) !== false) {
-                    return true;
-                }
-                if (strpos($argument, '[') === false && strpos($argument, $argumentName) !== false) {
-                    return true;
-                }
+        foreach ($arguments as $argument) {
+            if (strpos($argument, sprintf('%s[%s]', $identifier, $argumentName)) !== false) {
+                return true;
+            }
+            if (strpos($argument, '[') === false && strpos($argument, $argumentName) !== false) {
+                return true;
             }
         }
         return false;
