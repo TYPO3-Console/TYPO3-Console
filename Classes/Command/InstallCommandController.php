@@ -21,8 +21,6 @@ use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageInterface;
-use TYPO3\CMS\Extbase\Mvc\Cli\CommandManager;
-use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 
 /**
  * Alpha version of a setup command controller
@@ -89,13 +87,7 @@ class InstallCommandController extends CommandController
         }
         $skipExtensionSetup |= !Bootstrap::usesComposerClassLoading();
 
-        $cliSetupRequestHandler = new CliSetupRequestHandler(
-            $this->objectManager,
-            $this->objectManager->get(CommandManager::class),
-            $this->objectManager->get(ReflectionService::class),
-            CommandDispatcher::createFromCommandRun(),
-            $this->output
-        );
+        $cliSetupRequestHandler = new CliSetupRequestHandler($this->output);
         $cliSetupRequestHandler->setup(!$nonInteractive, $this->request->getArguments(), $skipExtensionSetup);
 
         $this->outputLine();
