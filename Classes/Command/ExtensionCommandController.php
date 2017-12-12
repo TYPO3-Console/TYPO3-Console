@@ -21,6 +21,7 @@ use TYPO3\CMS\Core\Core\ClassLoadingInformation;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
+use TYPO3\CMS\Extensionmanager\Utility\InstallUtility;
 
 /**
  * CommandController for working with extension management through CLI
@@ -39,8 +40,7 @@ class ExtensionCommandController extends CommandController
     protected $signalSlotDispatcher;
 
     /**
-     * @var \TYPO3\CMS\Extensionmanager\Utility\InstallUtility
-     * @inject
+     * @var InstallUtility
      */
     protected $extensionInstaller;
 
@@ -82,7 +82,7 @@ class ExtensionCommandController extends CommandController
         }
 
         if (!empty($activatedExtensions)) {
-            $this->extensionInstaller->reloadCaches();
+            $this->getExtensionInstaller()->reloadCaches();
             $this->cacheService->flush();
 
             $extensionKeysAsString = implode('", "', $activatedExtensions);
@@ -112,7 +112,7 @@ class ExtensionCommandController extends CommandController
     public function deactivateCommand(array $extensionKeys)
     {
         foreach ($extensionKeys as $extensionKey) {
-            $this->extensionInstaller->uninstall($extensionKey);
+            $this->getExtensionInstaller()->uninstall($extensionKey);
         }
         $extensionKeysAsString = implode('", "', $extensionKeys);
         if (count($extensionKeys) === 1) {
@@ -157,7 +157,7 @@ class ExtensionCommandController extends CommandController
 
         $extensionSetup = new ExtensionSetup(
             new ExtensionFactory($this->packageManager),
-            $this->extensionInstaller
+            $this->getExtensionInstaller()
         );
 
         $extensionSetup->setupExtensions($packages);
@@ -291,6 +291,17 @@ class ExtensionCommandController extends CommandController
                 ['Extension key', 'Version', 'Description']
             );
         }
+    }
+
+    /**
+     * @return InstallUtility
+     */
+    private function getExtensionInstaller(): InstallUtility
+    {
+        if ($this->extensionInstaller === null) {
+            $this->extensionInstaller = $this->objectManager->get(InstallUtility::class);
+        }
+        return $this->extensionInstaller;
     }
 
     /**
