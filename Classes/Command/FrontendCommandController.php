@@ -30,12 +30,12 @@ class FrontendCommandController extends CommandController
         // TODO: this needs heavy cleanup!
         $template = file_get_contents(__DIR__ . '/../../Resources/Private/Templates/request.tpl');
         $arguments = [
-            'documentRoot' => PATH_site,
+            'documentRoot' => getenv('TYPO3_PATH_WEB') ?: PATH_site,
             'requestUrl' => $this->makeAbsolute($requestUrl),
         ];
         // No other solution atm than to fake a CLI request type
-        $code = str_replace(['{originalRoot}', '{arguments}'], [PATH_site, var_export($arguments, true)], $template);
-        $process = new PhpProcess($code);
+        $code = str_replace('{arguments}', var_export($arguments, true), $template);
+        $process = new PhpProcess($code, null, null, null);
         $process->mustRun();
         $rawResponse = json_decode($process->getOutput());
         if ($rawResponse === null || $rawResponse->status === 'failure') {
