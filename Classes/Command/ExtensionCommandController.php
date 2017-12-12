@@ -308,7 +308,7 @@ class ExtensionCommandController extends CommandController
     /**
      * @return InstallUtility
      */
-    private function getExtensionInstaller(): InstallUtility
+    private function getExtensionInstaller()
     {
         if ($this->extensionInstaller === null) {
             $this->extensionInstaller = $this->objectManager->get(InstallUtility::class);
