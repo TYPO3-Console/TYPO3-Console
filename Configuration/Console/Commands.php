@@ -25,7 +25,7 @@ return [
         'typo3_console:configuration:*' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
         'typo3_console:database:import' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
         'typo3_console:database:updateschema' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
-        'typo3_console:extension:dumpautoload' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
+        'typo3_console:extension:dumpautoload' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
         'typo3_console:upgrade:subprocess' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_FULL,
         'typo3_console:upgrade:*' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
     ],
