@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
+use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Helhum\Typo3Console\Service\CacheService;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
@@ -50,17 +51,26 @@ class CacheCommandController extends CommandController
      *
      * @param bool $force Cache is forcibly flushed (low level operations are performed)
      * @param bool $filesOnly Only file caches are flushed
-     * @throws \Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException
+     * @throws FailedSubProcessCommandException
      */
     public function flushCommand($force = false, $filesOnly = false)
     {
         $exitCode = 0;
-        if (!$this->applicationIsFullyCapable()) {
+        $isApplicationFullyCapable = $this->isApplicationFullyCapable();
+        if (!$isApplicationFullyCapable) {
             $filesOnly = true;
         }
         if ($filesOnly) {
             $this->cacheService->flushFileCaches($force);
-            $this->commandDispatcher->executeCommand('cache:flushcomplete', ['--files-only']);
+            try {
+                $this->commandDispatcher->executeCommand('cache:flushcomplete', ['--files-only']);
+            } catch (FailedSubProcessCommandException $e) {
+                if ($isApplicationFullyCapable) {
+                    throw $e;
+                }
+                $this->output->getSymfonyConsoleOutput()->getErrorOutput()->writeln('<warning>Could not load extension configuration.</warning>');
+                $this->output->getSymfonyConsoleOutput()->getErrorOutput()->writeln('<warning>Some caches might not have been flushed.</warning>');
+            }
         } else {
             $this->cacheService->flush($force);
             $this->commandDispatcher->executeCommand('cache:flushcomplete');
@@ -76,7 +86,7 @@ class CacheCommandController extends CommandController
      * @return bool
      * @deprecated can be removed once this is converted into a native Symfony command. We can use the Application API then.
      */
-    private function applicationIsFullyCapable(): bool
+    private function isApplicationFullyCapable(): bool
     {
         return file_exists(PATH_site . 'typo3conf/PackageStates.php') && file_exists(PATH_site . 'typo3conf/LocalConfiguration.php');
     }
