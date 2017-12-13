@@ -39,6 +39,10 @@ class PopulateCommandConfiguration implements InstallerScript
         foreach ($this->extractPackageMapFromComposer($composer) as $item) {
             /** @var \Composer\Package\PackageInterface $package */
             list($package, $installPath) = $item;
+            if ($package->getType() === 'metapackage') {
+                // We have a meta package, which does not have any files
+                continue;
+            }
             $installPath = ($installPath ?: $basePath);
             $packageName = $package->getName();
             if ($packageName === 'typo3/cms') {

@@ -70,7 +70,7 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
      */
     public function activeConfigurationReflectsRealState()
     {
-        $output = $this->executeConsoleCommand('configuration:showactive', ['SYS/caching/cacheConfigurations/extbase_reflection/backend', '--json']);
+        $output = $this->executeConsoleCommand('configuration:showactive', ['SYS/caching/cacheConfigurations/extbase_datamapfactory_datamap/backend', '--json']);
         $this->assertSame('TYPO3\\CMS\\Core\\Cache\\Backend\\Typo3DatabaseBackend', \json_decode($output));
     }
 

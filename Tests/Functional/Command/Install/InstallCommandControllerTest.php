@@ -42,7 +42,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
                 '--skip-extension-setup',
                 '--database-user-name' => getenv('TYPO3_INSTALL_DB_USER'),
                 '--database-user-password' => getenv('TYPO3_INSTALL_DB_PASSWORD'),
-                '--database-host-name' => 'localhost',
+                '--database-host-name' => getenv('TYPO3_INSTALL_DB_HOST'),
                 '--database-port' => '3306',
                 '--database-name' => getenv('TYPO3_INSTALL_DB_DBNAME'),
                 '--admin-user-name' => 'admin',
@@ -69,7 +69,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
                 '--non-interactive',
                 '--database-user-name' => getenv('TYPO3_INSTALL_DB_USER'),
                 '--database-user-password' => getenv('TYPO3_INSTALL_DB_PASSWORD'),
-                '--database-host-name' => 'localhost',
+                '--database-host-name' => getenv('TYPO3_INSTALL_DB_HOST'),
                 '--database-port' => '3306',
                 '--database-name' => getenv('TYPO3_INSTALL_DB_DBNAME'),
                 '--admin-user-name' => 'admin',
@@ -131,10 +131,6 @@ class InstallCommandControllerTest extends AbstractCommandTest
         $this->assertTrue(file_exists($packageStatesFile));
         $packageConfig = require $packageStatesFile;
         copy($packageStatesFile . '_', $packageStatesFile);
-        if ($packageConfig['version'] === 5) {
-            $this->assertArrayHasKey('reports', $packageConfig['packages']);
-        } else {
-            $this->assertSame('active', $packageConfig['packages']['reports']['state']);
-        }
+        $this->assertArrayHasKey('reports', $packageConfig['packages']);
     }
 }

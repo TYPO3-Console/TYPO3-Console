@@ -17,6 +17,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Service\Exception\ConfigurationChangedException;
+use TYPO3\CMS\Install\Service\ExtensionConfigurationService;
 use TYPO3\CMS\Install\Service\SilentConfigurationUpgradeService;
 
 /**
@@ -46,6 +47,11 @@ class SilentConfigurationUpgrade
         if (!file_exists($this->configurationManager->getLocalConfigurationFileLocation())) {
             return;
         }
+        // We need to write the extension configuration for all active extensions ourselves
+        // as the core does not take care doing so (yet)
+        $extensionConfigurationService = new ExtensionConfigurationService();
+        $extensionConfigurationService->synchronizeExtConfTemplateWithLocalConfigurationOfAllExtensions();
+
         $upgradeService = new SilentConfigurationUpgradeService($this->configurationManager);
         $count = 0;
         do {

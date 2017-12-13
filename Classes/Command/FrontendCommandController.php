@@ -42,7 +42,7 @@ class FrontendCommandController extends CommandController
             $this->outputLine('<error>An error occurred while trying to request the specified URL.</error>');
             $this->outputLine(sprintf('<error>Error: %s</error>', !empty($rawResponse->error) ? $rawResponse->error : 'Could not decode response. Please check your error log!'));
             $this->outputLine(sprintf('<error>Content: %s</error>', $process->getOutput()));
-            $this->sendAndExit(1);
+            $this->quit(1);
         }
 
         $this->output($rawResponse->content);

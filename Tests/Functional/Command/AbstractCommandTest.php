@@ -16,10 +16,10 @@ namespace Helhum\Typo3Console\Tests\Functional\Command;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
 
-abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CommandDispatcher
@@ -29,7 +29,7 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         if (!file_exists(getenv('TYPO3_PATH_ROOT') . '/index.php')
-            && strpos(getenv('TYPO3_PATH_ROOT'), '.Build/Web') === false
+            && strpos(getenv('TYPO3_PATH_ROOT'), '.Build/public') === false
         ) {
             throw new \RuntimeException('TYPO3_PATH_ROOT is not properly set!', 1493574402);
         }
@@ -48,6 +48,8 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
         $processBuilder->add('--skip-column-names');
         $processBuilder->add('-u');
         $processBuilder->add(getenv('TYPO3_INSTALL_DB_USER'));
+        $processBuilder->add('-h');
+        $processBuilder->add(getenv('TYPO3_INSTALL_DB_HOST'));
         $processBuilder->add('--password=' . getenv('TYPO3_INSTALL_DB_PASSWORD'));
         if ($useDatabase) {
             $processBuilder->add(getenv('TYPO3_INSTALL_DB_DBNAME'));
@@ -68,6 +70,8 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
         $processBuilder->setPrefix('mysqldump');
         $processBuilder->add('-u');
         $processBuilder->add(getenv('TYPO3_INSTALL_DB_USER'));
+        $processBuilder->add('-h');
+        $processBuilder->add(getenv('TYPO3_INSTALL_DB_HOST'));
         $processBuilder->add('--password=' . getenv('TYPO3_INSTALL_DB_PASSWORD'));
         $processBuilder->add(getenv('TYPO3_INSTALL_DB_DBNAME'));
 
@@ -85,6 +89,8 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
         $processBuilder->setPrefix('mysql');
         $processBuilder->add('-u');
         $processBuilder->add(getenv('TYPO3_INSTALL_DB_USER'));
+        $processBuilder->add('-h');
+        $processBuilder->add(getenv('TYPO3_INSTALL_DB_HOST'));
         $processBuilder->add('--password=' . getenv('TYPO3_INSTALL_DB_PASSWORD'));
         $processBuilder->add(getenv('TYPO3_INSTALL_DB_DBNAME'));
         $processBuilder->setInput(file_get_contents(getenv('TYPO3_PATH_ROOT') . '/typo3temp/' . getenv('TYPO3_INSTALL_DB_DBNAME') . '.sql'));
@@ -114,6 +120,7 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
      */
     protected function copyDirectory($sourcePath, $targetPath, array $ignoredDirectories = [])
     {
+        $ignoredDirectories = array_merge($ignoredDirectories, ['.git']);
         $fileSystem = new Filesystem();
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($sourcePath, \RecursiveDirectoryIterator::SKIP_DOTS),
@@ -160,21 +167,22 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $arguments
      * @param array $environmentVariables
+     * @param bool $dryRun
      * @return string
      */
-    protected function executeComposerCommand(array $arguments = [], array $environmentVariables = [])
+    protected function executeComposerCommand(array $arguments = [], array $environmentVariables = [], $dryRun = false)
     {
         $processBuilder = new ProcessBuilder();
         $processBuilder->addEnvironmentVariables($environmentVariables);
         $processBuilder->setEnv('TYPO3_CONSOLE_SUB_PROCESS', 'yes');
 
-        if ($phpPath = getenv('PHP_PATH')) {
-            $phpFinder = new PhpExecutableFinder();
-            $processBuilder->setPrefix($phpFinder->find(false));
-            $processBuilder->add($phpPath . '/composer.phar');
-        } else {
-            $processBuilder->setPrefix('composer');
+        if (getenv('PHP_PATH')) {
+            $processBuilder->setPrefix(getenv('PHP_PATH'));
         }
+        $composerFinder = new ExecutableFinder();
+        $composerBin = $composerFinder->find('composer');
+        $processBuilder->add($composerBin);
+
         foreach ($arguments as $argument) {
             $processBuilder->add($argument);
         }
@@ -183,6 +191,9 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
         $processBuilder->add(getenv('TYPO3_PATH_COMPOSER_ROOT'));
 
         $process = $processBuilder->setTimeout(null)->getProcess();
+        if ($dryRun) {
+            return $process->getCommandLine();
+        }
         $process->run();
         if (!$process->isSuccessful()) {
             $this->fail(sprintf('Composer command "%s" failed with message: "%s", output: "%s"', $process->getCommandLine(), $process->getErrorOutput(), $process->getOutput()));
@@ -190,10 +201,10 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
         return $process->getOutput() . $process->getErrorOutput();
     }
 
-    protected function executeConsoleCommand($command, array $arguments = [], array $environment = [])
+    protected function executeConsoleCommand($command, array $arguments = [], array $environment = [], string $stdIn = null)
     {
         try {
-            return $this->commandDispatcher->executeCommand($command, $arguments, $environment);
+            return $this->commandDispatcher->executeCommand($command, $arguments, $environment, $stdIn);
         } catch (FailedSubProcessCommandException $e) {
             $this->fail(sprintf('Console command "%s" failed with message: "%s", output: "%s"', $e->getCommandLine(), $e->getErrorMessage(), $e->getOutputMessage()));
         }

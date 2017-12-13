@@ -112,11 +112,8 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         $consoleComposerJson = str_replace('"name": "helhum/typo3-console"', '"name": "helhum/typo3-console-test"', $consoleComposerJson);
         file_put_contents($instancePath . '/typo3_console/composer.json', $consoleComposerJson);
         $this->executeComposerCommand(['config', 'repositories.console', '{"type": "path", "url": "typo3_console", "options": {"symlink": false}}']);
-        $output = $this->executeComposerCommand(['require', 'typo3/cms=^8.7.7', 'helhum/typo3-console-test=@dev']);
+        $output = $this->executeComposerCommand(['require', 'typo3/cms-core=^8.7.9', 'helhum/typo3-composer-setup=^0.4', 'helhum/typo3-console-test=@dev']);
         $this->assertContains('Mirroring from typo3_console', $output);
-        if (DIRECTORY_SEPARATOR === '\\') {
-            $this->assertContains('Copied typo3 directory to document root', $output);
-        }
 
         $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
         $output = $this->executeConsoleCommand(
@@ -125,7 +122,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
                 '--non-interactive',
                 '--database-user-name' => getenv('TYPO3_INSTALL_DB_USER'),
                 '--database-user-password' => getenv('TYPO3_INSTALL_DB_PASSWORD'),
-                '--database-host-name' => 'localhost',
+                '--database-host-name' => getenv('TYPO3_INSTALL_DB_HOST'),
                 '--database-port' => '3306',
                 '--database-name' => getenv('TYPO3_INSTALL_DB_DBNAME'),
                 '--admin-user-name' => 'admin',
@@ -142,7 +139,20 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
      */
     private function upgradeCodeToTypo3Version($typo3Version)
     {
-        $output = $this->executeComposerCommand(['require', 'typo3/cms=' . $typo3Version, '--update-with-dependencies']);
+        $this->executeComposerCommand(
+            [
+                'require',
+                'typo3/cms-backend=' . $typo3Version,
+                'typo3/cms-core=' . $typo3Version,
+                'typo3/cms-extbase=' . $typo3Version,
+                'typo3/cms-extensionmanager=' . $typo3Version,
+                'typo3/cms-fluid=' . $typo3Version,
+                'typo3/cms-install=' . $typo3Version,
+                'typo3/cms-scheduler=' . $typo3Version,
+                '--no-update',
+            ]
+        );
+        $output = $this->executeComposerCommand(['update', 'typo3/*']);
         if (DIRECTORY_SEPARATOR === '\\') {
             $output = preg_replace('/[^\x09-\x0d\x1b\x20-\xff]/', '', $output);
         }

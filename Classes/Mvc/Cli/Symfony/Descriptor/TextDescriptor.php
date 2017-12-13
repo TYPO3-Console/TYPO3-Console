@@ -59,7 +59,8 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
         // + 4 = 2 spaces before <info>, 2 spaces after </info>
         $indent = $totalWidth + 4;
         $maxWidth = isset($options['screen_width']) ? ($options['screen_width'] - $indent) : null;
-        $this->writeText(sprintf('  <info>%s</info>  %s%s%s',
+        $this->writeText(sprintf(
+            '  <info>%s</info>  %s%s%s',
             $argument->getName(),
             str_repeat(' ', $spacingWidth),
             $this->wordWrap($argument->getDescription(), $indent, $maxWidth),
@@ -88,7 +89,8 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
         }
 
         $totalWidth = isset($options['total_width']) ? $options['total_width'] : $this->calculateTotalWidthForOptions([$option]);
-        $synopsis = sprintf('%s%s',
+        $synopsis = sprintf(
+            '%s%s',
             $option->getShortcut() ? sprintf('-%s, ', $option->getShortcut()) : '    ',
             sprintf('--%s%s', $option->getName(), $value)
         );
@@ -98,7 +100,8 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
         // + 4 = 2 spaces before <info>, 2 spaces after </info>
         $indent = $totalWidth + 4;
         $maxWidth = isset($options['screen_width']) ? ($options['screen_width'] - $indent) : null;
-        $this->writeText(sprintf('  <info>%s</info>  %s%s%s%s',
+        $this->writeText(sprintf(
+            '  <info>%s</info>  %s%s%s%s',
             $synopsis,
             str_repeat(' ', $spacingWidth),
             $this->wordWrap($option->getDescription(), $indent, $maxWidth),
