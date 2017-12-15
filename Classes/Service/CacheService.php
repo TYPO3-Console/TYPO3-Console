@@ -212,6 +212,7 @@ class CacheService implements SingletonInterface
             // Already initialized
             return;
         }
+        Scripts::initializePersistence($this->bootstrap);
         Scripts::initializeAuthenticatedOperations($this->bootstrap);
     }
 
