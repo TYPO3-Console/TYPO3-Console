@@ -30,8 +30,8 @@ return [
         'typo3_console:upgrade:*' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
     ],
     'bootingSteps' => [
-        'typo3_console:install:databasedata' => ['helhum.typo3console:database'],
-        'typo3_console:install:defaultconfiguration' => ['helhum.typo3console:database'],
-        'typo3_console:database:updateschema' => ['helhum.typo3console:database'],
+        'typo3_console:install:databasedata' => ['helhum.typo3console:database', 'helhum.typo3console:persistence'],
+        'typo3_console:install:defaultconfiguration' => ['helhum.typo3console:database', 'helhum.typo3console:persistence'],
+        'typo3_console:database:updateschema' => ['helhum.typo3console:database', 'helhum.typo3console:persistence'],
     ],
 ];
