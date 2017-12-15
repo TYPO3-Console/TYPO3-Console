@@ -152,6 +152,13 @@ class Scripts
     {
         ExtensionManagementUtility::loadExtLocalconf();
         $bootstrap->applyAdditionalConfigurationSettings();
+    }
+
+    /**
+     * @param ConsoleBootstrap $bootstrap
+     */
+    public static function initializePersistence(ConsoleBootstrap $bootstrap)
+    {
         $bootstrap->loadTcaOnly();
     }
 

@@ -164,6 +164,7 @@ class RunLevel
         $this->addStep($sequence, 'helhum.typo3console:database');
         // Fix core caches that were disabled beforehand
         $this->addStep($sequence, 'helhum.typo3console:enablecorecaches');
+        $this->addStep($sequence, 'helhum.typo3console:persistence');
         $this->addStep($sequence, 'helhum.typo3console:authentication');
 
         return $sequence;
@@ -214,6 +215,9 @@ class RunLevel
             // @deprecated can be removed if TYPO3 8 support is removed
             case 'helhum.typo3console:database':
                 $sequence->addStep(new Step('helhum.typo3console:database', [Scripts::class, 'initializeDatabaseConnection']), 'helhum.typo3console:errorhandling');
+                break;
+            case 'helhum.typo3console:persistence':
+                $sequence->addStep(new Step('helhum.typo3console:persistence', [Scripts::class, 'initializePersistence']), 'helhum.typo3console:extensionconfiguration');
                 break;
             case 'helhum.typo3console:authentication':
                 $sequence->addStep(new Step('helhum.typo3console:authentication', [Scripts::class, 'initializeAuthenticatedOperations']), 'helhum.typo3console:extensionconfiguration');
