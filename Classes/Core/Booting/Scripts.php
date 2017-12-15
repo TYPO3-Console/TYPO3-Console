@@ -167,6 +167,13 @@ class Scripts
         ExtensionManagementUtility::loadExtLocalconf();
         $bootstrap->setFinalCachingFrameworkCacheConfiguration();
         $bootstrap->unsetReservedGlobalVariables();
+    }
+
+    /**
+     * @param Bootstrap $bootstrap
+     */
+    public static function initializePersistence(Bootstrap $bootstrap)
+    {
         ExtensionManagementUtility::loadBaseTca();
     }
 
