@@ -32,7 +32,7 @@ before_install:
 install:
   - export PATH="$PATH:./Scripts"
   - export COMPOSER_ROOT_VERSION=5.0.0
-  - composer require typo3/cms="$TYPO3_VERSION"
+  - composer require typo3/cms-backend="$TYPO3_VERSION" typo3/cms-core="$TYPO3_VERSION" typo3/cms-extbase="$TYPO3_VERSION" typo3/cms-extensionmanager="$TYPO3_VERSION" typo3/cms-fluid="$TYPO3_VERSION" typo3/cms-install="$TYPO3_VERSION" typo3/cms-scheduler="$TYPO3_VERSION"
   - git checkout composer.json
 
 # Test scripts
@@ -47,11 +47,11 @@ script:
 jobs:
   fast_finish: true
   allow_failures:
-    - env: TYPO3_VERSION="dev-master as 8.7.7"
+    - env: TYPO3_VERSION="dev-master as 9.0.0"
   include:
     - &lint
       stage: test
-      php: 7.1
+      php: 7.2
       env: PHP Lint
       before_install: skip
       install: skip
@@ -59,20 +59,25 @@ jobs:
       script:
         - errors=$(find . -name \*.php ! -path "./.Build/*" -exec php -d display_errors=stderr -l {} 2>&1 >/dev/null \;) && echo "$errors" && test -z "$errors"
     - <<: *lint
+      php: 7.1
+    - <<: *lint
       php: 7.0
 
     - stage: test
+      php: 7.2
+      env: TYPO3_VERSION=^8.7
+    - stage: test
       php: 7.1
       env: TYPO3_VERSION=^8.7
     - stage: test
       php: 7.0
       env: TYPO3_VERSION=^8.7
     - stage: test
-      php: 7.1
-      env: TYPO3_VERSION="dev-master as 8.7.7"
+      php: 7.2
+      env: TYPO3_VERSION="~9.0.0"
     - stage: test
-      php: 7.0
-      env: TYPO3_VERSION="dev-master as 8.7.7"
+      php: 7.2
+      env: TYPO3_VERSION="dev-master as 9.0.0"
 
     - stage: test
       php: 7.1
@@ -89,7 +94,8 @@ jobs:
         - composer extension-create-libs && ls -la Libraries/*.phar | grep -v ^-rwx
 
     - stage: sonar code scanner
-      if: type = push
+      if: type = push AND branch = master
+      php: 7.0
       before_install: skip
       install: skip
       before_script:
@@ -101,7 +107,7 @@ jobs:
 
     - stage: publish in ter
       if: tag IS present
-      php: 7.1
+      php: 7.0
       before_install: skip
       install: skip
       before_script: skip

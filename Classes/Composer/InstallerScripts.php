@@ -17,7 +17,6 @@ namespace Helhum\Typo3Console\Composer;
 use Composer\Script\Event;
 use Composer\Script\Event as ScriptEvent;
 use Composer\Semver\Constraint\EmptyConstraint;
-use Helhum\Typo3Console\Composer\InstallerScript\CopyTypo3Directory;
 use Helhum\Typo3Console\Composer\InstallerScript\PopulateCommandConfiguration;
 use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Composer\Plugin\Core\InstallerScripts\AutoloadConnector;
@@ -48,7 +47,6 @@ class InstallerScripts implements InstallerScriptsRegistration
             // @deprecated can be removed once TYPO3 8 support is removed
             $scriptDispatcher->addInstallerScript(new WebDirectory());
             $scriptDispatcher->addInstallerScript(new AutoloadConnector());
-            $scriptDispatcher->addInstallerScript(new CopyTypo3Directory());
         }
     }
 

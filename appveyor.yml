@@ -11,10 +11,12 @@ environment:
   TYPO3_INSTALL_DB_DBNAME: 'appveyor_console_test'
 
   matrix:
+    - TYPO3_VERSION: '~9.0.0'
+      PHP_VERSION: '7.2.0-Win32-VC15'
     - TYPO3_VERSION: '~8.7'
-      PHP_VERSION: '7.1.1'
+      PHP_VERSION: '7.1.12-Win32-VC14'
     - TYPO3_VERSION: '~8.7'
-      PHP_VERSION: '7.0.9'
+      PHP_VERSION: '7.0.26-Win32-VC14'
 
 matrix:
   fast_finish: true
@@ -25,15 +27,14 @@ cache:
 
 init:
   - SET PATH=c:\php\%PHP_VERSION%;"C:\Program Files\MySQL\MySQL Server 5.7\bin\";%PATH%
-  - SET PHP_PATH=c:\php\%PHP_VERSION%
 
 install:
   - mysql --version
   - IF NOT EXIST c:\php mkdir c:\php
   - IF NOT EXIST c:\php\%PHP_VERSION% mkdir c:\php\%PHP_VERSION%
   - cd c:\php\%PHP_VERSION%
-  - IF NOT EXIST php-installed.txt appveyor DownloadFile http://windows.php.net/downloads/releases/archives/php-%PHP_VERSION%-nts-Win32-VC14-x86.zip
-  - IF NOT EXIST php-installed.txt 7z x php-%PHP_VERSION%-nts-Win32-VC14-x86.zip -y >nul
+  - IF NOT EXIST php-installed.txt appveyor DownloadFile http://windows.php.net/downloads/releases/php-%PHP_VERSION%-x86.zip
+  - IF NOT EXIST php-installed.txt 7z x php-%PHP_VERSION%-x86.zip -y >nul
   - IF NOT EXIST php-installed.txt del /Q *.zip
   - IF NOT EXIST php-installed.txt copy /Y php.ini-development php.ini
   - IF NOT EXIST php-installed.txt echo max_execution_time=1200 >> php.ini
@@ -49,7 +50,7 @@ install:
   - IF NOT EXIST php-installed.txt type nul >> php-installed.txt
 
   - cd c:\t3c
-  - composer require "typo3/cms=%TYPO3_VERSION%" --prefer-dist --no-progress --ansi
+  - composer require "typo3/cms-backend=%TYPO3_VERSION%" "typo3/cms-core=%TYPO3_VERSION%" "typo3/cms-extbase=%TYPO3_VERSION%" "typo3/cms-extensionmanager=%TYPO3_VERSION%" "typo3/cms-fluid=%TYPO3_VERSION%" "typo3/cms-install=%TYPO3_VERSION%" "typo3/cms-scheduler=%TYPO3_VERSION%" --prefer-dist --no-progress --ansi
   - git checkout .
 
 test_script:

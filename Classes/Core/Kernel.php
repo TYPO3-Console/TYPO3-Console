@@ -109,6 +109,10 @@ class Kernel
         $classLoader = new ClassLoader();
         $classLoader->addPsr4($compatibilityNamespace, $compatibilityClassesPath);
         spl_autoload_register(function ($className) use ($classLoader, $compatibilityNamespace) {
+            if (strpos($className, 'Helhum\\Typo3Console\\') !== 0) {
+                // We don't care about classes that are not within our namespace
+                return;
+            }
             $compatibilityClassName = str_replace('Helhum\\Typo3Console\\', $compatibilityNamespace, $className);
             if ($file = $classLoader->findFile($compatibilityClassName)) {
                 require $file;

@@ -33,7 +33,10 @@ class ExceptionHandler
     public function __construct(ExceptionRenderer $exceptionRenderer = null, ConsoleOutput $output = null)
     {
         $this->exceptionRenderer = $exceptionRenderer ?: new ExceptionRenderer();
-        $this->output = $output ?: new ConsoleOutput();
+        if ($output === null) {
+            $output = new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG);
+        }
+        $this->output = $output;
     }
 
     /**

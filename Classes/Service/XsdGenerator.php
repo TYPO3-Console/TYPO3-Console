@@ -16,7 +16,6 @@ namespace Helhum\Typo3Console\Service;
 use Helhum\Typo3Console\Parser\ParsingException;
 use Helhum\Typo3Console\Parser\PhpParser;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Reflection\ClassReflection;
 use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
 use TYPO3\CMS\Fluid\Core\ViewHelper\ArgumentDefinition;
 
@@ -107,7 +106,7 @@ class XsdGenerator
      */
     protected function generateXmlForClassName($className, \SimpleXMLElement $xmlRootNode)
     {
-        $reflectionClass = new ClassReflection($className);
+        $reflectionClass = new \ReflectionClass($className);
         $tagName = $this->getTagNameForClass($className);
         $xsdElement = $xmlRootNode->addChild('xsd:element');
         $xsdElement['name'] = $tagName;
