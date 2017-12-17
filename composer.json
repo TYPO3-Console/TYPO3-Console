@@ -42,7 +42,7 @@
 
         "helhum/typo3-composer-setup": "^0.4",
         "typo3-console/php-server-command": "^0.1.1",
-        "typo3-console/create-reference-command": "^2.0",
+        "typo3-console/create-reference-command": "^2.2",
         "symfony/filesystem": "^3.2",
         "nimut/testing-framework": "3.*@dev",
         "mikey179/vfsStream": "~1.6.0"
@@ -74,7 +74,7 @@
         "bin-dir": ".Build/bin"
     },
     "bin": [
-        "Scripts/typo3console"
+        "typo3cms"
     ],
     "scripts": {
         "set-version": [
