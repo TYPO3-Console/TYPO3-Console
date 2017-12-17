@@ -30,7 +30,6 @@ before_install:
   - if php -i | grep -q xdebug; then phpenv config-rm xdebug.ini; fi
 
 install:
-  - export PATH="$PATH:./Scripts"
   - export COMPOSER_ROOT_VERSION=5.0.0
   - composer require typo3/cms-backend="$TYPO3_VERSION" typo3/cms-core="$TYPO3_VERSION" typo3/cms-extbase="$TYPO3_VERSION" typo3/cms-extensionmanager="$TYPO3_VERSION" typo3/cms-fluid="$TYPO3_VERSION" typo3/cms-install="$TYPO3_VERSION" typo3/cms-scheduler="$TYPO3_VERSION"
   - git checkout composer.json
@@ -38,7 +37,7 @@ install:
 # Test scripts
 script:
   # This fails when command reference is not up to date
-  - typo3console commandreference:render > /dev/null 2>&1 && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
+  - ./typo3cms commandreference:render > /dev/null 2>&1 && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
   - >
     echo "Running unit and functional tests…";
     .Build/bin/phpunit;
@@ -102,6 +101,7 @@ jobs:
       script:
         - >
           if [ -n "$SONAR_TOKEN" ]; then
+            git fetch --unshallow
             sonar-scanner
           fi
 

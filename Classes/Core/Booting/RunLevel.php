@@ -294,7 +294,7 @@ class RunLevel
      */
     private function getRunLevelForCommand(string $commandIdentifier): string
     {
-        if ($commandIdentifier === '' || $commandIdentifier === 'help') {
+        if (in_array($commandIdentifier, ['', 'help', 'list'], true)) {
             return $this->getMaximumAvailableRunLevel();
         }
         $options = $this->getOptionsForCommand($commandIdentifier);

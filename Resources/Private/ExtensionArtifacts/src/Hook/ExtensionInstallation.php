@@ -22,7 +22,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class ExtensionInstallation
 {
-    const BINARY_PATH = 'typo3conf/ext/typo3_console/Scripts/';
+    const BINARY_PATH = 'typo3conf/ext/typo3_console/';
     const COPY_FAILED_MESSAGE_TITLE = 'Could not copy %s script to TYPO3 root directory (%s)!';
     const COPY_FAILED_MESSAGE = 'Check the permissions of your root directory. Is there a file or directory named %s inside this directory?';
     const COPY_SUCCESS_MESSAGE = 'Successfully copied the %s script to TYPO3 root directory. Let\'s dance!';
@@ -39,8 +39,8 @@ class ExtensionInstallation
         if (self::EXTKEY !== $keyOfInstalledExtension) {
             return;
         }
-        $scriptName = TYPO3_OS === 'WIN' ? 'typo3console.bat' : 'typo3console';
-        $success = $this->safeCopy(PATH_site . self::BINARY_PATH . $scriptName, PATH_site . $scriptName);
+        $scriptName = $this->isWindowsOs() ? 'Scripts/typo3cms.bat' : 'typo3cms';
+        $success = $this->safeCopy(PATH_site . self::BINARY_PATH . $scriptName, PATH_site . basename($scriptName));
         if (!$success) {
             self::addFlashMessage(sprintf(self::COPY_FAILED_MESSAGE, $scriptName), sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName, PATH_site), AbstractMessage::WARNING);
         } else {
@@ -78,7 +78,7 @@ class ExtensionInstallation
     }
 
     /**
-     * Copy typo3console command to root directory taking several possible situations into account
+     * Copy typo3cms command to root directory taking several possible situations into account
      *
      * @param string $fullSourcePath Path to the script that should be copied (depending on OS)
      * @param string $fullTargetPath Target path to which the script should be copied to
@@ -98,14 +98,18 @@ class ExtensionInstallation
                 return false;
             }
         }
-        $proxyFileContent = file_get_contents($fullSourcePath);
-        $proxyFileContent = str_replace(
-            'require __DIR__ . \'/typo3console.php\';',
-            '// In non Composer mode we\'re copied into TYPO3 web root
-require __DIR__ . \'/typo3conf/ext/typo3_console/Scripts/typo3console.php\';',
-            $proxyFileContent
-        );
-        $success = file_put_contents($fullTargetPath, $proxyFileContent);
+        if ($this->isWindowsOs()) {
+            $success = @copy($fullSourcePath, $fullTargetPath);
+        } else {
+            $proxyFileContent = file_get_contents($fullSourcePath);
+            $proxyFileContent = str_replace(
+                'require __DIR__ . \'/Scripts/typo3-console.php\';',
+                '// In non Composer mode we\'re copied into TYPO3 web root
+    require __DIR__ . \'/typo3conf/ext/typo3_console/Scripts/typo3-console.php\';',
+                $proxyFileContent
+            );
+            $success = file_put_contents($fullTargetPath, $proxyFileContent);
+        }
 
         if ($success && !$this->isWindowsOs()) {
             $success = @chmod($fullTargetPath, 0755);
@@ -125,7 +129,7 @@ require __DIR__ . \'/typo3conf/ext/typo3_console/Scripts/typo3console.php\';',
 
     protected static function isTypo3CmsBinary($fullTargetPath)
     {
-        return strpos(file_get_contents($fullTargetPath), 'typo3console.php') !== false;
+        return strpos(file_get_contents($fullTargetPath), 'typo3-console.php') !== false;
     }
 
     /**

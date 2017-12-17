@@ -54,7 +54,7 @@ class CommandDispatcher
      */
     public static function createFromComposerRun(ScriptEvent $event, ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
     {
-        $name = 'typo3console';
+        $name = 'typo3cms';
         $searchDirs = [
             $event->getComposer()->getConfig()->get('bin-dir'),
             dirname(dirname(dirname(__DIR__))) . '/Scripts',
@@ -67,7 +67,7 @@ class CommandDispatcher
             }
         }
         if (!isset($typo3CommandPath)) {
-            throw new RuntimeException('The "typo3console" binary could not be found.', 1494778973);
+            throw new RuntimeException('The "typo3cms" binary could not be found.', 1494778973);
         }
         $processBuilder = $processBuilder ?: new ProcessBuilder();
         $processBuilder->addEnvironmentVariables(['TYPO3_CONSOLE_PLUGIN_RUN' => true]);
@@ -87,7 +87,7 @@ class CommandDispatcher
      */
     public static function createFromCommandRun(ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
     {
-        if (!isset($_SERVER['argv'][0]) && strpos($_SERVER['argv'][0], 'typo3console') === false) {
+        if (!isset($_SERVER['argv'][0]) && strpos($_SERVER['argv'][0], 'typo3cms') === false) {
             throw new RuntimeException('Tried to create typo3 command runner from wrong context', 1484945065);
         }
         $typo3CommandPath = $_SERVER['argv'][0];
@@ -106,16 +106,16 @@ class CommandDispatcher
     public static function createFromTestRun($typo3CommandPath = null)
     {
         if (!isset($_SERVER['argv'][0]) && strpos($_SERVER['argv'][0], 'phpunit') === false) {
-            throw new RuntimeException('Tried to create typo3console command runner from wrong context', 1493570522);
+            throw new RuntimeException('Tried to create typo3cms command runner from wrong context', 1493570522);
         }
-        $typo3CommandPath = $typo3CommandPath ?: dirname(dirname(dirname(__DIR__))) . '/Scripts/typo3console';
+        $typo3CommandPath = $typo3CommandPath ?: dirname(dirname(dirname(__DIR__))) . '/typo3cms';
         return self::create($typo3CommandPath);
     }
 
     /**
-     * Basic factory method, which need the exact path to the typo3console binary to create the dispatcher
+     * Basic factory method, which need the exact path to the typo3cms binary to create the dispatcher
      *
-     * @param string $typo3CommandPath Absolute path to the typo3console binary
+     * @param string $typo3CommandPath Absolute path to the typo3cms binary
      * @param ProcessBuilder $processBuilder
      * @param PhpExecutableFinder $phpFinder
      * @throws RuntimeException

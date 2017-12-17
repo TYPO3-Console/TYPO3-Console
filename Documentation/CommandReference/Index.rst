@@ -9,10 +9,10 @@ Command Reference
 
 .. note::
 
-  This reference uses ``typo3console`` as the command to invoke. If you are on
-  Windows, this will probably not work, there you need to use ``typo3console.bat``
+  This reference uses ``typo3cms`` as the command to invoke. If you are on
+  Windows, this will probably not work, there you need to use ``typo3cms.bat``
   instead.
-  In Composer based installations, the ``typo3console`` binary will be located
+  In Composer based installations, the ``typo3cms`` binary will be located
   in the binary directory specified in the root composer.json (by default ``vendor/bin``)
 
 
@@ -154,7 +154,7 @@ Valid group names are by default:
 - pages
 - system
 
-**Example:** ``typo3console cache:flushgroups pages,all``
+**Example:** ``typo3cms cache:flushgroups pages,all``
 
 Arguments
 ^^^^^^^^^
@@ -177,7 +177,7 @@ Arguments
 
 Flushes caches by tags, optionally only caches in specified groups.
 
-**Example:** ``typo3console cache:flushtags news_123 --groups pages,all``
+**Example:** ``typo3cms cache:flushtags news_123 --groups pages,all``
 
 Arguments
 ^^^^^^^^^
@@ -221,7 +221,7 @@ Lists all registered cache groups.
 
 Updates reference index to ensure data integrity
 
-**Example:** ``typo3console cleanup:updatereferenceindex --dry-run --verbose``
+**Example:** ``typo3cms cleanup:updatereferenceindex --dry-run --verbose``
 
 
 
@@ -251,7 +251,7 @@ Removes a system configuration option by path.
 For this command to succeed, the configuration option(s) must be in
 LocalConfiguration.php and not be overridden elsewhere.
 
-**Example:** ``typo3console configuration:remove DB,EXT/EXTCONF/realurl``
+**Example:** ``typo3cms configuration:remove DB,EXT/EXTCONF/realurl``
 
 Arguments
 ^^^^^^^^^
@@ -280,7 +280,7 @@ Options
 
 Set system configuration option value by path.
 
-**Example:** ``typo3console configuration:set SYS/fileCreateMask 0664``
+**Example:** ``typo3cms configuration:set SYS/fileCreateMask 0664``
 
 Arguments
 ^^^^^^^^^
@@ -307,7 +307,7 @@ Shows system configuration value by path.
 If the currently active configuration differs from the value in LocalConfiguration.php
 the difference between these values is shown.
 
-**Example:** ``typo3console configuration:show DB``
+**Example:** ``typo3cms configuration:show DB``
 
 Arguments
 ^^^^^^^^^
@@ -331,7 +331,7 @@ Arguments
 Shows active system configuration by path.
 Shows the configuration value that is currently effective, no matter where and how it is set.
 
-**Example:** ``typo3console configuration:showActive DB --json``
+**Example:** ``typo3cms configuration:showActive DB --json``
 
 Arguments
 ^^^^^^^^^
@@ -360,9 +360,9 @@ Options
 
 Shows local configuration option value by path.
 Shows the value which is stored in LocalConfiguration.php.
-Note that this value could be overridden. Use ``typo3console configuration:show <path>`` to see if this is the case.
+Note that this value could be overridden. Use ``typo3cms configuration:show <path>`` to see if this is the case.
 
-**Example:** ``typo3console configuration:showlocal DB``
+**Example:** ``typo3cms configuration:showlocal DB``
 
 Arguments
 ^^^^^^^^^
@@ -401,7 +401,7 @@ This obviously only works when MySQL is used as DBMS.
 
 A comma-separated list of tables can be passed to exclude from the export:
 
-**Example:** ``typo3console database:export --exclude-tables be_sessions,fe_sessions,sys_log``
+**Example:** ``typo3cms database:export --exclude-tables be_sessions,fe_sessions,sys_log``
 
 **This command passes the plain text database password to the command line process.**
 This means, that users that have the permission to observe running processes,
@@ -432,9 +432,9 @@ it but works as well to pass SELECT statements to it.
 The mysql binary must be available in the path for this command to work.
 This obviously only works when MySQL is used as DBMS.
 
-**Example (import):** ``ssh remote.server '/path/to/typo3console database:export' | typo3console database:import``
-**Example (select):** ``echo 'SELECT username from be_users WHERE admin=1;' | typo3console database:import``
-**Example (interactive):** ``typo3console database:import --interactive``
+**Example (import):** ``ssh remote.server '/path/to/typo3cms database:export' | typo3cms database:import``
+**Example (select):** ``echo 'SELECT username from be_users WHERE admin=1;' | typo3cms database:import``
+**Example (interactive):** ``typo3cms database:import --interactive``
 
 **This command passes the plain text database password to the command line process.**
 This means, that users that have the permission to observe running processes,
@@ -481,7 +481,7 @@ The list of schema update types supports wildcards to specify multiple types, e.
 
 To avoid shell matching all types with wildcards should be quoted.
 
-**Example:** ``typo3console database:updateschema "*.add,*.change"``
+**Example:** ``typo3cms database:updateschema "*.add,*.change"``
 
 
 
@@ -757,7 +757,7 @@ Arguments
 Display help for a command
 
 The help command displays help for a given command:
-typo3console help <command identifier>
+typo3cms help <command identifier>
 
 Arguments
 ^^^^^^^^^
@@ -809,7 +809,7 @@ Automatically create files and folders, required for a TYPO3 installation.
 
 This command creates the required folder structure needed for TYPO3 including extensions.
 It is recommended to be executed **after** executing
-``typo3console install:generatepackagestates``, to ensure proper generation of
+``typo3cms install:generatepackagestates``, to ensure proper generation of
 required folders for all active extensions.
 
 
@@ -847,7 +847,7 @@ To require TYPO3 core extensions use the following command:
 
 This updates your composer.json and composer.lock without any other changes.
 
-**Example:** ``typo3console install:generatepackagestates``
+**Example:** ``typo3cms install:generatepackagestates``
 
 
 
@@ -924,7 +924,7 @@ Options
 
 Executes tasks that are registered in the scheduler module.
 
-**Example:** ``typo3console scheduler:run 42 --force``
+**Example:** ``typo3cms scheduler:run 42 --force``
 
 
 
