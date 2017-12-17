@@ -542,7 +542,7 @@ Options
 Activates one or more extensions by key.
 Marks extensions as active, sets them up and clears caches for every activated extension.
 
-This command is only available in non composer mode.
+This command is deprecated (and hidden) in Composer mode.
 
 Arguments
 ^^^^^^^^^
@@ -572,7 +572,7 @@ Options
 Deactivates one or more extensions by key.
 Marks extensions as inactive in the system and clears caches for every deactivated extension.
 
-This command is only available in non composer mode.
+This command is deprecated (and hidden) in Composer mode.
 
 Arguments
 ^^^^^^^^^

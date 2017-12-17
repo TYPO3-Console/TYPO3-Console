@@ -68,12 +68,7 @@ class CommandControllerCommand extends Command
     public function isEnabled(): bool
     {
         if ($this->application->isComposerManaged()
-            && in_array($this->getName(), [
-                // Remove commands than don't make sense when application is composer managed
-                'extension:dumpautoload',
-                'extension:activate',
-                'extension:deactivate',
-            ], true)
+            && $this->getName() === 'extension:dumpautoload'
         ) {
             return false;
         }
@@ -152,6 +147,15 @@ class CommandControllerCommand extends Command
 
     public function isHidden(): bool
     {
+        if ($this->application->isComposerManaged()
+            && in_array($this->getName(), [
+                // Hide commands than don't make sense when application is composer managed, but should still work for a while
+                'extension:activate',
+                'extension:deactivate',
+            ], true)
+        ) {
+            return true;
+        }
         return $this->commandDefinition->isInternal();
     }
 }
