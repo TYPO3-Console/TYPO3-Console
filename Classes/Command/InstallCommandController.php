@@ -116,14 +116,19 @@ class InstallCommandController extends CommandController
      * <b>Example:</b> <code>%command.full_name% install:generatepackagestates</code>
      *
      * @param array $frameworkExtensions TYPO3 system extensions that should be marked as active. Extension keys separated by comma.
-     * @param bool $activateDefault If true, <code>typo3/cms</code> extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
      * @param array $excludedExtensions Extensions which should stay inactive. This does not affect provided framework extensions or framework extensions that are required or part as minimal usable system.
+     * @param bool $activateDefault (DEPRECATED) If true, <code>typo3/cms</code> extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
      */
-    public function generatePackageStatesCommand(array $frameworkExtensions = [], $activateDefault = false, array $excludedExtensions = [])
+    public function generatePackageStatesCommand(array $frameworkExtensions = [], array $excludedExtensions = [], $activateDefault = false)
     {
+        if ($activateDefault && Bootstrap::usesComposerClassLoading()) {
+            // @deprecated for composer usage in 5.0 will be removed with 6.0
+            $this->outputLine('<warning>Using --activate-default is deprecated in composer managed TYPO3 installations.</warning>');
+            $this->outputLine('<warning>Instead of requiring typo3/cms in your project, you should consider only requiring individual packages you need.</warning>');
+        }
         $frameworkExtensions = $frameworkExtensions ?: explode(',', (string)getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS'));
         $packageStatesGenerator = new PackageStatesGenerator($this->packageManager);
-        $activatedExtensions = $packageStatesGenerator->generate($frameworkExtensions, $activateDefault, $excludedExtensions);
+        $activatedExtensions = $packageStatesGenerator->generate($frameworkExtensions, $excludedExtensions, $activateDefault);
 
         try {
             // Make sure file caches are empty after generating package states file

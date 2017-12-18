@@ -856,10 +856,10 @@ Options
 
 ``--framework-extensions``
   TYPO3 system extensions that should be marked as active. Extension keys separated by comma.
-``--activate-default``
-  If true, ``typo3/cms`` extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
 ``--excluded-extensions``
   Extensions which should stay inactive. This does not affect provided framework extensions or framework extensions that are required or part as minimal usable system.
+``--activate-default``
+  (DEPRECATED) If true, ``typo3/cms`` extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
 
 
 
