@@ -14,10 +14,8 @@ namespace Helhum\Typo3Console\Install;
  */
 
 use Helhum\Typo3Console\Install\Upgrade\SilentConfigurationUpgrade;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\CMS\Install\Controller\Action\ActionInterface;
-use TYPO3\CMS\Install\Controller\Action\Step\StepInterface;
-use TYPO3\CMS\Install\Controller\Exception\RedirectException;
+use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Install\Controller\InstallerController;
 
 /**
  * This class is responsible for properly creating install tool step actions
@@ -26,23 +24,35 @@ use TYPO3\CMS\Install\Controller\Exception\RedirectException;
 class InstallStepActionExecutor
 {
     /**
-     * @var ObjectManager
-     */
-    private $objectManager;
-
-    /**
      * @var SilentConfigurationUpgrade
      */
     private $silentConfigurationUpgrade;
 
     /**
-     * @param ObjectManager $objectManager
+     * @var InstallerController
+     */
+    private $installerController;
+    /**
+     * @var callable
+     */
+    private $requestFactory;
+
+    /**
      * @param SilentConfigurationUpgrade $silentConfigurationUpgrade
      */
-    public function __construct(ObjectManager $objectManager, SilentConfigurationUpgrade $silentConfigurationUpgrade)
+    public function __construct(SilentConfigurationUpgrade $silentConfigurationUpgrade, InstallerController $installerController, callable $requestFactory = null)
     {
-        $this->objectManager = $objectManager;
         $this->silentConfigurationUpgrade = $silentConfigurationUpgrade;
+        $this->installerController = $installerController;
+        $this->requestFactory = $requestFactory ?: function (array $arguments) {
+            return (new ServerRequest())->withParsedBody(
+                [
+                    'install' => [
+                        'values' => $arguments,
+                    ],
+                ]
+            );
+        };
     }
 
     /**
@@ -55,44 +65,19 @@ class InstallStepActionExecutor
      */
     public function executeActionWithArguments($actionName, array $arguments = [], $dryRun = false)
     {
-        return $this->executeAction($this->createActionWithNameAndArguments($actionName, $arguments), $dryRun);
-    }
-
-    /**
-     * @param string $actionName
-     * @param array $arguments
-     * @return StepInterface|ActionInterface
-     */
-    private function createActionWithNameAndArguments($actionName, array $arguments = [])
-    {
-        $classPrefix = 'TYPO3\\CMS\\Install\\Controller\\Action\\Step\\';
-        $className = $classPrefix . ucfirst($actionName);
-
-        /** @var StepInterface|ActionInterface $action */
-        $action = $this->objectManager->get($className);
-        $action->setController('step');
-        $action->setAction($actionName);
-        $action->setPostValues(['values' => $arguments]);
-
-        return $action;
-    }
-
-    /**
-     * @param StepInterface $action
-     * @param bool $dryRun
-     * @throws \TYPO3\CMS\Install\Controller\Exception\RedirectException
-     * @return InstallStepResponse
-     */
-    private function executeAction(StepInterface $action, $dryRun = false)
-    {
+        $actionMethod = 'execute' . ucfirst($actionName) . 'Action';
+        $checkMethod = 'check' . ucfirst($actionName) . 'Action';
         $messages = [];
-        try {
-            $needsExecution = $action->needsExecution();
-        } catch (RedirectException $e) {
-            return new InstallStepResponse(true, $messages, true);
+        $needsExecution = true;
+        if (is_callable([$this->installerController, $checkMethod])) {
+            $needsExecution = !\json_decode($this->installerController->$checkMethod()->getBody(), true)['success'];
         }
         if ($needsExecution && !$dryRun) {
-            $messages = $action->execute();
+            $request = ($this->requestFactory)($arguments);
+            $response = \json_decode($this->installerController->$actionMethod($request)->getBody(), true);
+            if (!$response['success']) {
+                $messages = $response['status'];
+            }
             $this->silentConfigurationUpgrade->executeSilentConfigurationUpgradesIfNeeded();
             $needsExecution = false;
         }

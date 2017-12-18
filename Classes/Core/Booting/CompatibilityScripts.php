@@ -17,25 +17,18 @@ use TYPO3\CMS\Core\Core\Bootstrap;
 
 class CompatibilityScripts
 {
-    /**
-     * @param Bootstrap $bootstrap
-     */
-    public static function initializeConfigurationManagement(Bootstrap $bootstrap)
+    public static function initializeConfigurationManagement()
     {
-        \Closure::bind(function () use ($bootstrap) {
-            // Because links might be generated from CLI (e.g. by Solr indexer)
-            // We need to properly initialize the cache hash calculator here!
-            $bootstrap->setCacheHashOptions();
-            $bootstrap->defineUserAgentConstant();
-        }, null, $bootstrap)();
+        // noop for TYPO3 9
     }
 
     /**
      * @param Bootstrap $bootstrap
+     * @deprecated can be removed when TYPO3 8 support is removed
      */
     public static function initializeDatabaseConnection(Bootstrap $bootstrap)
     {
-        $bootstrap->initializeTypo3DbGlobal();
+        // noop for TYPO3 9
     }
 
     /**
@@ -43,6 +36,6 @@ class CompatibilityScripts
      */
     public static function initializeExtensionConfiguration(Bootstrap $bootstrap)
     {
-        $bootstrap->defineLoggingAndExceptionConstants();
+        // noop for TYPO3 9
     }
 }

@@ -1,5 +1,5 @@
 <?php
-namespace Helhum\Typo3Console\LTS9\Install\Upgrade;
+namespace Helhum\Typo3Console\TYPO3v87\Install\Upgrade;
 
 /*
  * This file is part of the TYPO3 Console project.
@@ -16,8 +16,9 @@ namespace Helhum\Typo3Console\LTS9\Install\Upgrade;
 use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Install\Service\Exception\ConfigurationChangedException;
-use TYPO3\CMS\Install\Service\ExtensionConfigurationService;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
+use TYPO3\CMS\Install\Controller\Exception\RedirectException;
 use TYPO3\CMS\Install\Service\SilentConfigurationUpgradeService;
 
 /**
@@ -31,9 +32,15 @@ class SilentConfigurationUpgrade
      */
     private $configurationManager;
 
-    public function __construct(ConfigurationManager $configurationManager = null)
+    /**
+     * @var ObjectManagerInterface
+     */
+    private $objectManager;
+
+    public function __construct(ConfigurationManager $configurationManager = null, ObjectManagerInterface $objectManager = null)
     {
         $this->configurationManager = $configurationManager ?: GeneralUtility::makeInstance(ConfigurationManager::class);
+        $this->objectManager = $objectManager ?: GeneralUtility::makeInstance(ObjectManager::class);
     }
 
     /**
@@ -47,19 +54,14 @@ class SilentConfigurationUpgrade
         if (!file_exists($this->configurationManager->getLocalConfigurationFileLocation())) {
             return;
         }
-        // We need to write the extension configuration for all active extensions ourselves
-        // as the core does not take care doing so (yet)
-        $extensionConfigurationService = new ExtensionConfigurationService();
-        $extensionConfigurationService->synchronizeExtConfTemplateWithLocalConfigurationOfAllExtensions();
-
-        $upgradeService = new SilentConfigurationUpgradeService($this->configurationManager);
+        $upgradeService = $this->objectManager->get(SilentConfigurationUpgradeService::class);
         $count = 0;
         do {
             try {
                 $count++;
                 $upgradeService->execute();
                 $redirect = false;
-            } catch (ConfigurationChangedException $e) {
+            } catch (RedirectException $e) {
                 $redirect = true;
                 $this->configurationManager->exportConfiguration();
                 if ($count > 20) {

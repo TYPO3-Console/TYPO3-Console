@@ -1,5 +1,5 @@
 <?php
-namespace Helhum\Typo3Console\LTS9\Core\Booting;
+namespace Helhum\Typo3Console\TYPO3v87\Core\Booting;
 
 /*
  * This file is part of the TYPO3 Console project.
@@ -17,18 +17,25 @@ use TYPO3\CMS\Core\Core\Bootstrap;
 
 class CompatibilityScripts
 {
-    public static function initializeConfigurationManagement()
+    /**
+     * @param Bootstrap $bootstrap
+     */
+    public static function initializeConfigurationManagement(Bootstrap $bootstrap)
     {
-        // noop for TYPO3 9
+        \Closure::bind(function () use ($bootstrap) {
+            // Because links might be generated from CLI (e.g. by Solr indexer)
+            // We need to properly initialize the cache hash calculator here!
+            $bootstrap->setCacheHashOptions();
+            $bootstrap->defineUserAgentConstant();
+        }, null, $bootstrap)();
     }
 
     /**
      * @param Bootstrap $bootstrap
-     * @deprecated can be removed when TYPO3 8 support is removed
      */
     public static function initializeDatabaseConnection(Bootstrap $bootstrap)
     {
-        // noop for TYPO3 9
+        $bootstrap->initializeTypo3DbGlobal();
     }
 
     /**
@@ -36,6 +43,6 @@ class CompatibilityScripts
      */
     public static function initializeExtensionConfiguration(Bootstrap $bootstrap)
     {
-        // noop for TYPO3 9
+        $bootstrap->defineLoggingAndExceptionConstants();
     }
 }
