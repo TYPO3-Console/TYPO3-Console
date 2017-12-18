@@ -67,14 +67,14 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
         $this->backupDatabase();
         $this->installFixtureExtensionCode('ext_test');
 
-        $output = $this->executeConsoleCommand('extension:activate', ['ext_test'], ['CONSOLE_NON_COMPOSER_TEST' => 1]);
+        $output = $this->executeConsoleCommand('extension:activate', ['ext_test']);
         $this->assertContains('Extension "ext_test" is now active.', $output);
         $this->assertContains('Extension "ext_test" is now set up.', $output);
 
         $output = $this->executeConsoleCommand('database:updateschema');
         $this->assertContains('No schema updates were performed for update types:', $output);
 
-        $output = $this->executeConsoleCommand('extension:deactivate', ['ext_test'], ['CONSOLE_NON_COMPOSER_TEST' => 1]);
+        $output = $this->executeConsoleCommand('extension:deactivate', ['ext_test']);
         $this->assertContains('Extension "ext_test" is now inactive.', $output);
 
         $this->removeFixtureExtensionCode('ext_test');
@@ -89,18 +89,18 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
         $this->backupDatabase();
         $this->installFixtureExtensionCode('ext_test');
 
-        $output = $this->executeConsoleCommand('extension:activate', ['ext_test'], ['CONSOLE_NON_COMPOSER_TEST' => 1]);
+        $output = $this->executeConsoleCommand('extension:activate', ['ext_test']);
         $this->assertContains('Extension "ext_test" is now active.', $output);
         $this->assertContains('Extension "ext_test" is now set up.', $output);
 
-        $output = $this->executeConsoleCommand('extension:activate', ['core'], ['CONSOLE_NON_COMPOSER_TEST' => 1]);
+        $output = $this->executeConsoleCommand('extension:activate', ['core']);
         $this->assertNotContains('is now active.', $output);
         $this->assertContains('Extension "core" is now set up.', $output);
 
         $output = $this->executeConsoleCommand('database:updateschema');
         $this->assertContains('No schema updates were performed for update types:', $output);
 
-        $output = $this->executeConsoleCommand('extension:deactivate', ['ext_test'], ['CONSOLE_NON_COMPOSER_TEST' => 1]);
+        $output = $this->executeConsoleCommand('extension:deactivate', ['ext_test']);
         $this->assertContains('Extension "ext_test" is now inactive.', $output);
 
         $this->removeFixtureExtensionCode('ext_test');
@@ -123,7 +123,7 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
         $output = $this->executeConsoleCommand('database:updateschema');
         $this->assertContains('No schema updates were performed for update types:', $output);
 
-        $output = $this->executeConsoleCommand('extension:deactivate', ['ext_test'], ['CONSOLE_NON_COMPOSER_TEST' => 1]);
+        $output = $this->executeConsoleCommand('extension:deactivate', ['ext_test']);
         $this->assertContains('Extension "ext_test" is now inactive.', $output);
 
         $this->removeFixtureExtensionCode('ext_test');

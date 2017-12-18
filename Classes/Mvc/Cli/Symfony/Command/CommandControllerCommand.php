@@ -152,6 +152,7 @@ class CommandControllerCommand extends Command
                 // Hide commands than don't make sense when application is composer managed, but should still work for a while
                 'extension:activate',
                 'extension:deactivate',
+                'extension:removeinactive',
             ], true)
         ) {
             return true;

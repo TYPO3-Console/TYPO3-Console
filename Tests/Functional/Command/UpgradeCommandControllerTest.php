@@ -44,14 +44,14 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     public function checkExtensionConstraintsReturnsErrorCodeOnFailure()
     {
         $this->installFixtureExtensionCode('ext_test');
-        $this->executeConsoleCommand('extension:activate', ['ext_test'], ['CONSOLE_NON_COMPOSER_TEST' => 1]);
+        $this->executeConsoleCommand('extension:activate', ['ext_test']);
         try {
             $this->commandDispatcher->executeCommand('upgrade:checkextensionconstraints', ['--typo3-version' => '3.6.0']);
         } catch (FailedSubProcessCommandException $e) {
             $this->assertSame(1, $e->getExitCode());
             $this->assertContains('"ext_test" requires TYPO3 versions 4.5.0', $e->getOutputMessage());
         }
-        $this->executeConsoleCommand('extension:deactivate', ['ext_test'], ['CONSOLE_NON_COMPOSER_TEST' => 1]);
+        $this->executeConsoleCommand('extension:deactivate', ['ext_test']);
         $this->removeFixtureExtensionCode('ext_test');
     }
 
