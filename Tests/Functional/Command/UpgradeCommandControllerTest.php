@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Tests\Functional\Command;
 
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 
 class UpgradeCommandControllerTest extends AbstractCommandTest
 {
@@ -93,7 +94,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     {
         $this->consoleRootPath = getenv('TYPO3_PATH_COMPOSER_ROOT');
         $this->typo3RootPath = getenv('TYPO3_PATH_ROOT');
-        $this->commandDispatcher = CommandDispatcher::createFromTestRun($instancePath . '/vendor/helhum/typo3-console-test/typo3cms');
+        $this->commandDispatcher = CommandDispatcher::createFromTestRun($instancePath . '/vendor/helhum/typo3-console-test/' . Application::COMMAND_NAME);
         if (!is_dir($instancePath)) {
             mkdir($instancePath);
         }

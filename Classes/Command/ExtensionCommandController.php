@@ -17,10 +17,14 @@ use Helhum\Typo3Console\Extension\ExtensionSetup;
 use Helhum\Typo3Console\Extension\ExtensionSetupResultRenderer;
 use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use Helhum\Typo3Console\Service\CacheService;
+use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\ClassLoadingInformation;
 use TYPO3\CMS\Core\Package\PackageInterface;
+use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
+use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 use TYPO3\CMS\Extensionmanager\Utility\InstallUtility;
 
 /**
@@ -34,8 +38,7 @@ class ExtensionCommandController extends CommandController
     protected $requestAdminPermissions = true;
 
     /**
-     * @var \TYPO3\CMS\Extbase\SignalSlot\Dispatcher
-     * @inject
+     * @var Dispatcher
      */
     protected $signalSlotDispatcher;
 
@@ -45,16 +48,29 @@ class ExtensionCommandController extends CommandController
     protected $extensionInstaller;
 
     /**
-     * @var \TYPO3\CMS\Core\Package\PackageManager
-     * @inject
+     * @var PackageManager
      */
     protected $packageManager;
 
     /**
-     * @var \Helhum\Typo3Console\Service\CacheService
-     * @inject
+     * @var CacheService
      */
     protected $cacheService;
+
+    public function injectSignalSlotDispatcher(Dispatcher $signalSlotDispatcher)
+    {
+        $this->signalSlotDispatcher = $signalSlotDispatcher;
+    }
+
+    public function injectPackageManager(PackageManager $packageManager)
+    {
+        $this->packageManager = $packageManager;
+    }
+
+    public function injectCacheService(CacheService $cacheService)
+    {
+        $this->cacheService = $cacheService;
+    }
 
     /**
      * Activate extension(s)
@@ -62,7 +78,7 @@ class ExtensionCommandController extends CommandController
      * Activates one or more extensions by key.
      * Marks extensions as active, sets them up and clears caches for every activated extension.
      *
-     * This command is only available in non composer mode.
+     * This command is deprecated (and hidden) in Composer mode.
      *
      * @param array $extensionKeys Extension keys to activate. Separate multiple extension keys with comma.
      * @param bool $verbose Whether or not to output results
@@ -70,6 +86,8 @@ class ExtensionCommandController extends CommandController
      */
     public function activateCommand(array $extensionKeys, $verbose = false)
     {
+        // @deprecated for composer usage in 5.0 will be removed with 6.0
+        $this->showDeprecationMessageIfApplicable();
         $this->emitPackagesMayHaveChangedSignal();
         $activatedExtensions = [];
         $extensionsToSetUp = [];
@@ -104,13 +122,15 @@ class ExtensionCommandController extends CommandController
      * Deactivates one or more extensions by key.
      * Marks extensions as inactive in the system and clears caches for every deactivated extension.
      *
-     * This command is only available in non composer mode.
+     * This command is deprecated (and hidden) in Composer mode.
      *
      * @param array $extensionKeys Extension keys to deactivate. Separate multiple extension keys with comma.
      * @throws \TYPO3\CMS\Extensionmanager\Exception\ExtensionManagerException
      */
     public function deactivateCommand(array $extensionKeys)
     {
+        // @deprecated for composer usage in 5.0 will be removed with 6.0
+        $this->showDeprecationMessageIfApplicable();
         foreach ($extensionKeys as $extensionKey) {
             $this->getExtensionInstaller()->uninstall($extensionKey);
         }
@@ -119,6 +139,18 @@ class ExtensionCommandController extends CommandController
             $this->outputLine('<info>Extension "%s" is now inactive.</info>', [$extensionKeysAsString]);
         } else {
             $this->outputLine('<info>Extensions "%s" are now inactive.</info>', [$extensionKeysAsString]);
+        }
+    }
+
+    private function showDeprecationMessageIfApplicable()
+    {
+        if (Bootstrap::usesComposerClassLoading()) {
+            $this->output->outputLine('<warning>This command is deprecated when TYPO3 is composer managed.</warning>');
+            $this->output->outputLine('<warning>It might lead to unexpected results.</warning>');
+            $this->output->outputLine('<warning>The PackageStates.php file that tracks which extension should be active,</warning>');
+            $this->output->outputLine('<warning>should be generated automatically using install:generatepackagestates.</warning>');
+            $this->output->outputLine('<warning>To set up all active extensions, extension:setupactive should be used.</warning>');
+            $this->output->outputLine('<warning>This command will be disabled, when TYPO3 is composer managed, in TYPO3 Console 6</warning>');
         }
     }
 

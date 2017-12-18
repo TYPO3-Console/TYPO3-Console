@@ -69,7 +69,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageManagerProphecy->getAvailablePackages()->willReturn($packages);
         $packageManagerProphecy->getActivePackages()->shouldBeCalled();
         $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal());
-        $packageStatesGenerator->generate([], false, ['foo']);
+        $packageStatesGenerator->generate([], ['foo'], false);
     }
 
     /**
@@ -149,7 +149,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageManagerProphecy->getAvailablePackages()->willReturn($packages);
         $packageManagerProphecy->getActivePackages()->shouldBeCalled();
         $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal());
-        $packageStatesGenerator->generate([], true);
+        $packageStatesGenerator->generate([], [], true);
     }
 
     /**
@@ -176,7 +176,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageManagerProphecy->getAvailablePackages()->willReturn($packages);
         $packageManagerProphecy->getActivePackages()->shouldBeCalled();
         $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal());
-        $packageStatesGenerator->generate([], true, ['foo']);
+        $packageStatesGenerator->generate([], ['foo'], true);
     }
 
     /**
@@ -228,7 +228,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageManagerProphecy->getAvailablePackages()->willReturn($packages);
         $packageManagerProphecy->getActivePackages()->shouldBeCalled();
         $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal());
-        $packageStatesGenerator->generate(['foo'], false, ['foo']);
+        $packageStatesGenerator->generate(['foo'], ['foo'], false);
     }
 
     /**
@@ -280,7 +280,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageManagerProphecy->getAvailablePackages()->willReturn($packages);
         $packageManagerProphecy->getActivePackages()->shouldBeCalled();
         $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal());
-        $packageStatesGenerator->generate(['foo'], false, ['foo']);
+        $packageStatesGenerator->generate(['foo'], ['foo'], false);
     }
 
     /**
@@ -332,6 +332,6 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageManagerProphecy->getAvailablePackages()->willReturn($packages);
         $packageManagerProphecy->getActivePackages()->shouldBeCalled();
         $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal());
-        $packageStatesGenerator->generate(['foo'], false, ['foo']);
+        $packageStatesGenerator->generate(['foo'], ['foo'], false);
     }
 }

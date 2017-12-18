@@ -40,11 +40,11 @@ class PackageStatesGenerator
 
     /**
      * @param array $frameworkExtensionsToActivate
-     * @param bool $activateDefaultExtensions
      * @param array $excludedExtensions
+     * @param bool $activateDefaultExtensions
      * @return PackageInterface[]
      */
-    public function generate(array $frameworkExtensionsToActivate = [], $activateDefaultExtensions = false, array $excludedExtensions = [])
+    public function generate(array $frameworkExtensionsToActivate = [], array $excludedExtensions = [], $activateDefaultExtensions = false)
     {
         $this->ensureDirectoryExists(PATH_site . 'typo3conf');
         $this->packageManager->scanAvailablePackages();

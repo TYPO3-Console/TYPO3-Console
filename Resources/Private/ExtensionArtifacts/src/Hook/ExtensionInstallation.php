@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Hook;
  *
  */
 
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -39,7 +40,7 @@ class ExtensionInstallation
         if (self::EXTKEY !== $keyOfInstalledExtension) {
             return;
         }
-        $scriptName = $this->isWindowsOs() ? 'Scripts/typo3cms.bat' : 'typo3cms';
+        $scriptName = $this->isWindowsOs() ? 'Scripts/' . Application::COMMAND_NAME . '.bat' : Application::COMMAND_NAME;
         $success = $this->safeCopy(PATH_site . self::BINARY_PATH . $scriptName, PATH_site . basename($scriptName));
         if (!$success) {
             self::addFlashMessage(sprintf(self::COPY_FAILED_MESSAGE, $scriptName), sprintf(self::COPY_FAILED_MESSAGE_TITLE, $scriptName, PATH_site), AbstractMessage::WARNING);
@@ -78,7 +79,7 @@ class ExtensionInstallation
     }
 
     /**
-     * Copy typo3cms command to root directory taking several possible situations into account
+     * Copy typo3 console binary to root directory taking several possible situations into account
      *
      * @param string $fullSourcePath Path to the script that should be copied (depending on OS)
      * @param string $fullTargetPath Target path to which the script should be copied to
@@ -105,7 +106,7 @@ class ExtensionInstallation
             $proxyFileContent = str_replace(
                 'require __DIR__ . \'/Scripts/typo3-console.php\';',
                 '// In non Composer mode we\'re copied into TYPO3 web root
-    require __DIR__ . \'/typo3conf/ext/typo3_console/Scripts/typo3-console.php\';',
+require __DIR__ . \'/typo3conf/ext/typo3_console/Scripts/typo3-console.php\';',
                 $proxyFileContent
             );
             $success = file_put_contents($fullTargetPath, $proxyFileContent);

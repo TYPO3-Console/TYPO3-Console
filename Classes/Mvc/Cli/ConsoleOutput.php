@@ -28,6 +28,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Terminal;
 
 /**
  * A wrapper for Symfony ConsoleOutput and related helpers
@@ -60,6 +61,11 @@ class ConsoleOutput
     protected $table;
 
     /**
+     * @var Terminal
+     */
+    private $terminal;
+
+    /**
      * Creates and initializes the Symfony I/O instances
      *
      * @param Output|null $output
@@ -79,6 +85,7 @@ class ConsoleOutput
         $this->output->getFormatter()->setStyle('del', new OutputFormatterStyle('red'));
         $this->output->getFormatter()->setStyle('code', new OutputFormatterStyle(null, null, ['bold']));
         $this->input = $input;
+        $this->terminal = new Terminal();
     }
 
     /**
@@ -96,7 +103,7 @@ class ConsoleOutput
      */
     public function getMaximumLineLength()
     {
-        return 79;
+        return $this->terminal->getWidth() - 2;
     }
 
     /**
