@@ -16,16 +16,16 @@ namespace Helhum\Typo3Console\Tests\Unit\Install;
 use Helhum\Typo3Console\Install\InstallStepActionExecutor;
 use Helhum\Typo3Console\Install\Upgrade\SilentConfigurationUpgrade;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\CMS\Install\Controller\Action\Step\AbstractStepAction;
-use TYPO3\CMS\Install\Controller\Exception\RedirectException;
+use TYPO3\CMS\Core\Http\JsonResponse;
+use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Install\Controller\InstallerController;
 
 class InstallStepExecutorTest extends UnitTestCase
 {
     protected function setUp()
     {
-        if (!class_exists(AbstractStepAction::class)) {
-            // @deprecated We can remove the test once we TYPO3 8 compatibility is removed
+        if (!class_exists(InstallerController::class)) {
+            // @deprecated We can remove the skip once TYPO3 8 compatibility is removed
             $this->markTestSkipped();
         }
     }
@@ -33,42 +33,13 @@ class InstallStepExecutorTest extends UnitTestCase
     /**
      * @test
      */
-    public function needsExecutionThrowsRedirectIsDetected()
-    {
-        $actionMock = $this->getMockBuilder(AbstractStepAction::class)->disableOriginalConstructor()->getMock();
-        $actionMock->expects($this->any())
-            ->method('needsExecution')
-            ->willReturnCallback(function () {
-                throw new RedirectException();
-            });
-        $objectManagerMock = $this->getMockBuilder(ObjectManager::class)->disableOriginalConstructor()->getMock();
-        $objectManagerMock->expects($this->any())
-            ->method('get')
-            ->willReturn($actionMock);
-        $silentConfigUpgradeMock = $this->getMockBuilder(SilentConfigurationUpgrade::class)->disableOriginalConstructor()->getMock();
-        $executor = new InstallStepActionExecutor($objectManagerMock, $silentConfigUpgradeMock);
-        $response = $executor->executeActionWithArguments('test', []);
-        $this->assertTrue($response->actionNeedsReevaluation());
-    }
-
-    /**
-     * @test
-     */
     public function actionIsNeverExecutedIfNotNeeded()
     {
-        $actionMock = $this->getMockBuilder(AbstractStepAction::class)->disableOriginalConstructor()->getMock();
-        $actionMock->expects($this->once())
-            ->method('needsExecution')
-            ->willReturn(false);
-        $actionMock->expects($this->never())
-            ->method('execute');
-        $objectManagerMock = $this->getMockBuilder(ObjectManager::class)->disableOriginalConstructor()->getMock();
-        $objectManagerMock->expects($this->any())
-            ->method('get')
-            ->willReturn($actionMock);
         $silentConfigUpgradeMock = $this->getMockBuilder(SilentConfigurationUpgrade::class)->disableOriginalConstructor()->getMock();
-        $executor = new InstallStepActionExecutor($objectManagerMock, $silentConfigUpgradeMock);
-        $response = $executor->executeActionWithArguments('test', []);
+        $installerControllerProphecy = $this->prophesize(InstallerController::class);
+        $installerControllerProphecy->checkEnvironmentAndFoldersAction()->willReturn(new JsonResponse(['success' => true]));
+        $executor = new InstallStepActionExecutor($silentConfigUpgradeMock, $installerControllerProphecy->reveal());
+        $response = $executor->executeActionWithArguments('environmentAndFolders');
         $this->assertFalse($response->actionNeedsExecution());
     }
 
@@ -77,19 +48,11 @@ class InstallStepExecutorTest extends UnitTestCase
      */
     public function actionIsNeverExecutedIfDryRun()
     {
-        $actionMock = $this->getMockBuilder(AbstractStepAction::class)->disableOriginalConstructor()->getMock();
-        $actionMock->expects($this->once())
-            ->method('needsExecution')
-            ->willReturn(true);
-        $actionMock->expects($this->never())
-            ->method('execute');
-        $objectManagerMock = $this->getMockBuilder(ObjectManager::class)->disableOriginalConstructor()->getMock();
-        $objectManagerMock->expects($this->any())
-            ->method('get')
-            ->willReturn($actionMock);
         $silentConfigUpgradeMock = $this->getMockBuilder(SilentConfigurationUpgrade::class)->disableOriginalConstructor()->getMock();
-        $executor = new InstallStepActionExecutor($objectManagerMock, $silentConfigUpgradeMock);
-        $response = $executor->executeActionWithArguments('test', [], true);
+        $installerControllerProphecy = $this->prophesize(InstallerController::class);
+        $installerControllerProphecy->checkEnvironmentAndFoldersAction()->willReturn(new JsonResponse(['success' => false]));
+        $executor = new InstallStepActionExecutor($silentConfigUpgradeMock, $installerControllerProphecy->reveal());
+        $response = $executor->executeActionWithArguments('environmentAndFolders', [], true);
         $this->assertTrue($response->actionNeedsExecution());
     }
 
@@ -98,20 +61,22 @@ class InstallStepExecutorTest extends UnitTestCase
      */
     public function actionIsExecutedIfNeeded()
     {
-        $actionMock = $this->getMockBuilder(AbstractStepAction::class)->disableOriginalConstructor()->getMock();
-        $actionMock->expects($this->once())
-            ->method('needsExecution')
-            ->willReturn(true);
-        $actionMock->expects($this->once())
-            ->method('execute')
-            ->willReturn([]);
-        $objectManagerMock = $this->getMockBuilder(ObjectManager::class)->disableOriginalConstructor()->getMock();
-        $objectManagerMock->expects($this->any())
-            ->method('get')
-            ->willReturn($actionMock);
+        $request = (new ServerRequest())->withParsedBody(
+            [
+                'install' => [
+                    'values' => [],
+                ],
+            ]
+        );
+        $requestFactory = function () use ($request) {
+            return $request;
+        };
         $silentConfigUpgradeMock = $this->getMockBuilder(SilentConfigurationUpgrade::class)->disableOriginalConstructor()->getMock();
-        $executor = new InstallStepActionExecutor($objectManagerMock, $silentConfigUpgradeMock);
-        $response = $executor->executeActionWithArguments('test', []);
+        $installerControllerProphecy = $this->prophesize(InstallerController::class);
+        $installerControllerProphecy->checkEnvironmentAndFoldersAction()->willReturn(new JsonResponse(['success' => false]));
+        $installerControllerProphecy->executeEnvironmentAndFoldersAction($request)->willReturn(new JsonResponse(['success' => true]));
+        $executor = new InstallStepActionExecutor($silentConfigUpgradeMock, $installerControllerProphecy->reveal(), $requestFactory);
+        $response = $executor->executeActionWithArguments('environmentAndFolders');
         $this->assertFalse($response->actionNeedsExecution());
     }
 }

@@ -1,5 +1,5 @@
 <?php
-namespace Helhum\Typo3Console\LTS9\Install;
+namespace Helhum\Typo3Console\TYPO3v87\Install;
 
 /*
  * This file is part of the TYPO3 Console project.
@@ -14,7 +14,7 @@ namespace Helhum\Typo3Console\LTS9\Install;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
-use TYPO3\CMS\Core\Messaging\AbstractMessage;
+use TYPO3\CMS\Install\Status\StatusInterface;
 
 class CliMessageRenderer
 {
@@ -22,11 +22,6 @@ class CliMessageRenderer
      * @var ConsoleOutput
      */
     private $output;
-
-    private static $severityMap = [
-        AbstractMessage::ERROR => 'error',
-        AbstractMessage::WARNING => 'warning',
-    ];
 
     public function __construct(ConsoleOutput $output)
     {
@@ -41,20 +36,19 @@ class CliMessageRenderer
         }
     }
 
-    private function renderSingle($statusMessage)
+    private function renderSingle(StatusInterface $statusMessage)
     {
-        $severity = self::$severityMap[$statusMessage['severity']] ?? 'notice';
-        $subject = strtoupper($severity) . ': ' . $statusMessage['title'];
-        switch ($severity) {
+        $subject = strtoupper($statusMessage->getSeverity()) . ': ' . $statusMessage->getTitle();
+        switch ($statusMessage->getSeverity()) {
             case 'error':
             case 'warning':
-                $subject = sprintf('<%1$s>' . $subject . '</%1$s>', $severity);
+                $subject = sprintf('<%1$s>' . $subject . '</%1$s>', $statusMessage->getSeverity());
             break;
             default:
         }
         $this->output->outputLine($subject);
-        foreach (explode("\n", wordwrap($statusMessage['message'])) as $line) {
-            $this->output->outputLine(sprintf('<%1$s>' . $line . '</%1$s>', $severity));
+        foreach (explode("\n", wordwrap($statusMessage->getMessage())) as $line) {
+            $this->output->outputLine(sprintf('<%1$s>' . $line . '</%1$s>', $statusMessage->getSeverity()));
         }
     }
 }

@@ -31,6 +31,11 @@ use TYPO3\CMS\Extbase\Object\ObjectManager;
 class Kernel
 {
     /**
+     * @var ClassLoader
+     */
+    private $classLoader;
+
+    /**
      * @var Bootstrap
      */
     private $bootstrap;
@@ -47,6 +52,7 @@ class Kernel
 
     public function __construct(\Composer\Autoload\ClassLoader $classLoader)
     {
+        $this->classLoader = $classLoader;
         $this->ensureRequiredEnvironment();
         $this->bootstrap = Bootstrap::getInstance();
         $this->bootstrap->initializeClassLoader($classLoader);
@@ -97,24 +103,21 @@ class Kernel
      */
     private function initializeCompatibilityLayer()
     {
-        $typo3Branch = 8;
-        if (!method_exists($this->bootstrap, 'setCacheHashOptions')) {
-            $typo3Branch = 9;
+        $typo3Branch = '90';
+        if (method_exists($this->bootstrap, 'setCacheHashOptions')) {
+            $typo3Branch = '87';
         }
-        if ($typo3Branch === 8) {
+        if ($typo3Branch === '90') {
             return;
         }
-        $compatibilityClassesPath = __DIR__ . '/../../Compatibility/LTS' . $typo3Branch;
-        $compatibilityNamespace = 'Helhum\\Typo3Console\\LTS' . $typo3Branch . '\\';
-        $classLoader = new ClassLoader();
-        $classLoader->addPsr4($compatibilityNamespace, $compatibilityClassesPath);
-        spl_autoload_register(function ($className) use ($classLoader, $compatibilityNamespace) {
+        $compatibilityNamespace = 'Helhum\\Typo3Console\\TYPO3v' . $typo3Branch . '\\';
+        spl_autoload_register(function ($className) use ($compatibilityNamespace) {
             if (strpos($className, 'Helhum\\Typo3Console\\') !== 0) {
                 // We don't care about classes that are not within our namespace
                 return;
             }
             $compatibilityClassName = str_replace('Helhum\\Typo3Console\\', $compatibilityNamespace, $className);
-            if ($file = $classLoader->findFile($compatibilityClassName)) {
+            if ($file = $this->classLoader->findFile($compatibilityClassName)) {
                 require $file;
                 class_alias($compatibilityClassName, $className);
             }
