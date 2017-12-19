@@ -25,6 +25,29 @@ Extension *typo3_console*
 -------------------------
 
 
+.. _`Command Reference: typo3_console backend:createadmin`:
+
+``backend:createadmin``
+***********************
+
+**Create admin backend user**
+
+Create a new user with administrative access.
+
+Arguments
+^^^^^^^^^
+
+``--username``
+  Username of the user
+``--password``
+  Password of the user
+
+
+
+
+
+
+
 .. _`Command Reference: typo3_console backend:lock`:
 
 ``backend:lock``

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Command;
 
 /*
@@ -14,12 +15,36 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Saltedpasswords\Salt\SaltFactory;
+use TYPO3\CMS\Saltedpasswords\Salt\SaltInterface;
 
 /**
- * Commands for (un)restricting backend access.
+ * Commands for (un)restricting backend access and creating admin user
  */
 class BackendCommandController extends CommandController
 {
+    const LOCK_TYPE_UNLOCKED = 0;
+    const LOCK_TYPE_ADMIN = 2;
+
+    /**
+     * @var ConfigurationService
+     */
+    protected $configurationService;
+
+    /**
+     * @var SaltInterface
+     */
+    private $salt;
+
+    public function __construct(ConfigurationService $configurationService, SaltInterface $salt = null)
+    {
+        $this->configurationService = $configurationService;
+        $this->salt = $salt ?: SaltFactory::getSaltingInstance(null, 'BE');
+    }
+
     /**
      * Lock backend
      *
@@ -67,15 +92,6 @@ class BackendCommandController extends CommandController
         }
     }
 
-    const LOCK_TYPE_UNLOCKED = 0;
-    const LOCK_TYPE_ADMIN = 2;
-
-    /**
-     * @var \Helhum\Typo3Console\Service\Configuration\ConfigurationService
-     * @inject
-     */
-    protected $configurationService;
-
     /**
      * Lock backend for editors
      *
@@ -116,9 +132,58 @@ class BackendCommandController extends CommandController
     }
 
     /**
+     * Create admin backend user
+     *
+     * Create a new user with administrative access.
+     *
+     * @param string $username Username of the user
+     * @param string $password Password of the user
+     */
+    public function createAdminCommand(string $username, string $password)
+    {
+        $givenUsername = $username;
+        $username = preg_replace('/[^a-z0-9]/', '', $username);
+
+        if ($givenUsername !== $username) {
+            $this->outputLine('<warning>Given username "%s" contains invalid characters. Using "%s" instead.</warning>', [$givenUsername, $username]);
+        }
+
+        if (strlen($username) < 4) {
+            $this->outputLine('<error>Username must be at least 4 characters.</error>');
+            $this->quit(1);
+        }
+        if (strlen($password) < 8) {
+            $this->outputLine('<error>Password must be at least 8 characters.</error>');
+            $this->quit(1);
+        }
+        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $userExists = $connectionPool->getConnectionForTable('be_users')
+            ->count(
+                'uid',
+                'be_users',
+                ['username' => $username]
+            );
+        if ($userExists) {
+            $this->outputLine('<error>A user with username "%s" already exists.</error>', [$username]);
+            $this->quit(1);
+        }
+        $adminUserFields = [
+            'username' => $username,
+            'password' => $this->salt->getHashedPassword($password),
+            'admin' => 1,
+            'tstamp' => $GLOBALS['EXEC_TIME'],
+            'crdate' => $GLOBALS['EXEC_TIME'],
+        ];
+        $connectionPool->getConnectionForTable('be_users')
+            ->insert('be_users', $adminUserFields);
+
+        $this->outputLine('<info>Created admin user with username "%s".</info>', [$username]);
+    }
+
+    /**
      * Checks whether the value can be set in LocalConfiguration.php and exits with error code if not.
      */
-    protected function ensureConfigValueModifiable()
+    private function ensureConfigValueModifiable()
     {
         if (!$this->configurationService->localIsActive('BE/adminOnly')) {
             $this->outputLine('<error>The configuration value BE/adminOnly is not modifiable. Is it forced to a value in Additional Configuration?</error>');
