@@ -13,6 +13,8 @@ namespace Helhum\Typo3Console\Core\Booting;
  *
  */
 
+use Helhum\Typo3Console\Extension\ExtensionConfiguration;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration as CoreExtensionConfiguration;
 use TYPO3\CMS\Core\Core\Bootstrap;
 
 class CompatibilityScripts
@@ -31,11 +33,9 @@ class CompatibilityScripts
         // noop for TYPO3 9
     }
 
-    /**
-     * @param Bootstrap $bootstrap
-     */
-    public static function initializeExtensionConfiguration(Bootstrap $bootstrap)
+    public static function initializeExtensionConfiguration()
     {
-        // noop for TYPO3 9
+        // Replace core functionality with something that is working for us
+        class_alias(ExtensionConfiguration::class, CoreExtensionConfiguration::class);
     }
 }

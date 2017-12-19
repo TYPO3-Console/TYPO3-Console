@@ -185,7 +185,8 @@ class ExceptionRenderer
             return;
         }
         \Closure::bind(function () use (&$runningCommand, $application) {
-            $runningCommand = $application->runningCommand;
+            $property = 'runningCommand';
+            $runningCommand = $application->$property;
         }, null, Application::class)();
 
         if ($runningCommand !== null) {

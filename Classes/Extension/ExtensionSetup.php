@@ -40,14 +40,21 @@ class ExtensionSetup
      */
     private $schemaService;
 
+    /**
+     * @var ExtensionConfiguration
+     */
+    private $extensionConfiguration;
+
     public function __construct(
         ExtensionFactory $extensionFactory = null,
         InstallUtility $extensionInstaller = null,
-        SchemaService $schemaService = null
+        SchemaService $schemaService = null,
+        ExtensionConfiguration $extensionConfiguration = null
     ) {
         $this->extensionFactory = $extensionFactory ?: new ExtensionFactory(GeneralUtility::makeInstance(PackageManager::class));
         $this->extensionInstaller = $extensionInstaller ?: GeneralUtility::makeInstance(ObjectManager::class)->get(InstallUtility::class);
         $this->schemaService = $schemaService ?: GeneralUtility::makeInstance(ObjectManager::class)->get(SchemaService::class);
+        $this->extensionConfiguration = $extensionConfiguration ?: new ExtensionConfiguration();
     }
 
     /**
@@ -62,11 +69,7 @@ class ExtensionSetup
         foreach ($packages as $package) {
             $this->extensionFactory->getExtensionStructure($package)->fix();
             $this->callInstaller('importInitialFiles', [PathUtility::stripPathSitePrefix($package->getPackagePath()), $package->getPackageKey()]);
-            if (!isset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$package->getPackageKey()])
-                && @is_file($package->getPackagePath() . 'ext_conf_template.txt')
-            ) {
-                $this->callInstaller('saveDefaultConfiguration', [$package->getPackageKey()]);
-            }
+            $this->extensionConfiguration->saveDefaultConfiguration($package->getPackageKey());
         }
 
         $this->schemaService->updateSchema(SchemaUpdateType::expandSchemaUpdateTypes(['safe']));

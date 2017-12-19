@@ -41,10 +41,12 @@ class Scripts
     {
         $bootstrap->populateLocalConfiguration();
         \Closure::bind(function () use ($bootstrap) {
+            $method = 'initializeRuntimeActivatedPackagesFromConfiguration';
             if (!Bootstrap::usesComposerClassLoading()) {
-                $bootstrap->initializeRuntimeActivatedPackagesFromConfiguration();
+                $bootstrap->$method();
             }
-            $bootstrap->setDefaultTimezone();
+            $method = 'setDefaultTimezone';
+            $bootstrap->$method();
         }, null, $bootstrap)();
         CompatibilityScripts::initializeConfigurationManagement($bootstrap);
         self::disableCachesForObjectManagement();
