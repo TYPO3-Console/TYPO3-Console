@@ -110,6 +110,47 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
+    public function extensionActivateWorksWhenExtensionChecksConfigInExtLocalConf()
+    {
+        $this->installFixtureExtensionCode('ext_config');
+        try {
+            $output = $this->executeConsoleCommand('extension:activate', ['ext_config']);
+            $this->assertContains('Extension "ext_config" is now active.', $output);
+            $this->assertContains('Extension "ext_config" is now set up.', $output);
+            $config = @\json_decode(trim($this->executeConsoleCommand('configuration:showlocal', ['EXT/extConf', '--json'])), true);
+            $this->assertArrayHasKey('ext_config', $config);
+        } finally {
+            $this->executeConsoleCommand('extension:deactivate', ['ext_config']);
+            $this->executeConsoleCommand('configuration:remove', ['EXTENSIONS/ext_config', '--force']);
+            $this->executeConsoleCommand('configuration:remove', ['EXT/extConf/ext_config', '--force']);
+            $this->removeFixtureExtensionCode('ext_config');
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function extensionSetupActiveWorksWhenExtensionChecksConfigInExtLocalConf()
+    {
+        $this->installFixtureExtensionCode('ext_config');
+        try {
+            $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
+            $output = $this->executeConsoleCommand('extension:setupactive');
+            $this->assertContains('ext_config', $output);
+            $this->assertContains('are now set up.', $output);
+            $config = @\json_decode(trim($this->executeConsoleCommand('configuration:showlocal', ['EXT/extConf', '--json'])), true);
+            $this->assertArrayHasKey('ext_config', $config);
+        } finally {
+            $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
+            $this->executeConsoleCommand('configuration:remove', ['EXTENSIONS/ext_config', '--force']);
+            $this->executeConsoleCommand('configuration:remove', ['EXT/extConf/ext_config', '--force']);
+            $this->removeFixtureExtensionCode('ext_config');
+        }
+    }
+
+    /**
+     * @test
+     */
     public function extensionSetupActivePerformsSchemaUpdate()
     {
         $this->backupDatabase();
