@@ -13,8 +13,10 @@ namespace Helhum\Typo3Console\Tests\Functional\Command;
  *
  */
 
+use Helhum\Typo3Console\Error\ExceptionRenderer;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
@@ -206,7 +208,10 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
         try {
             return $this->commandDispatcher->executeCommand($command, $arguments, $environment, $stdIn);
         } catch (FailedSubProcessCommandException $e) {
-            $this->fail(sprintf('Console command "%s" failed with message: "%s", output: "%s"', $e->getCommandLine(), $e->getErrorMessage(), $e->getOutputMessage()));
+            $exceptionRenderer = new ExceptionRenderer();
+            $output = new BufferedOutput(BufferedOutput::VERBOSITY_DEBUG);
+            $exceptionRenderer->render($e, $output);
+            $this->fail($output->fetch());
         }
         return '';
     }
