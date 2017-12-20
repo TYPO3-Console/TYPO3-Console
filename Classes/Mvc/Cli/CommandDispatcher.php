@@ -139,7 +139,7 @@ class CommandDispatcher
      * Execute a command in a sub process
      *
      * @param string $command Command identifier
-     * @param array $arguments Argument names will automatically be converted to dashed version, fi not provided like so
+     * @param array $arguments Argument names will automatically be converted to dashed version, if not provided like so
      * @param array $environment Environment vars to be added to the command
      * @param resource|string|\Traversable|null $input Inpupt (stdin) for the command
      * @throws FailedSubProcessCommandException
@@ -168,20 +168,13 @@ class CommandDispatcher
             if (is_array($argumentValue)) {
                 $argumentValue = implode(',', $argumentValue);
             }
-            if (strpos($argumentValue, '=') !== false) {
-                // Big WTF in argument parsing here
-                // If the value contains a = we need to separate the name and value with a = ourselves
-                // to get the parser to correctly read our value
-                $processBuilder->add($dashedName . '=' . $argumentValue);
-            } else {
-                $processBuilder->add($dashedName);
-                if ($argumentValue !== null) {
-                    if ($argumentValue === false) {
-                        // Convert boolean false to 'false' instead of empty string to correctly pass the value to the sub command
-                        $processBuilder->add('false');
-                    } else {
-                        $processBuilder->add($argumentValue);
-                    }
+            $processBuilder->add($dashedName);
+            if ($argumentValue !== null) {
+                if ($argumentValue === false) {
+                    // Convert boolean false to 'false' instead of empty string to correctly pass the value to the sub command
+                    $processBuilder->add('false');
+                } else {
+                    $processBuilder->add($argumentValue);
                 }
             }
         }

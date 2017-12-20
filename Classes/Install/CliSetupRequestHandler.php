@@ -146,7 +146,10 @@ class CliSetupRequestHandler
                 $this->output->outputLine('<info>No execution needed, skipped step!</info>');
                 return;
             }
-            $actionArguments = [];
+            $actionArguments = [
+                'arguments' => [],
+                'options' => [],
+            ];
             foreach ($command->getArgumentDefinitions() as $argumentDefinition) {
                 $isPasswordArgument = strpos($argumentDefinition->getOptionName(), 'password') !== false;
                 $isRequired = $argumentDefinition->isArgument();
@@ -191,9 +194,9 @@ class CliSetupRequestHandler
                     $this->setActionArgument($actionArguments, $argumentValue !== null ? $argumentValue : $argumentDefinition->getDefaultValue(), $argumentDefinition);
                 }
             }
-            $response = $this->executeActionWithArguments($actionName, $actionArguments);
+            $response = $this->executeActionWithArguments($actionName, $actionArguments['arguments'], $actionArguments['options']);
             if ($this->checkIfActionNeedsExecution($actionName)->actionNeedsExecution()) {
-                $response = $this->executeActionWithArguments($actionName, $actionArguments);
+                $response = $this->executeActionWithArguments($actionName, $actionArguments['arguments'], $actionArguments['options']);
             }
             $messages = $response->getMessages();
             if (empty($messages)) {
@@ -224,11 +227,14 @@ class CliSetupRequestHandler
      *
      * @param string $actionName Name of the install step
      * @param array $arguments Arguments for the install step
+     * @param array $options Options for the install step
      * @return InstallStepResponse
      */
-    private function executeActionWithArguments($actionName, array $arguments = [])
+    private function executeActionWithArguments($actionName, array $arguments = [], array $options = [])
     {
         $actionName = strtolower($actionName);
+        // Arguments must come first then options, to avoid argument values to be passed to boolean flags
+        $arguments = array_merge($arguments, $options);
         $response = @unserialize($this->commandDispatcher->executeCommand('install:' . $actionName, $arguments));
         if ($response === false && $actionName === 'defaultconfiguration') {
             // This action terminates with exit, (trying to initiate a HTTP redirect)
@@ -241,14 +247,14 @@ class CliSetupRequestHandler
     private function setActionArgument(&$currentActionArguments, $value, CommandArgumentDefinition $argumentDefinition)
     {
         if ($argumentDefinition->isArgument()) {
-            $currentActionArguments[] = $value;
+            $currentActionArguments['arguments'][] = $value;
         } else {
             if ($argumentDefinition->acceptsValue()) {
-                $currentActionArguments[$argumentDefinition->getDashedName()] = $value;
+                $currentActionArguments['options'][$argumentDefinition->getDashedName()] = $value;
             } else {
                 $value = (bool)$value;
                 if ($value) {
-                    $currentActionArguments[] = $argumentDefinition->getDashedName();
+                    $currentActionArguments['options'][] = $argumentDefinition->getDashedName();
                 }
             }
         }
