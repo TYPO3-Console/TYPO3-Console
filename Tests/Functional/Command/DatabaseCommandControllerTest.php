@@ -113,19 +113,11 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
-    public function databaseCanBeExportedAndImported()
+    public function sqlCanBeImported()
     {
-        $this->markTestSkipped('TODO: find out why the input is not correctly passed to stdin');
-        $this->backupDatabase();
-        $sqlDump = $this->executeConsoleCommand('database:export');
-        $this->executeMysqlQuery('DROP DATABASE ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
-        $this->executeMysqlQuery('CREATE DATABASE ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
-        $this->executeConsoleCommand('database:import', [], [], $sqlDump);
-
-        $queryResult = $this->executeMysqlQuery('SELECT uid FROM be_users WHERE username="_cli_"');
-        $this->assertSame('1', trim($queryResult));
-
-        $this->restoreDatabase();
+        $sql = 'SELECT username from be_users where username="_cli_";';
+        $output = $this->executeConsoleCommand('database:import', [], [], $sql);
+        $this->assertSame('_cli_', trim($output));
     }
 
     /**
