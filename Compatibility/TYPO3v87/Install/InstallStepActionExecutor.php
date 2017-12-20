@@ -19,6 +19,7 @@ use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Install\Controller\Action\ActionInterface;
 use TYPO3\CMS\Install\Controller\Action\Step\StepInterface;
 use TYPO3\CMS\Install\Controller\Exception\RedirectException;
+use TYPO3\CMS\Install\Status\ErrorStatus;
 
 /**
  * This class is responsible for properly creating install tool step actions
@@ -93,7 +94,15 @@ class InstallStepActionExecutor
             return new InstallStepResponse(true, $messages, true);
         }
         if ($needsExecution && !$dryRun) {
-            $messages = $action->execute();
+            try {
+                $messages = $action->execute();
+            } catch (\Throwable $e) {
+                $errorMessage = new ErrorStatus();
+                $errorMessage->setMessage($e->getMessage());
+                $messages = [
+                    $errorMessage,
+                ];
+            }
             $this->silentConfigurationUpgrade->executeSilentConfigurationUpgradesIfNeeded();
             $needsExecution = false;
         }

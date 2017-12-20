@@ -194,7 +194,7 @@ class CliSetupRequestHandler
                     $this->setActionArgument($actionArguments, $argumentValue !== null ? $argumentValue : $argumentDefinition->getDefaultValue(), $argumentDefinition);
                 }
             }
-            $response = $this->executeActionWithArguments($actionName,  $actionArguments['arguments'], $actionArguments['options']);
+            $response = $this->executeActionWithArguments($actionName, $actionArguments['arguments'], $actionArguments['options']);
             if ($this->checkIfActionNeedsExecution($actionName)->actionNeedsExecution()) {
                 $response = $this->executeActionWithArguments($actionName, $actionArguments['arguments'], $actionArguments['options']);
             }

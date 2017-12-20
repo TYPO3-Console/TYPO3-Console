@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Install;
 
 use Helhum\Typo3Console\Install\Upgrade\SilentConfigurationUpgrade;
 use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Install\Controller\InstallerController;
 
 /**
@@ -74,9 +75,18 @@ class InstallStepActionExecutor
         }
         if ($needsExecution && !$dryRun) {
             $request = ($this->requestFactory)($arguments);
-            $response = \json_decode($this->installerController->$actionMethod($request)->getBody(), true);
-            if (!$response['success']) {
-                $messages = $response['status'];
+            try {
+                $response = \json_decode($this->installerController->$actionMethod($request)->getBody(), true);
+                if (!$response['success']) {
+                    $messages = $response['status'];
+                }
+            } catch (\Throwable $e) {
+                $messages = [
+                    [
+                        'severity' => AbstractMessage::ERROR,
+                        'message' => $e->getMessage(),
+                    ],
+                ];
             }
             $this->silentConfigurationUpgrade->executeSilentConfigurationUpgradesIfNeeded();
             $needsExecution = false;
