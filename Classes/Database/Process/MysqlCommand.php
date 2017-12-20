@@ -105,7 +105,7 @@ class MysqlCommand
 
     private function buildConnectionArguments(): array
     {
-        if ($configFile = $this->createTemporaryMysqlConfigurationFile($this->dbConfig['user'] ?? null, $this->dbConfig['password'] ?? null)) {
+        if ($configFile = $this->createTemporaryMysqlConfigurationFile()) {
             $arguments[] = '--defaults-extra-file=' . $configFile;
         }
         if (!empty($this->dbConfig['host'])) {
@@ -124,9 +124,9 @@ class MysqlCommand
         return $arguments;
     }
 
-    private function createTemporaryMysqlConfigurationFile($username = null, $password = null)
+    private function createTemporaryMysqlConfigurationFile()
     {
-        if ($username === null && $password === null) {
+        if (empty($this->dbConfig['user']) && !isset($this->dbConfig['password'])) {
             return null;
         }
         if (self::$mysqlTempFile !== null && file_exists(self::$mysqlTempFile)) {
@@ -134,11 +134,11 @@ class MysqlCommand
         }
         $userDefinition = '';
         $passwordDefinition = '';
-        if ($username !== null) {
-            $userDefinition = sprintf('user=%s', $username);
+        if (!empty($this->dbConfig['user'])) {
+            $userDefinition = sprintf('user="%s"', $this->dbConfig['user']);
         }
-        if ($password !== null) {
-            $passwordDefinition = sprintf('password=%s', $password);
+        if (!empty($this->dbConfig['password'])) {
+            $passwordDefinition = sprintf('password="%s"', $this->dbConfig['password']);
         }
         $confFileContent = <<<EOF
 [mysqldump]
@@ -149,7 +149,7 @@ $passwordDefinition
 $userDefinition
 $passwordDefinition
 EOF;
-        self::$mysqlTempFile = tempnam(sys_get_temp_dir(), 'mysql_conf_');
+        self::$mysqlTempFile = tempnam(sys_get_temp_dir(), 'typo3_console_my_cnf_');
         file_put_contents(self::$mysqlTempFile, $confFileContent);
 
         return self::$mysqlTempFile;
