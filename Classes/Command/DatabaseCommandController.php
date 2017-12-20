@@ -13,9 +13,12 @@ namespace Helhum\Typo3Console\Command;
  *
  */
 
+use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
 use Helhum\Typo3Console\Database\Process\MysqlCommand;
+use Helhum\Typo3Console\Database\Schema\SchemaUpdateResultRenderer;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use Helhum\Typo3Console\Service\Database\SchemaService;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
@@ -26,22 +29,26 @@ use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 class DatabaseCommandController extends CommandController
 {
     /**
-     * @var \Helhum\Typo3Console\Service\Database\SchemaService
-     * @inject
+     * @var SchemaService
      */
-    protected $schemaService;
+    private $schemaService;
 
     /**
-     * @var \Helhum\Typo3Console\Database\Schema\SchemaUpdateResultRenderer
-     * @inject
+     * @var SchemaUpdateResultRenderer
      */
-    protected $schemaUpdateResultRenderer;
+    private $schemaUpdateResultRenderer;
 
     /**
-     * @var \Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration
-     * @inject
+     * @var ConnectionConfiguration
      */
-    protected $connectionConfiguration;
+    private $connectionConfiguration;
+
+    public function __construct(SchemaService $schemaService, SchemaUpdateResultRenderer $schemaUpdateResultRenderer, ConnectionConfiguration $connectionConfiguration)
+    {
+        $this->schemaService = $schemaService;
+        $this->schemaUpdateResultRenderer = $schemaUpdateResultRenderer;
+        $this->connectionConfiguration = $connectionConfiguration;
+    }
 
     /**
      * Update database schema
