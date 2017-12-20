@@ -253,8 +253,6 @@ Options
 
 ``--dry-run``
   If set, index is only checked without performing any action
-``--verbose``
-  Whether or not to output results
 ``--show-progress``
   Whether or not to output a progress bar
 
@@ -513,8 +511,6 @@ Options
 
 ``--schema-update-types``
   List of schema update types (default: "safe")
-``--verbose``
-  If set, database queries performed are shown in output
 ``--dry-run``
   If set the updates are only collected and shown, but not executed
 
@@ -574,12 +570,6 @@ Arguments
   Extension keys to activate. Separate multiple extension keys with comma.
 
 
-
-Options
-^^^^^^^
-
-``--verbose``
-  Whether or not to output results
 
 
 
@@ -702,12 +692,6 @@ Arguments
 
 
 
-Options
-^^^^^^^
-
-``--verbose``
-  Whether or not to output results
-
 
 
 
@@ -728,12 +712,6 @@ As an additional benefit no caches are flushed, which significantly improves per
 and avoids unnecessary cache clearing.
 
 
-
-Options
-^^^^^^^
-
-``--verbose``
-  Whether or not to output results
 
 
 
@@ -903,8 +881,6 @@ Manually enter details on the command line or non interactive for automated setu
 Options
 ^^^^^^^
 
-``--non-interactive``
-  If specified, optional arguments are not requested, but default values are assumed.
 ``--force``
   Force installation of TYPO3, even if ``LocalConfiguration.php`` file already exists.
 ``--skip-integrity-check``
@@ -933,6 +909,8 @@ Options
   Site Name
 ``--site-setup-type``
   Can be either ``no`` (which unsurprisingly does nothing at all) or ``site`` (which creates an empty root page and setup)
+``--non-interactive``
+  Deprecated. Use ``--no-interaction`` instead.
 
 
 
@@ -981,8 +959,6 @@ Options
 
 ``--arguments``
   Arguments for the wizard prefixed with the identifier, e.g. ``compatibility7Extension[install]=0``; multiple arguments separated with comma
-``--verbose``
-  If set, output of the wizards will be shown, including all SQL Queries that were executed
 
 
 
@@ -1027,8 +1003,6 @@ Options
 Options
 ^^^^^^^
 
-``--verbose``
-  If set, a more verbose description for each wizard is shown, if not set only the title is shown
 ``--all``
   If set, all wizards will be listed, even the once marked as ready or done
 

@@ -40,11 +40,11 @@ class CleanupCommandController extends CommandController
      * <b>Example:</b> <code>%command.full_name% cleanup:updatereferenceindex --dry-run --verbose</code>
      *
      * @param bool $dryRun If set, index is only checked without performing any action
-     * @param bool $verbose Whether or not to output results
      * @param bool $showProgress Whether or not to output a progress bar
      */
-    public function updateReferenceIndexCommand($dryRun = false, $verbose = false, $showProgress = false)
+    public function updateReferenceIndexCommand($dryRun = false, $showProgress = false)
     {
+        $verbose = $this->output->getSymfonyConsoleOutput()->isVerbose();
         $this->outputLine('<info>' . ($dryRun ? 'Checking' : 'Updating') . ' reference index. This may take a while …</info>');
 
         $operation = $dryRun ? 'checkReferenceIndex' : 'updateReferenceIndex';
