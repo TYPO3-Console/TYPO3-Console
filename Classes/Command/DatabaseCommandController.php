@@ -176,6 +176,9 @@ class DatabaseCommandController extends CommandController
             $additionalArguments[] = sprintf('--ignore-table=%s.%s', $dbConfig['dbname'], $table);
         }
 
+        $additionalArguments[] = '--single-transaction';
+        $additionalArguments[] = '--quick';
+
         $mysqlCommand = new MysqlCommand(
             $dbConfig,
             new ProcessBuilder()
