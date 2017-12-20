@@ -15,19 +15,23 @@ namespace Helhum\Typo3Console\Command;
 
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Helhum\Typo3Console\Service;
+use Helhum\Typo3Console\Service\XsdGenerator;
 use TYPO3\CMS\Core\SingletonInterface;
 
 /**
  * Command controller for Fluid documentation rendering
- *
  */
 class DocumentationCommandController extends CommandController implements SingletonInterface
 {
     /**
-     * @var \Helhum\Typo3Console\Service\XsdGenerator
-     * @inject
+     * @var XsdGenerator
      */
     protected $xsdGenerator;
+
+    public function __construct(XsdGenerator $xsdGenerator)
+    {
+        $this->xsdGenerator = $xsdGenerator;
+    }
 
     /**
      * Generate Fluid ViewHelper XSD Schema

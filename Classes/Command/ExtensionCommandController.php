@@ -57,18 +57,13 @@ class ExtensionCommandController extends CommandController
      */
     protected $cacheService;
 
-    public function injectSignalSlotDispatcher(Dispatcher $signalSlotDispatcher)
-    {
+    public function __construct(
+        Dispatcher $signalSlotDispatcher,
+        PackageManager $packageManager,
+        CacheService $cacheService
+    ) {
         $this->signalSlotDispatcher = $signalSlotDispatcher;
-    }
-
-    public function injectPackageManager(PackageManager $packageManager)
-    {
         $this->packageManager = $packageManager;
-    }
-
-    public function injectCacheService(CacheService $cacheService)
-    {
         $this->cacheService = $cacheService;
     }
 

@@ -14,17 +14,19 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use TYPO3\CMS\Scheduler\Scheduler;
 
-/**
- * Class SchedulerCommandController
- */
 class SchedulerCommandController extends CommandController
 {
     /**
-     * @var \TYPO3\CMS\Scheduler\Scheduler
-     * @inject
+     * @var Scheduler
      */
     protected $scheduler;
+
+    public function __construct(Scheduler $scheduler)
+    {
+        $this->scheduler = $scheduler;
+    }
 
     /**
      * Run scheduler

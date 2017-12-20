@@ -15,20 +15,22 @@ namespace Helhum\Typo3Console\Command;
 
 use Helhum\Typo3Console\Command\Delegation\ReferenceIndexUpdateDelegate;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use Helhum\Typo3Console\Service\Persistence\PersistenceIntegrityService;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Log\LogLevel;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * Class CleanupCommandController
- */
 class CleanupCommandController extends CommandController
 {
     /**
-     * @var \Helhum\Typo3Console\Service\Persistence\PersistenceIntegrityService
-     * @inject
+     * @var PersistenceIntegrityService
      */
     protected $persistenceIntegrityService;
+
+    public function __construct(PersistenceIntegrityService $persistenceIntegrityService)
+    {
+        $this->persistenceIntegrityService = $persistenceIntegrityService;
+    }
 
     /**
      * Update reference index
