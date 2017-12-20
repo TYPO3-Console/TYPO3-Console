@@ -14,6 +14,9 @@ namespace Helhum\Typo3Console\TYPO3v87\Mvc\Cli;
  *
  */
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use Helhum\Typo3Console\Annotation\Command\Definition\Argument;
+use Helhum\Typo3Console\Annotation\Command\Definition\Validate;
 use Helhum\Typo3Console\Mvc\Cli\CommandArgumentDefinition;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -252,7 +255,7 @@ class Command
      */
     public function shouldValidateInputStrict(): bool
     {
-        return !empty($this->getCommandMethodDefinitions()['Validate'][0]['strict']);
+        return !empty($this->getCommandMethodDefinitions()['Validate']->strict);
     }
 
     /**
@@ -386,9 +389,7 @@ class Command
         }
         $argumentNames = [];
         foreach ($definedArguments as $definedArgument) {
-            if (!empty($definedArgument['name'])) {
-                $argumentNames[$definedArgument['name']] = $definedArgument['name'];
-            }
+            $argumentNames[$definedArgument->name] = $definedArgument->name;
         }
         return $argumentNames;
     }
@@ -401,43 +402,29 @@ class Command
         $this->commandMethodDefinitions = [];
         $commandMethodReflection = $this->getCommandMethodReflection();
         $annotations = $commandMethodReflection->getTagsValues();
-        if (!empty($annotations['definition'])) {
-            $this->commandMethodDefinitions = $this->parseDefinitions($annotations['definition']);
-        }
+        $this->commandMethodDefinitions = $this->parseDefinitions();
         return $this->commandMethodDefinitions;
     }
 
     /**
-     * Very simple parsing of definition annotations on command methods.
+     * Very simple parsing of a definition annotations on command methods.
      *
-     * @param array $definitionAnnotations Definition tags on command controller command methods
      * @throws InvalidArgumentException
      * @return array
      */
-    private function parseDefinitions(array $definitionAnnotations): array
+    private function parseDefinitions(): array
     {
         $definitions = [];
-        foreach ($definitionAnnotations as $annotation) {
-            $annotation = preg_replace('/\s/', '', $annotation);
-            $instructions = explode(',', $annotation);
-            foreach ($instructions as $instruction) {
-                preg_match('/^([a-zA-Z]*)\(([^)]*)\)$/', $instruction, $matches);
-                list(, $name, $optionsString) = $matches;
-                $options = $this->parseOptions($optionsString);
-                $definitions[$name][] = $options;
+        $reader = new AnnotationReader();
+        foreach ($reader->getMethodAnnotations($this->getCommandMethodReflection()) as $annotation) {
+            if ($annotation instanceof Argument) {
+                $definitions['Argument'][] = $annotation;
+            }
+            if ($annotation instanceof Validate) {
+                $definitions['Validate'] = $annotation;
             }
         }
         return $definitions;
-    }
-
-    private function parseOptions(string $optionsString): array
-    {
-        $options = [];
-        foreach (explode(',', $optionsString) as $argumentOption) {
-            list($name, $value) = explode('=', $argumentOption);
-            $options[$name] = $value;
-        }
-        return $options;
     }
 
     /**

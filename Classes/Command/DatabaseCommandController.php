@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Command;
  *
  */
 
+use Helhum\Typo3Console\Annotation\Command\Definition;
 use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
 use Helhum\Typo3Console\Database\Process\MysqlCommand;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateResultRenderer;
@@ -79,7 +80,7 @@ class DatabaseCommandController extends CommandController
      * @param array $schemaUpdateTypes List of schema update types (default: "safe")
      * @param bool $verbose If set, database queries performed are shown in output
      * @param bool $dryRun If set the updates are only collected and shown, but not executed
-     * @definition Argument(name=schemaUpdateTypes)
+     * @Definition\Argument(name="schemaUpdateTypes")
      */
     public function updateSchemaCommand(array $schemaUpdateTypes = ['safe'], $verbose = false, $dryRun = false)
     {

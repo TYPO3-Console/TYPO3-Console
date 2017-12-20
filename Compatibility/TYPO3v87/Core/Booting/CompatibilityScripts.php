@@ -13,6 +13,8 @@ namespace Helhum\Typo3Console\TYPO3v87\Core\Booting;
  *
  */
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use TYPO3\CMS\Core\Core\Bootstrap;
 
 class CompatibilityScripts
@@ -22,12 +24,44 @@ class CompatibilityScripts
      */
     public static function initializeConfigurationManagement(Bootstrap $bootstrap)
     {
+        self::initializeAnnotationReader();
+
         \Closure::bind(function () use ($bootstrap) {
             // Because links might be generated from CLI (e.g. by Solr indexer)
             // We need to properly initialize the cache hash calculator here!
-            $bootstrap->setCacheHashOptions();
-            $bootstrap->defineUserAgentConstant();
+            $method = 'setCacheHashOptions';
+            $bootstrap->$method();
+            $method = 'defineUserAgentConstant';
+            $bootstrap->$method();
         }, null, $bootstrap)();
+    }
+
+    private static function initializeAnnotationReader()
+    {
+        AnnotationRegistry::registerLoader('class_exists');
+
+        /*
+         * All annotations defined by and for Extbase need to be
+         * ignored during their deprecation. Later, their usage may and
+         * should throw an Exception
+         */
+        AnnotationReader::addGlobalIgnoredName('inject');
+        AnnotationReader::addGlobalIgnoredName('transient');
+        AnnotationReader::addGlobalIgnoredName('lazy');
+        AnnotationReader::addGlobalIgnoredName('validate');
+        AnnotationReader::addGlobalIgnoredName('cascade');
+        AnnotationReader::addGlobalIgnoredName('ignorevalidation');
+        AnnotationReader::addGlobalIgnoredName('cli');
+        AnnotationReader::addGlobalIgnoredName('flushesCaches');
+        AnnotationReader::addGlobalIgnoredName('uuid');
+        AnnotationReader::addGlobalIgnoredName('identity');
+
+        // Annotations used in unit tests
+        AnnotationReader::addGlobalIgnoredName('test');
+
+        // Annotations that control the extension scanner
+        AnnotationReader::addGlobalIgnoredName('extensionScannerIgnoreFile');
+        AnnotationReader::addGlobalIgnoredName('extensionScannerIgnoreLine');
     }
 
     /**

@@ -13,6 +13,7 @@ namespace Helhum\Typo3Console\Command;
  *
  */
 
+use Helhum\Typo3Console\Annotation\Command\Definition;
 use Helhum\Typo3Console\Install\CliSetupRequestHandler;
 use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Helhum\Typo3Console\Install\PackageStatesGenerator;
@@ -254,7 +255,7 @@ class InstallCommandController extends CommandController
      *
      * @param bool $useExistingDatabase Use already existing database?
      * @param string $databaseName Name of the database
-     * @definition Argument(name=databaseName)
+     * @Definition\Argument(name="databaseName")
      * @internal
      */
     public function databaseSelectCommand($useExistingDatabase = false, $databaseName = '')
