@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Database\Process;
 
 /*
@@ -17,20 +18,19 @@ use Helhum\Typo3Console\Mvc\Cli\InteractiveProcess;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
-/**
- * Class MysqlCommand
- */
 class MysqlCommand
 {
     /**
      * @var ProcessBuilder
      */
-    protected $processBuilder;
+    private $processBuilder;
 
     /**
      * @var array
      */
-    protected $dbConfig = [];
+    private $dbConfig = [];
+
+    private static $mysqlTempFile;
 
     /**
      * MysqlCommand constructor.
@@ -43,6 +43,13 @@ class MysqlCommand
         $this->dbConfig = $dbConfig;
         $this->processBuilder = $processBuilder;
         $this->processBuilder->setTimeout(null);
+    }
+
+    public function __destruct()
+    {
+        if (self::$mysqlTempFile !== null && file_exists(self::$mysqlTempFile)) {
+            unlink(self::$mysqlTempFile);
+        }
     }
 
     /**
@@ -71,7 +78,7 @@ class MysqlCommand
      * @param null $outputCallback
      * @return int
      */
-    public function mysqldump(array $additionalArguments = [], $outputCallback = null)
+    public function mysqldump(array $additionalArguments = [], $outputCallback = null): int
     {
         $this->processBuilder->setPrefix('mysqldump');
         $this->processBuilder->setArguments(array_merge($this->buildConnectionArguments(), $additionalArguments));
@@ -83,7 +90,7 @@ class MysqlCommand
      * @param callable $outputCallback
      * @return callable
      */
-    protected function buildDefaultOutputCallback($outputCallback)
+    private function buildDefaultOutputCallback($outputCallback): callable
     {
         if (!is_callable($outputCallback)) {
             $outputCallback = function ($type, $output) {
@@ -96,14 +103,10 @@ class MysqlCommand
         return $outputCallback;
     }
 
-    protected function buildConnectionArguments()
+    private function buildConnectionArguments(): array
     {
-        if (!empty($this->dbConfig['user'])) {
-            $arguments[] = '-u';
-            $arguments[] = $this->dbConfig['user'];
-        }
-        if (!empty($this->dbConfig['password'])) {
-            $arguments[] = '-p' . $this->dbConfig['password'];
+        if ($configFile = $this->createTemporaryMysqlConfigurationFile($this->dbConfig['user'] ?? null, $this->dbConfig['password'] ?? null)) {
+            $arguments[] = '--defaults-extra-file=' . $configFile;
         }
         if (!empty($this->dbConfig['host'])) {
             $arguments[] = '-h';
@@ -119,5 +122,36 @@ class MysqlCommand
         }
         $arguments[] = $this->dbConfig['dbname'];
         return $arguments;
+    }
+
+    private function createTemporaryMysqlConfigurationFile($username = null, $password = null)
+    {
+        if ($username === null && $password === null) {
+            return null;
+        }
+        if (self::$mysqlTempFile !== null && file_exists(self::$mysqlTempFile)) {
+            return self::$mysqlTempFile;
+        }
+        $userDefinition = '';
+        $passwordDefinition = '';
+        if ($username !== null) {
+            $userDefinition = sprintf('user=%s', $username);
+        }
+        if ($password !== null) {
+            $passwordDefinition = sprintf('password=%s', $password);
+        }
+        $confFileContent = <<<EOF
+[mysqldump]
+$userDefinition
+$passwordDefinition
+
+[client]
+$userDefinition
+$passwordDefinition
+EOF;
+        self::$mysqlTempFile = tempnam(sys_get_temp_dir(), 'mysql_conf_');
+        file_put_contents(self::$mysqlTempFile, $confFileContent);
+
+        return self::$mysqlTempFile;
     }
 }
