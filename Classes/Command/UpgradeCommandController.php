@@ -76,11 +76,11 @@ class UpgradeCommandController extends CommandController
     /**
      * List upgrade wizards
      *
-     * @param bool $verbose If set, a more verbose description for each wizard is shown, if not set only the title is shown
      * @param bool $all If set, all wizards will be listed, even the once marked as ready or done
      */
-    public function listCommand($verbose = false, $all = false)
+    public function listCommand($all = false)
     {
+        $verbose = $this->output->getSymfonyConsoleOutput()->isVerbose();
         $messages = [];
         $wizards = $this->upgradeHandling->executeInSubProcess('listWizards', [], $messages);
 
@@ -120,10 +120,10 @@ class UpgradeCommandController extends CommandController
      * Execute all upgrade wizards that are scheduled for execution
      *
      * @param array $arguments Arguments for the wizard prefixed with the identifier, e.g. <code>compatibility7Extension[install]=0</code>; multiple arguments separated with comma
-     * @param bool $verbose If set, output of the wizards will be shown, including all SQL Queries that were executed
      */
-    public function allCommand(array $arguments = [], $verbose = false)
+    public function allCommand(array $arguments = [])
     {
+        $verbose = $this->output->getSymfonyConsoleOutput()->isVerbose();
         $this->outputLine(PHP_EOL . '<i>Initiating TYPO3 upgrade</i>' . PHP_EOL);
 
         $messages = [];

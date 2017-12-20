@@ -22,7 +22,6 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony\Descriptor;
  * file that was distributed with this source code.
  */
 
-use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\CommandControllerCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Descriptor\ApplicationDescription;
@@ -127,11 +126,7 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
         }
         $this->writeText("\n");
 
-        if ($command instanceof CommandControllerCommand) {
-            $definition = new InputDefinition($command->getCommandDefinition()->getInputDefinitions(true));
-        } else {
-            $definition = $command->getNativeDefinition();
-        }
+        $definition = $command->getNativeDefinition();
 
         if ($definition->getOptions() || $definition->getArguments()) {
             $this->writeText("\n");

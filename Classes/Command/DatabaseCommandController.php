@@ -78,12 +78,12 @@ class DatabaseCommandController extends CommandController
      * <b>Example:</b> <code>%command.full_name% database:updateschema "*.add,*.change"</code>
      *
      * @param array $schemaUpdateTypes List of schema update types (default: "safe")
-     * @param bool $verbose If set, database queries performed are shown in output
      * @param bool $dryRun If set the updates are only collected and shown, but not executed
      * @Definition\Argument(name="schemaUpdateTypes")
      */
-    public function updateSchemaCommand(array $schemaUpdateTypes = ['safe'], $verbose = false, $dryRun = false)
+    public function updateSchemaCommand(array $schemaUpdateTypes = ['safe'], $dryRun = false)
     {
+        $verbose = $this->output->getSymfonyConsoleOutput()->isVerbose();
         try {
             $expandedSchemaUpdateTypes = SchemaUpdateType::expandSchemaUpdateTypes($schemaUpdateTypes);
         } catch (InvalidEnumerationValueException $e) {

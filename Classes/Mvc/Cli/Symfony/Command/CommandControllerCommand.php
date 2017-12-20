@@ -33,6 +33,7 @@ use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -57,12 +58,11 @@ class CommandControllerCommand extends Command
         parent::__construct($name);
     }
 
-    /**
-     * @return CommandDefinition
-     */
-    public function getCommandDefinition(): CommandDefinition
+    public function getNativeDefinition()
     {
-        return $this->commandDefinition;
+        $commandInputDefinition = new InputDefinition($this->commandDefinition->getInputDefinitions(true));
+        $commandInputDefinition->addOptions($this->application->getDefinition()->getOptions());
+        return $commandInputDefinition;
     }
 
     public function isEnabled(): bool

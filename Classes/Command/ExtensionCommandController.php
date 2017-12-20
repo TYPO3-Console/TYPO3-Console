@@ -76,12 +76,12 @@ class ExtensionCommandController extends CommandController
      * This command is deprecated (and hidden) in Composer mode.
      *
      * @param array $extensionKeys Extension keys to activate. Separate multiple extension keys with comma.
-     * @param bool $verbose Whether or not to output results
      * @throws \TYPO3\CMS\Extensionmanager\Exception\ExtensionManagerException
      */
-    public function activateCommand(array $extensionKeys, $verbose = false)
+    public function activateCommand(array $extensionKeys)
     {
         // @deprecated for composer usage in 5.0 will be removed with 6.0
+        $verbose = $this->output->getSymfonyConsoleOutput()->isVerbose();
         $this->showDeprecationMessageIfApplicable();
         $this->emitPackagesMayHaveChangedSignal();
         $activatedExtensions = [];
@@ -160,10 +160,10 @@ class ExtensionCommandController extends CommandController
      * - Writing default extension configuration
      *
      * @param array $extensionKeys Extension keys to set up. Separate multiple extension keys with comma.
-     * @param bool $verbose Whether or not to output results
      */
-    public function setupCommand(array $extensionKeys, $verbose = false)
+    public function setupCommand(array $extensionKeys)
     {
+        $verbose = $this->output->getSymfonyConsoleOutput()->isVerbose();
         $packages = [];
         foreach ($extensionKeys as $extensionKey) {
             $packages[] = $this->packageManager->getPackage($extensionKey);
@@ -220,11 +220,10 @@ class ExtensionCommandController extends CommandController
      * @see typo3_console:extension:setup
      * @see typo3_console:install:generatepackagestates
      * @see typo3_console:cache:flush
-     *
-     * @param bool $verbose Whether or not to output results
      */
-    public function setupActiveCommand($verbose = false)
+    public function setupActiveCommand()
     {
+        $verbose = $this->output->getSymfonyConsoleOutput()->isVerbose();
         $this->setupExtensions($this->packageManager->getActivePackages(), $verbose);
     }
 

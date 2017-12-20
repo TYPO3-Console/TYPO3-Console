@@ -53,7 +53,6 @@ class InstallCommandController extends CommandController
      * Use as command line replacement for the web installation process.
      * Manually enter details on the command line or non interactive for automated setups.
      *
-     * @param bool $nonInteractive If specified, optional arguments are not requested, but default values are assumed.
      * @param bool $force Force installation of TYPO3, even if <code>LocalConfiguration.php</code> file already exists.
      * @param bool $skipIntegrityCheck Skip the checking for clean state before executing setup. This allows a pre-defined <code>LocalConfiguration.php</code> to be present. Handle with care. It might lead to unexpected or broken installation results.
      * @param bool $skipExtensionSetup Skip setting up extensions after TYPO3 is set up. Defaults to false in composer setups and to true in non composer setups.
@@ -68,9 +67,9 @@ class InstallCommandController extends CommandController
      * @param string $adminPassword Password of the administrative backend user account to be created
      * @param string $siteName Site Name
      * @param string $siteSetupType Can be either <code>no</code> (which unsurprisingly does nothing at all) or <code>site</code> (which creates an empty root page and setup)
+     * @param bool $nonInteractive Deprecated. Use <code>--no-interaction</code> instead.
      */
     public function setupCommand(
-        $nonInteractive = false,
         $force = false,
         $skipIntegrityCheck = false,
         $skipExtensionSetup = false,
@@ -84,13 +83,21 @@ class InstallCommandController extends CommandController
         $adminUserName = '',
         $adminPassword = '',
         $siteName = 'New TYPO3 Console site',
-        $siteSetupType = 'none'
+        $siteSetupType = 'none',
+        $nonInteractive = false
     ) {
+        $noInteraction = $this->output->getSymfonyConsoleInput()->getOption('no-interaction');
+        if ($nonInteractive) {
+            // @deprecated in 5.0 will be removed with 6.0
+            $this->outputLine('<warning>Option --non-interactive is deprecated. Please use --no-interaction instead.</warning>');
+            $noInteraction = true;
+        }
+
         $this->outputLine();
         $this->outputLine('<i>Welcome to the TYPO3 Console installer!</i>');
 
         if (!$skipIntegrityCheck) {
-            $this->ensureInstallationPossible($nonInteractive, $force);
+            $this->ensureInstallationPossible($noInteraction, $force);
         }
         $skipExtensionSetup |= !Bootstrap::usesComposerClassLoading();
 

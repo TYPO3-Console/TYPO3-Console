@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Mvc\Cli;
 
 /*
@@ -94,6 +95,14 @@ class ConsoleOutput
     public function getSymfonyConsoleOutput()
     {
         return $this->output;
+    }
+
+    /**
+     * @return Input
+     */
+    public function getSymfonyConsoleInput(): Input
+    {
+        return $this->getInput();
     }
 
     /**
