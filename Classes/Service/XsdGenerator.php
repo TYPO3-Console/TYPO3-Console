@@ -15,7 +15,11 @@ namespace Helhum\Typo3Console\Service;
 
 use Helhum\Typo3Console\Parser\ParsingException;
 use Helhum\Typo3Console\Parser\PhpParser;
+use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
+use TYPO3\CMS\Extbase\Reflection\DocCommentParser;
+use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
 use TYPO3\CMS\Fluid\Core\ViewHelper\ArgumentDefinition;
 
@@ -26,16 +30,38 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\ArgumentDefinition;
 class XsdGenerator
 {
     /**
-     * @var \TYPO3\CMS\Core\Package\PackageManager
-     * @inject
+     * @var PackageManager
      */
     protected $packageManager;
 
     /**
-     * @var \TYPO3\CMS\Extbase\Object\ObjectManagerInterface
-     * @inject
+     * @var ObjectManagerInterface
      */
     protected $objectManager;
+
+    /**
+     * The doc comment parser.
+     *
+     * @var DocCommentParser
+     */
+    protected $docCommentParser;
+
+    /**
+     * @var ReflectionService
+     */
+    protected $reflectionService;
+
+    public function __construct(
+        PackageManager $packageManager,
+        ObjectManagerInterface $objectManager,
+        DocCommentParser $docCommentParser,
+        ReflectionService $reflectionService
+    ) {
+        $this->packageManager = $packageManager;
+        $this->objectManager = $objectManager;
+        $this->docCommentParser = $docCommentParser;
+        $this->reflectionService = $reflectionService;
+    }
 
     /**
      * Generate the XML Schema definition for a given namespace.
@@ -268,20 +294,6 @@ class XsdGenerator
     {
         return strpos($namespace, '\\') === false ? '_' : '\\';
     }
-
-    /**
-     * The doc comment parser.
-     *
-     * @var \TYPO3\CMS\Extbase\Reflection\DocCommentParser
-     * @inject
-     */
-    protected $docCommentParser;
-
-    /**
-     * @var \TYPO3\CMS\Extbase\Reflection\ReflectionService
-     * @inject
-     */
-    protected $reflectionService;
 
     /**
      * Get a tag name for a given ViewHelper class.

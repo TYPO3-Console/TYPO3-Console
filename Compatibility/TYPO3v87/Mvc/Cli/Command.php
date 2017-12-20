@@ -23,6 +23,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use TYPO3\CMS\Extbase\Reflection\MethodReflection;
+use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 
 /**
  * Represents a Command
@@ -92,22 +93,16 @@ class Command
     private $inputDefinitions;
 
     /**
-     * @param \TYPO3\CMS\Extbase\Reflection\ReflectionService $reflectionService
-     */
-    public function injectReflectionService(\TYPO3\CMS\Extbase\Reflection\ReflectionService $reflectionService)
-    {
-        $this->reflectionService = $reflectionService;
-    }
-
-    /**
      * @param string $controllerClassName Class name of the controller providing the command
      * @param string $controllerCommandName Command name, i.e. the method name of the command, without the "Command" suffix
+     * @param ReflectionService $reflectionService
      * @throws InvalidArgumentException
      */
-    public function __construct(string $controllerClassName, string $controllerCommandName)
+    public function __construct(string $controllerClassName, string $controllerCommandName, ReflectionService $reflectionService)
     {
         $this->controllerClassName = $controllerClassName;
         $this->controllerCommandName = $controllerCommandName;
+        $this->reflectionService = $reflectionService;
         $delimiter = strpos($controllerClassName, '\\') !== false ? '\\' : '_';
         $classNameParts = explode($delimiter, $controllerClassName);
         if (isset($classNameParts[0]) && $classNameParts[0] === 'TYPO3' && isset($classNameParts[1]) && $classNameParts[1] === 'CMS') {
@@ -399,9 +394,6 @@ class Command
         if ($this->commandMethodDefinitions !== null) {
             return $this->commandMethodDefinitions;
         }
-        $this->commandMethodDefinitions = [];
-        $commandMethodReflection = $this->getCommandMethodReflection();
-        $annotations = $commandMethodReflection->getTagsValues();
         $this->commandMethodDefinitions = $this->parseDefinitions();
         return $this->commandMethodDefinitions;
     }

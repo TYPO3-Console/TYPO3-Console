@@ -21,7 +21,9 @@ use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Reflection\ClassSchema;
+use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 
 /**
  * Represents a Command
@@ -51,7 +53,7 @@ class Command
     protected $extensionName;
 
     /**
-     * @var \TYPO3\CMS\Extbase\Reflection\ReflectionService
+     * @var ReflectionService
      */
     protected $reflectionService;
 
@@ -96,26 +98,20 @@ class Command
     private $controllerCommandMethod;
 
     /**
-     * @param \TYPO3\CMS\Extbase\Reflection\ReflectionService $reflectionService
-     */
-    public function injectReflectionService(\TYPO3\CMS\Extbase\Reflection\ReflectionService $reflectionService)
-    {
-        $this->reflectionService = $reflectionService;
-    }
-
-    /**
      * @param string $controllerClassName Class name of the controller providing the command
      * @param string $controllerCommandName Command name, i.e. the method name of the command, without the "Command" suffix
+     * @param ReflectionService $reflectionService
      * @throws InvalidArgumentException
      */
-    public function __construct(string $controllerClassName, string $controllerCommandName)
+    public function __construct(string $controllerClassName, string $controllerCommandName, ReflectionService $reflectionService)
     {
         $this->controllerClassName = $controllerClassName;
         $this->controllerCommandName = $controllerCommandName;
+        $this->reflectionService = $reflectionService;
         $this->controllerCommandMethod = $this->controllerCommandName . 'Command';
         $delimiter = strpos($controllerClassName, '\\') !== false ? '\\' : '_';
         $classNameParts = explode($delimiter, $controllerClassName);
-        if (isset($classNameParts[0]) && $classNameParts[0] === 'TYPO3' && isset($classNameParts[1]) && $classNameParts[1] === 'CMS') {
+        if (isset($classNameParts[0], $classNameParts[1]) && $classNameParts[0] === 'TYPO3' && $classNameParts[1] === 'CMS') {
             $classNameParts[0] .= '\\' . $classNameParts[1];
             unset($classNameParts[1]);
             $classNameParts = array_values($classNameParts);
@@ -134,7 +130,7 @@ class Command
             );
         }
         $this->extensionName = $classNameParts[1];
-        $extensionKey = \TYPO3\CMS\Core\Utility\GeneralUtility::camelCaseToLowerCaseUnderscored($this->extensionName);
+        $extensionKey = GeneralUtility::camelCaseToLowerCaseUnderscored($this->extensionName);
         $this->commandIdentifier = strtolower($extensionKey . ':' . substr($classNameParts[$numberOfClassNameParts - 1], 0, -17) . ':' . $controllerCommandName);
     }
 

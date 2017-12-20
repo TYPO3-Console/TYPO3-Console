@@ -16,12 +16,14 @@ namespace Helhum\Typo3Console\Command;
 use Helhum\Typo3Console\Annotation\Command\Definition;
 use Helhum\Typo3Console\Install\CliSetupRequestHandler;
 use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
+use Helhum\Typo3Console\Install\InstallStepActionExecutor;
 use Helhum\Typo3Console\Install\PackageStatesGenerator;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageInterface;
+use TYPO3\CMS\Core\Package\PackageManager;
 
 /**
  * Alpha version of a setup command controller
@@ -30,16 +32,20 @@ use TYPO3\CMS\Core\Package\PackageInterface;
 class InstallCommandController extends CommandController
 {
     /**
-     * @var \TYPO3\CMS\Core\Package\PackageManager
-     * @inject
+     * @var PackageManager
      */
     protected $packageManager;
 
     /**
-     * @var \Helhum\Typo3Console\Install\InstallStepActionExecutor
-     * @inject
+     * @var InstallStepActionExecutor
      */
     protected $installStepActionExecutor;
+
+    public function __construct(PackageManager $packageManager, InstallStepActionExecutor $installStepActionExecutor)
+    {
+        $this->packageManager = $packageManager;
+        $this->installStepActionExecutor = $installStepActionExecutor;
+    }
 
     /**
      * TYPO3 Setup

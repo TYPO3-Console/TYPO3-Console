@@ -14,24 +14,27 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
+use Helhum\Typo3Console\Service\Configuration\ConsoleRenderer\ConsoleRenderer;
 use TYPO3\CMS\Core\SingletonInterface;
 
-/**
- * Class ConfigurationCommandController
- */
 class ConfigurationCommandController extends CommandController implements SingletonInterface
 {
     /**
-     * @var \Helhum\Typo3Console\Service\Configuration\ConfigurationService
-     * @inject
+     * @var ConfigurationService
      */
     protected $configurationService;
 
     /**
-     * @var \Helhum\Typo3Console\Service\Configuration\ConsoleRenderer\ConsoleRenderer
-     * @inject
+     * @var ConsoleRenderer
      */
     protected $consoleRenderer;
+
+    public function __construct(ConfigurationService $configurationService, ConsoleRenderer $consoleRenderer)
+    {
+        $this->configurationService = $configurationService;
+        $this->consoleRenderer = $consoleRenderer;
+    }
 
     /**
      * Remove configuration option
