@@ -15,6 +15,8 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Helhum\Typo3Console\Annotation\Command\Definition\Argument;
+use Helhum\Typo3Console\Annotation\Command\Definition\Validate;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -108,9 +110,6 @@ class Command
      */
     public function __construct(string $controllerClassName, string $controllerCommandName)
     {
-        // For now (before switching to Doctrine Annotations) we ignore this annotation
-        AnnotationReader::addGlobalIgnoredName('definition');
-
         $this->controllerClassName = $controllerClassName;
         $this->controllerCommandName = $controllerCommandName;
         $this->controllerCommandMethod = $this->controllerCommandName . 'Command';
@@ -266,7 +265,7 @@ class Command
      */
     public function shouldValidateInputStrict(): bool
     {
-        return !empty($this->getCommandMethodDefinitions()['Validate'][0]['strict']);
+        return !empty($this->getCommandMethodDefinitions()['Validate']->strict);
     }
 
     /**
@@ -399,9 +398,7 @@ class Command
         }
         $argumentNames = [];
         foreach ($definedArguments as $definedArgument) {
-            if (!empty($definedArgument['name'])) {
-                $argumentNames[$definedArgument['name']] = $definedArgument['name'];
-            }
+            $argumentNames[$definedArgument->name] = $definedArgument->name;
         }
         return $argumentNames;
     }
@@ -411,45 +408,30 @@ class Command
         if ($this->commandMethodDefinitions !== null) {
             return $this->commandMethodDefinitions;
         }
-        $this->commandMethodDefinitions = [];
-        $annotations = $this->classSchema->getMethod($this->controllerCommandMethod)['tags'];
-        if (!empty($annotations['definition'])) {
-            $this->commandMethodDefinitions = $this->parseDefinitions($annotations['definition']);
-        }
+        $this->commandMethodDefinitions = $this->parseDefinitions();
         return $this->commandMethodDefinitions;
     }
 
     /**
      * Very simple parsing of a definition annotations on command methods.
      *
-     * @param array $definitionAnnotations Definition tags on command controller command methods
      * @throws InvalidArgumentException
      * @return array
      */
-    private function parseDefinitions(array $definitionAnnotations): array
+    private function parseDefinitions(): array
     {
         $definitions = [];
-        foreach ($definitionAnnotations as $annotation) {
-            $annotation = preg_replace('/\s/', '', $annotation);
-            $instructions = explode(',', $annotation);
-            foreach ($instructions as $instruction) {
-                preg_match('/^([a-zA-Z]*)\(([^)]*)\)$/', $instruction, $matches);
-                list(, $name, $optionsString) = $matches;
-                $options = $this->parseOptions($optionsString);
-                $definitions[$name][] = $options;
+        $reader = new AnnotationReader();
+        $method = new \ReflectionMethod($this->controllerClassName, $this->controllerCommandMethod);
+        foreach ($reader->getMethodAnnotations($method) as $annotation) {
+            if ($annotation instanceof Argument) {
+                $definitions['Argument'][] = $annotation;
+            }
+            if ($annotation instanceof Validate) {
+                $definitions['Validate'] = $annotation;
             }
         }
         return $definitions;
-    }
-
-    private function parseOptions(string $optionsString): array
-    {
-        $options = [];
-        foreach (explode(',', $optionsString) as $argumentOption) {
-            list($name, $value) = explode('=', $argumentOption);
-            $options[$name] = $value;
-        }
-        return $options;
     }
 
     /**

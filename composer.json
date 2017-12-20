@@ -33,6 +33,7 @@
         "typo3/cms-install": "^8.7.7 || ~9.0.0",
         "typo3/cms-scheduler": "^8.7.7 || ~9.0.0",
 
+        "doctrine/annotations": "^1.4",
         "symfony/console": "^3.2",
         "symfony/process": "^3.2"
     },
