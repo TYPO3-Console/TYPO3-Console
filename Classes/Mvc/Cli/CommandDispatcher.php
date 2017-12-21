@@ -130,6 +130,10 @@ class CommandDispatcher
             throw new RuntimeException('The "php" binary could not be found.', 1485128615);
         }
         $processBuilder->setPrefix($php);
+        if (getenv('PHP_INI_PATH')) {
+            $processBuilder->add('-c');
+            $processBuilder->add(getenv('PHP_INI_PATH'));
+        }
         $processBuilder->add($typo3CommandPath);
         $processBuilder->addEnvironmentVariables(['TYPO3_CONSOLE_SUB_PROCESS' => true]);
         return new self($processBuilder);
