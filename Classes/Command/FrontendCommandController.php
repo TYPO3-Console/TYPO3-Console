@@ -35,7 +35,7 @@ class FrontendCommandController extends CommandController
         ];
         // No other solution atm than to fake a CLI request type
         $code = str_replace('{arguments}', var_export($arguments, true), $template);
-        $process = new PhpProcess($code, null, null, null);
+        $process = new PhpProcess($code, null, null, 0);
         $process->mustRun();
         $rawResponse = json_decode($process->getOutput());
         if ($rawResponse === null || $rawResponse->status === 'failure') {

@@ -17,7 +17,7 @@ use Composer\Script\Event as ScriptEvent;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Process\PhpExecutableFinder;
-use Symfony\Component\Process\ProcessBuilder;
+use Symfony\Component\Process\Process;
 
 /**
  * This class can be used to execute console commands in a sub process
@@ -28,18 +28,25 @@ use Symfony\Component\Process\ProcessBuilder;
 class CommandDispatcher
 {
     /**
-     * @var ProcessBuilder
+     * @var array
      */
-    private $processBuilder;
+    private $commandLine;
+
+    /**
+     * @var array
+     */
+    private $environmentVars;
 
     /**
      * Don't allow object creation without factory method
      *
-     * @param ProcessBuilder $processBuilder
+     * @param array $commandLine
+     * @param array $environmentVars
      */
-    private function __construct(ProcessBuilder $processBuilder)
+    private function __construct(array $commandLine, array $environmentVars = [])
     {
-        $this->processBuilder = $processBuilder;
+        $this->commandLine = $commandLine;
+        $this->environmentVars = $environmentVars;
     }
 
     /**
@@ -48,12 +55,13 @@ class CommandDispatcher
      * Just provide the composer script event to cover most cases
      *
      * @param ScriptEvent $event
-     * @param ProcessBuilder $processBuilder
+     * @param array $commandLine
+     * @param array $environmentVars
      * @param PhpExecutableFinder $phpFinder
      * @throws RuntimeException
      * @return CommandDispatcher
      */
-    public static function createFromComposerRun(ScriptEvent $event, ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
+    public static function createFromComposerRun(ScriptEvent $event, array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null)
     {
         $name = Application::COMMAND_NAME;
         $searchDirs = [
@@ -70,10 +78,9 @@ class CommandDispatcher
         if (!isset($typo3CommandPath)) {
             throw new RuntimeException(sprintf('The "%s" binary could not be found.', Application::COMMAND_NAME), 1494778973);
         }
-        $processBuilder = $processBuilder ?: new ProcessBuilder();
-        $processBuilder->addEnvironmentVariables(['TYPO3_CONSOLE_PLUGIN_RUN' => true]);
+        $environmentVars['TYPO3_CONSOLE_PLUGIN_RUN'] = true;
 
-        return self::create($typo3CommandPath, $processBuilder, $phpFinder);
+        return self::create($typo3CommandPath, $commandLine, $environmentVars, $phpFinder);
     }
 
     /**
@@ -81,18 +88,19 @@ class CommandDispatcher
      *
      * Just use the method without arguments for best results
      *
-     * @param ProcessBuilder $processBuilder
+     * @param array $commandLine
+     * @param array $environmentVars
      * @param PhpExecutableFinder $phpFinder
      * @throws RuntimeException
-     * @return self
+     * @return CommandDispatcher
      */
-    public static function createFromCommandRun(ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
+    public static function createFromCommandRun(array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null)
     {
         if (!isset($_SERVER['argv'][0]) && strpos($_SERVER['argv'][0], Application::COMMAND_NAME) === false) {
             throw new RuntimeException('Tried to create typo3 command runner from wrong context', 1484945065);
         }
         $typo3CommandPath = $_SERVER['argv'][0];
-        return self::create($typo3CommandPath, $processBuilder, $phpFinder);
+        return self::create($typo3CommandPath, $commandLine, $environmentVars, $phpFinder);
     }
 
     /**
@@ -117,26 +125,26 @@ class CommandDispatcher
      * Basic factory method, which need the exact path to the typo3 console binary to create the dispatcher
      *
      * @param string $typo3CommandPath Absolute path to the typo3 console binary
-     * @param ProcessBuilder $processBuilder
+     * @param array $commandLine
+     * @param array $environmentVars
      * @param PhpExecutableFinder $phpFinder
      * @throws RuntimeException
-     * @return self
+     * @return CommandDispatcher
      */
-    public static function create($typo3CommandPath, ProcessBuilder $processBuilder = null, PhpExecutableFinder $phpFinder = null)
+    public static function create($typo3CommandPath, array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null)
     {
-        $processBuilder = $processBuilder ?: new ProcessBuilder();
         $phpFinder = $phpFinder ?: new PhpExecutableFinder();
         if (!($php = $phpFinder->find())) {
             throw new RuntimeException('The "php" binary could not be found.', 1485128615);
         }
-        $processBuilder->setPrefix($php);
+        array_unshift($commandLine, $typo3CommandPath);
+        array_unshift($commandLine, $php);
         if (getenv('PHP_INI_PATH')) {
-            $processBuilder->add('-c');
-            $processBuilder->add(getenv('PHP_INI_PATH'));
+            $commandLine[] = '-c';
+            $commandLine[] = getenv('PHP_INI_PATH');
         }
-        $processBuilder->add($typo3CommandPath);
-        $processBuilder->addEnvironmentVariables(['TYPO3_CONSOLE_SUB_PROCESS' => true]);
-        return new self($processBuilder);
+        $environmentVars['TYPO3_CONSOLE_SUB_PROCESS'] = true;
+        return new self($commandLine, $environmentVars);
     }
 
     /**
@@ -151,12 +159,10 @@ class CommandDispatcher
      */
     public function executeCommand($command, array $arguments = [], array $environment = [], $input = null)
     {
-        // We need to clone the builder to be able to re-use the object for multiple commands
-        $processBuilder = clone $this->processBuilder;
-
-        $processBuilder->add($command);
-        $processBuilder->addEnvironmentVariables($environment);
-        $processBuilder->setInput($input);
+        // Start with a fresh list of arguments and environment
+        $commandLine = $this->commandLine;
+        $environmentVars = array_replace($this->environmentVars, $environment);
+        $commandLine[] = $command;
 
         foreach ($arguments as $argumentName => $argumentValue) {
             if (is_int($argumentName)) {
@@ -172,18 +178,19 @@ class CommandDispatcher
             if (is_array($argumentValue)) {
                 $argumentValue = implode(',', $argumentValue);
             }
-            $processBuilder->add($dashedName);
+            $commandLine[] = $dashedName;
             if ($argumentValue !== null) {
                 if ($argumentValue === false) {
                     // Convert boolean false to 'false' instead of empty string to correctly pass the value to the sub command
-                    $processBuilder->add('false');
+                    $commandLine[] = 'false';
                 } else {
-                    $processBuilder->add($argumentValue);
+                    $commandLine[] = $argumentValue;
                 }
             }
         }
 
-        $process = $processBuilder->setTimeout(null)->getProcess();
+        $process = new Process($commandLine, null, $environmentVars, $input, 0);
+        $process->inheritEnvironmentVariables();
         $process->run();
         $output = str_replace("\r\n", "\n", trim($process->getOutput()));
 

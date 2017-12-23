@@ -85,13 +85,7 @@ class Kernel
             return;
         }
         $classesPaths = [__DIR__ . '/../../Classes', __DIR__ . '/../../Resources/Private/ExtensionArtifacts/src/'];
-        $classLoader = new ClassLoader();
-        $classLoader->addPsr4('Helhum\\Typo3Console\\', $classesPaths);
-        spl_autoload_register(function ($className) use ($classLoader) {
-            if ($file = $classLoader->findFile($className)) {
-                require $file;
-            }
-        });
+        $this->classLoader->addPsr4('Helhum\\Typo3Console\\', $classesPaths);
         $pharFile = __DIR__ . '/../../Libraries/symfony-process.phar';
         require 'phar://' . $pharFile . '/vendor/autoload.php';
     }

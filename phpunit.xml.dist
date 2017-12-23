@@ -19,7 +19,6 @@
         <env name="TYPO3_INSTALL_DB_PASSWORD" value="" />
         <env name="TYPO3_INSTALL_DB_DBNAME" value="travis_console_test" />
         <env name="TYPO3_VERSION" value="^8.7" />
-        <env name="TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS" value="scheduler" />
     </php>
     <testsuites>
         <testsuite name="TYPO3 Console Unit Tests">
