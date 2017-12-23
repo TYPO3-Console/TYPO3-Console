@@ -31,7 +31,16 @@ before_install:
 
 install:
   - export COMPOSER_ROOT_VERSION=5.0.0
-  - composer require typo3/cms-backend="$TYPO3_VERSION" typo3/cms-core="$TYPO3_VERSION" typo3/cms-extbase="$TYPO3_VERSION" typo3/cms-extensionmanager="$TYPO3_VERSION" typo3/cms-fluid="$TYPO3_VERSION" typo3/cms-install="$TYPO3_VERSION" typo3/cms-scheduler="$TYPO3_VERSION"
+  - |
+    composer require \
+      typo3/cms-backend="$TYPO3_VERSION" \
+      typo3/cms-core="$TYPO3_VERSION" \
+      typo3/cms-extbase="$TYPO3_VERSION" \
+      typo3/cms-extensionmanager="$TYPO3_VERSION" \
+      typo3/cms-fluid="$TYPO3_VERSION" \
+      typo3/cms-install="$TYPO3_VERSION" \
+      typo3/cms-scheduler="$TYPO3_VERSION" \
+      $PREFER_LOWEST
   - git checkout composer.json
 
 # Test scripts
@@ -71,6 +80,9 @@ jobs:
     - stage: test
       php: 7.0
       env: TYPO3_VERSION=^8.7
+    - stage: test
+      php: 7.0
+      env: TYPO3_VERSION=^8.7 PREFER_LOWEST="--prefer-lowest"
     - stage: test
       php: 7.2
       env: TYPO3_VERSION="~9.0.0"
@@ -116,7 +128,6 @@ jobs:
           if [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
             echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n";
             # Install requirements
-            composer require --dev typo3/cms ^8.7
             composer require --dev helhum/ter-client dev-master
             # Cleanup before we upload
             git reset --hard HEAD && git clean -fx

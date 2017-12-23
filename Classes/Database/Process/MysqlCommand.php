@@ -16,14 +16,13 @@ namespace Helhum\Typo3Console\Database\Process;
 
 use Helhum\Typo3Console\Mvc\Cli\InteractiveProcess;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
 
 class MysqlCommand
 {
     /**
-     * @var ProcessBuilder
+     * @var array
      */
-    private $processBuilder;
+    private $commandLine;
 
     /**
      * @var array
@@ -36,20 +35,12 @@ class MysqlCommand
      * MysqlCommand constructor.
      *
      * @param array $dbConfig
-     * @param ProcessBuilder $processBuilder
+     * @param array $commandLine
      */
-    public function __construct(array $dbConfig, ProcessBuilder $processBuilder)
+    public function __construct(array $dbConfig, array $commandLine = [])
     {
         $this->dbConfig = $dbConfig;
-        $this->processBuilder = $processBuilder;
-        $this->processBuilder->setTimeout(null);
-    }
-
-    public function __destruct()
-    {
-        if (self::$mysqlTempFile !== null && file_exists(self::$mysqlTempFile)) {
-            unlink(self::$mysqlTempFile);
-        }
+        $this->commandLine = $commandLine;
     }
 
     /**
@@ -61,15 +52,16 @@ class MysqlCommand
      */
     public function mysql(array $additionalArguments = [], $inputStream = STDIN, $outputCallback = null, $interactive = false)
     {
-        $this->processBuilder->setPrefix('mysql');
-        $this->processBuilder->setArguments(array_merge($this->buildConnectionArguments(), $additionalArguments));
+        $commandLine = $this->commandLine;
+        array_unshift($commandLine, 'mysql');
+        $commandLine = array_merge($commandLine, $this->buildConnectionArguments(), $additionalArguments);
+        $process = new Process($commandLine, null, null, $inputStream, 0);
+        $process->inheritEnvironmentVariables();
         if ($interactive) {
             // I did not figure out how to change pipes with symfony/process
             $interactiveProcess = new InteractiveProcess();
-            return $interactiveProcess->run($this->processBuilder->getProcess()->getCommandLine());
+            return $interactiveProcess->run($process->getCommandLine());
         }
-        $process = $this->processBuilder->getProcess();
-        $process->setInput($inputStream);
         return $process->run($this->buildDefaultOutputCallback($outputCallback));
     }
 
@@ -80,9 +72,11 @@ class MysqlCommand
      */
     public function mysqldump(array $additionalArguments = [], $outputCallback = null): int
     {
-        $this->processBuilder->setPrefix('mysqldump');
-        $this->processBuilder->setArguments(array_merge($this->buildConnectionArguments(), $additionalArguments));
-        $process = $this->processBuilder->getProcess();
+        $commandLine = $this->commandLine;
+        array_unshift($commandLine, 'mysqldump');
+        $commandLine = array_merge($commandLine, $this->buildConnectionArguments(), $additionalArguments);
+        $process = new Process($commandLine, null, null, null, 0);
+        $process->inheritEnvironmentVariables();
         return $process->run($this->buildDefaultOutputCallback($outputCallback));
     }
 
@@ -151,6 +145,7 @@ $passwordDefinition
 EOF;
         self::$mysqlTempFile = tempnam(sys_get_temp_dir(), 'typo3_console_my_cnf_');
         file_put_contents(self::$mysqlTempFile, $confFileContent);
+        register_shutdown_function('unlink', self::$mysqlTempFile);
 
         return self::$mysqlTempFile;
     }

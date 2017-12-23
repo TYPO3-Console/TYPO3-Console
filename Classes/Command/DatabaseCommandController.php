@@ -21,7 +21,6 @@ use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Helhum\Typo3Console\Service\Database\SchemaService;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 
 /**
@@ -136,10 +135,7 @@ class DatabaseCommandController extends CommandController
      */
     public function importCommand($interactive = false)
     {
-        $mysqlCommand = new MysqlCommand(
-            $this->connectionConfiguration->build(),
-            new ProcessBuilder()
-        );
+        $mysqlCommand = new MysqlCommand($this->connectionConfiguration->build());
         $exitCode = $mysqlCommand->mysql(
             $interactive ? [] : ['--skip-column-names'],
             STDIN,
@@ -179,10 +175,7 @@ class DatabaseCommandController extends CommandController
         $additionalArguments[] = '--single-transaction';
         $additionalArguments[] = '--quick';
 
-        $mysqlCommand = new MysqlCommand(
-            $dbConfig,
-            new ProcessBuilder()
-        );
+        $mysqlCommand = new MysqlCommand($this->connectionConfiguration->build());
         $exitCode = $mysqlCommand->mysqldump(
             $additionalArguments,
             $this->buildOutputClosure()

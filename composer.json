@@ -32,10 +32,11 @@
         "typo3/cms-fluid": "^8.7.7 || ~9.0.0",
         "typo3/cms-install": "^8.7.7 || ~9.0.0",
         "typo3/cms-scheduler": "^8.7.7 || ~9.0.0",
+        "typo3/cms-saltedpasswords": "^8.7.7 || ~9.0.0",
 
         "doctrine/annotations": "^1.4",
-        "symfony/console": "^3.2",
-        "symfony/process": "^3.2"
+        "symfony/console": "^3.3.6 || ^4.0",
+        "symfony/process": "^3.3.6 || ^4.0"
     },
     "require-dev": {
         "typo3/cms-reports": "^8.7.7 || ~9.0.0 || 9.1.*@dev",
@@ -92,7 +93,7 @@
         "extension-create-libs": [
             "mkdir -p Libraries/temp",
             "[ -f $HOME/.composer/vendor/bin/phar-composer ] || composer global require clue/phar-composer",
-            "if [ ! -f Libraries/symfony-process.phar ]; then cd Libraries/temp && composer require symfony/process=^3.2 && composer config classmap-authoritative true && composer config prepend-autoloader false && composer dump-autoload -o; fi",
+            "if [ ! -f Libraries/symfony-process.phar ]; then cd Libraries/temp && composer require symfony/console=^3.3.6 symfony/process=^3.3.6 && composer config classmap-authoritative true && composer config prepend-autoloader true && composer dump-autoload -o; fi",
             "[ -f Libraries/symfony-process.phar ] || $HOME/.composer/vendor/bin/phar-composer build Libraries/temp/ Libraries/symfony-process.phar",
             "chmod -x Libraries/*.phar",
             "rm -rf Libraries/temp"
