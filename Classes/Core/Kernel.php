@@ -56,6 +56,8 @@ class Kernel
         $this->ensureRequiredEnvironment();
         $this->bootstrap = Bootstrap::getInstance();
         $this->bootstrap->initializeClassLoader($classLoader);
+        // We need to be sure all classes can be loaded in non composer mode as early as possible
+        $this->initializeNonComposerClassLoading();
         $this->runLevel = new RunLevel($this->bootstrap);
     }
 
@@ -129,7 +131,6 @@ class Kernel
     public function initialize(string $runLevel = null)
     {
         if (!$this->initialized) {
-            $this->initializeNonComposerClassLoading();
             $this->initializeCompatibilityLayer();
             Scripts::baseSetup($this->bootstrap);
             $this->initialized = true;
