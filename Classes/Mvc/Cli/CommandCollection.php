@@ -216,6 +216,15 @@ class CommandCollection implements \IteratorAggregate
         if (file_exists($commandConfigurationFile = __DIR__ . '/../../../Configuration/Console/AllCommands.php')) {
             return require $commandConfigurationFile;
         }
+
+        // All code below is only for non composer mode
+        if (!$this->packageManager->isPackageAvailable('typo3_console')
+            || !$this->packageManager->isPackageActive('typo3_console')
+        ) {
+            // We are not installed, or not even existing as extension, but we still want to be able to run,
+            // thus we include our config directly in this case.
+            $this->commandConfigurations['typo3_console'] = require __DIR__ . '/../../../Configuration/Console/Commands.php';
+        }
         foreach ($this->packageManager->getActivePackages() as $package) {
             $installPath = $package->getPackagePath();
             $packageConfig = $this->getConfigFromPackage($installPath);

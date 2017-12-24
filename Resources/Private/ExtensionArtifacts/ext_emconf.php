@@ -14,8 +14,14 @@ $EM_CONF[$_EXTKEY] = [
   'version' => '5.0.0',
   'constraints' => [
     'depends' => [
-      'php' => '7.0.0-7.1.99',
-      'typo3' => '8.7.0-8.7.99',
+      'php' => '7.0.0-7.2.99',
+      'typo3' => '8.7.0-9.0.99',
+      'extbase' => '8.7.0-9.0.99',
+      'extensionmanager' => '8.7.0-9.0.99',
+      'fluid' => '8.7.0-9.0.99',
+      'install' => '8.7.0-9.0.99',
+      'scheduler' => '8.7.0-9.0.99',
+      'saltedpasswords' => '8.7.0-9.0.99',
     ],
     'conflicts' => [
         'dbal' => '',
