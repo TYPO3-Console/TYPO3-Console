@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Core;
  */
 
 use Composer\Autoload\ClassLoader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\Booting\Scripts;
 use Helhum\Typo3Console\Mvc\Cli\CommandCollection;
@@ -56,6 +57,9 @@ class Kernel
         $this->ensureRequiredEnvironment();
         $this->bootstrap = Bootstrap::getInstance();
         $this->bootstrap->initializeClassLoader($classLoader);
+        // Initialize basic annotation loader until TYPO3 does so as well
+        AnnotationRegistry::registerLoader('class_exists');
+
         // We need to be sure all classes can be loaded in non composer mode as early as possible
         $this->initializeNonComposerClassLoading();
         $this->runLevel = new RunLevel($this->bootstrap);

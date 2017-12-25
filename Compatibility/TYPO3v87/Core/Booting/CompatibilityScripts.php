@@ -14,7 +14,6 @@ namespace Helhum\Typo3Console\TYPO3v87\Core\Booting;
  */
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use TYPO3\CMS\Core\Core\Bootstrap;
 
 class CompatibilityScripts
@@ -38,8 +37,6 @@ class CompatibilityScripts
 
     private static function initializeAnnotationReader()
     {
-        AnnotationRegistry::registerLoader('class_exists');
-
         /*
          * All annotations defined by and for Extbase need to be
          * ignored during their deprecation. Later, their usage may and
