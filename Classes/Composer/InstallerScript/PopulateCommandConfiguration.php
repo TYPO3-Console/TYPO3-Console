@@ -39,25 +39,17 @@ class PopulateCommandConfiguration implements InstallerScript
         foreach ($this->extractPackageMapFromComposer($composer) as $item) {
             /** @var \Composer\Package\PackageInterface $package */
             list($package, $installPath) = $item;
+            $installPath = ($installPath ?: $basePath);
+            $packageName = $package->getName();
             if ($package->getType() === 'metapackage') {
                 // We have a meta package, which does not have any files
                 continue;
             }
-            $installPath = ($installPath ?: $basePath);
-            $packageName = $package->getName();
             if ($packageName === 'typo3/cms') {
-                foreach (glob($installPath . '/typo3/sysext/*/') as $installPath) {
-                    $packageName = basename($installPath);
-                    $extensionConfig = $this->getConfigFromPackage($installPath);
-                    if (!empty($extensionConfig)) {
-                        $commandConfiguration[$packageName] = $extensionConfig;
-                    }
-                }
+                $commandConfiguration = array_merge($commandConfiguration, $this->getConfigFromTypo3Packages($installPath));
+                continue;
             }
-            $packageConfig = $this->getConfigFromPackage($installPath);
-            if (!empty($packageConfig)) {
-                $commandConfiguration[$packageName] = $packageConfig;
-            }
+            $commandConfiguration = array_merge($commandConfiguration, $this->getConfigFromPackage($installPath, $packageName));
         }
         $success = file_put_contents(
             __DIR__ . '/../../../Configuration/Console/AllCommands.php',
@@ -86,7 +78,7 @@ class PopulateCommandConfiguration implements InstallerScript
      * @param $installPath
      * @return mixed
      */
-    private function getConfigFromPackage($installPath)
+    private function getConfigFromPackage(string $installPath, string $packageName)
     {
         $commandConfiguration = [];
         if (file_exists($commandConfigurationFile = $installPath . '/Configuration/Console/Commands.php')) {
@@ -94,6 +86,23 @@ class PopulateCommandConfiguration implements InstallerScript
         }
         if (file_exists($commandConfigurationFile = $installPath . '/Configuration/Commands.php')) {
             $commandConfiguration['commands'] = require $commandConfigurationFile;
+        }
+        if (empty($commandConfiguration)) {
+            return [];
+        }
+        return [$packageName => $commandConfiguration];
+    }
+
+    /**
+     * @param $typo3InstallPath
+     * @return array
+     */
+    private function getConfigFromTypo3Packages(string $typo3InstallPath): array
+    {
+        $commandConfiguration = [];
+        foreach (glob($typo3InstallPath . '/typo3/sysext/*/') as $installPath) {
+            $packageName = basename($installPath);
+            $commandConfiguration = array_merge($commandConfiguration, $this->getConfigFromPackage($installPath, $packageName));
         }
         return $commandConfiguration;
     }
