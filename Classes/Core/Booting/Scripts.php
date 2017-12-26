@@ -171,10 +171,7 @@ class Scripts
         $bootstrap->unsetReservedGlobalVariables();
     }
 
-    /**
-     * @param Bootstrap $bootstrap
-     */
-    public static function initializePersistence(Bootstrap $bootstrap)
+    public static function initializePersistence()
     {
         ExtensionManagementUtility::loadBaseTca();
     }

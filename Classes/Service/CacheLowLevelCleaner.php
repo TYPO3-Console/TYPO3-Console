@@ -38,7 +38,7 @@ class CacheLowLevelCleaner
         // Get all table names from Default connection starting with 'cf_' and truncate them
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $connection = $connectionPool->getConnectionByName('Default');
-        $tablesNames = $tableNames = $connection->getSchemaManager()->listTableNames();
+        $tablesNames = $connection->getSchemaManager()->listTableNames();
         foreach ($tablesNames as $tableName) {
             if ($tableName === 'cache_treelist' || strpos($tableName, 'cf_') === 0) {
                 $connection->truncate($tableName);
