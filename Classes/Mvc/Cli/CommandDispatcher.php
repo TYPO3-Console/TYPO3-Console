@@ -18,6 +18,7 @@ use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\ProcessBuilder;
 
 /**
  * This class can be used to execute console commands in a sub process
@@ -63,7 +64,8 @@ class CommandDispatcher
      */
     public static function createFromComposerRun(ScriptEvent $event, array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null)
     {
-        $name = Application::COMMAND_NAME;
+        // should be Application::COMMAND_NAME, but our Application class currently conflicts with symfony/console 2.7, which is used by Composer
+        $name = 'typo3cms';
         $searchDirs = [
             $event->getComposer()->getConfig()->get('bin-dir'),
             dirname(__DIR__, 3),
@@ -76,7 +78,7 @@ class CommandDispatcher
             }
         }
         if (!isset($typo3CommandPath)) {
-            throw new RuntimeException(sprintf('The "%s" binary could not be found.', Application::COMMAND_NAME), 1494778973);
+            throw new RuntimeException(sprintf('The "%s" binary could not be found.', $name), 1494778973);
         }
         $environmentVars['TYPO3_CONSOLE_PLUGIN_RUN'] = true;
 
@@ -189,8 +191,14 @@ class CommandDispatcher
             }
         }
 
-        $process = new Process($commandLine, null, $environmentVars, $input, 0);
-        $process->inheritEnvironmentVariables();
+        if (isset($environmentVars['TYPO3_CONSOLE_PLUGIN_RUN']) && class_exists(ProcessBuilder::class)) {
+            // During a composer run, we have symfony/console 2.7 unfortunately, thus we must handle it here with "old" code.
+            $process = (new ProcessBuilder($commandLine))->setTimeout(null)->addEnvironmentVariables($environmentVars)->getProcess();
+        } else {
+            $process = new Process($commandLine, null, $environmentVars, $input, 0);
+            $process->inheritEnvironmentVariables();
+        }
+
         $process->run();
         $output = str_replace("\r\n", "\n", trim($process->getOutput()));
 

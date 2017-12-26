@@ -252,8 +252,7 @@ class CliSetupRequestHandler
             if ($argumentDefinition->acceptsValue()) {
                 $currentActionArguments['options'][$argumentDefinition->getDashedName()] = $value;
             } else {
-                $value = (bool)$value;
-                if ($value) {
+                if ((bool)$value) {
                     $currentActionArguments['options'][] = $argumentDefinition->getDashedName();
                 }
             }
