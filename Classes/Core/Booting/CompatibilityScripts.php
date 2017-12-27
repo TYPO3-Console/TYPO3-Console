@@ -15,7 +15,6 @@ namespace Helhum\Typo3Console\Core\Booting;
 
 use Helhum\Typo3Console\Extension\ExtensionConfiguration;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration as CoreExtensionConfiguration;
-use TYPO3\CMS\Core\Core\Bootstrap;
 
 class CompatibilityScripts
 {
@@ -25,10 +24,9 @@ class CompatibilityScripts
     }
 
     /**
-     * @param Bootstrap $bootstrap
      * @deprecated can be removed when TYPO3 8 support is removed
      */
-    public static function initializeDatabaseConnection(Bootstrap $bootstrap)
+    public static function initializeDatabaseConnection()
     {
         // noop for TYPO3 9
     }

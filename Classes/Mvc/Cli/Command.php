@@ -22,8 +22,6 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Reflection\ClassSchema;
-use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 
 /**
  * Represents a Command
@@ -43,6 +41,11 @@ class Command
     /**
      * @var string
      */
+    private $controllerCommandMethod;
+
+    /**
+     * @var string
+     */
     protected $commandIdentifier;
 
     /**
@@ -51,11 +54,6 @@ class Command
      * @var string
      */
     protected $extensionName;
-
-    /**
-     * @var ReflectionService
-     */
-    protected $reflectionService;
 
     /**
      * @var CommandArgumentDefinition[]
@@ -88,27 +86,22 @@ class Command
     private $inputDefinitions;
 
     /**
-     * @var ClassSchema
+     * @var CommandReflection
      */
-    private $classSchema;
-
-    /**
-     * @var string
-     */
-    private $controllerCommandMethod;
+    private $commandReflection;
 
     /**
      * @param string $controllerClassName Class name of the controller providing the command
      * @param string $controllerCommandName Command name, i.e. the method name of the command, without the "Command" suffix
-     * @param ReflectionService $reflectionService
+     * @param CommandReflection $commandReflection
      * @throws InvalidArgumentException
      */
-    public function __construct(string $controllerClassName, string $controllerCommandName, ReflectionService $reflectionService)
+    public function __construct(string $controllerClassName, string $controllerCommandName, CommandReflection $commandReflection = null)
     {
         $this->controllerClassName = $controllerClassName;
         $this->controllerCommandName = $controllerCommandName;
-        $this->reflectionService = $reflectionService;
         $this->controllerCommandMethod = $this->controllerCommandName . 'Command';
+        $this->commandReflection = $commandReflection ?: new CommandReflection($this->controllerClassName, $this->controllerCommandMethod);
         $delimiter = strpos($controllerClassName, '\\') !== false ? '\\' : '_';
         $classNameParts = explode($delimiter, $controllerClassName);
         if (isset($classNameParts[0], $classNameParts[1]) && $classNameParts[0] === 'TYPO3' && $classNameParts[1] === 'CMS') {
@@ -132,11 +125,6 @@ class Command
         $this->extensionName = $classNameParts[1];
         $extensionKey = GeneralUtility::camelCaseToLowerCaseUnderscored($this->extensionName);
         $this->commandIdentifier = strtolower($extensionKey . ':' . substr($classNameParts[$numberOfClassNameParts - 1], 0, -17) . ':' . $controllerCommandName);
-    }
-
-    public function initializeObject()
-    {
-        $this->classSchema = $this->reflectionService->getClassSchema($this->controllerClassName);
     }
 
     /**
@@ -182,7 +170,7 @@ class Command
      */
     public function getShortDescription(): string
     {
-        $lines = explode(LF, $this->classSchema->getMethod($this->controllerCommandMethod)['description']);
+        $lines = explode(LF, $this->commandReflection->getDescription());
         return !empty($lines) ? trim($lines[0]) : '<no description available>';
     }
 
@@ -195,7 +183,7 @@ class Command
      */
     public function getDescription(): string
     {
-        $lines = explode(LF, $this->classSchema->getMethod($this->controllerCommandMethod)['description']);
+        $lines = explode(LF, $this->commandReflection->getDescription());
         array_shift($lines);
         $descriptionLines = [];
         foreach ($lines as $line) {
@@ -214,7 +202,7 @@ class Command
      */
     public function hasArguments(): bool
     {
-        return !empty($this->classSchema->getMethod($this->controllerCommandMethod)['params']);
+        return !empty($this->commandReflection->getParameters());
     }
 
     /**
@@ -280,8 +268,8 @@ class Command
             return $this->argumentDefinitions = [];
         }
         $this->argumentDefinitions = [];
-        $commandParameters = $this->classSchema->getMethod($this->controllerCommandMethod)['params'];
-        $commandParameterTags = $this->classSchema->getMethod($this->controllerCommandMethod)['tags']['param'];
+        $commandParameters = $this->commandReflection->getParameters();
+        $commandParameterTags = $this->commandReflection->getTagsValues()['param'];
         $i = 0;
         $argumentNames = $this->getDefinedArgumentNames();
         foreach ($commandParameters as $commandParameterName => $commandParameterDefinition) {
@@ -409,7 +397,7 @@ class Command
     }
 
     /**
-     * Very simple parsing of a definition annotations on command methods.
+     * Get parsed annotations if command has any
      *
      * @throws InvalidArgumentException
      * @return array
@@ -474,7 +462,7 @@ class Command
      */
     public function isInternal(): bool
     {
-        return isset($this->classSchema->getMethod($this->controllerCommandMethod)['tags']['internal']);
+        return isset($this->commandReflection->getTagsValues()['internal']);
     }
 
     /**
@@ -484,7 +472,7 @@ class Command
      */
     public function isCliOnly(): bool
     {
-        return isset($this->classSchema->getMethod($this->controllerCommandMethod)['tags']['cli']);
+        return isset($this->commandReflection->getTagsValues()['cli']);
     }
 
     /**
@@ -496,7 +484,7 @@ class Command
      */
     public function isFlushingCaches(): bool
     {
-        return isset($this->classSchema->getMethod($this->controllerCommandMethod)['tags']['flushesCaches']);
+        return isset($this->commandReflection->getTagsValues()['flushesCaches']);
     }
 
     /**
@@ -508,12 +496,12 @@ class Command
      */
     public function getRelatedCommandIdentifiers(): array
     {
-        if (!isset($this->classSchema->getMethod($this->controllerCommandMethod)['tags']['see'])) {
+        if (!isset($this->commandReflection->getTagsValues()['see'])) {
             return [];
         }
         $relatedCommandIdentifiers = [];
-        foreach ($this->classSchema->getMethod($this->controllerCommandMethod)['tags']['see'] as $tagValue) {
-            if (preg_match('/^[\\w\\d\\.]+:[\\w\\d]+:[\\w\\d]+$/', $tagValue) === 1) {
+        foreach ($this->commandReflection->getTagsValues()['see'] as $tagValue) {
+            if (preg_match('/^[\\w\\._]+:[\\w]+:[\\w]+$/', $tagValue) === 1) {
                 $relatedCommandIdentifiers[] = $tagValue;
             }
         }
