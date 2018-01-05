@@ -90,8 +90,17 @@ class Kernel
         if (Bootstrap::usesComposerClassLoading()) {
             return;
         }
-        $classesPaths = [__DIR__ . '/../../Classes', __DIR__ . '/../../Resources/Private/ExtensionArtifacts/src/'];
-        $this->classLoader->addPsr4('Helhum\\Typo3Console\\', $classesPaths);
+        $extensionBaseDir = dirname(__DIR__, 2) . '/';
+        $autoloadDefinition = json_decode(file_get_contents($extensionBaseDir . 'composer.json'), true)['autoload']['psr-4'];
+        foreach ($autoloadDefinition as $prefix => $paths) {
+            $paths = array_map(
+                function ($path) use ($extensionBaseDir) {
+                    return $extensionBaseDir . $path;
+                },
+                (array)$paths
+            );
+            $this->classLoader->addPsr4($prefix, $paths);
+        }
         $pharFile = __DIR__ . '/../../Libraries/symfony-process.phar';
         require 'phar://' . $pharFile . '/vendor/autoload.php';
     }

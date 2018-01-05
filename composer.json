@@ -56,10 +56,8 @@
         "psr-4": {
             "Helhum\\Typo3Console\\": [
                 "Classes/",
+                "Compatibility/",
                 "Resources/Private/ExtensionArtifacts/src/"
-            ],
-            "Helhum\\Typo3Console\\TYPO3v87\\": [
-                "Compatibility/TYPO3v87/"
             ]
         }
     },
