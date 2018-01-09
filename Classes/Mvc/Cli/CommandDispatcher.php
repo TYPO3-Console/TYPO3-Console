@@ -14,11 +14,11 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 use Composer\Script\Event as ScriptEvent;
+use Composer\Util\ProcessExecutor;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
 
 /**
  * This class can be used to execute console commands in a sub process
@@ -164,6 +164,9 @@ class CommandDispatcher
         // Start with a fresh list of arguments and environment
         $commandLine = $this->commandLine;
         $environmentVars = array_replace($this->environmentVars, $environment);
+        if (empty($environmentVars)) {
+            $environmentVars = null;
+        }
         $commandLine[] = $command;
 
         foreach ($arguments as $argumentName => $argumentValue) {
@@ -191,9 +194,16 @@ class CommandDispatcher
             }
         }
 
-        if (isset($environmentVars['TYPO3_CONSOLE_PLUGIN_RUN']) && class_exists(ProcessBuilder::class)) {
-            // During a composer run, we have symfony/console 2.7 unfortunately, thus we must handle it here with "old" code.
-            $process = (new ProcessBuilder($commandLine))->setTimeout(null)->addEnvironmentVariables($environmentVars)->getProcess();
+        if (isset($envVars['TYPO3_CONSOLE_PLUGIN_RUN'])) {
+            // During a composer run, we have symfony/console 2.8 unfortunately,
+            // thus we must handle convert the arguments to a string.
+            $process = new Process(
+                implode(' ', array_map(ProcessExecutor::class . '::escape', $commandLine)),
+                null,
+                array_replace($this->getDefaultEnv(), $environmentVars),
+                $input,
+                0
+            );
         } else {
             $process = new Process($commandLine, null, $environmentVars, $input, 0);
             $process->inheritEnvironmentVariables();
@@ -207,5 +217,24 @@ class CommandDispatcher
         }
 
         return $output;
+    }
+
+    private function getDefaultEnv(): array
+    {
+        $env = [];
+
+        foreach ($_SERVER as $k => $v) {
+            if (is_string($v) && false !== $v = getenv($k)) {
+                $env[$k] = $v;
+            }
+        }
+
+        foreach ($_ENV as $k => $v) {
+            if (is_string($v)) {
+                $env[$k] = $v;
+            }
+        }
+
+        return $env;
     }
 }
