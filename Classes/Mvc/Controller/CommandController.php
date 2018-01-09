@@ -259,10 +259,10 @@ abstract class CommandController implements CommandControllerInterface
             $preparedArguments[] = $argument->getValue();
         }
         $commandResult = $this->{$this->commandMethodName}(...$preparedArguments);
-        if (is_string($commandResult) && $commandResult !== '') {
-            $this->response->appendContent($commandResult);
-        } elseif (is_object($commandResult) && method_exists($commandResult, '__toString')) {
-            $this->response->appendContent((string)$commandResult);
+        if ($commandResult !== null) {
+            $this->outputLine((string)$commandResult);
+            $this->outputLine('<warning>Returning a string from a command method is deprecated.</warning>');
+            $this->outputLine('<warning>Please use $this->outputLine() instead.</warning>');
         }
     }
 
