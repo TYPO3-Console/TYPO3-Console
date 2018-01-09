@@ -31,7 +31,7 @@ class CommandDispatcher
     /**
      * @var array
      */
-    private $commandLine;
+    private $commandLinePrefix;
 
     /**
      * @var array
@@ -41,12 +41,12 @@ class CommandDispatcher
     /**
      * Don't allow object creation without factory method
      *
-     * @param array $commandLine
+     * @param array $commandLinePrefix
      * @param array $environmentVars
      */
-    private function __construct(array $commandLine, array $environmentVars = [])
+    private function __construct(array $commandLinePrefix, array $environmentVars = [])
     {
-        $this->commandLine = $commandLine;
+        $this->commandLinePrefix = $commandLinePrefix;
         $this->environmentVars = $environmentVars;
     }
 
@@ -154,57 +154,29 @@ class CommandDispatcher
      *
      * @param string $command Command identifier
      * @param array $arguments Argument names will automatically be converted to dashed version, if not provided like so
-     * @param array $environment Environment vars to be added to the command
+     * @param array $envVars Environment vars to be added to the command
      * @param resource|string|\Traversable|null $input Inpupt (stdin) for the command
      * @throws FailedSubProcessCommandException
      * @return string
      */
-    public function executeCommand($command, array $arguments = [], array $environment = [], $input = null)
+    public function executeCommand($command, array $arguments = [], array $envVars = [], $input = null)
     {
-        // Start with a fresh list of arguments and environment
-        $commandLine = $this->commandLine;
-        $environmentVars = array_replace($this->environmentVars, $environment);
-        if (empty($environmentVars)) {
-            $environmentVars = null;
-        }
-        $commandLine[] = $command;
+        $envVars = array_replace($this->environmentVars, $envVars);
+        $commandLine = $this->commandLinePrefix;
 
+        $commandLine[] = $command;
         foreach ($arguments as $argumentName => $argumentValue) {
             if (is_int($argumentName)) {
-                $dashedName = $argumentValue;
-                $argumentValue = null;
-            } elseif (strpos($argumentName, '--') === 0) {
-                $dashedName = $argumentName;
-            } else {
-                $dashedName = ucfirst($argumentName);
-                $dashedName = preg_replace('/([A-Z][a-z0-9]+)/', '$1-', $dashedName);
-                $dashedName = '--' . strtolower(substr($dashedName, 0, -1));
-            }
-            if (is_array($argumentValue)) {
-                $argumentValue = implode(',', $argumentValue);
-            }
-            $commandLine[] = $dashedName;
-            if ($argumentValue !== null) {
                 $commandLine[] = $argumentValue;
+            } else {
+                $commandLine[] = $this->getDashedArgumentName($argumentName);
+                $commandLine[] = is_array($argumentValue) ? implode(',', $argumentValue) : $argumentValue;
             }
         }
 
-        if (isset($envVars['TYPO3_CONSOLE_PLUGIN_RUN'])) {
-            // During a composer run, we have symfony/console 2.8 unfortunately,
-            // thus we must handle convert the arguments to a string.
-            $process = new Process(
-                implode(' ', array_map(ProcessExecutor::class . '::escape', $commandLine)),
-                null,
-                array_replace($this->getDefaultEnv(), $environmentVars),
-                $input,
-                0
-            );
-        } else {
-            $process = new Process($commandLine, null, $environmentVars, $input, 0);
-            $process->inheritEnvironmentVariables();
-        }
-
+        $process = $this->getProcess($commandLine, $envVars, $input);
         $process->run();
+
         $output = str_replace("\r\n", "\n", trim($process->getOutput()));
 
         if (!$process->isSuccessful()) {
@@ -212,6 +184,43 @@ class CommandDispatcher
         }
 
         return $output;
+    }
+
+    private function getDashedArgumentName(string $argumentName): string
+    {
+        if (strpos($argumentName, '--') === 0) {
+            $dashedName = $argumentName;
+        } else {
+            $dashedName = ucfirst($argumentName);
+            $dashedName = preg_replace('/([A-Z][a-z0-9]+)/', '$1-', $dashedName);
+            $dashedName = '--' . strtolower(substr($dashedName, 0, -1));
+        }
+        return $dashedName;
+    }
+
+    /**
+     * @param array $commandLine
+     * @param array $envVars
+     * @param resource|string|\Traversable|null $input
+     * @return Process
+     */
+    private function getProcess(array $commandLine, array $envVars, $input): Process
+    {
+        if (isset($envVars['TYPO3_CONSOLE_PLUGIN_RUN'])) {
+            // During a composer run, we have symfony/console 2.8 unfortunately,
+            // thus we must handle convert the arguments to a string.
+            $process = new Process(
+                implode(' ', array_map(ProcessExecutor::class . '::escape', $commandLine)),
+                null,
+                array_replace($this->getDefaultEnv(), $envVars),
+                $input,
+                0
+            );
+        } else {
+            $process = new Process($commandLine, null, $envVars, $input, 0);
+            $process->inheritEnvironmentVariables();
+        }
+        return $process;
     }
 
     private function getDefaultEnv(): array
@@ -229,7 +238,6 @@ class CommandDispatcher
                 $env[$k] = $v;
             }
         }
-
         return $env;
     }
 }
