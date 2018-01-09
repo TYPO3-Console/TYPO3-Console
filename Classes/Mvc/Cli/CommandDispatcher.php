@@ -185,12 +185,7 @@ class CommandDispatcher
             }
             $commandLine[] = $dashedName;
             if ($argumentValue !== null) {
-                if ($argumentValue === false) {
-                    // Convert boolean false to 'false' instead of empty string to correctly pass the value to the sub command
-                    $commandLine[] = 'false';
-                } else {
-                    $commandLine[] = $argumentValue;
-                }
+                $commandLine[] = $argumentValue;
             }
         }
 
