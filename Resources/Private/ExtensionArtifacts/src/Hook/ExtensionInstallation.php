@@ -130,7 +130,9 @@ require __DIR__ . \'/typo3conf/ext/typo3_console/Scripts/typo3-console.php\';',
 
     protected static function isTypo3CmsBinary($fullTargetPath)
     {
-        return strpos(file_get_contents($fullTargetPath), 'typo3-console.php') !== false;
+        $binaryContent = file_get_contents($fullTargetPath);
+        return strpos($binaryContent, 'typo3cms.php') !== false
+            || strpos($binaryContent, 'typo3-console.php') !== false;
     }
 
     /**
