@@ -261,8 +261,8 @@ abstract class CommandController implements CommandControllerInterface
         $commandResult = $this->{$this->commandMethodName}(...$preparedArguments);
         if ($commandResult !== null) {
             $this->outputLine((string)$commandResult);
-            $this->outputLine('<warning>Returning a string from a command method is deprecated.</warning>');
-            $this->outputLine('<warning>Please use $this->outputLine() instead.</warning>');
+            $this->output->getSymfonyConsoleOutput()->getErrorOutput()->writeln('<warning>Returning a string from a command method is deprecated.</warning>');
+            $this->output->getSymfonyConsoleOutput()->getErrorOutput()->writeln('<warning>Please use $this->outputLine() instead.</warning>');
         }
     }
 
