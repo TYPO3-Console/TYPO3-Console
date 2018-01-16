@@ -164,7 +164,7 @@ class UpgradeHandling
                         if (ConsoleBootstrap::usesComposerClassLoading()) {
                             $arguments[] = sprintf('%s[%s]=%s', $shortIdentifier, $argumentName, $argumentDefault);
                             $messages[] = '<warning>Wizard "' . $shortIdentifier . '" was not executed but only marked as executed due to composer mode.</warning>';
-                            // We currently only handle one argument type
+                        // We currently only handle one argument type
                         } elseif ($argumentDefinition['type'] === 'bool') {
                             $wizard = $this->factory->create($wizardOptions['className']);
                             $consoleOutput->outputLine(PHP_EOL . PHP_EOL . '<info>' . $wizard->getTitle() . '</info>' . PHP_EOL);

@@ -58,7 +58,7 @@ class InstallDummyExtension implements InstallerScript
         $extensionDir = "$webDir/typo3conf/ext/typo3_console";
 
         if ($pluginConfig->get('install-extension-dummy')) {
-            $io->writeError('<warning>Installation of TYPO3 extension has been deprecated</warning>');
+            $io->writeError('<warning>Installation of TYPO3 Console extension is deprecated</warning>');
             $io->writeError('<warning>To get rid of this message, set "install-extension-dummy" option to false</warning>');
             $io->writeError('<warning>Use the following command to set this option:</warning>');
             $io->writeError('<warning>composer config extra.helhum/typo3-console.install-extension-dummy 0</warning>');
