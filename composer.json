@@ -20,7 +20,7 @@
             "homepage": "http://helhum.io"
         }
     ],
-    "license": "GPL-2.0+",
+    "license": "GPL-2.0-or-later",
     "require": {
         "php": ">=7.0.0 <7.3",
         "helhum/typo3-console-plugin": "^2.0.2",
