@@ -18,7 +18,7 @@
             "homepage": "http://helhum.io"
         }
     ],
-    "license": "GPL-2.0+",
+    "license": "GPL-2.0-or-later",
     "version": "1.1.9",
     "require": {
         "typo3/cms-core": ">=6.2.6,<7.3.0"
