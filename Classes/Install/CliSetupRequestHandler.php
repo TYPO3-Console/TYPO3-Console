@@ -196,6 +196,8 @@ class CliSetupRequestHandler
             }
             $response = $this->executeActionWithArguments($actionName, $actionArguments['arguments'], $actionArguments['options']);
             if ($this->checkIfActionNeedsExecution($actionName)->actionNeedsExecution()) {
+                // @deprecated Can be removed once TYPO3 8.7 support is removed. Then it will be safe to call the action only once
+                // and just assume it completed
                 $response = $this->executeActionWithArguments($actionName, $actionArguments['arguments'], $actionArguments['options']);
             }
             $messages = $response->getMessages();
