@@ -65,21 +65,7 @@ class CommandDispatcher
     public static function createFromComposerRun(ScriptEvent $event, array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null)
     {
         // should be Application::COMMAND_NAME, but our Application class currently conflicts with symfony/console 2.7, which is used by Composer
-        $name = 'typo3cms';
-        $searchDirs = [
-            $event->getComposer()->getConfig()->get('bin-dir'),
-            dirname(__DIR__, 3),
-        ];
-        foreach ($searchDirs as $dir) {
-            $file = $dir . DIRECTORY_SEPARATOR . $name;
-            if (is_file($file)) {
-                $typo3CommandPath = $file;
-                break;
-            }
-        }
-        if (!isset($typo3CommandPath)) {
-            throw new RuntimeException(sprintf('The "%s" binary could not be found.', $name), 1494778973);
-        }
+        $typo3CommandPath = dirname(__DIR__, 3) . '/typo3cms';
         $environmentVars['TYPO3_CONSOLE_PLUGIN_RUN'] = true;
 
         return self::create($typo3CommandPath, $commandLine, $environmentVars, $phpFinder);
