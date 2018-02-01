@@ -94,6 +94,15 @@ class InstallCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
+    public function siteSetupCreatedHomepageOnlyOnce()
+    {
+        $queryResult = $this->executeMysqlQuery('SELECT count(*) FROM `pages`;');
+        $this->assertSame('1', preg_replace('/\s+/', '', $queryResult));
+    }
+
+    /**
+     * @test
+     */
     public function folderStructureIsCreated()
     {
         $indexFile = getenv('TYPO3_PATH_ROOT') . '/typo3temp/index.html';

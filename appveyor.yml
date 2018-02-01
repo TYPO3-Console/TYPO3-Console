@@ -12,9 +12,9 @@ environment:
 
   matrix:
     - TYPO3_VERSION: '~9.0.0'
-      PHP_VERSION: '7.2.0-Win32-VC15'
+      PHP_VERSION: '7.2.1-Win32-VC15'
     - TYPO3_VERSION: '~8.7'
-      PHP_VERSION: '7.1.12-Win32-VC14'
+      PHP_VERSION: '7.1.13-Win32-VC14'
     - TYPO3_VERSION: '~8.7'
       PHP_VERSION: '7.0.26-Win32-VC14'
 
@@ -33,7 +33,7 @@ install:
   - IF NOT EXIST c:\php mkdir c:\php
   - IF NOT EXIST c:\php\%PHP_VERSION% mkdir c:\php\%PHP_VERSION%
   - cd c:\php\%PHP_VERSION%
-  - IF NOT EXIST php-installed.txt appveyor DownloadFile http://windows.php.net/downloads/releases/php-%PHP_VERSION%-x86.zip
+  - IF NOT EXIST php-installed.txt appveyor DownloadFile http://windows.php.net/downloads/releases/archives/php-%PHP_VERSION%-x86.zip
   - IF NOT EXIST php-installed.txt 7z x php-%PHP_VERSION%-x86.zip -y >nul
   - IF NOT EXIST php-installed.txt del /Q *.zip
   - IF NOT EXIST php-installed.txt copy /Y php.ini-development php.ini

@@ -69,7 +69,7 @@ class InstallStepActionExecutor
         $actionMethod = 'execute' . ucfirst($actionName) . 'Action';
         $checkMethod = 'check' . ucfirst($actionName) . 'Action';
         $messages = [];
-        $needsExecution = true;
+        $needsExecution = file_exists(PATH_site . 'FIRST_INSTALL');
         if (is_callable([$this->installerController, $checkMethod])) {
             $needsExecution = !\json_decode($this->installerController->$checkMethod()->getBody(), true)['success'];
         }
