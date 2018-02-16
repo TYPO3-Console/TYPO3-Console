@@ -141,10 +141,10 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
             $config = @\json_decode(trim($this->executeConsoleCommand('configuration:showlocal', ['EXT/extConf', '--json'])), true);
             $this->assertArrayHasKey('ext_config', $config);
         } finally {
+            $this->removeFixtureExtensionCode('ext_config');
             $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
             $this->executeConsoleCommand('configuration:remove', ['EXTENSIONS/ext_config', '--force']);
             $this->executeConsoleCommand('configuration:remove', ['EXT/extConf/ext_config', '--force']);
-            $this->removeFixtureExtensionCode('ext_config');
         }
     }
 

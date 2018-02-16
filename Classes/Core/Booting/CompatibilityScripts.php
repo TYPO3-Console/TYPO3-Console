@@ -13,9 +13,6 @@ namespace Helhum\Typo3Console\Core\Booting;
  *
  */
 
-use Helhum\Typo3Console\Extension\ExtensionConfiguration;
-use TYPO3\CMS\Core\Configuration\ExtensionConfiguration as CoreExtensionConfiguration;
-
 class CompatibilityScripts
 {
     public static function initializeConfigurationManagement()
@@ -33,7 +30,6 @@ class CompatibilityScripts
 
     public static function initializeExtensionConfiguration()
     {
-        // Replace core functionality with something that is working for us
-        class_alias(ExtensionConfiguration::class, CoreExtensionConfiguration::class);
+        // noop for TYPO3 9
     }
 }
