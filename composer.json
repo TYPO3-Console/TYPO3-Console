@@ -25,22 +25,22 @@
         "php": ">=7.0.0 <7.3",
         "helhum/typo3-console-plugin": "^2.0.2",
 
-        "typo3/cms-backend": "^8.7.7 || ~9.0.0",
-        "typo3/cms-core": "^8.7.7 || ~9.0.0",
-        "typo3/cms-extbase": "^8.7.7 || ~9.0.0",
-        "typo3/cms-extensionmanager": "^8.7.7 || ~9.0.0",
-        "typo3/cms-fluid": "^8.7.7 || ~9.0.0",
-        "typo3/cms-install": "^8.7.7 || ~9.0.0",
-        "typo3/cms-scheduler": "^8.7.7 || ~9.0.0",
-        "typo3/cms-saltedpasswords": "^8.7.7 || ~9.0.0",
+        "typo3/cms-backend": "^8.7.10 || ~9.0.0",
+        "typo3/cms-core": "^8.7.10 || ~9.0.0",
+        "typo3/cms-extbase": "^8.7.10 || ~9.0.0",
+        "typo3/cms-extensionmanager": "^8.7.10 || ~9.0.0",
+        "typo3/cms-fluid": "^8.7.10 || ~9.0.0",
+        "typo3/cms-install": "^8.7.10 || ~9.0.0",
+        "typo3/cms-scheduler": "^8.7.10 || ~9.0.0",
+        "typo3/cms-saltedpasswords": "^8.7.10 || ~9.0.0",
 
         "doctrine/annotations": "^1.4",
         "symfony/console": "^3.3.6 || ^4.0",
         "symfony/process": "^3.3.6 || ^4.0"
     },
     "require-dev": {
-        "typo3/cms-reports": "^8.7.7 || ~9.0.0 || 9.1.*@dev",
-        "typo3/cms-filemetadata": "^8.7.7 || ~9.0.0 || 9.1.*@dev",
+        "typo3/cms-reports": "^8.7.10 || ~9.0.0 || 9.1.*@dev",
+        "typo3/cms-filemetadata": "^8.7.10 || ~9.0.0 || 9.1.*@dev",
 
         "helhum/typo3-composer-setup": "^0.4",
         "typo3-console/php-server-command": "^0.1.1",

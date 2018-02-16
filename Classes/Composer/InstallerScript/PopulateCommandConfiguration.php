@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\Composer\InstallerScript;
 
 use Composer\Script\Event as ScriptEvent;
 use TYPO3\CMS\Composer\Plugin\Core\InstallerScript;
+use TYPO3\CMS\Composer\Plugin\Util\ExtensionKeyResolver;
 
 /**
  * Reads console command configuration files from all composer packages in the current project
@@ -41,6 +42,9 @@ class PopulateCommandConfiguration implements InstallerScript
             list($package, $installPath) = $item;
             $installPath = ($installPath ?: $basePath);
             $packageName = $package->getName();
+            if (in_array($package->getType(), ['typo3-cms-extension', 'typo3-cms-framework'], true)) {
+                $packageName = ExtensionKeyResolver::resolve($package);
+            }
             if ($package->getType() === 'metapackage') {
                 // We have a meta package, which does not have any files
                 continue;
