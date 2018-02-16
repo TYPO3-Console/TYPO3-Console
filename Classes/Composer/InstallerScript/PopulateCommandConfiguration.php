@@ -16,7 +16,6 @@ namespace Helhum\Typo3Console\Composer\InstallerScript;
 
 use Composer\Script\Event as ScriptEvent;
 use TYPO3\CMS\Composer\Plugin\Core\InstallerScript;
-use TYPO3\CMS\Composer\Plugin\Util\ExtensionKeyResolver;
 
 /**
  * Reads console command configuration files from all composer packages in the current project
@@ -42,21 +41,17 @@ class PopulateCommandConfiguration implements InstallerScript
             list($package, $installPath) = $item;
             $installPath = ($installPath ?: $basePath);
             $packageName = $package->getName();
-            if (in_array($package->getType(), ['typo3-cms-extension', 'typo3-cms-framework'], true)) {
-                $packageName = ExtensionKeyResolver::resolve($package);
-            }
-            if ($package->getType() === 'metapackage') {
-                // We have a meta package, which does not have any files
-                continue;
-            }
-            if ($packageName === 'typo3/cms') {
-                $commandConfiguration = array_merge($commandConfiguration, $this->getConfigFromTypo3Packages($installPath));
+            $packageType = $package->getType();
+            if (in_array($packageType, ['metapackage', 'typo3-cms-extension', 'typo3-cms-framework'], true)) {
+                // Commands in TYPO3 extensions are scanned for anyway at a later point.
+                // With that we ensure not showing commands for extensions that aren't active.
+                // Since meta packages have no code, thus cannot include any commands, we ignore them as well.
                 continue;
             }
             $commandConfiguration = array_merge($commandConfiguration, $this->getConfigFromPackage($installPath, $packageName));
         }
         $success = file_put_contents(
-            __DIR__ . '/../../../Configuration/Console/AllCommands.php',
+            __DIR__ . '/../../../Configuration/Console/ComposerPackagesCommands.php',
             '<?php' . chr(10)
             . 'return '
             . var_export($commandConfiguration, true)
@@ -95,19 +90,5 @@ class PopulateCommandConfiguration implements InstallerScript
             return [];
         }
         return [$packageName => $commandConfiguration];
-    }
-
-    /**
-     * @param $typo3InstallPath
-     * @return array
-     */
-    private function getConfigFromTypo3Packages(string $typo3InstallPath): array
-    {
-        $commandConfiguration = [];
-        foreach (glob($typo3InstallPath . '/typo3/sysext/*/') as $installPath) {
-            $packageName = basename($installPath);
-            $commandConfiguration = array_merge($commandConfiguration, $this->getConfigFromPackage($installPath, $packageName));
-        }
-        return $commandConfiguration;
     }
 }

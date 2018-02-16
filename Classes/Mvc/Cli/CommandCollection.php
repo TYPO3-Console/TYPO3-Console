@@ -213,29 +213,28 @@ class CommandCollection implements \IteratorAggregate
         if (!empty($this->commandConfigurations)) {
             return $this->commandConfigurations;
         }
-        if (file_exists($commandConfigurationFile = __DIR__ . '/../../../Configuration/Console/AllCommands.php')) {
-            return require $commandConfigurationFile;
-        }
-
-        // All code below is only for non composer mode
-        if (!$this->packageManager->isPackageAvailable('typo3_console')
-            || !$this->packageManager->isPackageActive('typo3_console')
-        ) {
-            // We are not installed, or not even existing as extension, but we still want to be able to run,
-            // thus we include our config directly in this case.
+        if (file_exists($commandConfigurationFile = __DIR__ . '/../../../Configuration/Console/ComposerPackagesCommands.php')) {
+            $this->commandConfigurations = require $commandConfigurationFile;
+        } else {
+            // We only reach this point in non composer mode
+            // We ensure that our commands are present, even if we are not an active extension or even not being an extension at all
             $this->commandConfigurations['typo3_console'] = require __DIR__ . '/../../../Configuration/Console/Commands.php';
         }
+        $this->populateCommandConfigurationFromExtensions();
+        return $this->commandConfigurations;
+    }
+
+    private function populateCommandConfigurationFromExtensions()
+    {
         foreach ($this->packageManager->getActivePackages() as $package) {
-            $installPath = $package->getPackagePath();
-            $packageConfig = $this->getConfigFromPackage($installPath);
+            $packageConfig = $this->getConfigFromExtension($package->getPackagePath());
             if (!empty($packageConfig)) {
                 $this->commandConfigurations[$package->getPackageKey()] = $packageConfig;
             }
         }
-        return $this->commandConfigurations;
     }
 
-    private function getConfigFromPackage(string $installPath): array
+    private function getConfigFromExtension(string $installPath): array
     {
         $commandConfiguration = [];
         if (file_exists($commandConfigurationFile = $installPath . '/Configuration/Console/Commands.php')) {

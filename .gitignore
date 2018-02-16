@@ -1,7 +1,7 @@
 /.Build/*
 /composer.lock
 
-/Configuration/Console/AllCommands.php
+/Configuration/Console/ComposerPackagesCommands.php
 /Libraries/*
 /ext_emconf.php
 /ext_icon.png

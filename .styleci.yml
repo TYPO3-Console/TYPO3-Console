@@ -59,4 +59,4 @@ finder:
     - "Libraries"
   not-name:
     - "ext_emconf.php"
-    - "AllCommands.php"
+    - "ComposerPackagesCommands.php"
