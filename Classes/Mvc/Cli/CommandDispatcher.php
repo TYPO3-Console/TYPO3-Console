@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Mvc\Cli;
 
 /*
@@ -62,24 +63,10 @@ class CommandDispatcher
      * @throws RuntimeException
      * @return CommandDispatcher
      */
-    public static function createFromComposerRun(ScriptEvent $event, array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null)
+    public static function createFromComposerRun(ScriptEvent $event, array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null): self
     {
         // should be Application::COMMAND_NAME, but our Application class currently conflicts with symfony/console 2.7, which is used by Composer
-        $name = 'typo3cms';
-        $searchDirs = [
-            $event->getComposer()->getConfig()->get('bin-dir'),
-            dirname(__DIR__, 3),
-        ];
-        foreach ($searchDirs as $dir) {
-            $file = $dir . DIRECTORY_SEPARATOR . $name;
-            if (is_file($file)) {
-                $typo3CommandPath = $file;
-                break;
-            }
-        }
-        if (!isset($typo3CommandPath)) {
-            throw new RuntimeException(sprintf('The "%s" binary could not be found.', $name), 1494778973);
-        }
+        $typo3CommandPath = dirname(__DIR__, 3) . '/typo3cms';
         $environmentVars['TYPO3_CONSOLE_PLUGIN_RUN'] = true;
 
         return self::create($typo3CommandPath, $commandLine, $environmentVars, $phpFinder);
@@ -96,7 +83,7 @@ class CommandDispatcher
      * @throws RuntimeException
      * @return CommandDispatcher
      */
-    public static function createFromCommandRun(array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null)
+    public static function createFromCommandRun(array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null): self
     {
         if (!isset($_SERVER['argv'][0]) && strpos($_SERVER['argv'][0], Application::COMMAND_NAME) === false) {
             throw new RuntimeException('Tried to create typo3 command runner from wrong context', 1484945065);
@@ -114,7 +101,7 @@ class CommandDispatcher
      * @throws RuntimeException
      * @return CommandDispatcher
      */
-    public static function createFromTestRun($typo3CommandPath = null)
+    public static function createFromTestRun($typo3CommandPath = null): self
     {
         if (!isset($_SERVER['argv'][0]) && strpos($_SERVER['argv'][0], 'phpunit') === false) {
             throw new RuntimeException(sprintf('Tried to create %s command runner from wrong context', Application::COMMAND_NAME), 1493570522);
@@ -133,7 +120,7 @@ class CommandDispatcher
      * @throws RuntimeException
      * @return CommandDispatcher
      */
-    public static function create($typo3CommandPath, array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null)
+    public static function create($typo3CommandPath, array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null): self
     {
         $phpFinder = $phpFinder ?: new PhpExecutableFinder();
         if (!($php = $phpFinder->find())) {
@@ -159,7 +146,7 @@ class CommandDispatcher
      * @throws FailedSubProcessCommandException
      * @return string
      */
-    public function executeCommand($command, array $arguments = [], array $envVars = [], $input = null)
+    public function executeCommand($command, array $arguments = [], array $envVars = [], $input = null): string
     {
         $envVars = array_replace($this->environmentVars, $envVars);
         $commandLine = $this->commandLinePrefix;
