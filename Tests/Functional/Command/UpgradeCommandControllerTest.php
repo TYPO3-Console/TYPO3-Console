@@ -113,7 +113,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         $consoleComposerJson = str_replace('"name": "helhum/typo3-console"', '"name": "helhum/typo3-console-test"', $consoleComposerJson);
         file_put_contents($instancePath . '/typo3_console/composer.json', $consoleComposerJson);
         $this->executeComposerCommand(['config', 'repositories.console', '{"type": "path", "url": "typo3_console", "options": {"symlink": false}}']);
-        $output = $this->executeComposerCommand(['require', 'typo3/cms-core=^8.7.9', 'helhum/typo3-composer-setup=^0.4', 'helhum/typo3-console-test=@dev']);
+        $output = $this->executeComposerCommand(['require', 'typo3/cms-core=^8.7.10', 'helhum/typo3-console-test=@dev']);
         $this->assertContains('Mirroring from typo3_console', $output);
 
         $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
