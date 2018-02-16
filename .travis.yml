@@ -30,7 +30,7 @@ before_install:
   - if php -i | grep -q xdebug; then phpenv config-rm xdebug.ini; fi
 
 install:
-  - export COMPOSER_ROOT_VERSION=5.0.3
+  - export COMPOSER_ROOT_VERSION=5.0.4
   - |
     composer require \
       typo3/cms-backend="$TYPO3_VERSION" \
