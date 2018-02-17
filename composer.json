@@ -35,14 +35,14 @@
         "typo3/cms-saltedpasswords": "^8.7.10 || ~9.1.0",
 
         "doctrine/annotations": "^1.4",
-        "symfony/console": "^3.3.6 || ^4.0",
-        "symfony/process": "^3.3.6 || ^4.0"
+        "symfony/console": "^3.4.4 || ^4.0",
+        "symfony/process": "^3.4.4 || ^4.0"
     },
     "require-dev": {
         "typo3/cms-reports": "^8.7.10 || ~9.1.0 || 9.2.*@dev",
         "typo3/cms-filemetadata": "^8.7.10 || ~9.1.0 || 9.2.*@dev",
 
-        "typo3-console/php-server-command": "^0.1.1",
+        "typo3-console/php-server-command": "^0.2",
         "typo3-console/create-reference-command": "^2.2",
         "symfony/filesystem": "^3.2",
         "nimut/testing-framework": "3.*@dev"
@@ -89,7 +89,7 @@
         "extension-create-libs": [
             "mkdir -p Libraries/temp",
             "[ -f $HOME/.composer/vendor/bin/phar-composer ] || composer global require clue/phar-composer",
-            "if [ ! -f Libraries/symfony-process.phar ]; then cd Libraries/temp && composer require symfony/console=^3.3.6 symfony/process=^3.3.6 && composer config classmap-authoritative true && composer config prepend-autoloader true && composer dump-autoload -o; fi",
+            "if [ ! -f Libraries/symfony-process.phar ]; then cd Libraries/temp && composer require symfony/console=^3.4.4 symfony/process=^3.4.4 && composer config classmap-authoritative true && composer config prepend-autoloader true && composer dump-autoload -o; fi",
             "[ -f Libraries/symfony-process.phar ] || $HOME/.composer/vendor/bin/phar-composer build Libraries/temp/ Libraries/symfony-process.phar",
             "chmod -x Libraries/*.phar",
             "rm -rf Libraries/temp"
