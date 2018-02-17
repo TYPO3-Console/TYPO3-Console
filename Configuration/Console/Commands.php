@@ -44,7 +44,6 @@ return [
         'extensionmanager:extension:dumpclassloadinginformation',
         'extensionmanager:extension:install',
         'extensionmanager:extension:uninstall',
-        'help:help',
         'help:error',
         'scheduler:scheduler:run',
     ],

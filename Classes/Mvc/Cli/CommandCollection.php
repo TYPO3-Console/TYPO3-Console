@@ -34,6 +34,14 @@ use TYPO3\CMS\Extbase\Mvc\Cli\CommandManager;
 class CommandCollection implements CommandLoaderInterface
 {
     /**
+     * Only use for rendering the reference
+     *
+     * @var bool
+     * @internal
+     */
+    public static $rendersReference = false;
+
+    /**
      * @var BaseCommand[]
      */
     private $commands;
@@ -77,7 +85,7 @@ class CommandCollection implements CommandLoaderInterface
      */
     public function get($name): BaseCommand
     {
-        if (!isset($this->commands[$name]) || !$this->runLevel->isCommandAvailable($name)) {
+        if (!isset($this->commands[$name]) || !$this->isCommandAvailable($name)) {
             throw new CommandNotFoundException(sprintf('A command with name "%s" could not be found.', $name), 1518812618);
         }
         $command = $this->commands[$name]['closure']();
@@ -93,7 +101,7 @@ class CommandCollection implements CommandLoaderInterface
      */
     public function has($name): bool
     {
-        return isset($this->commands[$name]) && $this->runLevel->isCommandAvailable($name);
+        return isset($this->commands[$name]) && $this->isCommandAvailable($name);
     }
 
     /**
@@ -113,6 +121,14 @@ class CommandCollection implements CommandLoaderInterface
     {
         $this->populateCommands();
         $this->populateCommandControllerCommands($commandManager);
+    }
+
+    private function isCommandAvailable(string $name): bool
+    {
+        if (self::$rendersReference) {
+            return true;
+        }
+        return $this->runLevel->isCommandAvailable($name);
     }
 
     private function populateCommands()

@@ -23,22 +23,6 @@ use Helhum\Typo3Console\Mvc\Controller\CommandController;
 class HelpCommandController extends CommandController
 {
     /**
-     * Help
-     *
-     * Display help for a command
-     *
-     * The help command displays help for a given command:
-     * %command.full_name% help <command identifier>
-     *
-     * @param string $commandIdentifier Identifier of a command for more details
-     * @return void
-     */
-    public function helpCommand($commandIdentifier)
-    {
-        // Intentionally empty for now (until command reference can render Symfony commands)
-    }
-
-    /**
      * Displays an error message
      *
      * @internal

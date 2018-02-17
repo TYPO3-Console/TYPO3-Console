@@ -1,0 +1,26 @@
+{
+    "name": "typo3-console/create-reference-command",
+    "description": "TYPO3 Console command that creates the command reference",
+    "license": "GPL-2.0-or-later",
+    "type": "typo3-console-command",
+    "authors": [
+        {
+            "name": "Helmut Hummel",
+            "email": "info@helhum.io"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Typo3Console\\CreateReferenceCommand\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.0 <7.3",
+        "helhum/typo3-console": "^5.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}

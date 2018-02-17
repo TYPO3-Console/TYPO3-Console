@@ -33,7 +33,7 @@ class SchedulerCommandController extends CommandController
      *
      * Executes tasks that are registered in the scheduler module.
      *
-     * <b>Example:</b> <code>%command.full_name% scheduler:run 42 --force</code>
+     * <b>Example:</b> <code>%command.full_name% 42 --force</code>
      *
      * @param int $task Uid of the task that should be executed (instead of all scheduled tasks)
      * @param bool $force The execution can be forced with this flag. The task will then be executed even if it is not scheduled for execution yet. Only works, when a task is specified.
