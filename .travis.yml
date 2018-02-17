@@ -55,7 +55,7 @@ script:
 jobs:
   fast_finish: true
   allow_failures:
-    - env: TYPO3_VERSION="dev-master as 9.0.0"
+    - env: TYPO3_VERSION="dev-master as 9.1.0"
   include:
     - &lint
       stage: test
@@ -85,10 +85,10 @@ jobs:
       env: TYPO3_VERSION=^8.7 PREFER_LOWEST="--prefer-lowest"
     - stage: test
       php: 7.2
-      env: TYPO3_VERSION="~9.0.0"
+      env: TYPO3_VERSION="~9.1.0"
     - stage: test
       php: 7.2
-      env: TYPO3_VERSION="dev-master as 9.0.0"
+      env: TYPO3_VERSION="dev-master as 9.1.0"
 
     - stage: test
       php: 7.1

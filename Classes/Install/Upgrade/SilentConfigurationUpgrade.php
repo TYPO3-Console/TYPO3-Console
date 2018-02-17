@@ -15,9 +15,9 @@ namespace Helhum\Typo3Console\Install\Upgrade;
 
 use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Service\Exception\ConfigurationChangedException;
-use TYPO3\CMS\Install\Service\ExtensionConfigurationService;
 use TYPO3\CMS\Install\Service\SilentConfigurationUpgradeService;
 
 /**
@@ -49,7 +49,7 @@ class SilentConfigurationUpgrade
         }
         // We need to write the extension configuration for all active extensions ourselves
         // as the core does not take care doing so (yet)
-        $extensionConfigurationService = new ExtensionConfigurationService();
+        $extensionConfigurationService = new ExtensionConfiguration();
         $extensionConfigurationService->synchronizeExtConfTemplateWithLocalConfigurationOfAllExtensions();
 
         $upgradeService = new SilentConfigurationUpgradeService($this->configurationManager);
