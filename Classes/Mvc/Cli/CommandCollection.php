@@ -17,6 +17,8 @@ namespace Helhum\Typo3Console\Mvc\Cli;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\CommandControllerCommand;
 use Symfony\Component\Console\Command\Command as BaseCommand;
+use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
+use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Core\Console\CommandNameAlreadyInUseException;
 use TYPO3\CMS\Core\Package\PackageManager;
@@ -29,7 +31,7 @@ use TYPO3\CMS\Extbase\Mvc\Cli\CommandManager;
  * This implementation pulls in the commands from various places,
  * mainly reading configuration files from TYPO3 extensions and composer packages
  */
-class CommandCollection implements \IteratorAggregate
+class CommandCollection implements CommandLoaderInterface
 {
     /**
      * @var BaseCommand[]
@@ -61,33 +63,56 @@ class CommandCollection implements \IteratorAggregate
      */
     private $packageManager;
 
-    public function __construct(RunLevel $runLevel, PackageManager $packageManager = null)
+    public function __construct(RunLevel $runLevel, PackageManager $packageManager)
     {
         $this->runLevel = $runLevel;
         $this->packageManager = $packageManager;
+        $this->populateCommands();
     }
 
     /**
-     * @return \Generator
+     * @param string $name
+     * @throws \Symfony\Component\Console\Exception\CommandNotFoundException
+     * @return BaseCommand
      */
-    public function getIterator(): \Generator
+    public function get($name): BaseCommand
     {
-        $this->populateCommands();
-        foreach ($this->commands as $commandName => $command) {
-            yield $commandName => $command;
+        if (!isset($this->commands[$name]) || !$this->runLevel->isCommandAvailable($name)) {
+            throw new CommandNotFoundException(sprintf('A command with name "%s" could not be found.', $name), 1518812618);
         }
+        $command = $this->commands[$name]['closure']();
+        if (isset($commandDefinition['alias'])) {
+            $command->setAliases([$this->commands[$name]['alias']]);
+        }
+        return $command;
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function has($name): bool
+    {
+        return isset($this->commands[$name]) && $this->runLevel->isCommandAvailable($name);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getNames(): array
+    {
+        return array_keys($this->commands);
     }
 
     /**
      * Add command controller commands
      *
      * @throws \TYPO3\CMS\Core\Console\CommandNameAlreadyInUseException
-     * @return BaseCommand[]
      */
-    public function addCommandControllerCommands(CommandManager $commandManager): array
+    public function addCommandControllerCommands(CommandManager $commandManager)
     {
         $this->populateCommands();
-        return $this->populateCommandControllerCommands($commandManager);
+        $this->populateCommandControllerCommands($commandManager);
     }
 
     private function populateCommands()
@@ -127,11 +152,9 @@ class CommandCollection implements \IteratorAggregate
 
     /**
      * @param CommandManager $commandManager
-     * @return array
      */
-    private function populateCommandControllerCommands(CommandManager $commandManager): array
+    private function populateCommandControllerCommands(CommandManager $commandManager)
     {
-        $registeredCommands = [];
         $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] = $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] ?? [];
         $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] = array_merge($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'], $this->commandControllerClasses);
         foreach ($commandManager->getAvailableCommands() as $commandDefinition) {
@@ -142,13 +165,12 @@ class CommandCollection implements \IteratorAggregate
                 $fullCommandIdentifier
             );
             if ($commandName) {
-                $commandControllerCommand = GeneralUtility::makeInstance(CommandControllerCommand::class, $commandName, $commandDefinition);
-                $this->add($commandControllerCommand, $fullCommandIdentifier);
-                $registeredCommands[] = $commandControllerCommand;
+                $closure = function () use ($commandName, $commandDefinition) {
+                    return GeneralUtility::makeInstance(CommandControllerCommand::class, $commandName, $commandDefinition);
+                };
+                $this->add($closure, $commandName, $fullCommandIdentifier);
             }
         }
-
-        return $registeredCommands;
     }
 
     /**
@@ -169,22 +191,23 @@ class CommandCollection implements \IteratorAggregate
                     $fullCommandIdentifier
                 );
                 if ($commandName) {
-                    /** @var BaseCommand $command */
-                    $command = GeneralUtility::makeInstance($commandConfig['class'], $commandName);
+                    $closure = function () use ($commandConfig, $commandName) {
+                        /** @var BaseCommand $command */
+                        return GeneralUtility::makeInstance($commandConfig['class'], $commandName);
+                    };
                     // No aliases for native commands (they can define their own aliases)
-                    $this->add($command, $commandName);
+                    $this->add($closure, $commandName, $commandName);
                 }
             }
         }
     }
 
-    private function add(BaseCommand $command, $fullCommandIdentifier)
+    private function add(\Closure $closure, $commandName, $fullCommandIdentifier)
     {
-        $commandName = $command->getName();
-        $this->commands[$commandName] = $command;
+        $this->commands[$commandName]['closure'] = $closure;
         if ($commandName !== $fullCommandIdentifier) {
             // @deprecated in 5.0 will be removed in 6.0
-            $this->commands[$commandName]->setAliases([$fullCommandIdentifier]);
+            $this->commands[$commandName]['alias'] = $fullCommandIdentifier;
         }
     }
 

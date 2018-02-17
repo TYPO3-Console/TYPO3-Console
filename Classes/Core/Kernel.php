@@ -165,17 +165,19 @@ class Kernel
     {
         $this->initialize();
 
-        $commandRegistry = new CommandCollection(
+        $commandCollection = new CommandCollection(
             $this->runLevel,
             GeneralUtility::makeInstance(PackageManager::class)
         );
 
         $application = new Application($this->runLevel, Bootstrap::usesComposerClassLoading());
-        $application->addCommandsIfAvailable($commandRegistry);
+        $application->setCommandLoader($commandCollection);
 
         $commandIdentifier = $input->getFirstArgument() ?: '';
-        $this->runLevel->runSequenceForCommand($commandIdentifier);
-        $application->addCommandsIfAvailable($commandRegistry->addCommandControllerCommands(GeneralUtility::makeInstance(ObjectManager::class)->get(CommandManager::class)));
+        if ($this->runLevel->isCommandAvailable($commandIdentifier)) {
+            $this->runLevel->runSequenceForCommand($commandIdentifier);
+            $commandCollection->addCommandControllerCommands(GeneralUtility::makeInstance(ObjectManager::class)->get(CommandManager::class));
+        }
 
         return $application->run($input);
     }
