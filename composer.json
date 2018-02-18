@@ -1,4 +1,7 @@
 {
+    "repositories": [
+        {"type": "path", "url": "Commands/*"}
+    ],
     "name": "helhum/typo3-console",
     "description": "A reliable and powerful command line interface for TYPO3 CMS",
     "keywords": [
@@ -43,7 +46,7 @@
         "typo3/cms-filemetadata": "^8.7.10 || ~9.1.0 || 9.2.*@dev",
 
         "typo3-console/php-server-command": "^0.2",
-        "typo3-console/create-reference-command": "^2.2",
+        "typo3-console/create-reference-command": "@dev",
         "symfony/filesystem": "^3.2",
         "nimut/testing-framework": "3.*@dev"
     },

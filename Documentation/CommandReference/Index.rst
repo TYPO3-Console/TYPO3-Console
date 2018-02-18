@@ -18,11 +18,137 @@ Command Reference
 
 The following reference was automatically generated from code.
 
+*TYPO3 Console*
+---------------
+
+Application Options
+*******************
+
+The following options can be used with every command:
+
+``--help|-h``
+  Display this help message
+``--quiet|-q``
+  Do not output any message
+``--verbose|-v|-vv|-vvv``
+  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+``--ansi``
+  Force ANSI output
+``--no-ansi``
+  Disable ANSI output
+``--no-interaction|-n``
+  Do not ask any interactive question
+
+
 
 .. _`Command Reference: typo3_console`:
 
-Extension *typo3_console*
--------------------------
+Available Commands
+******************
+
+
+.. _`Command Reference: typo3_console help`:
+
+``help``
+********
+
+**Displays help for a command**
+
+The ``help`` command displays help for a given command:
+
+  ``php typo3cms help list``
+
+You can also output the help in other formats by using the **--format** option:
+
+  ``php typo3cms help --format=xml list``
+
+To display the list of available commands, please use the ``list`` command.
+
+Arguments
+^^^^^^^^^
+
+``command_name``
+  The command name
+
+
+
+Options
+^^^^^^^
+
+``--format``
+  The output format (txt, xml, json, or md)
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: 'txt'
+
+``--raw``
+  To output raw command help
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
+
+
+
+
+
+.. _`Command Reference: typo3_console list`:
+
+``list``
+********
+
+**Lists commands**
+
+The ``list`` command lists all commands:
+
+  ``php typo3cms list``
+
+You can also display the commands for a specific namespace:
+
+  ``php typo3cms list test``
+
+You can also output the information in other formats by using the **--format** option:
+
+  ``php typo3cms list --format=xml``
+
+It's also possible to get raw list of commands (useful for embedding command runner):
+
+  ``php typo3cms list --raw``
+
+Arguments
+^^^^^^^^^
+
+``namespace``
+  The namespace name
+
+
+
+Options
+^^^^^^^
+
+``--raw``
+  To output raw command list
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
+``--format``
+  The output format (txt, xml, json, or md)
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: 'txt'
+
+
+
+
 
 
 .. _`Command Reference: typo3_console backend:createadmin`:
@@ -37,9 +163,9 @@ Create a new user with administrative access.
 Arguments
 ^^^^^^^^^
 
-``--username``
+``username``
   Username of the user
-``--password``
+``password``
   Password of the user
 
 
@@ -64,6 +190,12 @@ Options
 
 ``--redirect-url``
   URL to redirect to when the backend is accessed
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: NULL
+
 
 
 
@@ -155,8 +287,20 @@ Options
 
 ``--force``
   Cache is forcibly flushed (low level operations are performed)
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 ``--files-only``
   Only file caches are flushed
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 
 
 
@@ -182,7 +326,7 @@ Valid group names are by default:
 Arguments
 ^^^^^^^^^
 
-``--groups``
+``groups``
   An array of names (specified as comma separated values) of cache groups to flush
 
 
@@ -205,7 +349,7 @@ Flushes caches by tags, optionally only caches in specified groups.
 Arguments
 ^^^^^^^^^
 
-``--tags``
+``tags``
   Array of tags (specified as comma separated values) to flush.
 
 
@@ -215,6 +359,12 @@ Options
 
 ``--groups``
   Optional array of groups (specified as comma separated values) for which to flush tags. If no group is specified, caches of all groups are flushed.
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: NULL
+
 
 
 
@@ -253,8 +403,20 @@ Options
 
 ``--dry-run``
   If set, index is only checked without performing any action
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 ``--show-progress``
   Whether or not to output a progress bar
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 
 
 
@@ -277,7 +439,7 @@ LocalConfiguration.php and not be overridden elsewhere.
 Arguments
 ^^^^^^^^^
 
-``--paths``
+``paths``
   Path to system configuration that should be removed. Multiple paths can be specified separated by comma
 
 
@@ -287,6 +449,12 @@ Options
 
 ``--force``
   If set, does not ask for confirmation
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 
 
 
@@ -306,9 +474,9 @@ Set system configuration option value by path.
 Arguments
 ^^^^^^^^^
 
-``--path``
+``path``
   Path to system configuration
-``--value``
+``value``
   Value for system configuration
 
 
@@ -333,7 +501,7 @@ the difference between these values is shown.
 Arguments
 ^^^^^^^^^
 
-``--path``
+``path``
   Path to system configuration option
 
 
@@ -352,12 +520,12 @@ Arguments
 Shows active system configuration by path.
 Shows the configuration value that is currently effective, no matter where and how it is set.
 
-**Example:** ``typo3cms configuration:showActive DB --json``
+**Example:** ``typo3cms configuration:showactive DB --json``
 
 Arguments
 ^^^^^^^^^
 
-``--path``
+``path``
   Path to system configuration
 
 
@@ -367,6 +535,12 @@ Options
 
 ``--json``
   If set, the configuration is shown as JSON
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 
 
 
@@ -388,7 +562,7 @@ Note that this value could be overridden. Use ``typo3cms configuration:show <pat
 Arguments
 ^^^^^^^^^
 
-``--path``
+``path``
   Path to local system configuration
 
 
@@ -398,6 +572,12 @@ Options
 
 ``--json``
   If set, the configuration is shown as JSON
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 
 
 
@@ -437,6 +617,12 @@ Options
 ``--exclude-tables``
   Comma-separated list of table names to exclude from the export
 
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: array ()
+
+
 
 
 
@@ -469,6 +655,12 @@ Options
 
 ``--interactive``
   Open an interactive mysql shell using the TYPO3 connection settings.
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 
 
 
@@ -504,15 +696,25 @@ To avoid shell matching all types with wildcards should be quoted.
 
 **Example:** ``typo3cms database:updateschema "*.add,*.change"``
 
+Arguments
+^^^^^^^^^
+
+``schemaUpdateTypes``
+  List of schema update types (default: "safe")
+
 
 
 Options
 ^^^^^^^
 
-``--schema-update-types``
-  List of schema update types (default: "safe")
 ``--dry-run``
   If set the updates are only collected and shown, but not executed
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 
 
 
@@ -534,7 +736,7 @@ in your Fluid template by adding the xmlns:* attribute(s):
 Arguments
 ^^^^^^^^^
 
-``--php-namespace``
+``phpNamespace``
   Namespace of the Fluid ViewHelpers without leading backslash (for example 'TYPO3\Fluid\ViewHelpers' or 'Tx_News_ViewHelpers'). NOTE: Quote and/or escape this argument as needed to avoid backslashes from being interpreted!
 
 
@@ -544,8 +746,20 @@ Options
 
 ``--xsd-namespace``
   Unique target namespace used in the XSD schema (for example "http://yourdomain.org/ns/viewhelpers"). Defaults to "http://typo3.org/ns/<php namespace>".
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: NULL
+
 ``--target-file``
   File path and name of the generated XSD schema. If not specified the schema will be output to standard output.
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: NULL
+
 
 
 
@@ -566,7 +780,7 @@ This command is deprecated (and hidden) in Composer mode.
 Arguments
 ^^^^^^^^^
 
-``--extension-keys``
+``extensionKeys``
   Extension keys to activate. Separate multiple extension keys with comma.
 
 
@@ -590,7 +804,7 @@ This command is deprecated (and hidden) in Composer mode.
 Arguments
 ^^^^^^^^^
 
-``--extension-keys``
+``extensionKeys``
   Extension keys to deactivate. Separate multiple extension keys with comma.
 
 
@@ -635,10 +849,28 @@ Options
 
 ``--active``
   Only show active extensions
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 ``--inactive``
   Only show inactive extensions
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 ``--raw``
   Enable machine readable output (just extension keys separated by line feed)
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 
 
 
@@ -666,6 +898,12 @@ Options
 ``--force``
   The option has to be specified, otherwise nothing happens
 
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
+
 
 
 
@@ -687,7 +925,7 @@ Set up means:
 Arguments
 ^^^^^^^^^
 
-``--extension-keys``
+``extensionKeys``
   Extension keys to set up. Separate multiple extension keys with comma.
 
 
@@ -739,32 +977,8 @@ Submits a frontend request to TYPO3 on the specified URL.
 Arguments
 ^^^^^^^^^
 
-``--request-url``
+``requestUrl``
   URL to make a frontend request.
-
-
-
-
-
-
-
-.. _`Command Reference: typo3_console help`:
-
-``help``
-********
-
-**Help**
-
-Display help for a command
-
-The help command displays help for a given command:
-typo3cms help <command identifier>
-
-Arguments
-^^^^^^^^^
-
-``--command-identifier``
-  Identifier of a command for more details
 
 
 
@@ -857,10 +1071,28 @@ Options
 
 ``--framework-extensions``
   TYPO3 system extensions that should be marked as active. Extension keys separated by comma.
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: array ()
+
 ``--excluded-extensions``
   Extensions which should stay inactive. This does not affect provided framework extensions or framework extensions that are required or part as minimal usable system.
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: array ()
+
 ``--activate-default``
   (DEPRECATED) If true, ``typo3/cms`` extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 
 
 
@@ -883,34 +1115,124 @@ Options
 
 ``--force``
   Force installation of TYPO3, even if ``LocalConfiguration.php`` file already exists.
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 ``--skip-integrity-check``
   Skip the checking for clean state before executing setup. This allows a pre-defined ``LocalConfiguration.php`` to be present. Handle with care. It might lead to unexpected or broken installation results.
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 ``--skip-extension-setup``
   Skip setting up extensions after TYPO3 is set up. Defaults to false in composer setups and to true in non composer setups.
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 ``--database-user-name``
   User name for database server
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: ''
+
 ``--database-user-password``
   User password for database server
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: ''
+
 ``--database-host-name``
   Host name of database server
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: ''
+
 ``--database-port``
   TCP Port of database server
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: ''
+
 ``--database-socket``
   Unix Socket to connect to (if localhost is given as hostname and this is kept empty, a socket connection will be established)
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: ''
+
 ``--database-name``
   Name of the database
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: ''
+
 ``--use-existing-database``
   If set an empty database with the specified name will be used. Otherwise a database with the specified name is created.
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 ``--admin-user-name``
   User name of the administrative backend user account to be created
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: ''
+
 ``--admin-password``
   Password of the administrative backend user account to be created
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: ''
+
 ``--site-name``
   Site Name
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: 'New TYPO3 Console site'
+
 ``--site-setup-type``
   Can be either ``no`` (which unsurprisingly does nothing at all) or ``site`` (which creates an empty root page and setup)
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: 'none'
+
 ``--non-interactive``
   Deprecated. Use ``--no-interaction`` instead.
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 
 
 
@@ -934,10 +1256,28 @@ Options
 
 ``--task``
   Uid of the task that should be executed (instead of all scheduled tasks)
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: NULL
+
 ``--force``
   The execution can be forced with this flag. The task will then be executed even if it is not scheduled for execution yet. Only works, when a task is specified.
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 ``--task-id``
   Deprecated option (same as --task)
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: NULL
+
 
 
 
@@ -960,6 +1300,12 @@ Options
 ``--arguments``
   Arguments for the wizard prefixed with the identifier, e.g. ``compatibility7Extension[install]=0``; multiple arguments separated with comma
 
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: array ()
+
+
 
 
 
@@ -975,15 +1321,25 @@ This command is especially useful **before** switching sources to a new TYPO3 ve
 It checks the version constraints of all third party extensions against a given TYPO3 version.
 It therefore relies on the constraints to be correct.
 
+Arguments
+^^^^^^^^^
+
+``extensionKeys``
+  Extension keys to check. Separate multiple extension keys with comma.
+
 
 
 Options
 ^^^^^^^
 
-``--extension-keys``
-  Extension keys to check. Separate multiple extension keys with comma.
 ``--typo3-version``
   TYPO3 version to check against. Defaults to current TYPO3 version.
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: '<Current-TYPO3-Version>'
+
 
 
 
@@ -1006,6 +1362,12 @@ Options
 ``--all``
   If set, all wizards will be listed, even the once marked as ready or done
 
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
+
 
 
 
@@ -1022,7 +1384,7 @@ Options
 Arguments
 ^^^^^^^^^
 
-``--identifier``
+``identifier``
   Identifier of the wizard that should be executed
 
 
@@ -1032,8 +1394,20 @@ Options
 
 ``--arguments``
   Arguments for the wizard prefixed with the identifier, e.g. ``compatibility7Extension[install]=0``
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: array ()
+
 ``--force``
   Force execution, even if the wizard has been marked as done
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 
 
 
