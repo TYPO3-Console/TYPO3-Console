@@ -43,7 +43,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     public function addingAndRemovingFieldsAndTablesIncludingVerbositySwitchWork()
     {
         $this->installFixtureExtensionCode('ext_test');
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
+        $this->executeConsoleCommand('extension:dumpactive', ['--activate-default']);
 
         $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
 
@@ -52,7 +52,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
         $this->assertContains('Add tables', $output);
 
         $this->removeFixtureExtensionCode('ext_test');
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
+        $this->executeConsoleCommand('extension:dumpactive', ['--activate-default']);
 
         $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
 
@@ -104,7 +104,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     public function schemaUpdateShowsErrorMessageIfTheyOccur()
     {
         $this->installFixtureExtensionCode('ext_broken_sql');
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
+        $this->executeConsoleCommand('extension:dumpactive', ['--activate-default']);
         try {
             $output = $this->commandDispatcher->executeCommand('database:updateschema', ['*']);
         } catch (FailedSubProcessCommandException $e) {
@@ -120,7 +120,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
         $this->assertContains('The following errors occurred:', $output);
         $this->assertContains('SQL Statement', $output);
         $this->removeFixtureExtensionCode('ext_broken_sql');
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
+        $this->executeConsoleCommand('extension:dumpactive', ['--activate-default']);
     }
 
     /**

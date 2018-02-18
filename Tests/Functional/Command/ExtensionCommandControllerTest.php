@@ -134,7 +134,7 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
     {
         $this->installFixtureExtensionCode('ext_config');
         try {
-            $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
+            $this->executeConsoleCommand('extension:dumpactive', ['--activate-default']);
             $output = $this->executeConsoleCommand('extension:setupactive');
             $this->assertContains('ext_config', $output);
             $this->assertContains('are now set up.', $output);
@@ -142,7 +142,7 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
             $this->assertArrayHasKey('ext_config', $config);
         } finally {
             $this->removeFixtureExtensionCode('ext_config');
-            $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
+            $this->executeConsoleCommand('extension:dumpactive', ['--activate-default']);
             $this->executeConsoleCommand('configuration:remove', ['EXTENSIONS/ext_config', '--force']);
             $this->executeConsoleCommand('configuration:remove', ['EXT/extConf/ext_config', '--force']);
         }
@@ -155,7 +155,7 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
     {
         $this->backupDatabase();
         $this->installFixtureExtensionCode('ext_test');
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
+        $this->executeConsoleCommand('extension:dumpactive', ['--activate-default']);
 
         $output = $this->executeConsoleCommand('extension:setupactive');
         $this->assertContains('ext_test', $output);

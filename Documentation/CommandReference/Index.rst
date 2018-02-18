@@ -813,6 +813,64 @@ Arguments
 
 
 
+.. _`Command Reference: typo3_console extension:dumpactive`:
+
+``extension:dumpactive``
+************************
+
+**Mark selected TYPO3 core extensions and all third party extensions as active**
+
+This command will write or update ``typo3conf/PackageStates.php`` file.
+TYPO3 uses this file to track whether an extension is active in the system.
+Goal is to not have this file in version control, but generate it automatically using the information
+present in the root composer.json file (or given with the available options).
+
+The following extensions will be marked as active:
+
+- All third party extensions (present in typo3conf/ext/)
+- All essential TYPO3 core extensions
+- All TYPO3 core extensions which are provided with the ``--framework-extensions`` argument.
+- In Composer managed TYPO3 systems, all composer dependencies to TYPO3 core extensions.
+
+To require TYPO3 core extensions in your composer managed project use the following command:
+
+``composer require typo3/cms-<exension-name> "<TYPO3-version>"``
+
+
+
+Options
+^^^^^^^
+
+``--core-extension|-c``
+  TYPO3 core extension that should be marked as active.
+
+- Accept value: yes
+- Is value required: no
+- Is multiple: yes
+- Default: array ()
+
+``--exclude-extension|-e``
+  Extension which should stay inactive. This does not affect provided core extensions or core extensions that are essential.
+
+- Accept value: yes
+- Is value required: no
+- Is multiple: yes
+- Default: array ()
+
+``--activate-default|-d``
+  (DEPRECATED for composer managed TYPO3)
+If true, ``typo3/cms`` extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured core extensions.
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
+
+
+
+
+
 .. _`Command Reference: typo3_console extension:dumpautoload`:
 
 ``extension:dumpautoload``
@@ -958,8 +1016,8 @@ Related commands
 
 ``extension:setup``
   Set up extension(s)
-``install:generatepackagestates``
-  Generate PackageStates.php file
+``extension:dumpactive``
+  Mark selected TYPO3 core extensions and all third party extensions as active
 ``cache:flush``
   Flush all caches
 
@@ -1024,7 +1082,7 @@ Automatically create files and folders, required for a TYPO3 installation.
 
 This command creates the required folder structure needed for TYPO3 including extensions.
 It is recommended to be executed **after** executing
-``typo3cms install:generatepackagestates``, to ensure proper generation of
+``typo3cms extension:dumpactive``, to ensure proper generation of
 required folders for all active extensions.
 
 
@@ -1034,67 +1092,8 @@ required folders for all active extensions.
 Related commands
 ^^^^^^^^^^^^^^^^
 
-``install:generatepackagestates``
-  Generate PackageStates.php file
-
-
-
-.. _`Command Reference: typo3_console install:generatepackagestates`:
-
-``install:generatepackagestates``
-*********************************
-
-**Generate PackageStates.php file**
-
-Generates and writes ``typo3conf/PackageStates.php`` file.
-Goal is to not have this file in version control, but generate it on ``composer install``.
-
-Marks the following extensions as active:
-
-- Third party extensions
-- All core extensions that are required (or part of minimal usable system)
-- All core extensions which are provided with the ``--framework-extensions`` argument.
-- In composer mode all composer dependencies to TYPO3 framework extensions are detected and activated by default.
-
-To require TYPO3 core extensions use the following command:
-
-``composer require typo3/cms-foo "*"``
-
-This updates your composer.json and composer.lock without any other changes.
-
-**Example:** ``typo3cms install:generatepackagestates``
-
-
-
-Options
-^^^^^^^
-
-``--framework-extensions``
-  TYPO3 system extensions that should be marked as active. Extension keys separated by comma.
-
-- Accept value: yes
-- Is value required: yes
-- Is multiple: no
-- Default: array ()
-
-``--excluded-extensions``
-  Extensions which should stay inactive. This does not affect provided framework extensions or framework extensions that are required or part as minimal usable system.
-
-- Accept value: yes
-- Is value required: yes
-- Is multiple: no
-- Default: array ()
-
-``--activate-default``
-  (DEPRECATED) If true, ``typo3/cms`` extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Default: false
-
-
-
+``extension:dumpactive``
+  Mark selected TYPO3 core extensions and all third party extensions as active
 
 
 

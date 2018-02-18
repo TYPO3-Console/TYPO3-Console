@@ -102,12 +102,13 @@ class CliSetupRequestHandler
         if (!$skipExtensionSetup) {
             // Start with a clean set of packages
             @unlink(PATH_site . 'typo3conf/PackageStates.php');
-            $packageStatesArguments = [];
+            $markActiveArguments = [];
             // Exclude all local extensions in case any are present, to avoid interference with the setup
             foreach (glob(PATH_site . 'typo3conf/ext/*') as $item) {
-                $packageStatesArguments['--excluded-extensions'][] = basename($item);
+                $markActiveArguments[] = ['--exclude-extension'];
+                $markActiveArguments[] = basename($item);
             }
-            $this->commandDispatcher->executeCommand('install:generatepackagestates', $packageStatesArguments);
+            $this->commandDispatcher->executeCommand('extension:dumpactive', $markActiveArguments);
         }
 
         foreach ($this->installationActions as $actionName) {
@@ -118,7 +119,7 @@ class CliSetupRequestHandler
             // so we do it manually here.
             $this->output->outputLine();
             $this->output->outputLine('Set up extensions:');
-            $this->commandDispatcher->executeCommand('install:generatepackagestates');
+            $this->commandDispatcher->executeCommand('extension:dumpactive');
             $this->commandDispatcher->executeCommand('database:updateschema');
             $this->commandDispatcher->executeCommand('extension:setupactive');
         }

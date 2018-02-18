@@ -143,7 +143,7 @@ class ExtensionCommandController extends CommandController
             $this->output->outputLine('<warning>This command is deprecated when TYPO3 is composer managed.</warning>');
             $this->output->outputLine('<warning>It might lead to unexpected results.</warning>');
             $this->output->outputLine('<warning>The PackageStates.php file that tracks which extension should be active,</warning>');
-            $this->output->outputLine('<warning>should be generated automatically using install:generatepackagestates.</warning>');
+            $this->output->outputLine('<warning>should be generated automatically using extension:dumpactive.</warning>');
             $this->output->outputLine('<warning>To set up all active extensions, extension:setupactive should be used.</warning>');
             $this->output->outputLine('<warning>This command will be disabled, when TYPO3 is composer managed, in TYPO3 Console 6</warning>');
         }
@@ -218,7 +218,7 @@ class ExtensionCommandController extends CommandController
      * and avoids unnecessary cache clearing.
      *
      * @see typo3_console:extension:setup
-     * @see typo3_console:install:generatepackagestates
+     * @see typo3_console:extension:dumpactive
      * @see typo3_console:cache:flush
      */
     public function setupActiveCommand()

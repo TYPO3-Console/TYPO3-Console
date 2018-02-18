@@ -110,36 +110,4 @@ class InstallCommandControllerTest extends AbstractCommandTest
         $this->executeConsoleCommand('install:fixfolderstructure');
         $this->assertTrue(file_exists($indexFile));
     }
-
-    /**
-     * @test
-     */
-    public function packageStatesFileIsCreatedWithoutDefaultPackages()
-    {
-        $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
-        @unlink($packageStatesFile);
-        $this->executeConsoleCommand('install:generatepackagestates');
-        $this->assertTrue(file_exists($packageStatesFile));
-        $packageConfig = require $packageStatesFile;
-        if ($packageConfig['version'] === 5) {
-            $this->assertArrayNotHasKey('reports', $packageConfig['packages']);
-        } else {
-            $this->assertSame('inactive', $packageConfig['packages']['reports']['state']);
-        }
-    }
-
-    /**
-     * @test
-     */
-    public function packageStatesFileIsCreatedWithDefaultPackages()
-    {
-        $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
-        copy($packageStatesFile, $packageStatesFile . '_');
-        @unlink($packageStatesFile);
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
-        $this->assertTrue(file_exists($packageStatesFile));
-        $packageConfig = require $packageStatesFile;
-        copy($packageStatesFile . '_', $packageStatesFile);
-        $this->assertArrayHasKey('reports', $packageConfig['packages']);
-    }
 }

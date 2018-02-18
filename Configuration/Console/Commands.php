@@ -158,6 +158,15 @@ return [
                 'extensionmanager:extension:uninstall',
             ],
         ],
+        'extension:dumpactive' => [
+            'vendor' => 'typo3_console',
+            'class' => \Helhum\Typo3Console\Command\Extension\DumpActiveCommand::class,
+            'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
+            'aliases' => [
+                'install:generatepackagestates',
+                'typo3_console:install:generatepackagestates',
+            ],
+        ],
         'extension:dumpautoload' => [
             'vendor' => 'typo3_console',
             'controller' => Helhum\Typo3Console\Command\ExtensionCommandController::class,
@@ -200,12 +209,6 @@ return [
             'vendor' => 'typo3_console',
             'controller' => Helhum\Typo3Console\Command\InstallCommandController::class,
             'controllerCommandName' => 'setup',
-            'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-        ],
-        'install:generatepackagestates' => [
-            'vendor' => 'typo3_console',
-            'controller' => Helhum\Typo3Console\Command\InstallCommandController::class,
-            'controllerCommandName' => 'generatePackageStates',
             'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
         ],
         'install:fixfolderstructure' => [
