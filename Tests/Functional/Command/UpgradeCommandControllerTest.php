@@ -16,6 +16,8 @@ namespace Helhum\Typo3Console\Tests\Functional\Command;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
+use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\Process;
 
 class UpgradeCommandControllerTest extends AbstractCommandTest
 {
@@ -27,7 +29,12 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     /**
      * @var string
      */
-    private $typo3RootPath;
+    private $upgradeInstancePath;
+
+    /**
+     * @var string
+     */
+    private $upgradeInstanceDatabase;
 
     /**
      * @test
@@ -70,9 +77,11 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
      */
     public function canPerformTypo3Upgrade()
     {
-        $instancePath = dirname(dirname(dirname(__DIR__))) . '/.Build/upgrade_test';
+        $this->consoleRootPath = getenv('TYPO3_PATH_COMPOSER_ROOT');
+        $this->upgradeInstancePath = dirname(__DIR__, 3) . '/.Build/upgrade_test';
+        $this->upgradeInstanceDatabase = getenv('TYPO3_INSTALL_DB_DBNAME') . '_up';
         try {
-            $this->setUpNewTypo3Instance($instancePath);
+            $this->setUpNewTypo3Instance();
             $this->upgradeCodeToTypo3Version(getenv('TYPO3_VERSION'));
 
             $output = $this->executeConsoleCommand('upgrade:list');
@@ -83,57 +92,47 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         } catch (\Throwable $e) {
             throw $e;
         } finally {
-            $this->tearDownTypo3Instance($instancePath);
+            $this->tearDownTypo3Instance();
         }
     }
 
-    /**
-     * @param string $instancePath
-     */
-    private function setUpNewTypo3Instance($instancePath)
+    private function setUpNewTypo3Instance()
     {
-        $this->consoleRootPath = getenv('TYPO3_PATH_COMPOSER_ROOT');
-        $this->typo3RootPath = getenv('TYPO3_PATH_ROOT');
-        $this->commandDispatcher = CommandDispatcher::createFromTestRun($instancePath . '/vendor/helhum/typo3-console-test/' . Application::COMMAND_NAME);
-        if (!is_dir($instancePath)) {
-            mkdir($instancePath);
+        $this->commandDispatcher = CommandDispatcher::createFromTestRun($this->upgradeInstancePath . '/vendor/helhum/typo3-console-test/' . Application::COMMAND_NAME);
+        if (!is_dir($this->upgradeInstancePath)) {
+            mkdir($this->upgradeInstancePath);
         }
-        putenv('TYPO3_PATH_COMPOSER_ROOT=' . $instancePath);
-        $_ENV['TYPO3_PATH_COMPOSER_ROOT'] = $instancePath;
-        putenv('TYPO3_PATH_ROOT=' . $instancePath . '/web');
-        $_ENV['TYPO3_PATH_ROOT'] = $instancePath . '/web';
-        putenv('TYPO3_PATH_WEB=' . $instancePath . '/web');
-        $_ENV['TYPO3_PATH_WEB'] = $instancePath . '/web';
-        putenv('TYPO3_INSTALL_DB_DBNAME=' . getenv('TYPO3_INSTALL_DB_DBNAME') . '_up');
-        $_ENV['TYPO3_INSTALL_DB_DBNAME'] = getenv('TYPO3_INSTALL_DB_DBNAME') . '_up';
-        chdir($instancePath);
 
-        file_put_contents($instancePath . '/composer.json', '{}');
+        file_put_contents($this->upgradeInstancePath . '/composer.json', '{}');
         $this->executeComposerCommand(['config', 'extra.typo3/cms.cms-package-dir', '{$vendor-dir}/typo3/cms']);
         $this->executeComposerCommand(['config', 'extra.typo3/cms.web-dir', 'web']);
         $this->executeComposerCommand(['config', 'extra.helhum/typo3-console.install-extension-dummy', '0']);
-        $this->copyDirectory($this->consoleRootPath, $instancePath . '/typo3_console', ['.Build', '.git']);
-        $consoleComposerJson = file_get_contents($instancePath . '/typo3_console/composer.json');
+        $this->copyDirectory($this->consoleRootPath, $this->upgradeInstancePath . '/typo3_console', ['.Build', '.git']);
+        $consoleComposerJson = file_get_contents($this->upgradeInstancePath . '/typo3_console/composer.json');
         $consoleComposerJson = str_replace('"name": "helhum/typo3-console"', '"name": "helhum/typo3-console-test"', $consoleComposerJson);
-        file_put_contents($instancePath . '/typo3_console/composer.json', $consoleComposerJson);
+        file_put_contents($this->upgradeInstancePath . '/typo3_console/composer.json', $consoleComposerJson);
         $this->executeComposerCommand(['config', 'repositories.console', '{"type": "path", "url": "typo3_console", "options": {"symlink": false}}']);
         $output = $this->executeComposerCommand(['require', 'typo3/cms-core=^8.7.10', 'helhum/typo3-console-test=@dev']);
         $this->assertContains('Mirroring from typo3_console', $output);
 
-        $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
+        $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . $this->upgradeInstanceDatabase, false);
         $output = $this->executeConsoleCommand(
             'install:setup',
             [
-                '--non-interactive',
+                '--no-interaction',
                 '--database-user-name' => getenv('TYPO3_INSTALL_DB_USER'),
                 '--database-user-password' => getenv('TYPO3_INSTALL_DB_PASSWORD'),
                 '--database-host-name' => getenv('TYPO3_INSTALL_DB_HOST'),
                 '--database-port' => '3306',
-                '--database-name' => getenv('TYPO3_INSTALL_DB_DBNAME'),
+                '--database-name' => $this->upgradeInstanceDatabase,
                 '--admin-user-name' => 'admin',
                 '--admin-password' => 'password',
                 '--site-name' => 'Travis Install',
                 '--site-setup-type' => 'createsite',
+            ],
+            [
+                'TYPO3_PATH_COMPOSER_ROOT' => $this->upgradeInstancePath,
+                'TYPO3_PATH_ROOT' => $this->upgradeInstancePath . '/web',
             ]
         );
         $this->assertContains('Successfully installed TYPO3 CMS!', $output);
@@ -164,23 +163,51 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         $this->assertContains('Generating autoload files', $output);
     }
 
-    /**
-     * @param string $instancePath
-     * @throws \Exception
-     */
-    private function tearDownTypo3Instance($instancePath)
+    private function tearDownTypo3Instance()
     {
-        putenv('TYPO3_PATH_COMPOSER_ROOT=' . $this->consoleRootPath);
-        putenv('TYPO3_PATH_ROOT=' . $this->typo3RootPath);
-        putenv('TYPO3_PATH_WEB=' . $this->typo3RootPath);
         chdir($this->consoleRootPath);
         try {
-            $this->removeDirectory($instancePath);
-        } catch (\Exception $e) {
-            // Ignore this exception on Windows
-            if (DIRECTORY_SEPARATOR !== '\\') {
-                throw $e;
-            }
+            $this->removeDirectory($this->upgradeInstancePath);
+            $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . $this->upgradeInstanceDatabase, false);
+        } catch (\Throwable $e) {
+            // Ignore exceptions for tear down
         }
+    }
+
+    /**
+     * @param array $arguments
+     * @param array $environmentVariables
+     * @param bool $dryRun
+     * @return string
+     */
+    protected function executeComposerCommand(array $arguments = [], array $environmentVariables = [], $dryRun = false)
+    {
+        $environmentVariables['TYPO3_CONSOLE_SUB_PROCESS'] = 'yes';
+        $commandLine = [];
+
+        if (getenv('PHP_PATH')) {
+            $commandLine[] = getenv('PHP_PATH');
+        }
+        $composerFinder = new ExecutableFinder();
+        $composerBin = $composerFinder->find('composer');
+        $commandLine[] = $composerBin;
+
+        foreach ($arguments as $argument) {
+            $commandLine[] = $argument;
+        }
+        $commandLine[] = '--no-ansi';
+        $commandLine[] = '-d';
+        $commandLine[] = $this->upgradeInstancePath;
+
+        $process = new Process($commandLine, null, $environmentVariables, null, 0);
+        $process->inheritEnvironmentVariables();
+        if ($dryRun) {
+            return $process->getCommandLine();
+        }
+        $process->run();
+        if (!$process->isSuccessful()) {
+            $this->fail(sprintf('Composer command "%s" failed with message: "%s", output: "%s"', $process->getCommandLine(), $process->getErrorOutput(), $process->getOutput()));
+        }
+        return $process->getOutput() . $process->getErrorOutput();
     }
 }

@@ -50,7 +50,7 @@ Additionally it provides some commands, that wouldn't be possible at all with th
 	typo3cms install:setup
 
 	# Non interactive automatic setup of a new TYPO3 instance
-	typo3cms install:setup --non-interactive \
+	typo3cms install:setup --no-interaction \
 		--database-user-name="root" \
 		--database-host-name="localhost" \
 		--database-port="3306" \

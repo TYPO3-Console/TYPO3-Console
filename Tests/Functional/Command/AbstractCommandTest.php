@@ -18,7 +18,6 @@ use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 
 abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
@@ -170,43 +169,6 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
         );
         $fileSystem->remove($iterator);
         $fileSystem->remove($targetPath);
-    }
-
-    /**
-     * @param array $arguments
-     * @param array $environmentVariables
-     * @param bool $dryRun
-     * @return string
-     */
-    protected function executeComposerCommand(array $arguments = [], array $environmentVariables = [], $dryRun = false)
-    {
-        $environmentVariables['TYPO3_CONSOLE_SUB_PROCESS'] = 'yes';
-        $commandLine = [];
-
-        if (getenv('PHP_PATH')) {
-            $commandLine[] = getenv('PHP_PATH');
-        }
-        $composerFinder = new ExecutableFinder();
-        $composerBin = $composerFinder->find('composer');
-        $commandLine[] = $composerBin;
-
-        foreach ($arguments as $argument) {
-            $commandLine[] = $argument;
-        }
-        $commandLine[] = '--no-ansi';
-        $commandLine[] = '-d';
-        $commandLine[] = getenv('TYPO3_PATH_COMPOSER_ROOT');
-
-        $process = new Process($commandLine, null, $environmentVariables, null, 0);
-        $process->inheritEnvironmentVariables();
-        if ($dryRun) {
-            return $process->getCommandLine();
-        }
-        $process->run();
-        if (!$process->isSuccessful()) {
-            $this->fail(sprintf('Composer command "%s" failed with message: "%s", output: "%s"', $process->getCommandLine(), $process->getErrorOutput(), $process->getOutput()));
-        }
-        return $process->getOutput() . $process->getErrorOutput();
     }
 
     protected function executeConsoleCommand($command, array $arguments = [], array $environment = [], string $stdIn = null)

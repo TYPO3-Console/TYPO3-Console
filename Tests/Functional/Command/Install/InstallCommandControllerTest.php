@@ -38,7 +38,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
         $output = $this->executeConsoleCommand(
             'install:setup',
             [
-                '--non-interactive',
+                '--no-interaction',
                 '--skip-extension-setup',
                 '--database-user-name' => getenv('TYPO3_INSTALL_DB_USER'),
                 '--database-user-password' => getenv('TYPO3_INSTALL_DB_PASSWORD'),
@@ -66,7 +66,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
         $output = $this->executeConsoleCommand(
             'install:setup',
             [
-                '--non-interactive',
+                '--no-interaction',
                 '--database-user-name' => getenv('TYPO3_INSTALL_DB_USER'),
                 '--database-user-password' => getenv('TYPO3_INSTALL_DB_PASSWORD'),
                 '--database-host-name' => getenv('TYPO3_INSTALL_DB_HOST'),
