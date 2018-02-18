@@ -42,7 +42,9 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
 {
     private $skipCommands = [
         'commandreference:render',
+        'language:update',
         'server:run',
+        'swiftmailer:spool:send',
     ];
 
     protected function configure()
