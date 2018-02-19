@@ -160,7 +160,7 @@ return [
         ],
         'extension:dumpactive' => [
             'vendor' => 'typo3_console',
-            'class' => \Helhum\Typo3Console\Command\Extension\DumpActiveCommand::class,
+            'class' => \Typo3Console\Command\Extension\DumpActiveCommand::class,
             'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
             'aliases' => [
                 'install:generatepackagestates',

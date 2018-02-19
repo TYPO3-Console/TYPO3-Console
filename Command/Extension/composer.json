@@ -1,0 +1,30 @@
+{
+    "name": "typo3-console/extension-commands",
+    "description": "TYPO3 Console commands related to Extension handling",
+    "license": "GPL-2.0-or-later",
+    "type": "typo3-console-command",
+    "authors": [
+        {
+            "name": "Helmut Hummel",
+            "email": "info@helhum.io"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Typo3Console\\Command\\Extension\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "require": {
+        "php": ">=7.0 <7.3",
+        "helhum/typo3-console": "^5.0",
+        "typo3/cms-core": "^8.7.10 || ~9.1.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.x-dev"
+        }
+    }
+}

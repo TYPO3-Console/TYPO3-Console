@@ -1,5 +1,5 @@
 <?php
-namespace Helhum\Typo3Console\Install;
+namespace Typo3Console\Command\Extension;
 
 /*
  * This file is part of the TYPO3 Console project.

@@ -24,12 +24,18 @@
         <testsuite name="TYPO3 Console Unit Tests">
             <directory>./Tests/Unit/*/</directory>
         </testsuite>
+        <testsuite name="TYPO3 Console Command Unit Tests">
+            <directory>./Command/*/Tests/Unit/</directory>
+        </testsuite>
         <testsuite name="TYPO3 Console Install Command Tests">
             <directory>./Tests/Functional/Command/Install/</directory>
         </testsuite>
-        <testsuite name="TYPO3 Console all Command Tests">
+        <testsuite name="TYPO3 Console all Functional Command Tests">
             <directory>./Tests/Functional/*/</directory>
             <exclude>./Tests/Functional/Command/Install/</exclude>
+        </testsuite>
+        <testsuite name="TYPO3 Console Command Functional Tests">
+            <directory>./Command/*/Tests/Functional/</directory>
         </testsuite>
     </testsuites>
 </phpunit>

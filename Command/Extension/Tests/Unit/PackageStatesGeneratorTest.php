@@ -1,5 +1,5 @@
 <?php
-namespace Helhum\Typo3Console\Tests\Unit\Install;
+namespace Typo3Console\Command\Tests\Unit;
 
 /*
  * This file is part of the TYPO3 Console project.
@@ -13,10 +13,10 @@ namespace Helhum\Typo3Console\Tests\Unit\Install;
  *
  */
 
-use Helhum\Typo3Console\Install\PackageStatesGenerator;
 use Helhum\Typo3Console\Package\UncachedPackageManager;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 use TYPO3\CMS\Core\Package\PackageInterface;
+use Typo3Console\Command\Extension\PackageStatesGenerator;
 
 class PackageStatesGeneratorTest extends UnitTestCase
 {

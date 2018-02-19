@@ -61,7 +61,8 @@
                 "Classes/",
                 "Compatibility/",
                 "Resources/Private/ExtensionArtifacts/src/"
-            ]
+            ],
+            "Typo3Console\\Command\\": "Command/"
         }
     },
     "autoload-dev": {

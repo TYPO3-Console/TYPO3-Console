@@ -1,5 +1,5 @@
 <?php
-namespace Helhum\Typo3Console\Tests\Functional\Command\Extension;
+namespace Typo3Console\Command\Extension\Tests\Functional;
 
 /*
  * This file is part of the TYPO3 Console project.
@@ -15,7 +15,7 @@ namespace Helhum\Typo3Console\Tests\Functional\Command\Extension;
 
 use Helhum\Typo3Console\Tests\Functional\Command\AbstractCommandTest;
 
-class MarkActiveCommandTest extends AbstractCommandTest
+class DumpActiveCommandTest extends AbstractCommandTest
 {
     /**
      * @test

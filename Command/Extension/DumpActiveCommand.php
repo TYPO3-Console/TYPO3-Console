@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace Helhum\Typo3Console\Command\Extension;
+namespace Typo3Console\Command\Extension;
 
 /*
  * This file is part of the TYPO3 Console project.
@@ -14,7 +14,6 @@ namespace Helhum\Typo3Console\Command\Extension;
  *
  */
 
-use Helhum\Typo3Console\Install\PackageStatesGenerator;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Symfony\Component\Console\Command\Command;
