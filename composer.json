@@ -1,6 +1,6 @@
 {
     "repositories": [
-        {"type": "path", "url": "Commands/*"}
+        {"type": "path", "url": "Packages/*"}
     ],
     "name": "helhum/typo3-console",
     "description": "A reliable and powerful command line interface for TYPO3 CMS",
