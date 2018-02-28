@@ -47,6 +47,11 @@ class CommandCollection implements CommandLoaderInterface
     private $commands;
 
     /**
+     * @var string[]
+     */
+    private $aliases;
+
+    /**
      * @var array
      */
     private $commandControllerClasses = [];
@@ -85,12 +90,15 @@ class CommandCollection implements CommandLoaderInterface
      */
     public function get($name): BaseCommand
     {
+        if (isset($this->aliases[$name])) {
+            $name = $this->aliases[$name];
+        }
         if (!isset($this->commands[$name]) || !$this->isCommandAvailable($name)) {
-            throw new CommandNotFoundException(sprintf('A command with name "%s" could not be found.', $name), 1518812618);
+            throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name), [], 1518812618);
         }
         $command = $this->commands[$name]['closure']();
-        if (isset($commandDefinition['alias'])) {
-            $command->setAliases([$this->commands[$name]['alias']]);
+        if (isset($this->commands[$name]['aliases'])) {
+            $command->setAliases($this->commands[$name]['aliases']);
         }
         return $command;
     }
@@ -101,6 +109,9 @@ class CommandCollection implements CommandLoaderInterface
      */
     public function has($name): bool
     {
+        if (isset($this->aliases[$name])) {
+            $name = $this->aliases[$name];
+        }
         return isset($this->commands[$name]) && $this->isCommandAvailable($name);
     }
 
@@ -109,7 +120,7 @@ class CommandCollection implements CommandLoaderInterface
      */
     public function getNames(): array
     {
-        return array_keys($this->commands);
+        return array_merge(array_keys($this->commands), array_keys($this->aliases));
     }
 
     /**
@@ -184,7 +195,12 @@ class CommandCollection implements CommandLoaderInterface
                 $closure = function () use ($commandName, $commandDefinition) {
                     return GeneralUtility::makeInstance(CommandControllerCommand::class, $commandName, $commandDefinition);
                 };
-                $this->add($closure, $commandName, $fullCommandIdentifier);
+                $aliases = [];
+                if ($commandName !== $fullCommandIdentifier) {
+                    // @deprecated in 5.0 will be removed in 6.0
+                    $aliases = [$fullCommandIdentifier];
+                }
+                $this->add($closure, $commandName, $aliases);
             }
         }
     }
@@ -211,19 +227,18 @@ class CommandCollection implements CommandLoaderInterface
                         /** @var BaseCommand $command */
                         return GeneralUtility::makeInstance($commandConfig['class'], $commandName);
                     };
-                    // No aliases for native commands (they can define their own aliases)
-                    $this->add($closure, $commandName, $commandName);
+                    $this->add($closure, $commandName, $commandConfig['aliases'] ?? []);
                 }
             }
         }
     }
 
-    private function add(\Closure $closure, $commandName, $fullCommandIdentifier)
+    private function add(\Closure $closure, $commandName, array $aliases = [])
     {
         $this->commands[$commandName]['closure'] = $closure;
-        if ($commandName !== $fullCommandIdentifier) {
-            // @deprecated in 5.0 will be removed in 6.0
-            $this->commands[$commandName]['alias'] = $fullCommandIdentifier;
+        foreach ($aliases as $alias) {
+            $this->aliases[$alias] = $commandName;
+            $this->commands[$commandName]['aliases'][] = $alias;
         }
     }
 
