@@ -33,6 +33,7 @@
         "typo3/cms-extbase": "^8.7.10 || ~9.1.0",
         "typo3/cms-extensionmanager": "^8.7.10 || ~9.1.0",
         "typo3/cms-fluid": "^8.7.10 || ~9.1.0",
+        "typo3/cms-frontend": "^8.7.10 || ~9.1.0",
         "typo3/cms-install": "^8.7.10 || ~9.1.0",
         "typo3/cms-scheduler": "^8.7.10 || ~9.1.0",
         "typo3/cms-saltedpasswords": "^8.7.10 || ~9.1.0",
