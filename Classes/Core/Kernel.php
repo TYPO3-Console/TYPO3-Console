@@ -189,7 +189,6 @@ class Kernel
      */
     public function terminate(int $exitCode = 0)
     {
-        $this->bootstrap->shutdown();
         if ($exitCode > 255) {
             $exitCode = 255;
         }

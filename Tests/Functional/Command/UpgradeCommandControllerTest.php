@@ -99,9 +99,13 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             mkdir($instancePath);
         }
         putenv('TYPO3_PATH_COMPOSER_ROOT=' . $instancePath);
+        $_ENV['TYPO3_PATH_COMPOSER_ROOT'] = $instancePath;
         putenv('TYPO3_PATH_ROOT=' . $instancePath . '/web');
+        $_ENV['TYPO3_PATH_ROOT'] = $instancePath . '/web';
         putenv('TYPO3_PATH_WEB=' . $instancePath . '/web');
+        $_ENV['TYPO3_PATH_WEB'] = $instancePath . '/web';
         putenv('TYPO3_INSTALL_DB_DBNAME=' . getenv('TYPO3_INSTALL_DB_DBNAME') . '_up');
+        $_ENV['TYPO3_INSTALL_DB_DBNAME'] = getenv('TYPO3_INSTALL_DB_DBNAME') . '_up';
         chdir($instancePath);
 
         file_put_contents($instancePath . '/composer.json', '{}');
