@@ -35,8 +35,8 @@
         "typo3/cms-fluid": "^8.7.10 || ~9.1.0",
         "typo3/cms-frontend": "^8.7.10 || ~9.1.0",
         "typo3/cms-install": "^8.7.10 || ~9.1.0",
-        "typo3/cms-scheduler": "^8.7.10 || ~9.1.0",
         "typo3/cms-saltedpasswords": "^8.7.10 || ~9.1.0",
+        "typo3/cms-scheduler": "^8.7.10 || ~9.1.0",
 
         "doctrine/annotations": "^1.4",
         "symfony/console": "^3.4.4 || ^4.0",

@@ -14,13 +14,26 @@ namespace Helhum\Typo3Console\TYPO3v87\Core\Booting;
  */
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Helhum\Typo3Console\Package\UncachedPackageManager;
 use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Package\DependencyResolver;
+use TYPO3\CMS\Core\Service\DependencyOrderingService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CompatibilityScripts
 {
-    /**
-     * @param Bootstrap $bootstrap
-     */
+    public static function createPackageManager(): UncachedPackageManager
+    {
+        $packageManager = new UncachedPackageManager();
+        $dependencyResolver = GeneralUtility::makeInstance(DependencyResolver::class);
+        $dependencyResolver->injectDependencyOrderingService(
+            GeneralUtility::makeInstance(DependencyOrderingService::class)
+        );
+        $packageManager->injectDependencyResolver($dependencyResolver);
+
+        return $packageManager;
+    }
+
     public static function initializeConfigurationManagement(Bootstrap $bootstrap)
     {
         self::initializeAnnotationReader();
