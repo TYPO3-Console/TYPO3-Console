@@ -88,6 +88,19 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
+    public function schemaUpdateCanBePerformedWithoutAnyTablesAndShortName()
+    {
+        $this->backupDatabase();
+        $this->executeMysqlQuery('DROP DATABASE ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
+        $this->executeMysqlQuery('CREATE DATABASE ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
+        $output = $this->executeConsoleCommand('d:u', ['*']);
+        $this->assertContains('The following database schema updates were performed:', $output);
+        $this->restoreDatabase();
+    }
+
+    /**
+     * @test
+     */
     public function schemaUpdateShowsErrorMessageIfTheyOccur()
     {
         $this->installFixtureExtensionCode('ext_broken_sql');

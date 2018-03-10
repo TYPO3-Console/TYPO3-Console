@@ -292,13 +292,13 @@ class RunLevel
      * @return string
      * @internal
      */
-    private function getRunLevelForCommand(string $commandIdentifier): string
+    public function getRunLevelForCommand(string $commandIdentifier): string
     {
-        if (in_array($commandIdentifier, ['', 'help', 'list'], true)) {
+        if (in_array($commandIdentifier, ['help', 'list'], true)) {
             return $this->getMaximumAvailableRunLevel();
         }
         $options = $this->getOptionsForCommand($commandIdentifier);
-        return isset($options['runLevel']) ? $options['runLevel'] : self::LEVEL_FULL;
+        return $options['runLevel'] ?? self::LEVEL_FULL;
     }
 
     /**
@@ -337,30 +337,19 @@ class RunLevel
      */
     private function getOptionsForCommand(string $commandIdentifier)
     {
-        $commandIdentifierParts = explode(':', $commandIdentifier);
-        if (count($commandIdentifierParts) < 2 || count($commandIdentifierParts) > 3) {
-            return null;
+        $commandIdentifierPrefix = $commandIdentifier;
+        $position = strrpos($commandIdentifier, ':');
+        if ($position !== false) {
+            $commandIdentifierPrefix = substr($commandIdentifier, 0, $position);
         }
+
         if (isset($this->commandOptions[$commandIdentifier])) {
             return $this->commandOptions[$commandIdentifier];
         }
 
-        if (count($commandIdentifierParts) === 3) {
-            $currentCommandControllerName = $commandIdentifierParts[1];
-            $currentCommandName = $commandIdentifierParts[2];
-        } else {
-            $currentCommandControllerName = $commandIdentifierParts[0];
-            $currentCommandName = $commandIdentifierParts[1];
-        }
-
-        foreach ($this->commandOptions as $fullControllerIdentifier => $commandRegistry) {
-            list(, $controllerName, $commandName) = explode(':', $fullControllerIdentifier);
-            if ($controllerName === $currentCommandControllerName && $commandName === $currentCommandName) {
-                return $this->commandOptions[$fullControllerIdentifier];
-            }
-            if ($controllerName === $currentCommandControllerName && $commandName === '*') {
-                return $this->commandOptions[$fullControllerIdentifier];
-            }
+        $lookupKey = $commandIdentifierPrefix . ':*';
+        if (isset($this->commandOptions[$lookupKey])) {
+            return $this->commandOptions[$lookupKey];
         }
 
         return null;

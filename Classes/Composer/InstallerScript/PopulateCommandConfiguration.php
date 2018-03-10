@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Composer\InstallerScript;
  */
 
 use Composer\Script\Event as ScriptEvent;
+use Helhum\Typo3Console\Mvc\Cli\CommandConfiguration;
 use TYPO3\CMS\Composer\Plugin\Core\InstallerScript;
 
 /**
@@ -50,6 +51,7 @@ class PopulateCommandConfiguration implements InstallerScript
             }
             $commandConfiguration = array_merge($commandConfiguration, $this->getConfigFromPackage($installPath, $packageName));
         }
+
         $success = file_put_contents(
             __DIR__ . '/../../../Configuration/Console/ComposerPackagesCommands.php',
             '<?php' . chr(10)
@@ -65,7 +67,7 @@ class PopulateCommandConfiguration implements InstallerScript
      * @param \Composer\Composer $composer
      * @return array
      */
-    private function extractPackageMapFromComposer(\Composer\Composer $composer)
+    private function extractPackageMapFromComposer(\Composer\Composer $composer): array
     {
         $mainPackage = $composer->getPackage();
         $autoLoadGenerator = $composer->getAutoloadGenerator();
@@ -74,10 +76,12 @@ class PopulateCommandConfiguration implements InstallerScript
     }
 
     /**
-     * @param $installPath
-     * @return mixed
+     * @param string $installPath
+     * @param string $packageName
+     * @throws \Symfony\Component\Console\Exception\RuntimeException
+     * @return array
      */
-    private function getConfigFromPackage(string $installPath, string $packageName)
+    private function getConfigFromPackage(string $installPath, string $packageName): array
     {
         $commandConfiguration = [];
         if (file_exists($commandConfigurationFile = $installPath . '/Configuration/Console/Commands.php')) {
@@ -89,6 +93,7 @@ class PopulateCommandConfiguration implements InstallerScript
         if (empty($commandConfiguration)) {
             return [];
         }
-        return [$packageName => $commandConfiguration];
+        CommandConfiguration::ensureValidCommandRegistration($commandConfiguration, $packageName);
+        return [$packageName => CommandConfiguration::unifyCommandConfiguration($commandConfiguration, $packageName)];
     }
 }
