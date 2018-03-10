@@ -17,14 +17,15 @@ use Composer\Autoload\ClassLoader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\Booting\Scripts;
+use Helhum\Typo3Console\Exception;
 use Helhum\Typo3Console\Mvc\Cli\CommandCollection;
+use Helhum\Typo3Console\Mvc\Cli\CommandConfiguration;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Mvc\Cli\CommandManager;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 /**
  * @internal
@@ -138,8 +139,8 @@ class Kernel
      * without actually executing a command (e.g. during composer install)
      *
      * @param string $runLevel
-     * @throws \Helhum\Typo3Console\Exception
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public function initialize(string $runLevel = null)
     {
@@ -157,8 +158,8 @@ class Kernel
      * Handle the given command input and return the exit code of the called command
      *
      * @param InputInterface $input
-     * @throws \Helhum\Typo3Console\Exception
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @throws Exception
+     * @throws InvalidArgumentException
      * @return int
      */
     public function handle(InputInterface $input): int
@@ -167,16 +168,17 @@ class Kernel
 
         $commandCollection = new CommandCollection(
             $this->runLevel,
-            GeneralUtility::makeInstance(PackageManager::class)
+            new CommandConfiguration(GeneralUtility::makeInstance(PackageManager::class))
         );
 
         $application = new Application($this->runLevel, Bootstrap::usesComposerClassLoading());
         $application->setCommandLoader($commandCollection);
 
-        $commandIdentifier = $input->getFirstArgument() ?: '';
-        if ($this->runLevel->isCommandAvailable($commandIdentifier)) {
-            $this->runLevel->runSequenceForCommand($commandIdentifier);
-            $commandCollection->addCommandControllerCommands(GeneralUtility::makeInstance(ObjectManager::class)->get(CommandManager::class));
+        // Try to resolve short command names and aliases
+        $commandName = $commandCollection->find($input->getFirstArgument() ?: 'list');
+        if ($this->runLevel->isCommandAvailable($commandName)) {
+            $this->runLevel->runSequenceForCommand($commandName);
+            $commandCollection->addCommandControllerCommands($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] ?? []);
         }
 
         return $application->run($input);
