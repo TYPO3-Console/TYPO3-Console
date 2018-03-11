@@ -91,7 +91,7 @@ class Kernel
         if (Bootstrap::usesComposerClassLoading()) {
             return;
         }
-        $extensionBaseDir = dirname(__DIR__, 2) . '/';
+        $extensionBaseDir = dirname(__DIR__, 3) . '/';
         $autoloadDefinition = json_decode(file_get_contents($extensionBaseDir . 'composer.json'), true)['autoload']['psr-4'];
         foreach ($autoloadDefinition as $prefix => $paths) {
             $paths = array_map(
@@ -102,7 +102,7 @@ class Kernel
             );
             $this->classLoader->addPsr4($prefix, $paths);
         }
-        $pharFile = __DIR__ . '/../../Libraries/symfony-process.phar';
+        $pharFile = __DIR__ . '/../../../Libraries/symfony-process.phar';
         require 'phar://' . $pharFile . '/vendor/autoload.php';
     }
 

@@ -58,15 +58,15 @@
     "autoload": {
         "psr-4": {
             "Helhum\\Typo3Console\\": [
-                "Classes/",
-                "Compatibility/",
+                "Classes/Console/",
+                "Classes/Compatibility/",
                 "Resources/Private/ExtensionArtifacts/src/"
             ]
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Helhum\\Typo3Console\\Tests\\": "Tests/"
+            "Helhum\\Typo3Console\\Tests\\": "Tests/Console/"
         }
     },
     "replace": {

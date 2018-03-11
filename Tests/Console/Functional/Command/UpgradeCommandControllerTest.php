@@ -78,7 +78,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     public function canPerformTypo3Upgrade()
     {
         $this->consoleRootPath = getenv('TYPO3_PATH_COMPOSER_ROOT');
-        $this->upgradeInstancePath = dirname(__DIR__, 3) . '/.Build/upgrade_test';
+        $this->upgradeInstancePath = dirname(__DIR__, 4) . '/.Build/upgrade_test';
         $this->upgradeInstanceDatabase = getenv('TYPO3_INSTALL_DB_DBNAME') . '_up';
         try {
             $this->setUpNewTypo3Instance();

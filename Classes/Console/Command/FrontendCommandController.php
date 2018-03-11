@@ -28,7 +28,7 @@ class FrontendCommandController extends CommandController
     public function requestCommand($requestUrl)
     {
         // TODO: this needs heavy cleanup!
-        $template = file_get_contents(__DIR__ . '/../../Resources/Private/Templates/request.tpl');
+        $template = file_get_contents(__DIR__ . '/../../../Resources/Private/Templates/request.tpl');
         $arguments = [
             'documentRoot' => getenv('TYPO3_PATH_WEB') ?: PATH_site,
             'requestUrl' => $this->makeAbsolute($requestUrl),

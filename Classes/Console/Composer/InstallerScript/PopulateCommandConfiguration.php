@@ -53,7 +53,7 @@ class PopulateCommandConfiguration implements InstallerScript
         }
 
         $success = file_put_contents(
-            __DIR__ . '/../../../Configuration/Console/ComposerPackagesCommands.php',
+            __DIR__ . '/../../../../Configuration/Console/ComposerPackagesCommands.php',
             '<?php' . chr(10)
             . 'return '
             . var_export($commandConfiguration, true)

@@ -176,12 +176,12 @@ class CommandConfiguration
      */
     private function gatherRawConfig(): array
     {
-        if (file_exists($commandConfigurationFile = __DIR__ . '/../../../Configuration/Console/ComposerPackagesCommands.php')) {
+        if (file_exists($commandConfigurationFile = __DIR__ . '/../../../../Configuration/Console/ComposerPackagesCommands.php')) {
             $configuration = require $commandConfigurationFile;
         } else {
             // We only reach this point in non composer mode
             // We ensure that our commands are present, even if we are not an active extension or even not being an extension at all
-            $configuration['typo3_console'] = self::unifyCommandConfiguration(require __DIR__ . '/../../../Configuration/Console/Commands.php', 'typo3_console');
+            $configuration['typo3_console'] = self::unifyCommandConfiguration(require __DIR__ . '/../../../../Configuration/Console/Commands.php', 'typo3_console');
         }
         foreach ($this->packageManager->getActivePackages() as $package) {
             $packageConfig = $this->getConfigFromExtension($package);
