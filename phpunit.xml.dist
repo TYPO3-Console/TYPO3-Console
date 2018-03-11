@@ -22,14 +22,14 @@
     </php>
     <testsuites>
         <testsuite name="TYPO3 Console Unit Tests">
-            <directory>./Tests/Unit/*/</directory>
+            <directory>./Tests/Console/Unit/*/</directory>
         </testsuite>
         <testsuite name="TYPO3 Console Install Command Tests">
-            <directory>./Tests/Functional/Command/Install/</directory>
+            <directory>./Tests/Console/Functional/Command/Install/</directory>
         </testsuite>
         <testsuite name="TYPO3 Console all Command Tests">
-            <directory>./Tests/Functional/*/</directory>
-            <exclude>./Tests/Functional/Command/Install/</exclude>
+            <directory>./Tests/Console/Functional/*/</directory>
+            <exclude>./Tests/Console/Functional/Command/Install/</exclude>
         </testsuite>
     </testsuites>
 </phpunit>

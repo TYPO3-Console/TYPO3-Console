@@ -66,7 +66,7 @@ class CommandDispatcher
     public static function createFromComposerRun(ScriptEvent $event, array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null): self
     {
         // should be Application::COMMAND_NAME, but our Application class currently conflicts with symfony/console 2.7, which is used by Composer
-        $typo3CommandPath = dirname(__DIR__, 3) . '/typo3cms';
+        $typo3CommandPath = dirname(__DIR__, 4) . '/typo3cms';
         $environmentVars['TYPO3_CONSOLE_PLUGIN_RUN'] = true;
 
         return self::create($typo3CommandPath, $commandLine, $environmentVars, $phpFinder);
@@ -106,7 +106,7 @@ class CommandDispatcher
         if (!isset($_SERVER['argv'][0]) && strpos($_SERVER['argv'][0], 'phpunit') === false) {
             throw new RuntimeException(sprintf('Tried to create %s command runner from wrong context', Application::COMMAND_NAME), 1493570522);
         }
-        $typo3CommandPath = $typo3CommandPath ?: dirname(__DIR__, 3) . '/' . Application::COMMAND_NAME;
+        $typo3CommandPath = $typo3CommandPath ?: dirname(__DIR__, 4) . '/' . Application::COMMAND_NAME;
         return self::create($typo3CommandPath);
     }
 
