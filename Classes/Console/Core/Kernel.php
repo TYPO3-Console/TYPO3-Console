@@ -60,9 +60,6 @@ class Kernel
         $this->bootstrap->initializeClassLoader($classLoader);
         // Initialize basic annotation loader until TYPO3 does so as well
         AnnotationRegistry::registerLoader('class_exists');
-
-        // We need to be sure all classes can be loaded in non composer mode as early as possible
-        $this->initializeNonComposerClassLoading();
         $this->runLevel = new RunLevel($this->bootstrap);
     }
 
@@ -81,29 +78,6 @@ class Kernel
         if (ini_get('max_execution_time') !== '0') {
             @ini_set('max_execution_time', '0');
         }
-    }
-
-    /**
-     * Register auto loading for our own classes in case we cannot rely on composer class loading.
-     */
-    private function initializeNonComposerClassLoading()
-    {
-        if (Bootstrap::usesComposerClassLoading()) {
-            return;
-        }
-        $extensionBaseDir = dirname(__DIR__, 3) . '/';
-        $autoloadDefinition = json_decode(file_get_contents($extensionBaseDir . 'composer.json'), true)['autoload']['psr-4'];
-        foreach ($autoloadDefinition as $prefix => $paths) {
-            $paths = array_map(
-                function ($path) use ($extensionBaseDir) {
-                    return $extensionBaseDir . $path;
-                },
-                (array)$paths
-            );
-            $this->classLoader->addPsr4($prefix, $paths);
-        }
-        $pharFile = __DIR__ . '/../../../Libraries/symfony-process.phar';
-        require 'phar://' . $pharFile . '/vendor/autoload.php';
     }
 
     /**
