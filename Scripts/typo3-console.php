@@ -6,20 +6,14 @@
     } elseif (file_exists($vendorAutoLoadFile = dirname(dirname(dirname(__DIR__))) . '/autoload.php')) {
         // Console is a dependency, thus located in vendor/helhum/typo3-console
         $classLoader = require $vendorAutoLoadFile;
-    } elseif (file_exists($typo3AutoLoadFile = realpath(($rootPath = dirname(dirname(dirname(dirname(__DIR__))))) . '/typo3') . '/../vendor/autoload.php')) {
+    } elseif (file_exists($typo3AutoLoadFile = __DIR__ . '/../Resources/Private/ExtensionArtifacts/autoload.php')) {
         // Console is extension
-        putenv('TYPO3_PATH_ROOT=' . $rootPath);
         $classLoader = require $typo3AutoLoadFile;
     } else {
-        echo 'Could not find autoload.php file. Is TYPO3_PATH_ROOT specified correctly?' . PHP_EOL;
+        echo 'Could not find autoload.php file. TYPO3 Console needs to be installed with composer' . PHP_EOL;
         exit(1);
     }
 
-    if (!class_exists(\Helhum\Typo3Console\Core\Kernel::class)) {
-        // This require is needed so that the console works in non Composer mode,
-        // where requiring the main autoload.php is not enough to load extension classes
-        require __DIR__ . '/../Classes/Core/Kernel.php';
-    }
     $kernel = new \Helhum\Typo3Console\Core\Kernel($classLoader);
     $exitCode = $kernel->handle(new \Helhum\Typo3Console\Mvc\Cli\Symfony\Input\ArgvInput());
     $kernel->terminate($exitCode);
