@@ -32,6 +32,7 @@ class UpgradeWizardListRenderer
     {
         if (empty($upgradeWizardList)) {
             $output->outputLine('<info>None</info>');
+
             return;
         }
         $tableHeader = ['Identifier', 'Title'];

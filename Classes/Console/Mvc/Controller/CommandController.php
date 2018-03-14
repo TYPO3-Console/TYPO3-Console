@@ -168,6 +168,7 @@ abstract class CommandController implements CommandControllerInterface
         if (!is_callable([$this, $commandMethodName])) {
             throw new NoSuchCommandException(sprintf('A command method "%s()" does not exist in controller "%s".', $commandMethodName, get_class($this)), 1300902143);
         }
+
         return $commandMethodName;
     }
 

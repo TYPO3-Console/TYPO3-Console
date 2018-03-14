@@ -89,6 +89,7 @@ class CommandDispatcher
             throw new RuntimeException('Tried to create typo3 command runner from wrong context', 1484945065);
         }
         $typo3CommandPath = $_SERVER['argv'][0];
+
         return self::create($typo3CommandPath, $commandLine, $environmentVars, $phpFinder);
     }
 
@@ -107,6 +108,7 @@ class CommandDispatcher
             throw new RuntimeException(sprintf('Tried to create %s command runner from wrong context', Application::COMMAND_NAME), 1493570522);
         }
         $typo3CommandPath = $typo3CommandPath ?: dirname(__DIR__, 4) . '/' . Application::COMMAND_NAME;
+
         return self::create($typo3CommandPath);
     }
 
@@ -133,6 +135,7 @@ class CommandDispatcher
             $commandLine[] = getenv('PHP_INI_PATH');
         }
         $environmentVars['TYPO3_CONSOLE_SUB_PROCESS'] = true;
+
         return new self($commandLine, $environmentVars);
     }
 
@@ -182,6 +185,7 @@ class CommandDispatcher
             $dashedName = preg_replace('/([A-Z][a-z0-9]+)/', '$1-', $dashedName);
             $dashedName = '--' . strtolower(substr($dashedName, 0, -1));
         }
+
         return $dashedName;
     }
 
@@ -207,6 +211,7 @@ class CommandDispatcher
             $process = new Process($commandLine, null, $envVars, $input, 0);
             $process->inheritEnvironmentVariables();
         }
+
         return $process;
     }
 
@@ -225,6 +230,7 @@ class CommandDispatcher
                 $env[$k] = $v;
             }
         }
+
         return $env;
     }
 }

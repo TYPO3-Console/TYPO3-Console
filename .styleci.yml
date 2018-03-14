@@ -3,6 +3,7 @@ preset: psr2
 enabled:
   - alpha_ordered_imports
   - binary_operator_spaces
+  - blank_line_before_return
   - concat_with_spaces
   - function_typehint_space
   - hash_to_slash_comment

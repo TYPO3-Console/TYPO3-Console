@@ -49,6 +49,7 @@ class SchemaUpdateResult
         foreach ($this->performedUpdates as $type => $performedUpdates) {
             $typesCount[$type] = count($performedUpdates);
         }
+
         return $typesCount;
     }
 

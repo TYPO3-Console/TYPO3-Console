@@ -91,6 +91,7 @@ class ConfigurationServiceTest extends UnitTestCase
             ->willReturnCallback(
                 function ($path, $value) use (&$localConfigurationReference) {
                     $localConfigurationReference = ArrayUtility::setValueByPath($localConfigurationReference, $path, $value);
+
                     return true;
                 }
             );

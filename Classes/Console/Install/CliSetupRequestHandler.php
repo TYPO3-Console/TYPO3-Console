@@ -144,6 +144,7 @@ class CliSetupRequestHandler
 
             if (!$this->checkIfActionNeedsExecution($actionName)->actionNeedsExecution()) {
                 $this->output->outputLine('<info>No execution needed, skipped step!</info>');
+
                 return;
             }
             $actionArguments = [
@@ -243,6 +244,7 @@ class CliSetupRequestHandler
             // Therefore we gracefully create a valid response here
             $response = new InstallStepResponse(false, []);
         }
+
         return $response;
     }
 

@@ -182,6 +182,7 @@ class FakeDatabaseBackend extends AbstractBackend implements PhpCapableBackendIn
             ExtensionManagementUtility::extPath('core') .
             'Resources/Private/Sql/Cache/Backend/Typo3DatabaseBackendTags.sql'
         );
+
         return $requiredTableStructures . str_replace('###TAGS_TABLE###', $this->tagsTable, $tagsTableSql) . LF;
     }
 }

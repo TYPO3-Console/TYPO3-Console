@@ -7,6 +7,7 @@ return PhpCsFixer\Config::create()
             'syntax' => 'short',
         ],
         'binary_operator_spaces' => true,
+        'blank_line_before_return' => true,
         'concat_space' => [
             'spacing' => 'one',
         ],

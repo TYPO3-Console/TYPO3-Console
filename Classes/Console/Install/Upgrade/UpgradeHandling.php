@@ -184,6 +184,7 @@ class UpgradeHandling
                 return true;
             }
         }
+
         return false;
     }
 
@@ -230,6 +231,7 @@ class UpgradeHandling
     public function executeInSubProcess($command, array $arguments = [], array &$messages = [])
     {
         $messages = $this->ensureUpgradeIsPossible();
+
         return @unserialize($this->commandDispatcher->executeCommand('upgrade:subprocess', [$command, serialize($arguments)]));
     }
 
@@ -260,6 +262,7 @@ class UpgradeHandling
             $this->commandDispatcher->executeCommand('cache:flush');
             $this->commandDispatcher->executeCommand('database:updateschema');
         }
+
         return $messages;
     }
 
@@ -279,6 +282,7 @@ class UpgradeHandling
             $messages[] = sprintf('<error>Extension "%s" seems to be not compatible or broken</error>', $extensionKey);
             $messages[] = sprintf('<info>Deactivated extension "%s".</info>', $extensionKey);
         }
+
         return $messages;
     }
 }

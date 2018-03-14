@@ -102,6 +102,7 @@ class PhpParser implements PhpParserInterface
         if (!isset($matches[2])) {
             throw new ParsingException('Class file does not contain a class or interface definition', 1399285302);
         }
+
         return $matches[3];
     }
 
@@ -112,6 +113,7 @@ class PhpParser implements PhpParserInterface
     protected function isInterface($classContent)
     {
         preg_match('/^\\s*interface ([a-zA-Z_\x7f-\xff][a-zA-Z0-9\\\\_\x7f-\xff]*)/ims', $classContent, $matches);
+
         return isset($matches[1]);
     }
 
@@ -122,6 +124,7 @@ class PhpParser implements PhpParserInterface
     protected function isAbstract($classContent)
     {
         preg_match('/^\\s*(abstract)*\\s*(class|interface) ([a-zA-Z_\x7f-\xff][a-zA-Z0-9\\\\_\x7f-\xff]*)/ims', $classContent, $matches);
+
         return isset($matches[1]) && trim($matches[1]) === 'abstract';
     }
 
@@ -132,6 +135,7 @@ class PhpParser implements PhpParserInterface
     protected function parseNamespaceRaw($classContent)
     {
         preg_match('/^\\s*namespace ([^ ;]*)/ims', $classContent, $matches);
+
         return isset($matches[1]) ? trim($matches[1]) : false;
     }
 }

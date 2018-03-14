@@ -60,8 +60,10 @@ class MysqlCommand
         if ($interactive) {
             // I did not figure out how to change pipes with symfony/process
             $interactiveProcess = new InteractiveProcess();
+
             return $interactiveProcess->run($process->getCommandLine());
         }
+
         return $process->run($this->buildDefaultOutputCallback($outputCallback));
     }
 
@@ -77,6 +79,7 @@ class MysqlCommand
         $commandLine = array_merge($commandLine, $this->buildConnectionArguments(), $additionalArguments);
         $process = new Process($commandLine, null, null, null, 0);
         $process->inheritEnvironmentVariables();
+
         return $process->run($this->buildDefaultOutputCallback($outputCallback));
     }
 
@@ -94,6 +97,7 @@ class MysqlCommand
                 }
             };
         }
+
         return $outputCallback;
     }
 
@@ -115,6 +119,7 @@ class MysqlCommand
             $arguments[] = $this->dbConfig['unix_socket'];
         }
         $arguments[] = $this->dbConfig['dbname'];
+
         return $arguments;
     }
 

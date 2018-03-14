@@ -22,5 +22,6 @@ return (function () {
     }
     $pharFile = __DIR__ . '/../../../Libraries/symfony-process.phar';
     require 'phar://' . $pharFile . '/vendor/autoload.php';
+
     return $classLoader;
 })();

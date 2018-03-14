@@ -79,6 +79,7 @@ class XsdGenerator
         if (count($classNames) === 0) {
             throw new Exception(sprintf('No ViewHelpers found in namespace "%s"', $viewHelperNamespace), 1330029328);
         }
+
         return $this->generateXsdFromClassNames($classNames, $xsdNamespace);
     }
 
@@ -97,6 +98,7 @@ class XsdGenerator
         if (count($classNames) === 0) {
             throw new Exception(sprintf('No ViewHelpers found in paths "%s"', implode(',', $viewHelperPaths)), 1464982249);
         }
+
         return $this->generateXsdFromClassNames($classNames, $xsdNamespace);
     }
 
@@ -120,6 +122,7 @@ class XsdGenerator
         foreach ($classNames as $className) {
             $this->generateXmlForClassName($className, $xmlRootNode);
         }
+
         return $xmlRootNode->asXML();
     }
 
@@ -235,6 +238,7 @@ class XsdGenerator
             }
         }
         sort($affectedViewHelperClassNames);
+
         return $affectedViewHelperClassNames;
     }
 
@@ -254,6 +258,7 @@ class XsdGenerator
         if ($packageKey === 'fluid') {
             $viewHelperClassFilePaths[] = realpath(PATH_site . 'typo3/') . '/../vendor/typo3fluid/fluid/src/ViewHelpers/';
         }
+
         return $this->getClassNamesInPaths($viewHelperClassFilePaths);
     }
 
@@ -308,6 +313,7 @@ class XsdGenerator
         /// Strip namespace from the beginning and "ViewHelper" from the end of the class name
         $strippedClassName = substr($className, strpos($className, 'ViewHelpers') + 12, -10);
         $classNameParts = explode('\\', $strippedClassName);
+
         return implode(
             '.',
             array_map(
@@ -336,6 +342,7 @@ class XsdGenerator
         $childNode->appendChild($domDocument->createCDATASection($childNodeValue));
         $childNodeTarget = $parentDomNode->ownerDocument->importNode($childNode, true);
         $parentDomNode->appendChild($childNodeTarget);
+
         return simplexml_import_dom($childNodeTarget);
     }
 }

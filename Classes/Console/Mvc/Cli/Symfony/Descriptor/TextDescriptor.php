@@ -232,6 +232,7 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
     private function wordWrap(string $stringToWrap, int $indent, $maxWidth): string
     {
         $wrapped = $maxWidth === null ? $stringToWrap : wordwrap($stringToWrap, $maxWidth, "\n", true);
+
         return preg_replace('/\s*[\r\n]\s*/', "\n" . str_repeat(' ', $indent), $wrapped);
     }
 

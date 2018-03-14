@@ -111,6 +111,7 @@ class SchemaUpdateResultRenderer
             }
             $query = implode(chr(10), $truncatedLines);
         }
+
         return $queries;
     }
 }

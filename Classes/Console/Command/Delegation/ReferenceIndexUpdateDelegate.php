@@ -112,6 +112,7 @@ class ReferenceIndexUpdateDelegate implements ReferenceIndexIntegrityDelegateInt
     {
         $logger = new Logger(__CLASS__);
         $logger->addWriter(LogLevel::EMERGENCY, new NullWriter());
+
         return $logger;
     }
 }

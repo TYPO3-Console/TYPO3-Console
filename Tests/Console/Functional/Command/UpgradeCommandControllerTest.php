@@ -208,6 +208,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         if (!$process->isSuccessful()) {
             $this->fail(sprintf('Composer command "%s" failed with message: "%s", output: "%s"', $process->getCommandLine(), $process->getErrorOutput(), $process->getOutput()));
         }
+
         return $process->getOutput() . $process->getErrorOutput();
     }
 }

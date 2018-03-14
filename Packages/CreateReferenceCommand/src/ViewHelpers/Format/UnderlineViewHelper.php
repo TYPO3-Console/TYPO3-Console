@@ -41,6 +41,7 @@ class UnderlineViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewH
     {
         $withCharacter = $this->arguments['withCharacter'];
         $string = $this->renderChildren();
+
         return $string . chr(10) . str_repeat($withCharacter, strlen($string));
     }
 }

@@ -33,6 +33,7 @@ class DiffConsoleRenderer extends Renderer
             $addition = preg_replace('/^(.)/m', '+$1 ', $addition);
             $output = '<ins>' . $addition . '</ins>';
         }
+
         return $output;
     }
 }
