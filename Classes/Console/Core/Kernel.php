@@ -24,6 +24,7 @@ use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -87,11 +88,13 @@ class Kernel
      */
     private function initializeCompatibilityLayer()
     {
-        $typo3Branch = '90';
+        $typo3Branch = '92';
         if (method_exists($this->bootstrap, 'setCacheHashOptions')) {
             $typo3Branch = '87';
+        } elseif (!class_exists(Environment::class)) {
+            $typo3Branch = '91';
         }
-        if ($typo3Branch === '90') {
+        if ($typo3Branch === '92') {
             return;
         }
         $compatibilityNamespace = 'Helhum\\Typo3Console\\TYPO3v' . $typo3Branch . '\\';

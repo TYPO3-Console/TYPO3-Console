@@ -16,7 +16,6 @@ namespace Helhum\Typo3Console\Core\Booting;
 use Helhum\Typo3Console\Core\Cache\FakeDatabaseBackend;
 use Helhum\Typo3Console\Error\ErrorHandler;
 use Helhum\Typo3Console\Error\ExceptionHandler;
-use Helhum\Typo3Console\Package\UncachedPackageManager;
 use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
 use TYPO3\CMS\Core\Cache\Backend\NullBackend;
@@ -76,16 +75,11 @@ class Scripts
      */
     private static function initializePackageManagement(Bootstrap $bootstrap)
     {
-        $packageManager = new UncachedPackageManager();
+        $packageManager = CompatibilityScripts::createPackageManager();
         $bootstrap->setEarlyInstance(PackageManager::class, $packageManager);
-        ExtensionManagementUtility::setPackageManager($packageManager);
-        $dependencyResolver = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Package\DependencyResolver::class);
-        $dependencyResolver->injectDependencyOrderingService(
-            GeneralUtility::makeInstance(\TYPO3\CMS\Core\Service\DependencyOrderingService::class)
-        );
-        $packageManager->injectDependencyResolver($dependencyResolver);
-        $packageManager->init();
         GeneralUtility::setSingletonInstance(PackageManager::class, $packageManager);
+        ExtensionManagementUtility::setPackageManager($packageManager);
+        $packageManager->init();
     }
 
     public static function disableCachesForObjectManagement()

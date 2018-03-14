@@ -98,21 +98,19 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
 
     private function setUpNewTypo3Instance()
     {
-        $this->commandDispatcher = CommandDispatcher::createFromTestRun($this->upgradeInstancePath . '/vendor/helhum/typo3-console-test/' . Application::COMMAND_NAME);
+        $this->commandDispatcher = CommandDispatcher::createFromTestRun($this->upgradeInstancePath . '/vendor/helhum/typo3-console/' . Application::COMMAND_NAME);
         if (!is_dir($this->upgradeInstancePath)) {
             mkdir($this->upgradeInstancePath);
         }
 
         file_put_contents($this->upgradeInstancePath . '/composer.json', '{}');
-        $this->executeComposerCommand(['config', 'extra.typo3/cms.cms-package-dir', '{$vendor-dir}/typo3/cms']);
-        $this->executeComposerCommand(['config', 'extra.typo3/cms.web-dir', 'web']);
-        $this->executeComposerCommand(['config', 'extra.helhum/typo3-console.install-extension-dummy', '0']);
+        $this->executeComposerCommand(['config', 'extra.typo3/cms.web-dir', 'public']);
         $this->copyDirectory($this->consoleRootPath, $this->upgradeInstancePath . '/typo3_console', ['.Build', '.git']);
         $consoleComposerJson = file_get_contents($this->upgradeInstancePath . '/typo3_console/composer.json');
-        $consoleComposerJson = str_replace('"name": "helhum/typo3-console"', '"name": "helhum/typo3-console-test"', $consoleComposerJson);
+        $consoleComposerJson = preg_replace('#"typo3/cms-([^"]*)": "([^"]*)"#', '"typo3/cms-\1": "\2 || ' . getenv('TYPO3_VERSION') . '"', $consoleComposerJson);
         file_put_contents($this->upgradeInstancePath . '/typo3_console/composer.json', $consoleComposerJson);
         $this->executeComposerCommand(['config', 'repositories.console', '{"type": "path", "url": "typo3_console", "options": {"symlink": false}}']);
-        $output = $this->executeComposerCommand(['require', 'typo3/cms-core=^8.7.10', 'helhum/typo3-console-test=@dev']);
+        $output = $this->executeComposerCommand(['require', 'typo3/cms-core=^8.7.10', 'helhum/typo3-console=@dev']);
         $this->assertContains('Mirroring from typo3_console', $output);
 
         $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . $this->upgradeInstanceDatabase, false);
@@ -132,7 +130,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             ],
             [
                 'TYPO3_PATH_COMPOSER_ROOT' => $this->upgradeInstancePath,
-                'TYPO3_PATH_ROOT' => $this->upgradeInstancePath . '/web',
+                'TYPO3_PATH_ROOT' => $this->upgradeInstancePath . '/public',
             ]
         );
         $this->assertContains('Successfully installed TYPO3 CMS!', $output);
@@ -151,12 +149,14 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
                 'typo3/cms-extbase=' . $typo3Version,
                 'typo3/cms-extensionmanager=' . $typo3Version,
                 'typo3/cms-fluid=' . $typo3Version,
+                'typo3/cms-frontend=' . $typo3Version,
                 'typo3/cms-install=' . $typo3Version,
+                'typo3/cms-saltedpasswords=' . $typo3Version,
                 'typo3/cms-scheduler=' . $typo3Version,
                 '--no-update',
             ]
         );
-        $output = $this->executeComposerCommand(['update', 'typo3/*', 'doctrine/dbal', '--with-all-dependencies']);
+        $output = $this->executeComposerCommand(['update', 'typo3/*', 'doctrine/dbal', 'helhum/typo3-composer-setup']);
         if (DIRECTORY_SEPARATOR === '\\') {
             $output = preg_replace('/[^\x09-\x0d\x1b\x20-\xff]/', '', $output);
         }

@@ -1,5 +1,5 @@
 <?php
-namespace Helhum\Typo3Console\Core\Booting;
+namespace Helhum\Typo3Console\TYPO3v91\Core\Booting;
 
 /*
  * This file is part of the TYPO3 Console project.
@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Core\Booting;
  */
 
 use Helhum\Typo3Console\Package\UncachedPackageManager;
+use TYPO3\CMS\Core\Package\DependencyResolver;
 use TYPO3\CMS\Core\Service\DependencyOrderingService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -21,7 +22,12 @@ class CompatibilityScripts
 {
     public static function createPackageManager(): UncachedPackageManager
     {
-        $packageManager = new UncachedPackageManager(GeneralUtility::makeInstance(DependencyOrderingService::class));
+        $packageManager = new UncachedPackageManager();
+        $dependencyResolver = GeneralUtility::makeInstance(DependencyResolver::class);
+        $dependencyResolver->injectDependencyOrderingService(
+            GeneralUtility::makeInstance(DependencyOrderingService::class)
+        );
+        $packageManager->injectDependencyResolver($dependencyResolver);
 
         return $packageManager;
     }
