@@ -268,7 +268,7 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
     {
         $this->write(
             isset($options['raw_text']) && $options['raw_text'] ? strip_tags($content) : $content,
-            isset($options['raw_output']) ? !$options['raw_output'] : true
+            !isset($options['raw_output']) || !$options['raw_output']
         );
     }
 

@@ -22,9 +22,7 @@ class CompatibilityScripts
 {
     public static function createPackageManager(): UncachedPackageManager
     {
-        $packageManager = new UncachedPackageManager(GeneralUtility::makeInstance(DependencyOrderingService::class));
-
-        return $packageManager;
+        return new UncachedPackageManager(GeneralUtility::makeInstance(DependencyOrderingService::class));
     }
 
     public static function initializeConfigurationManagement()

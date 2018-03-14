@@ -17,9 +17,6 @@ namespace Helhum\Typo3Console\Tests\Unit\Parser;
 use Helhum\Typo3Console\Parser;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 
-/**
- * Class PhpParserTest
- */
 class PhpParserTest extends UnitTestCase
 {
     /**

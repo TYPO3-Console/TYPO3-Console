@@ -14,9 +14,6 @@ namespace Helhum\Typo3Console\Parser;
  *
  */
 
-/**
- * Class PhpParser
- */
 class PhpParser implements PhpParserInterface
 {
     /**
@@ -24,7 +21,7 @@ class PhpParser implements PhpParserInterface
      * @throws ParsingException
      * @return ParsedClass
      */
-    public function parseClassFile($classFile)
+    public function parseClassFile($classFile): ParsedClass
     {
         if (!file_exists($classFile)) {
             throw new ParsingException('Class File does not exist', 1399284080);
@@ -41,7 +38,7 @@ class PhpParser implements PhpParserInterface
      * @throws ParsingException
      * @return ParsedClass
      */
-    public function parseClass($classContent)
+    public function parseClass($classContent): ParsedClass
     {
         $parsedClass = new ParsedClass();
 
@@ -62,9 +59,9 @@ class PhpParser implements PhpParserInterface
     /**
      * @param string $classContent
      * @throws ParsingException
-     * @return bool
+     * @return string
      */
-    protected function parseClassName($classContent)
+    protected function parseClassName($classContent): string
     {
         $className = $this->parseClassNameRaw($classContent);
         if (!$this->parseNamespaceRaw($classContent)) {
@@ -79,7 +76,7 @@ class PhpParser implements PhpParserInterface
      * @param string $classContent
      * @return string
      */
-    protected function parseNamespace($classContent)
+    protected function parseNamespace($classContent): string
     {
         $phpNamespace = $this->parseNamespaceRaw($classContent);
         if (!$phpNamespace) {
@@ -89,7 +86,7 @@ class PhpParser implements PhpParserInterface
             $namespace = implode('_', $classParts);
         }
 
-        return isset($namespace) ? $namespace : $phpNamespace;
+        return $namespace ?? $phpNamespace;
     }
 
     /**
@@ -97,7 +94,7 @@ class PhpParser implements PhpParserInterface
      * @throws ParsingException
      * @return string
      */
-    protected function parseClassNameRaw($classContent)
+    protected function parseClassNameRaw($classContent): string
     {
         preg_match('/^\\s*(abstract)*\\s*(class|interface) ([a-zA-Z_\x7f-\xff][a-zA-Z0-9\\\\_\x7f-\xff]*)/ims', $classContent, $matches);
         if (!isset($matches[2])) {
@@ -109,9 +106,9 @@ class PhpParser implements PhpParserInterface
 
     /**
      * @param string $classContent
-     * @return string
+     * @return bool
      */
-    protected function isInterface($classContent)
+    protected function isInterface($classContent): bool
     {
         preg_match('/^\\s*interface ([a-zA-Z_\x7f-\xff][a-zA-Z0-9\\\\_\x7f-\xff]*)/ims', $classContent, $matches);
 
@@ -120,9 +117,9 @@ class PhpParser implements PhpParserInterface
 
     /**
      * @param string $classContent
-     * @return string
+     * @return bool
      */
-    protected function isAbstract($classContent)
+    protected function isAbstract($classContent): bool
     {
         preg_match('/^\\s*(abstract)*\\s*(class|interface) ([a-zA-Z_\x7f-\xff][a-zA-Z0-9\\\\_\x7f-\xff]*)/ims', $classContent, $matches);
 
@@ -131,12 +128,12 @@ class PhpParser implements PhpParserInterface
 
     /**
      * @param string $classContent
-     * @return bool|string
+     * @return string
      */
-    protected function parseNamespaceRaw($classContent)
+    protected function parseNamespaceRaw($classContent): string
     {
         preg_match('/^\\s*namespace ([^ ;]*)/ims', $classContent, $matches);
 
-        return isset($matches[1]) ? trim($matches[1]) : false;
+        return isset($matches[1]) ? trim($matches[1]) : '';
     }
 }

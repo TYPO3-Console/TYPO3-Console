@@ -149,7 +149,7 @@ class CommandConfiguration
 
     private function initialize()
     {
-        foreach ($this->gatherRawConfig() as $packageName => $commandConfiguration) {
+        foreach ($this->gatherRawConfig() as $commandConfiguration) {
             $this->commandDefinitions = array_replace($this->commandDefinitions, $this->getCommandDefinitionsForCommands($commandConfiguration));
         }
     }
