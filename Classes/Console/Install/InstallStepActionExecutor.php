@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Install;
 
 /*
@@ -71,12 +72,12 @@ class InstallStepActionExecutor
         $messages = [];
         $needsExecution = file_exists(PATH_site . 'FIRST_INSTALL');
         if (is_callable([$this->installerController, $checkMethod])) {
-            $needsExecution = !\json_decode($this->installerController->$checkMethod()->getBody(), true)['success'];
+            $needsExecution = !\json_decode((string)$this->installerController->$checkMethod()->getBody(), true)['success'];
         }
         if ($needsExecution && !$dryRun) {
             $request = ($this->requestFactory)($arguments);
             try {
-                $response = \json_decode($this->installerController->$actionMethod($request)->getBody(), true);
+                $response = \json_decode((string)$this->installerController->$actionMethod($request)->getBody(), true);
                 if (!$response['success']) {
                     $messages = $response['status'];
                 }
