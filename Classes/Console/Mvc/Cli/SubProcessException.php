@@ -25,17 +25,17 @@ class SubProcessException extends \Exception
     private $previousExceptionClass;
 
     /**
-     * @var
+     * @var string|null
      */
     private $previousExceptionTrace;
 
     /**
-     * @var
+     * @var string|null
      */
     private $previousExceptionLine;
 
     /**
-     * @var
+     * @var string|null
      */
     private $previousExceptionFile;
 

@@ -52,6 +52,8 @@ class ExceptionRenderer
         do {
             $this->outputException($exception, $output);
             if ($output->isVerbose()) {
+                $this->outputCode($exception, $output);
+                $this->outputCommand($exception, $output);
                 $this->outputTrace($exception, $output);
                 $output->writeln('');
             }
@@ -72,7 +74,6 @@ class ExceptionRenderer
      */
     private function outputException(\Throwable $exception, OutputInterface $output)
     {
-        $exceptionCodeNumber = $exception->getCode() > 0 ? $exception->getCode() : '';
         $exceptionClass = get_class($exception);
         if ($exception instanceof SubProcessException) {
             $exceptionClass = $exception->getPreviousExceptionClass();
@@ -100,30 +101,80 @@ class ExceptionRenderer
         $messages[] = $emptyLine;
         $messages[] = '';
         $output->writeln($messages, OutputInterface::VERBOSITY_QUIET);
+    }
 
-        if ($output->isVerbose()) {
-            if ($exceptionCodeNumber) {
-                $output->writeln(sprintf('<comment>Exception code:</comment> <info>%s</info>', $exceptionCodeNumber));
+    /**
+     * @param \Throwable $exception
+     * @param OutputInterface $output
+     */
+    private function outputCode(\Throwable $exception, OutputInterface $output)
+    {
+        if ($exception->getCode() > 0) {
+            $output->writeln(sprintf('<comment>Exception code:</comment> <info>%s</info>', $exception->getCode()));
+            $output->writeln('');
+        }
+    }
+
+    /**
+     * @param \Throwable $exception
+     * @param OutputInterface $output
+     */
+    private function outputCommand(\Throwable $exception, OutputInterface $output)
+    {
+        if ($exception instanceof FailedSubProcessCommandException || ($exception instanceof SubProcessException && $exception->getCommandLine())) {
+            $output->writeln('<comment>Command line:</comment>');
+            $output->writeln($exception->getCommandLine());
+            $output->writeln('');
+            if ($exception->getOutputMessage()) {
+                $output->writeln('<comment>Command output:</comment>');
+                $output->writeln($exception->getOutputMessage());
                 $output->writeln('');
             }
-
-            if ($exception instanceof FailedSubProcessCommandException
-                || ($exception instanceof SubProcessException && $exception->getCommandLine())
-            ) {
-                $output->writeln('<comment>Command line:</comment>');
-                $output->writeln($exception->getCommandLine());
+            if ($exception->getErrorMessage()) {
+                $output->writeln('<comment>Command error output:</comment>');
+                $output->writeln($exception->getErrorMessage());
                 $output->writeln('');
-                if ($exception->getOutputMessage()) {
-                    $output->writeln('<comment>Command output:</comment>');
-                    $output->writeln($exception->getOutputMessage());
-                    $output->writeln('');
-                }
-                if ($exception->getErrorMessage()) {
-                    $output->writeln('<comment>Command error output:</comment>');
-                    $output->writeln($exception->getErrorMessage());
-                    $output->writeln('');
-                }
             }
+        }
+    }
+
+    /**
+     * Output formatted trace.
+     *
+     * @param \Throwable $exception
+     */
+    private function outputTrace(\Throwable $exception, OutputInterface $output)
+    {
+        $output->writeln('<comment>Exception trace:</comment>');
+        $backtraceSteps = $this->getTrace($exception);
+        foreach ($backtraceSteps as $index => $step) {
+            $traceLine = '#' . $index . ' ';
+            if (isset($backtraceSteps[$index]['class'])) {
+                $traceLine .= $backtraceSteps[$index]['class'];
+            }
+            if (isset($backtraceSteps[$index]['function'])) {
+                $traceLine .= (isset($backtraceSteps[$index]['class']) ? $backtraceSteps[$index]['type'] : '') . $backtraceSteps[$index]['function'] . '()';
+            }
+            $output->writeln(sprintf('<info>%s</info>', $traceLine));
+            if (isset($backtraceSteps[$index]['file'])) {
+                $output->writeln('   ' . $this->getPossibleShortenedFileName($backtraceSteps[$index]['file']) . (isset($backtraceSteps[$index]['line']) ? ':' . $backtraceSteps[$index]['line'] : ''));
+            }
+        }
+    }
+
+    private function outputSynopsis(OutputInterface $output, Application $application = null)
+    {
+        if (!$application || getenv('TYPO3_CONSOLE_SUB_PROCESS')) {
+            return;
+        }
+        \Closure::bind(function () use (&$runningCommand, $application) {
+            $property = 'runningCommand';
+            $runningCommand = $application->$property;
+        }, null, Application::class)();
+
+        if ($runningCommand !== null) {
+            $output->writeln(sprintf('<info>%s</info>', sprintf($runningCommand->getSynopsis(), $application->getName())), OutputInterface::VERBOSITY_QUIET);
+            $output->writeln('', OutputInterface::VERBOSITY_QUIET);
         }
     }
 
@@ -151,50 +202,9 @@ class ExceptionRenderer
         }
 
         $lines[] = count($lines) ? str_pad($line, $width) : $line;
-
         mb_convert_variables($encoding, 'utf8', $lines);
 
         return $lines;
-    }
-
-    /**
-     * Output formatted trace.
-     *
-     * @param \Throwable $exception
-     */
-    private function outputTrace(\Throwable $exception, OutputInterface $output)
-    {
-        $output->writeln('<comment>Exception trace:</comment>');
-        $backtraceSteps = $this->getTrace($exception);
-        foreach ($backtraceSteps as $index => $step) {
-            $traceLine = '#' . $index . ' ';
-            if (isset($backtraceSteps[$index]['class'])) {
-                $traceLine .= $backtraceSteps[$index]['class'];
-            }
-            if (isset($backtraceSteps[$index]['function'])) {
-                $traceLine .= (isset($backtraceSteps[$index]['class']) ? '::' : '') . $backtraceSteps[$index]['function'] . '()';
-            }
-            $output->writeln(sprintf('<info>%s</info>', $traceLine));
-            if (isset($backtraceSteps[$index]['file'])) {
-                $output->writeln('   ' . $this->getPossibleShortenedFileName($backtraceSteps[$index]['file']) . (isset($backtraceSteps[$index]['line']) ? ':' . $backtraceSteps[$index]['line'] : ''));
-            }
-        }
-    }
-
-    private function outputSynopsis(OutputInterface $output, Application $application = null)
-    {
-        if (!$application || getenv('TYPO3_CONSOLE_SUB_PROCESS')) {
-            return;
-        }
-        \Closure::bind(function () use (&$runningCommand, $application) {
-            $property = 'runningCommand';
-            $runningCommand = $application->$property;
-        }, null, Application::class)();
-
-        if ($runningCommand !== null) {
-            $output->writeln(sprintf('<info>%s</info>', sprintf($runningCommand->getSynopsis(), $application->getName())), OutputInterface::VERBOSITY_QUIET);
-            $output->writeln('', OutputInterface::VERBOSITY_QUIET);
-        }
     }
 
     /**
