@@ -75,8 +75,8 @@ class SchemaUpdateResultRenderer
     public function renderErrors(SchemaUpdateResult $result, ConsoleOutput $output, $includeStatements = false, $maxStatementLength = 90)
     {
         $tableRows = [];
-        $messageLength = $includeStatements ? $maxStatementLength * .3 : $maxStatementLength;
-        $statementLength = $maxStatementLength * 0.6;
+        $messageLength = $includeStatements ? (int)($maxStatementLength * .3) : $maxStatementLength;
+        $statementLength = (int)($maxStatementLength * 0.6);
         foreach ($result->getErrors() as $type => $errors) {
             $typeLabel = self::$schemaUpdateTypeLabels[(string)$type];
             foreach ($errors as $error) {
@@ -103,7 +103,7 @@ class SchemaUpdateResultRenderer
      * @param int $truncateAt
      * @return array
      */
-    protected function getTruncatedQueries(array $queries, $truncateAt)
+    protected function getTruncatedQueries(array $queries, int $truncateAt): array
     {
         foreach ($queries as &$query) {
             $truncatedLines = [];
