@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 (function () {
     if (file_exists($rootAutoLoadFile = dirname(__DIR__) . '/.Build/vendor/autoload.php')) {
         // Console is root package, thus vendor folder is .Build/vendor

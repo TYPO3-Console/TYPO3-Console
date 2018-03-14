@@ -5,6 +5,7 @@ enabled:
   - binary_operator_spaces
   - blank_line_before_return
   - concat_with_spaces
+  - declare_strict_types
   - function_typehint_space
   - hash_to_slash_comment
   - linebreak_after_opening_tag
@@ -67,4 +68,5 @@ finder:
     - "Libraries"
   not-name:
     - "ext_emconf.php"
+    - "ext_localconf.php"
     - "ComposerPackagesCommands.php"

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Tests\Unit\Service\Configuration;
 
 /*
