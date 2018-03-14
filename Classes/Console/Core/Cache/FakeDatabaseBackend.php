@@ -22,7 +22,6 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 /**
  * A caching backend which forgets everything immediately,
  * but pretends to be a database backend
- *
  */
 class FakeDatabaseBackend extends AbstractBackend implements PhpCapableBackendInterface, TaggableBackendInterface
 {
