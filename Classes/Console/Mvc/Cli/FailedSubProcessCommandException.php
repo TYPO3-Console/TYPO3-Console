@@ -66,7 +66,7 @@ class FailedSubProcessCommandException extends \Exception
      */
     public function __construct($command, $commandLine, $exitCode, $outputMessage, $errorMessage)
     {
-        $previousExceptionData = @json_decode($errorMessage, true) ?: null;
+        $previousExceptionData = @\json_decode($errorMessage, true) ?: null;
         $previousException = null;
         if ($previousExceptionData) {
             $errorMessage = '';
@@ -92,7 +92,7 @@ class FailedSubProcessCommandException extends \Exception
     /**
      * @return string
      */
-    public function getCommand()
+    public function getCommand(): string
     {
         return $this->command;
     }
@@ -100,7 +100,7 @@ class FailedSubProcessCommandException extends \Exception
     /**
      * @return string
      */
-    public function getCommandLine()
+    public function getCommandLine(): string
     {
         return $this->commandLine;
     }
@@ -108,7 +108,7 @@ class FailedSubProcessCommandException extends \Exception
     /**
      * @return int
      */
-    public function getExitCode()
+    public function getExitCode(): int
     {
         return $this->exitCode;
     }
@@ -116,7 +116,7 @@ class FailedSubProcessCommandException extends \Exception
     /**
      * @return string
      */
-    public function getOutputMessage()
+    public function getOutputMessage(): string
     {
         return $this->outputMessage;
     }
@@ -124,7 +124,7 @@ class FailedSubProcessCommandException extends \Exception
     /**
      * @return string
      */
-    public function getErrorMessage()
+    public function getErrorMessage(): string
     {
         return $this->errorMessage;
     }
