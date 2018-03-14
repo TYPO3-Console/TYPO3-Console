@@ -76,6 +76,7 @@ class ExtensionConstraintCheck
                 );
             }
         }
+
         return $message;
     }
 
@@ -96,6 +97,7 @@ class ExtensionConstraintCheck
                 $failedPackageMessages[$package->getPackageKey()] = $constraintMessage;
             }
         }
+
         return $failedPackageMessages;
     }
 }

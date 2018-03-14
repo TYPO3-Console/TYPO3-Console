@@ -64,6 +64,7 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
         if (!$mysqlProcess->isSuccessful()) {
             throw new \RuntimeException(sprintf('Executing query "%s" failed. Did you set TYPO3_INSTALL_DB_* correctly? Is your database server running? Output: "%s", Error Output: "%s"', $sql, $mysqlProcess->getOutput(), $mysqlProcess->getErrorOutput()), 1493634196);
         }
+
         return $mysqlProcess->getOutput();
     }
 
@@ -181,6 +182,7 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
             $exceptionRenderer->render($e, $output);
             $this->fail($output->fetch());
         }
+
         return '';
     }
 }

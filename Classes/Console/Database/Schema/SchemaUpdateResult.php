@@ -19,12 +19,12 @@ namespace Helhum\Typo3Console\Database\Schema;
 class SchemaUpdateResult
 {
     /**
-     * @var array $performedUpdates
+     * @var array
      */
     protected $performedUpdates = [];
 
     /**
-     * @var array $errors
+     * @var array
      */
     protected $errors = [];
 
@@ -49,6 +49,7 @@ class SchemaUpdateResult
         foreach ($this->performedUpdates as $type => $performedUpdates) {
             $typesCount[$type] = count($performedUpdates);
         }
+
         return $typesCount;
     }
 

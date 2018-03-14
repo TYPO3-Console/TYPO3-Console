@@ -62,6 +62,7 @@ class ArrayConverter extends \TYPO3\CMS\Extbase\Property\TypeConverter\AbstractT
             if ($source === '') {
                 return [];
             }
+
             return array_filter(array_map('trim', explode($this->getConfiguredStringDelimiter($configuration), $source)));
         }
 
@@ -84,6 +85,7 @@ class ArrayConverter extends \TYPO3\CMS\Extbase\Property\TypeConverter\AbstractT
         } elseif (!is_string($stringDelimiter)) {
             throw new \TYPO3\CMS\Extbase\Property\Exception\InvalidPropertyMappingConfigurationException('CONFIGURATION_STRING_DELIMITER must be of type string, "' . (is_object($stringDelimiter) ? get_class($stringDelimiter) : gettype($stringDelimiter)) . '" given', 1368433339);
         }
+
         return $stringDelimiter;
     }
 }

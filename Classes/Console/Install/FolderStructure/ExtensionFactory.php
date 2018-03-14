@@ -54,6 +54,7 @@ class ExtensionFactory extends DefaultFactory
     {
         $structure = $this->getDefaultStructureDefinition();
         $structure['children'] = $this->appendStructureDefinition($structure['children'], $this->createExtensionStructureDefinition($this->packageManager->getActivePackages()));
+
         return new StructureFacade(new RootNode($structure));
     }
 
@@ -70,6 +71,7 @@ class ExtensionFactory extends DefaultFactory
             'targetPermission' => $GLOBALS['TYPO3_CONF_VARS']['SYS']['folderCreateMask'],
             'children' => $this->appendStructureDefinition([], $this->createExtensionStructureDefinition([$package])),
         ];
+
         return new StructureFacade(new RootNode($structure));
     }
 
@@ -136,6 +138,7 @@ class ExtensionFactory extends DefaultFactory
             // Add next directory as children of current node
             $node = &$node[0]['children'];
         }
+
         return isset($baseNode[0]) ? $baseNode[0] : [];
     }
 
@@ -174,6 +177,7 @@ class ExtensionFactory extends DefaultFactory
                 }
             }
         }
+
         return $original;
     }
 }

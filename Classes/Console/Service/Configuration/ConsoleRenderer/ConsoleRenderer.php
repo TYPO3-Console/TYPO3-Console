@@ -29,6 +29,7 @@ class ConsoleRenderer
         if ($renderJson) {
             return $this->getConfigurationAsJson($config);
         }
+
         return $this->getConfigurationAsString($config);
     }
 

@@ -115,6 +115,7 @@ class CleanupCommandController extends CommandController
         if ($addNewLines) {
             $options['messageWrap'] = LF . LF . '|' . LF;
         }
+
         return parent::createDefaultLogger($verbose ? LogLevel::DEBUG : LogLevel::WARNING, $options);
     }
 }

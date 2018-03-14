@@ -67,6 +67,7 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->skipCommands = $input->getArgument('skipCommands') ?: $this->skipCommands;
+
         return $this->renderReference($output);
     }
 
@@ -171,6 +172,7 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
         $renderedOutputFile = getenv('TYPO3_PATH_COMPOSER_ROOT') . '/Documentation/CommandReference/Index.rst';
         file_put_contents($renderedOutputFile, $standaloneView->render());
         $output->writeln('DONE.');
+
         return 0;
     }
 
@@ -180,6 +182,7 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
         if ($option->getShortcut()) {
             $name .= '|-' . implode('|-', explode('|', $option->getShortcut()));
         }
+
         return $name;
     }
 
@@ -198,6 +201,7 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
         $output = preg_replace('|\<strike>(((?!\</strike>).)*)\</strike>|', '[$1]', $output);
         $output = preg_replace('|\<code>(((?!\</code>).)*)\</code>|', '``$1``', $output);
         $output = preg_replace('|\<info>(((?!\</info>).)*)\</info>|', '``$1``', $output);
+
         return $output;
     }
 }

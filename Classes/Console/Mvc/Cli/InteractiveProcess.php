@@ -33,6 +33,7 @@ class InteractiveProcess
         if (is_resource($process)) {
             $returnValue = proc_close($process);
         }
+
         return $returnValue;
     }
 }

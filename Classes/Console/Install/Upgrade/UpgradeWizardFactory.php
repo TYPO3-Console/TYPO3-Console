@@ -76,6 +76,7 @@ class UpgradeWizardFactory
         ) {
             throw new RuntimeException(sprintf('Upgrade wizard "%s" not found', $identifier), 1491914890);
         }
+
         return $className;
     }
 

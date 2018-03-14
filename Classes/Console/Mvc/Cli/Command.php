@@ -171,6 +171,7 @@ class Command
     public function getShortDescription(): string
     {
         $lines = explode(LF, $this->commandReflection->getDescription());
+
         return !empty($lines) ? trim($lines[0]) : '<no description available>';
     }
 
@@ -192,6 +193,7 @@ class Command
                 $descriptionLines[] = $trimmedLine;
             }
         }
+
         return implode(LF, $descriptionLines);
     }
 
@@ -229,6 +231,7 @@ class Command
         if ($this->argumentDefinitions === null) {
             $this->getArgumentDefinitions();
         }
+
         return $this->arguments;
     }
 
@@ -240,6 +243,7 @@ class Command
         if ($this->argumentDefinitions === null) {
             $this->getArgumentDefinitions();
         }
+
         return $this->options;
     }
 
@@ -291,6 +295,7 @@ class Command
             $this->argumentDefinitions[] = $argumentDefinition;
             $i++;
         }
+
         return $this->argumentDefinitions;
     }
 
@@ -384,6 +389,7 @@ class Command
         foreach ($definedArguments as $definedArgument) {
             $argumentNames[$definedArgument->name] = $definedArgument->name;
         }
+
         return $argumentNames;
     }
 
@@ -393,6 +399,7 @@ class Command
             return $this->commandMethodDefinitions;
         }
         $this->commandMethodDefinitions = $this->parseDefinitions();
+
         return $this->commandMethodDefinitions;
     }
 
@@ -415,6 +422,7 @@ class Command
                 $definitions['Validate'] = $annotation;
             }
         }
+
         return $definitions;
     }
 
@@ -505,6 +513,7 @@ class Command
                 $relatedCommandIdentifiers[] = $tagValue;
             }
         }
+
         return $relatedCommandIdentifiers;
     }
 }

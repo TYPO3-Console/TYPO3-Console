@@ -32,8 +32,8 @@ class SchemaUpdateType extends Enumeration
     const FIELD_CHANGE = 'field.change';
 
     /**
-    * Prefix a field
-    */
+     * Prefix a field
+     */
     const FIELD_PREFIX = 'field.prefix';
 
     /**
@@ -52,8 +52,8 @@ class SchemaUpdateType extends Enumeration
     const TABLE_CHANGE = 'table.change';
 
     /**
-    * Prefix a table
-    */
+     * Prefix a table
+     */
     const TABLE_PREFIX = 'table.prefix';
 
     /**

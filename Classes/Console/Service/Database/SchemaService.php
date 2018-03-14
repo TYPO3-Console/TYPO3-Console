@@ -88,6 +88,7 @@ class SchemaService implements SingletonInterface
         }
 
         $this->emitDatabaseUpdateSignal($updateResult);
+
         return $updateResult;
     }
 

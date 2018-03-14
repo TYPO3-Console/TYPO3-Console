@@ -117,8 +117,10 @@ class ConfigurationService implements SingletonInterface
             if ($e->getCode() !== self::EXCEPTION_CODE_ARRAY_KEY_NOT_FOUND) {
                 throw $e;
             }
+
             return false;
         }
+
         return true;
     }
 
@@ -138,6 +140,7 @@ class ConfigurationService implements SingletonInterface
             }
             throw new ConfigurationValueNotFoundException('No value found for this key!', 1461607530);
         }
+
         return $value;
     }
 
@@ -164,6 +167,7 @@ class ConfigurationService implements SingletonInterface
     {
         try {
             $value = $this->convertToTargetType($path, $value, $targetType);
+
             return $this->configurationManager->setLocalConfigurationValueByPath($path, $value);
         } catch (TypesAreNotConvertibleException $e) {
             return false;
@@ -182,6 +186,7 @@ class ConfigurationService implements SingletonInterface
         if ($this->hasLocal($path)) {
             return $this->hasActive($path) && $this->getLocal($path) === $this->getActive($path);
         }
+
         return !$this->hasActive($path);
     }
 
@@ -226,6 +231,7 @@ class ConfigurationService implements SingletonInterface
                 throw new TypesAreNotConvertibleException(sprintf('Cannot convert type from "%s" to "%s"', $actualType, $targetType), 1477778754);
             }
         }
+
         return $value;
     }
 
@@ -247,6 +253,7 @@ class ConfigurationService implements SingletonInterface
         if ($this->hasDefault($path)) {
             $value = $this->getDefault($path);
         }
+
         return gettype($value);
     }
 
@@ -265,6 +272,7 @@ class ConfigurationService implements SingletonInterface
         if (in_array($actualType, ['array', 'object', 'resource'], true)) {
             return false;
         }
+
         return true;
     }
 
@@ -275,6 +283,7 @@ class ConfigurationService implements SingletonInterface
     {
         $mergedConfig = $this->configurationManager->getDefaultConfiguration();
         ArrayUtility::mergeRecursiveWithOverrule($mergedConfig, $this->configurationManager->getLocalConfiguration());
+
         return $mergedConfig;
     }
 }

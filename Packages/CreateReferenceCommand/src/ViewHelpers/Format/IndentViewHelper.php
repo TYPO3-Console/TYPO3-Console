@@ -43,6 +43,7 @@ class IndentViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelp
         $indent = $this->arguments['indent'];
         $inline = $this->arguments['inline'];
         $string = $this->renderChildren();
+
         return ($inline === false ? $indent : '') . str_replace("\n", "\n" . $indent, $string);
     }
 }

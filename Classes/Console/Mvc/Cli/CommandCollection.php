@@ -87,6 +87,7 @@ class CommandCollection implements CommandLoaderInterface
             $commandList = $this->commands;
             $commands = array_unique(array_filter($commands, function ($nameOrAlias) use ($commandList, $commands) {
                 $commandName = $commandList[$nameOrAlias]['name'];
+
                 return $commandName === $nameOrAlias || !in_array($commandName, $commands, true);
             }));
         }
@@ -117,6 +118,7 @@ class CommandCollection implements CommandLoaderInterface
         if (!empty($this->commands[$name]['aliases'])) {
             $command->setAliases($this->commands[$name]['aliases']);
         }
+
         return $command;
     }
 
@@ -147,6 +149,7 @@ class CommandCollection implements CommandLoaderInterface
         if (self::$rendersReference) {
             return true;
         }
+
         return $this->runLevel->isCommandAvailable($name);
     }
 

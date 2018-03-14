@@ -143,6 +143,7 @@ class CommandConfiguration
     {
         $addedCommandDefinitions = $this->getCommandDefinitionsForCommands(self::unifyCommandConfiguration(['controllers' => $commandControllers], ''));
         $this->commandDefinitions = array_replace($this->commandDefinitions, $addedCommandDefinitions);
+
         return $addedCommandDefinitions;
     }
 
@@ -168,6 +169,7 @@ class CommandConfiguration
             }
             $commandDefinitions[$nameSpacedCommandName] = $singleCommandConfiguration;
         }
+
         return $commandDefinitions;
     }
 
@@ -190,6 +192,7 @@ class CommandConfiguration
                 $configuration[$package->getPackageKey()] = self::unifyCommandConfiguration($packageConfig, $package->getPackageKey());
             }
         }
+
         return $configuration;
     }
 
@@ -202,6 +205,7 @@ class CommandConfiguration
         if (file_exists($commandConfigurationFile = $package->getPackagePath() . 'Configuration/Commands.php')) {
             $commandConfiguration['commands'] = require $commandConfigurationFile;
         }
+
         return $commandConfiguration;
     }
 }

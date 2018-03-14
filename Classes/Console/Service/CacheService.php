@@ -186,6 +186,7 @@ class CacheService implements SingletonInterface
                 $validGroups = array_merge($validGroups, $cacheConfiguration['groups']);
             }
         }
+
         return array_unique($validGroups);
     }
 
@@ -248,6 +249,7 @@ class CacheService implements SingletonInterface
                 $fileCaches[] = $this->cacheManager->getCache($identifier);
             }
         }
+
         return $fileCaches;
     }
 
@@ -267,6 +269,7 @@ class CacheService implements SingletonInterface
         $user->admin = 1;
         $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
         $dataHandler->start([], [], $user);
+
         return $dataHandler;
     }
 }

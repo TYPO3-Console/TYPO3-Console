@@ -327,6 +327,7 @@ class ExtensionCommandController extends CommandController
         if ($this->extensionInstaller === null) {
             $this->extensionInstaller = $this->objectManager->get(InstallUtility::class);
         }
+
         return $this->extensionInstaller;
     }
 

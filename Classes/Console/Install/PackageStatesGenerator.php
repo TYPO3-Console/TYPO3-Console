@@ -62,6 +62,7 @@ class PackageStatesGenerator
             }
         }
         $this->packageManager->forceSortAndSavePackageStates();
+
         return $this->packageManager->getActivePackages();
     }
 

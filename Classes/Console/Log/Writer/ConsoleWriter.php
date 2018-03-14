@@ -71,6 +71,7 @@ class ConsoleWriter extends AbstractWriter
             $this->wrapMessage(vsprintf($record->getMessage(), $record->getData()), $record->getLevel()),
             true
         );
+
         return $this;
     }
 
@@ -78,6 +79,7 @@ class ConsoleWriter extends AbstractWriter
     {
         list($tagStart, $tagEnd) = explode('|', $this->severityTagMapping[$level]);
         list($wrapStart, $wrapEnd) = explode('|', $this->messageWrap);
+
         return $tagStart . $wrapStart . $message . $wrapEnd . $tagEnd;
     }
 }

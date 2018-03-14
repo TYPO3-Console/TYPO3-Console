@@ -72,6 +72,7 @@ class PopulateCommandConfiguration implements InstallerScript
         $mainPackage = $composer->getPackage();
         $autoLoadGenerator = $composer->getAutoloadGenerator();
         $localRepo = $composer->getRepositoryManager()->getLocalRepository();
+
         return $autoLoadGenerator->buildPackageMap($composer->getInstallationManager(), $mainPackage, $localRepo->getCanonicalPackages());
     }
 
@@ -94,6 +95,7 @@ class PopulateCommandConfiguration implements InstallerScript
             return [];
         }
         CommandConfiguration::ensureValidCommandRegistration($commandConfiguration, $packageName);
+
         return [$packageName => CommandConfiguration::unifyCommandConfiguration($commandConfiguration, $packageName)];
     }
 }

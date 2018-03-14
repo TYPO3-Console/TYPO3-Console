@@ -92,6 +92,7 @@ class PersistenceContext implements PersistenceContextInterface
         // Main query to find lost records
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_refindex');
         $queryBuilder->getRestrictions()->removeAll();
+
         return $queryBuilder
             ->count('hash')
             ->from('sys_refindex')
@@ -114,6 +115,7 @@ class PersistenceContext implements PersistenceContextInterface
     public function deleteLostIndexesOfRecordsInTable($tableName)
     {
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_refindex');
+
         return $queryBuilder->delete('sys_refindex')
             ->where(
                 $queryBuilder->expr()->eq(
@@ -158,6 +160,7 @@ class PersistenceContext implements PersistenceContextInterface
                     $queryBuilder->quoteIdentifier('sys_refindex.recuid')
                 )
             );
+
         return $queryBuilder->getSQL();
     }
 
@@ -169,6 +172,7 @@ class PersistenceContext implements PersistenceContextInterface
     {
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_refindex');
         $queryBuilder->getRestrictions()->removeAll();
+
         return $queryBuilder
             ->count('hash')
             ->from('sys_refindex')

@@ -91,6 +91,7 @@ class InstallStepActionExecutor
             $this->silentConfigurationUpgrade->executeSilentConfigurationUpgradesIfNeeded();
             $needsExecution = false;
         }
+
         return new InstallStepResponse($needsExecution, $messages);
     }
 }

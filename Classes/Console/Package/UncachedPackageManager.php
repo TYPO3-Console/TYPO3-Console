@@ -78,6 +78,7 @@ class UncachedPackageManager extends PackageManager
         if (!$this->forceSavePackageStates) {
             return [];
         }
+
         return parent::sortActivePackagesByDependencies();
     }
 

@@ -107,6 +107,7 @@ class RequestHandler
                 $request->setArgument($option->getName(), (bool)$optionValue);
             }
         }
+
         return $request;
     }
 }

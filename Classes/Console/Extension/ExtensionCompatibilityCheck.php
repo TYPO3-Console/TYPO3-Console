@@ -48,6 +48,7 @@ class ExtensionCompatibilityCheck
             if ($configOnly) {
                 return $this->canLoadExtLocalconfFile($extensionKey);
             }
+
             return $this->canLoadExtTablesFile($extensionKey);
         } catch (\Throwable $e) {
             return false;
@@ -78,6 +79,7 @@ class ExtensionCompatibilityCheck
                 $failedPackages[] = $package->getPackageKey();
             }
         }
+
         return $failedPackages;
     }
 
@@ -96,6 +98,7 @@ class ExtensionCompatibilityCheck
                 break;
             }
         }
+
         return true;
     }
 
@@ -118,6 +121,7 @@ class ExtensionCompatibilityCheck
                 break;
             }
         }
+
         return true;
     }
 

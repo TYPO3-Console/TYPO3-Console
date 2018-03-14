@@ -70,6 +70,7 @@ class UpgradeWizardExecutor
     public function wizardNeedsExecution(string $identifier): bool
     {
         $upgradeWizard = $this->factory->create($identifier);
+
         return $upgradeWizard->shouldRenderWizard();
     }
 
@@ -81,6 +82,7 @@ class UpgradeWizardExecutor
             $processedArguments = array_replace_recursive($processedArguments, $processedArgument);
         }
         $argumentNamespace = str_replace('TYPO3\\CMS\\Install\\Updates\\', '', $identifier);
+
         return isset($processedArguments[$argumentNamespace]) ? $processedArguments[$argumentNamespace] : $processedArguments;
     }
 }

@@ -238,6 +238,7 @@ class RunLevel
             $sequence->addStep(new Step($stepIdentifier, function () {
                 // Don't do anything again, step has been executed already
             }));
+
             return;
         }
         $this->executedSteps[$stepIdentifier] = true;
@@ -298,6 +299,7 @@ class RunLevel
             return $this->getMaximumAvailableRunLevel();
         }
         $options = $this->getOptionsForCommand($commandIdentifier);
+
         return $options['runLevel'] ?? self::LEVEL_FULL;
     }
 

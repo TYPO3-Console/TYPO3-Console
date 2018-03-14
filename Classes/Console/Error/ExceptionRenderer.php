@@ -44,6 +44,7 @@ class ExceptionRenderer
     {
         if (getenv('TYPO3_CONSOLE_SUB_PROCESS')) {
             $output->write(\json_encode($this->serializeException($exception)), false, OutputInterface::VERBOSITY_QUIET);
+
             return;
         }
         $output->writeln('', OutputInterface::VERBOSITY_QUIET);
@@ -224,6 +225,7 @@ class ExceptionRenderer
         $pathPosition = strpos($fileName, 'typo3conf/ext/');
         $pathAndFilename = ($pathPosition !== false) ? substr($fileName, $pathPosition) : $fileName;
         $pathPosition = strpos($pathAndFilename, 'typo3/sysext/');
+
         return ($pathPosition !== false) ? substr($pathAndFilename, $pathPosition) : $pathAndFilename;
     }
 
@@ -263,6 +265,7 @@ class ExceptionRenderer
                 'error' => $errorMessage ?? null,
             ];
         }
+
         return $serializedException;
     }
 

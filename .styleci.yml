@@ -3,6 +3,7 @@ preset: psr2
 enabled:
   - alpha_ordered_imports
   - binary_operator_spaces
+  - blank_line_before_return
   - concat_with_spaces
   - function_typehint_space
   - hash_to_slash_comment
@@ -35,13 +36,20 @@ enabled:
   - no_useless_return
   - no_whitespace_before_comma_in_array
   - no_whitespace_in_blank_line
+  - non_printable_character
   - normalize_index_brace
+  - object_operator_without_whitespace
   - phpdoc_add_missing_param_annotation
+  - phpdoc_indent
+  - phpdoc_no_access
   - phpdoc_no_package
   - phpdoc_order
   - phpdoc_scalar
+  - phpdoc_single_line_var_spacing
+  - phpdoc_trim
   - phpdoc_types
   - self_accessor
+  - phpdoc_var_without_name
   - short_array_syntax
   - short_scalar_cast
   - single_quote

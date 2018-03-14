@@ -387,6 +387,7 @@ class ConsoleOutput
             $helperSet = new HelperSet([new FormatterHelper()]);
             $this->questionHelper->setHelperSet($helperSet);
         }
+
         return $this->questionHelper;
     }
 
@@ -400,6 +401,7 @@ class ConsoleOutput
         if ($this->progressBar === null) {
             $this->progressBar = new ProgressBar($this->output);
         }
+
         return $this->progressBar;
     }
 
@@ -413,6 +415,7 @@ class ConsoleOutput
         if ($this->table === null) {
             $this->table = new Table($this->output);
         }
+
         return $this->table;
     }
 }

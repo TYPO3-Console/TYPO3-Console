@@ -70,6 +70,7 @@ class CommandControllerCommand extends Command
     {
         $commandInputDefinition = new InputDefinition($this->commandDefinition->getInputDefinitions(true));
         $commandInputDefinition->addOptions($this->application->getDefinition()->getOptions());
+
         return $commandInputDefinition;
     }
 
@@ -104,6 +105,7 @@ class CommandControllerCommand extends Command
         if ($this->getName() === 'cache:flushcomplete') {
             return true;
         }
+
         return $this->application->isCommandAvailable($this);
     }
 
@@ -158,6 +160,7 @@ class CommandControllerCommand extends Command
             $output->writeln(sprintf('<warning>Please use "%s" as command name instead.</warning>', $this->getName()));
         }
         $response = (new RequestHandler())->handle($this->commandDefinition, $input, $output);
+
         return $response->getExitCode();
     }
 
@@ -174,8 +177,10 @@ class CommandControllerCommand extends Command
             if (self::$rendersReference) {
                 return false;
             }
+
             return true;
         }
+
         return $this->commandDefinition->isInternal();
     }
 }
