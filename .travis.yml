@@ -107,15 +107,18 @@ jobs:
         - composer extension-create-libs && ls -la Libraries/*.phar | grep -v ^-rwx
 
     - stage: sonar code scanner
-      if: type = push AND branch = master
-      php: 7.0
+      if: type = push AND branch IN (master, develop)
+      php: 7.2
       before_install: skip
       install: skip
       before_script:
       script:
+        - git fetch --unshallow
+        - export COMPOSER_ROOT_VERSION=5.2.0
+        - composer install
+        - .Build/bin/phpunit --whitelist Classes --coverage-clover clover.xml --log-junit junit.xml
         - >
           if [ -n "$SONAR_TOKEN" ]; then
-            git fetch --unshallow
             sonar-scanner
           fi
 
