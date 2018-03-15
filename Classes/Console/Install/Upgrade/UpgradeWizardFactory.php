@@ -70,8 +70,8 @@ class UpgradeWizardFactory
      */
     public function getClassNameFromIdentifier(string $identifier): string
     {
-        if (empty($className = $this->wizardRegistry[$identifier])
-            && empty($className = $this->wizardRegistry['TYPO3\\CMS\\Install\\Updates\\' . $identifier])
+        if (empty($className = $this->wizardRegistry[$identifier] ?? '')
+            && empty($className = $this->wizardRegistry['TYPO3\\CMS\\Install\\Updates\\' . $identifier] ?? '')
             && !class_exists($className = $identifier)
         ) {
             throw new RuntimeException(sprintf('Upgrade wizard "%s" not found', $identifier), 1491914890);
@@ -87,8 +87,8 @@ class UpgradeWizardFactory
      */
     public function getShortIdentifier(string $classNameOrIdentifier): string
     {
-        if (!empty($className = $this->wizardRegistry[$classNameOrIdentifier])
-            || !empty($className = $this->wizardRegistry['TYPO3\\CMS\\Install\\Updates\\' . $classNameOrIdentifier])
+        if (!empty($className = $this->wizardRegistry[$classNameOrIdentifier] ?? '')
+            || !empty($className = $this->wizardRegistry['TYPO3\\CMS\\Install\\Updates\\' . $classNameOrIdentifier] ?? '')
         ) {
             $classNameOrIdentifier = $className;
         }
