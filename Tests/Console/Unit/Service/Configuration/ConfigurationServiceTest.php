@@ -68,6 +68,7 @@ class ConfigurationServiceTest extends UnitTestCase
             'bool' => true,
             'float' => 1.0,
             'string' => '1',
+            'array' => [],
         ],
         'main' => [
             'bla' => 'blupp',
@@ -239,6 +240,24 @@ class ConfigurationServiceTest extends UnitTestCase
     {
         $this->assertTrue($this->subject->setLocal('local/bool', '0'));
         $this->assertFalse($this->localConfiguration['local']['bool']);
+    }
+
+    /**
+     * @test
+     */
+    public function setLocalSetsArrayConfigurationPresentInLocal()
+    {
+        $this->assertTrue($this->subject->setLocal('local/array', ['foo', 'bar']));
+        $this->assertSame(['foo', 'bar'], $this->localConfiguration['local']['array']);
+    }
+
+    /**
+     * @test
+     */
+    public function setLocalSetsArrayConfigurationIfNotPresent()
+    {
+        $this->assertTrue($this->subject->setLocal('local/array2', ['foo', 'bar']));
+        $this->assertSame(['foo', 'bar'], $this->localConfiguration['local']['array2']);
     }
 
     /**

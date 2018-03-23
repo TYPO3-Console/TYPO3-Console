@@ -155,19 +155,28 @@ class ConfigurationCommandController extends CommandController implements Single
      *
      * Set system configuration option value by path.
      *
-     * <b>Example:</b> <code>%command.full_name% SYS/fileCreateMask 0664</code>
+     * <b>Examples:</b>
+     * <code>%command.full_name% SYS/fileCreateMask 0664</code>
+     * <code>%command.full_name% EXTCONF/processor_enabled true --json</code>
+     * <code>%command.full_name% EXTCONF/lang/availableLanguages '["de", "fr"]' --json</code>
      *
      * @param string $path Path to system configuration
      * @param string $value Value for system configuration
+     * @param bool $json Treat value as JSON (also makes it possible to force datatypes for value)
      */
-    public function setCommand($path, $value)
+    public function setCommand($path, $value, $json = false)
     {
         if (!$this->configurationService->localIsActive($path)) {
             $this->outputLine('<warning>It seems that configuration for path "%s" is overridden.</warning>', [$path]);
             $this->outputLine('<warning>Writing the new value might have no effect.</warning>');
         }
 
-        $success = $this->configurationService->setLocal($path, $value);
+        $encodedValue = $value;
+        if ($json) {
+            $encodedValue = json_decode($value, true);
+        }
+
+        $success = $this->configurationService->setLocal($path, $encodedValue);
 
         if (!$this->configurationService->hasLocal($path)) {
             $this->outputLine('<warning>Value "%s" for configuration path "%s" is still empty.</warning>', [$value, $path]);
