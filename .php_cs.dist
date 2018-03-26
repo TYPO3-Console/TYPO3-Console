@@ -71,6 +71,7 @@ return PhpCsFixer\Config::create()
         'phpdoc_types' => true,
         'self_accessor' => true,
         'phpdoc_var_without_name' => true,
+        'return_type_declaration' => ['space_before' => 'none'],
         'short_scalar_cast' => true,
         'single_quote' => true,
         'standardize_not_equals' => true,

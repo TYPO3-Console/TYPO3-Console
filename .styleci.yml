@@ -51,6 +51,7 @@ enabled:
   - phpdoc_types
   - self_accessor
   - phpdoc_var_without_name
+  - return_type_declaration
   - short_array_syntax
   - short_scalar_cast
   - single_quote
