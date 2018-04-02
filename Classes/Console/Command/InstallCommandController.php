@@ -103,7 +103,7 @@ class InstallCommandController extends CommandController
         $skipExtensionSetup |= !Bootstrap::usesComposerClassLoading();
 
         $cliSetupRequestHandler = new CliSetupRequestHandler($this->output);
-        $cliSetupRequestHandler->setup(!$nonInteractive, $this->request->getArguments(), $skipExtensionSetup);
+        $cliSetupRequestHandler->setup(!$noInteraction, $this->request->getArguments(), $skipExtensionSetup);
 
         $this->outputLine();
         $this->outputLine('<i>Successfully installed TYPO3 CMS!</i>');
