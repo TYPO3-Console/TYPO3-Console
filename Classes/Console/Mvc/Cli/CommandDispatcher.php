@@ -125,10 +125,13 @@ class CommandDispatcher
     public static function create($typo3CommandPath, array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null): self
     {
         $phpFinder = $phpFinder ?: new PhpExecutableFinder();
-        if (!($php = $phpFinder->find())) {
+        if (!($php = $phpFinder->find(false))) {
             throw new RuntimeException('The "php" binary could not be found.', 1485128615);
         }
         array_unshift($commandLine, $typo3CommandPath);
+        if (!empty($phpArguments = $phpFinder->findArguments())) {
+            array_unshift($commandLine, ...$phpArguments);
+        }
         array_unshift($commandLine, $php);
         if (getenv('PHP_INI_PATH')) {
             $commandLine[] = '-c';
