@@ -104,7 +104,13 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             mkdir($this->upgradeInstancePath);
         }
 
-        file_put_contents($this->upgradeInstancePath . '/composer.json', '{}');
+        file_put_contents(
+            $this->upgradeInstancePath . '/composer.json',
+            '{
+    "conflict": {
+        "symfony/finder": "2.7.44 || 2.8.37 || 3.4.7 || 4.0.7"
+    }
+}');
         $this->executeComposerCommand(['config', 'extra.typo3/cms.web-dir', 'public']);
         $this->copyDirectory($this->consoleRootPath, $this->upgradeInstancePath . '/typo3_console', ['.Build', '.git']);
         $consoleComposerJson = file_get_contents($this->upgradeInstancePath . '/typo3_console/composer.json');
