@@ -53,7 +53,8 @@
     },
     "conflict": {
         "typo3-ter/dbal": "*",
-        "friendsoftypo3/dbal": "*"
+        "friendsoftypo3/dbal": "*",
+        "symfony/finder": "2.7.44 || 2.8.37 || 3.4.7 || 4.0.7"
     },
     "autoload": {
         "psr-4": {
