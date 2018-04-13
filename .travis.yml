@@ -90,7 +90,10 @@ jobs:
       env: TYPO3_VERSION="~9.1.0"
     - stage: test
       php: 7.2
-      env: TYPO3_VERSION="9.2.*@dev"
+      env: TYPO3_VERSION="~9.2.0"
+    - stage: test
+      php: 7.2
+      env: TYPO3_VERSION="9.3.*@dev"
 
     - stage: test
       php: 7.1
