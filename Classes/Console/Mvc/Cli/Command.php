@@ -277,8 +277,11 @@ class Command
         $i = 0;
         $argumentNames = $this->getDefinedArgumentNames();
         foreach ($commandParameters as $commandParameterName => $commandParameterDefinition) {
-            $explodedAnnotation = preg_split('/\s+/', $commandParameterTags[$i], 3);
-            $description = !empty($explodedAnnotation[2]) ? $explodedAnnotation[2] : '';
+            $description = '';
+            if (isset($commandParameterTags[$i])) {
+                $explodedAnnotation = preg_split('/\s+/', $commandParameterTags[$i], 3);
+                $description = !empty($explodedAnnotation[2]) ? $explodedAnnotation[2] : '';
+            }
             $dataType = $commandParameterDefinition['type'] ?? 'null';
             if ($commandParameterDefinition['array']) {
                 $dataType = 'array';
