@@ -142,7 +142,7 @@ class BackendCommandController extends CommandController
     public function createAdminCommand(string $username, string $password)
     {
         $givenUsername = $username;
-        $username = preg_replace('/[^a-z0-9]/', '', $username);
+        $username = strtolower(preg_replace('/\\s/i', '', $username));
 
         if ($givenUsername !== $username) {
             $this->outputLine('<warning>Given username "%s" contains invalid characters. Using "%s" instead.</warning>', [$givenUsername, $username]);
