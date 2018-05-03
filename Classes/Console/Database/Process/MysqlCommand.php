@@ -27,16 +27,13 @@ class MysqlCommand
     /**
      * @var array
      */
-    private $dbConfig = [];
-
-    private static $mysqlTempFile;
+    private $dbConfig;
 
     /**
-     * MysqlCommand constructor.
-     *
-     * @param array $dbConfig
-     * @param array $commandLine
+     * @var string
      */
+    private static $mysqlTempFile;
+
     public function __construct(array $dbConfig, array $commandLine = [])
     {
         $this->dbConfig = $dbConfig;
@@ -55,7 +52,7 @@ class MysqlCommand
         $commandLine = $this->commandLine;
         array_unshift($commandLine, 'mysql');
         $commandLine = array_merge($commandLine, $this->buildConnectionArguments(), $additionalArguments);
-        $process = new Process($commandLine, null, null, $inputStream, 0);
+        $process = new Process($commandLine, null, null, $inputStream, 0.0);
         $process->inheritEnvironmentVariables();
         if ($interactive) {
             // I did not figure out how to change pipes with symfony/process
@@ -77,7 +74,7 @@ class MysqlCommand
         $commandLine = $this->commandLine;
         array_unshift($commandLine, 'mysqldump');
         $commandLine = array_merge($commandLine, $this->buildConnectionArguments(), $additionalArguments);
-        $process = new Process($commandLine, null, null, null, 0);
+        $process = new Process($commandLine, null, null, null, 0.0);
         $process->inheritEnvironmentVariables();
 
         return $process->run($this->buildDefaultOutputCallback($outputCallback));
