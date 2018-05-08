@@ -68,3 +68,10 @@ into the installation root directory during activation.
 
 Look at the [Issues](https://github.com/TYPO3-Console/typo3_console/issues)
 for what has been planned to be implemented in the (near) future.
+
+## Credits
+Thanks to all contributors and everybody providing feedback.
+
+Special thanks to [@hzoo](https://github.com/hzoo) for creating great Github issue templates for [Babel](https://github.com/babel/babel),
+which were adopted for this package.
+ 
