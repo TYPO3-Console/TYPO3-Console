@@ -176,17 +176,19 @@ class ConfigurationCommandController extends CommandController implements Single
             $encodedValue = json_decode($value, true);
         }
 
-        $success = $this->configurationService->setLocal($path, $encodedValue);
+        $setWasAllowed = $this->configurationService->setLocal($path, $encodedValue);
+        $isApplied = $this->configurationService->hasLocal($path);
 
-        if (!$this->configurationService->hasLocal($path)) {
-            $this->outputLine('<warning>Value "%s" for configuration path "%s" is still empty.</warning>', [$value, $path]);
-            $this->outputLine('<warning>Maybe it is removed in AdditionalConfiguration.php?</warning>');
+        if (!$setWasAllowed) {
+            $this->outputLine('<warning>Could not set value "%s" for configuration path "%s".</warning>', [$value, $path]);
+            $this->outputLine('<warning>Possible reasons: configuration path is not allowed, configuration is not writable or type of value does not match given type.</warning>', [$value, $path]);
+            $this->quit(1);
         }
-
-        if ($success) {
+        if ($isApplied) {
             $this->outputLine('<info>Successfully set value for path "%s".</info>', [$path]);
         } else {
-            $this->outputLine('<warning>Could not set value "%s" for configuration path "%s".</warning>', [$value, $path]);
+            $this->outputLine('<warning>Value "%s" for configuration path "%s" seems not applied.</warning>', [$value, $path]);
+            $this->outputLine('<warning>Possible reasons: changed value in AdditionalConfiguration.php or extension ext_localconf.php</warning>');
         }
     }
 }
