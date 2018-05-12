@@ -124,4 +124,24 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
         $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
         $this->assertSame('baz', $config['EXTCONF']['foo']['bar']);
     }
+
+    /**
+     * @test
+     */
+    public function arraysCanBeSetAsJson()
+    {
+        $this->executeConsoleCommand('configuration:set', ['EXTCONF/foo/baz', '["baz"]', '--json']);
+        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $this->assertSame(['baz'], $config['EXTCONF']['foo']['baz']);
+    }
+
+    /**
+     * @test
+     */
+    public function booleanCanBeSetAsJson()
+    {
+        $this->executeConsoleCommand('configuration:set', ['EXTCONF/foo/bool', 'true', '--json']);
+        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $this->assertTrue($config['EXTCONF']['foo']['bool']);
+    }
 }

@@ -204,7 +204,7 @@ class ConfigurationService implements SingletonInterface
     {
         $targetType = $targetType ?: $this->getType($path);
         $actualType = gettype($value);
-        if ($actualType !== $targetType) {
+        if ($actualType !== $targetType && $targetType !== 'NULL') {
             if ($this->isTypeConvertible($targetType, $actualType)) {
                 switch ($targetType) {
                     case 'integer':
@@ -219,9 +219,6 @@ class ConfigurationService implements SingletonInterface
                         break;
                     case 'string':
                         $value = (string)$value;
-                        break;
-                    case 'NULL':
-                        // Path has not been set before, so the new value defines the type
                         break;
                     default:
                         // We don't know any type conversion, so we better exit
