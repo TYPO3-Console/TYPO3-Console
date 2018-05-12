@@ -167,14 +167,14 @@ class DatabaseCommandController extends CommandController
     public function exportCommand(array $excludeTables = [])
     {
         $dbConfig = $this->connectionConfiguration->build();
-        $additionalArguments = [];
+        $additionalArguments = [
+            '--opt',
+            '--single-transaction',
+        ];
 
         foreach ($excludeTables as $table) {
             $additionalArguments[] = sprintf('--ignore-table=%s.%s', $dbConfig['dbname'], $table);
         }
-
-        $additionalArguments[] = '--single-transaction';
-        $additionalArguments[] = '--quick';
 
         $mysqlCommand = new MysqlCommand($this->connectionConfiguration->build());
         $exitCode = $mysqlCommand->mysqldump(

@@ -14,15 +14,12 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  *
  */
 
-/**
- * Class InteractiveProcess
- */
 class InteractiveProcess
 {
-    public function run($command)
+    public function run(string $command): int
     {
         $returnValue = 1;
-        $pipes = [ ];
+        $pipes = [];
         $descriptors = [
             ['file', 'php://stdin', 'r'],   // stdin is a file that the child will read from
             ['file', 'php://stdout', 'w'],  // stdout is a file that the child will write to
