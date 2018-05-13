@@ -173,7 +173,12 @@ class ConfigurationCommandController extends CommandController implements Single
 
         $encodedValue = $value;
         if ($json) {
-            $encodedValue = json_decode($value, true);
+            $encodedValue = @json_decode($value, true);
+        }
+
+        if ($encodedValue === null && strtolower($value) !== 'null') {
+            $this->outputLine('<error>Could not decode value "%s" as json.</error>', [$value]);
+            $this->quit(2);
         }
 
         $setWasAllowed = $this->configurationService->setLocal($path, $encodedValue);

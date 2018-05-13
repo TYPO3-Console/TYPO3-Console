@@ -14,6 +14,8 @@ namespace Helhum\Typo3Console\Tests\Functional\Command;
  *
  */
 
+use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
+
 class ConfigurationCommandControllerTest extends AbstractCommandTest
 {
     /**
@@ -143,5 +145,27 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
         $this->executeConsoleCommand('configuration:set', ['EXTCONF/foo/bool', 'true', '--json']);
         $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
         $this->assertTrue($config['EXTCONF']['foo']['bool']);
+    }
+
+    /**
+     * @test
+     */
+    public function nullCanBeSetAsJson()
+    {
+        $this->executeConsoleCommand('configuration:set', ['EXTCONF/foo/null', 'null', '--json']);
+        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $this->assertNull($config['EXTCONF']['foo']['null']);
+    }
+
+    /**
+     * @test
+     */
+    public function invalidJsonOutputsErrorMessage()
+    {
+        try {
+            $this->commandDispatcher->executeCommand('configuration:set', ['EXTCONF/foo/bla', '[asd{', '--json']);
+        } catch (FailedSubProcessCommandException $e) {
+            $this->assertContains('Could not decode value', $e->getOutputMessage());
+        }
     }
 }
