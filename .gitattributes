@@ -9,3 +9,4 @@
 /.styleci.yml export-ignore
 /phpunit.xml.dist export-ignore
 /appveyor.yml export-ignore
+/sonar-project.properties export-ignore
