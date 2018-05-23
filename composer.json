@@ -64,8 +64,7 @@
         "psr-4": {
             "Helhum\\Typo3Console\\": [
                 "Classes/Console/",
-                "Classes/Compatibility/",
-                "Resources/Private/ExtensionArtifacts/src/"
+                "Classes/Compatibility/"
             ]
         }
     },
@@ -92,8 +91,8 @@
         ],
         "extension-copy-artifacts": [
             "cp -f Resources/Private/ExtensionArtifacts/ext_* .",
-            "mkdir -p Resources/Public/Icons",
-            "cp -f ext_icon.png Resources/Public/Icons/Extension.png"
+            "cp -rf Resources/Private/ExtensionArtifacts/Resources/Public Resources/",
+            "cp -rf Resources/Private/ExtensionArtifacts/Classes/Console/* Classes/Console/"
         ],
         "extension-create-libs": [
             "mkdir -p Libraries/temp",
@@ -109,15 +108,18 @@
         ],
         "extension-release": [
             "@extension-build",
-            "rm Resources/Private/ExtensionArtifacts/ext_*",
+            "rm -rf Packages/",
+            "rm -rf Resources/Private/ExtensionArtifacts/",
             "rm -rf Tests/",
             "rm .gitattributes",
+            "rm -rf .github/",
             "rm .gitignore",
             "rm .php_cs.dist",
             "rm .styleci.yml",
-            "rm phpunit.xml.dist",
+            "rm .travis.yml",
             "rm appveyor.yml",
-            "rm .travis.yml"
+            "rm phpunit.xml.dist",
+            "rm sonar-project.properties"
         ],
         "extension-clean": [
             "rm -rf Libraries Resources/Public/Icons",
