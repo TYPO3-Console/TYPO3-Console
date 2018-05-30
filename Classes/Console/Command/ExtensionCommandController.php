@@ -96,8 +96,8 @@ class ExtensionCommandController extends CommandController
         }
 
         if (!empty($activatedExtensions)) {
-            $this->getExtensionInstaller()->reloadCaches();
             $this->cacheService->flush();
+            $this->getExtensionInstaller()->reloadCaches();
 
             $extensionKeysAsString = implode('", "', $activatedExtensions);
             if (count($activatedExtensions) === 1) {
