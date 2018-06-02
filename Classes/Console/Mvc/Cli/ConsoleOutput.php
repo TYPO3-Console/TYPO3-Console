@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  *
  */
 
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Output\TrackableOutput;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\FormatterHelper;
@@ -42,7 +43,7 @@ class ConsoleOutput
     protected $input;
 
     /**
-     * @var SymfonyConsoleOutput
+     * @var TrackableOutput
      */
     protected $output;
 
@@ -74,7 +75,7 @@ class ConsoleOutput
      */
     public function __construct(Output $output = null, Input $input = null)
     {
-        $this->output = $output ?: new SymfonyConsoleOutput();
+        $this->output = new TrackableOutput($output ?: new SymfonyConsoleOutput());
         $this->output->getFormatter()->setStyle('b', new OutputFormatterStyle(null, null, ['bold']));
         $this->output->getFormatter()->setStyle('i', new OutputFormatterStyle('black', 'white'));
         $this->output->getFormatter()->setStyle('u', new OutputFormatterStyle(null, null, ['underscore']));
@@ -90,7 +91,7 @@ class ConsoleOutput
     }
 
     /**
-     * @return SymfonyConsoleOutput
+     * @return SymfonyConsoleOutput|TrackableOutput
      */
     public function getSymfonyConsoleOutput()
     {

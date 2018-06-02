@@ -194,7 +194,7 @@ Options
 - Accept value: yes
 - Is value required: yes
 - Is multiple: no
-- Default: NULL
+
 
 
 
@@ -363,7 +363,7 @@ Options
 - Accept value: yes
 - Is value required: yes
 - Is multiple: no
-- Default: NULL
+
 
 
 
@@ -765,7 +765,7 @@ Options
 - Accept value: yes
 - Is value required: yes
 - Is multiple: no
-- Default: NULL
+
 
 ``--target-file``
   File path and name of the generated XSD schema. If not specified the schema will be output to standard output.
@@ -773,7 +773,7 @@ Options
 - Accept value: yes
 - Is value required: yes
 - Is multiple: no
-- Default: NULL
+
 
 
 
@@ -1174,7 +1174,7 @@ Options
 - Accept value: yes
 - Is value required: yes
 - Is multiple: no
-- Default: ''
+- Default: '127.0.0.1'
 
 ``--database-port``
   TCP Port of database server
@@ -1182,7 +1182,7 @@ Options
 - Accept value: yes
 - Is value required: yes
 - Is multiple: no
-- Default: ''
+- Default: '3306'
 
 ``--database-socket``
   Unix Socket to connect to (if localhost is given as hostname and this is kept empty, a socket connection will be established)
@@ -1198,7 +1198,7 @@ Options
 - Accept value: yes
 - Is value required: yes
 - Is multiple: no
-- Default: ''
+
 
 ``--use-existing-database``
   If set an empty database with the specified name will be used. Otherwise a database with the specified name is created.
@@ -1214,7 +1214,7 @@ Options
 - Accept value: yes
 - Is value required: yes
 - Is multiple: no
-- Default: ''
+
 
 ``--admin-password``
   Password of the administrative backend user account to be created
@@ -1222,7 +1222,7 @@ Options
 - Accept value: yes
 - Is value required: yes
 - Is multiple: no
-- Default: ''
+
 
 ``--site-name``
   Site Name
@@ -1238,7 +1238,7 @@ Options
 - Accept value: yes
 - Is value required: yes
 - Is multiple: no
-- Default: 'none'
+- Default: 'no'
 
 ``--non-interactive``
   Deprecated. Use ``--no-interaction`` instead.
@@ -1275,7 +1275,7 @@ Options
 - Accept value: yes
 - Is value required: yes
 - Is multiple: no
-- Default: NULL
+
 
 ``--force``
   The execution can be forced with this flag. The task will then be executed even if it is not scheduled for execution yet. Only works, when a task is specified.
@@ -1291,7 +1291,7 @@ Options
 - Accept value: yes
 - Is value required: yes
 - Is multiple: no
-- Default: NULL
+
 
 
 

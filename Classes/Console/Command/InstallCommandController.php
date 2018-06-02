@@ -15,7 +15,7 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Helhum\Typo3Console\Annotation\Command\Definition;
-use Helhum\Typo3Console\Install\CliSetupRequestHandler;
+use Helhum\Typo3Console\Install\Action\InstallActionDispatcher;
 use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Helhum\Typo3Console\Install\InstallStepActionExecutor;
 use Helhum\Typo3Console\Install\PackageStatesGenerator;
@@ -76,34 +76,41 @@ class InstallCommandController extends CommandController
         $skipExtensionSetup = false,
         $databaseUserName = '',
         $databaseUserPassword = '',
-        $databaseHostName = '',
-        $databasePort = '',
+        $databaseHostName = '127.0.0.1',
+        $databasePort = '3306',
         $databaseSocket = '',
-        $databaseName = '',
+        $databaseName = null,
         $useExistingDatabase = false,
-        $adminUserName = '',
-        $adminPassword = '',
+        $adminUserName = null,
+        $adminPassword = null,
         $siteName = 'New TYPO3 Console site',
-        $siteSetupType = 'none',
+        $siteSetupType = 'no',
         $nonInteractive = false
     ) {
-        $noInteraction = $this->output->getSymfonyConsoleInput()->getOption('no-interaction');
+        $isInteractive = $this->output->getSymfonyConsoleInput()->isInteractive();
         if ($nonInteractive) {
             // @deprecated in 5.0 will be removed with 6.0
             $this->outputLine('<warning>Option --non-interactive is deprecated. Please use --no-interaction instead.</warning>');
-            $noInteraction = true;
+            $isInteractive = false;
         }
 
         $this->outputLine();
         $this->outputLine('<i>Welcome to the TYPO3 Console installer!</i>');
+        $this->outputLine();
 
         if (!$skipIntegrityCheck) {
-            $this->ensureInstallationPossible($noInteraction, $force);
+            $this->ensureInstallationPossible($isInteractive, $force);
         }
-        $skipExtensionSetup |= !Bootstrap::usesComposerClassLoading();
+        $skipExtensionSetup = $skipExtensionSetup || !Bootstrap::usesComposerClassLoading();
 
-        $cliSetupRequestHandler = new CliSetupRequestHandler($this->output);
-        $cliSetupRequestHandler->setup(!$noInteraction, $this->request->getArguments(), $skipExtensionSetup);
+        $installActionDispatcher = new InstallActionDispatcher($this->output);
+        $installActionDispatcher->dispatch(
+            $this->request->getArguments(),
+            [
+                'interactive' => $isInteractive,
+                'extensionSetup' => !$skipExtensionSetup,
+            ]
+        );
 
         $this->outputLine();
         $this->outputLine('<i>Successfully installed TYPO3 CMS!</i>');
@@ -257,7 +264,7 @@ class InstallCommandController extends CommandController
      * @param string $databaseSocket Unix Socket to connect to
      * @internal
      */
-    public function databaseConnectCommand($databaseUserName = '', $databaseUserPassword = '', $databaseHostName = 'localhost', $databasePort = '3306', $databaseSocket = '')
+    public function databaseConnectCommand($databaseUserName = '', $databaseUserPassword = '', $databaseHostName = '127.0.0.1', $databasePort = '3306', $databaseSocket = '')
     {
         $this->executeActionWithArguments('databaseConnect', ['host' => $databaseHostName, 'port' => $databasePort, 'username' => $databaseUserName, 'password' => $databaseUserPassword, 'socket' => $databaseSocket, 'driver' => 'mysqli']);
     }
@@ -267,12 +274,12 @@ class InstallCommandController extends CommandController
      *
      * Select a database by name
      *
-     * @param bool $useExistingDatabase Use already existing database?
      * @param string $databaseName Name of the database
-     * @Definition\Argument(name="databaseName")
+     * @param bool $useExistingDatabase Use already existing database?
+     * @Definition\Option(name="databaseName")
      * @internal
      */
-    public function databaseSelectCommand($useExistingDatabase = false, $databaseName = '')
+    public function databaseSelectCommand($databaseName, $useExistingDatabase = false)
     {
         $selectType = $useExistingDatabase ? 'existing' : 'new';
         $this->executeActionWithArguments('databaseSelect', ['type' => $selectType, $selectType => $databaseName]);
@@ -286,6 +293,8 @@ class InstallCommandController extends CommandController
      * @param string $adminUserName Username of to be created administrative user account
      * @param string $adminPassword Password of to be created administrative user account
      * @param string $siteName Site name
+     * @Definition\Option(name="adminUserName")
+     * @Definition\Option(name="adminPassword")
      * @internal
      */
     public function databaseDataCommand($adminUserName, $adminPassword, $siteName = 'New TYPO3 Console site')
@@ -348,18 +357,18 @@ class InstallCommandController extends CommandController
     /**
      * Handles the case when LocalConfiguration.php file already exists
      *
-     * @param $nonInteractive
-     * @param $force
+     * @param bool $isInteractive
+     * @param bool $force
      */
-    private function ensureInstallationPossible($nonInteractive, $force)
+    private function ensureInstallationPossible(bool $isInteractive, bool $force)
     {
         $localConfFile = PATH_typo3conf . 'LocalConfiguration.php';
         $packageStatesFile = PATH_typo3conf . 'PackageStates.php';
         if (!$force && file_exists($localConfFile)) {
             $this->outputLine();
             $this->outputLine('<error>TYPO3 seems to be already set up!</error>');
-            $proceed = !$nonInteractive;
-            if (!$nonInteractive) {
+            $proceed = $isInteractive;
+            if ($isInteractive) {
                 $this->outputLine();
                 $this->outputLine('<info>If you continue, your <code>typo3conf/LocalConfiguration.php</code></info>');
                 $this->outputLine('<info>and <code>typo3conf/PackageStates.php</code> files will be deleted!</info>');

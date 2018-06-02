@@ -31,6 +31,10 @@ class CliMessageRenderer
 
     public function render(array $messages)
     {
+        if (empty($messages)) {
+            return;
+        }
+
         $this->output->outputLine();
         foreach ($messages as $statusMessage) {
             $this->renderSingle($statusMessage);
