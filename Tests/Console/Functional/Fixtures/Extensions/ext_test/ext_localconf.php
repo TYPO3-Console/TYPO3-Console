@@ -5,3 +5,7 @@ defined('TYPO3_MODE') or die();
     'ext_test',
     'tx_exttest_cattest'
 );
+
+if (empty($TYPO3_CONF_VARS['SYS']['caching']['cacheConfigurations']['test'])) {
+    $TYPO3_CONF_VARS['SYS']['caching']['cacheConfigurations']['test'] = [];
+}
