@@ -46,7 +46,7 @@ class ReferenceIndexUpdateDelegate implements ReferenceIndexIntegrityDelegateInt
 
     /**
      * @param string $name
-     * @param Callback $subscriber
+     * @param callable $subscriber
      */
     public function subscribeEvent($name, $subscriber)
     {
