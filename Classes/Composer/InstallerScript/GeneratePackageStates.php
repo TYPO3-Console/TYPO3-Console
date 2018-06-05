@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 namespace Helhum\Typo3Console\Composer\InstallerScript;
 
 /*
@@ -29,7 +28,7 @@ class GeneratePackageStates implements InstallerScript
      * @param ScriptEvent $event
      * @return bool
      */
-    private function shouldRun(ScriptEvent $event): bool
+    private function shouldRun(ScriptEvent $event)
     {
         if (!getenv('TYPO3_CONSOLE_FEATURE_GENERATE_PACKAGE_STATES')) {
             return false;
@@ -58,7 +57,7 @@ class GeneratePackageStates implements InstallerScript
      * @return bool
      * @internal
      */
-    public function run(ScriptEvent $event): bool
+    public function run(ScriptEvent $event)
     {
         if (!$this->shouldRun($event)) {
             return true;

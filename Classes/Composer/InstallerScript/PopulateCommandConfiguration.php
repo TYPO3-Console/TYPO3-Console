@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 namespace Helhum\Typo3Console\Composer\InstallerScript;
 
 /*
@@ -31,7 +30,7 @@ class PopulateCommandConfiguration implements InstallerScript
      * @return bool
      * @internal
      */
-    public function run(ScriptEvent $event): bool
+    public function run(ScriptEvent $event)
     {
         $composer = $event->getComposer();
         $composerConfig = $composer->getConfig();

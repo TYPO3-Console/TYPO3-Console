@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 namespace Helhum\Typo3Console\Composer\InstallerScript;
 
 /*
@@ -29,7 +28,7 @@ class InstallDummyExtension implements InstallerScript
      * @param ScriptEvent $event
      * @return bool
      */
-    private function shouldRun(ScriptEvent $event): bool
+    private function shouldRun(ScriptEvent $event)
     {
         return $event->getComposer()->getPackage()->getName() !== 'helhum/typo3-console';
     }
@@ -40,7 +39,7 @@ class InstallDummyExtension implements InstallerScript
      * @return bool
      * @internal
      */
-    public function run(ScriptEvent $event): bool
+    public function run(ScriptEvent $event)
     {
         if (!$this->shouldRun($event)) {
             return true;

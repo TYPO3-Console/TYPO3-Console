@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 namespace Helhum\Typo3Console\Composer\InstallerScript;
 
 /*
@@ -26,7 +25,7 @@ class CopyTypo3Directory implements InstallerScript
      * @param ScriptEvent $event
      * @return bool
      */
-    private function shouldRun(ScriptEvent $event): bool
+    private function shouldRun(ScriptEvent $event)
     {
         // Only run on Windows and only when we are the root package (made for Appveyor tests)
         return DIRECTORY_SEPARATOR === '\\' && (getenv('TYPO3_CONSOLE_SUB_PROCESS') || $event->getComposer()->getPackage()->getName() === 'helhum/typo3-console');
@@ -38,7 +37,7 @@ class CopyTypo3Directory implements InstallerScript
      * @return bool
      * @internal
      */
-    public function run(ScriptEvent $event): bool
+    public function run(ScriptEvent $event)
     {
         if (!$this->shouldRun($event)) {
             return true;
