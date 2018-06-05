@@ -90,6 +90,7 @@ class ExtensionSetup
         call_user_func(
          \Closure::bind(function () use ($installer, $method, $arguments) {
              return call_user_func_array([$installer, $method], $arguments);
-         }, null, InstallUtility::class));
+         }, null, InstallUtility::class)
+        );
     }
 }

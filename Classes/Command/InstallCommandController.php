@@ -356,8 +356,7 @@ class InstallCommandController extends CommandController
                 $this->outputLine('<info>If you continue, your <code>typo3conf/LocalConfiguration.php</code></info>');
                 $this->outputLine('<info>and <code>typo3conf/PackageStates.php</code> files will be deleted!</info>');
                 $this->outputLine();
-                $proceed = $this->output->askConfirmation('<info>Do you really want to proceed?</info> (<comment>no</comment>) ',
-                    false);
+                $proceed = $this->output->askConfirmation('<info>Do you really want to proceed?</info> (<comment>no</comment>) ', false);
             }
             if (!$proceed) {
                 $this->outputLine('<error>Installation aborted!</error>');

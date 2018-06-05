@@ -15,11 +15,11 @@ namespace Helhum\Typo3Console\Tests\Functional\Command;
 
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
+use Nimut\TestingFramework\TestCase\AbstractTestCase;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
 
-abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractCommandTest extends AbstractTestCase
 {
     /**
      * @var CommandDispatcher
@@ -157,43 +157,10 @@ abstract class AbstractCommandTest extends \PHPUnit_Framework_TestCase
         $fileSystem->remove($targetPath);
     }
 
-    /**
-     * @param array $arguments
-     * @param array $environmentVariables
-     * @return string
-     */
-    protected function executeComposerCommand(array $arguments = [], array $environmentVariables = [])
-    {
-        $processBuilder = new ProcessBuilder();
-        $processBuilder->addEnvironmentVariables($environmentVariables);
-        $processBuilder->setEnv('TYPO3_CONSOLE_SUB_PROCESS', 'yes');
-
-        if ($phpPath = getenv('PHP_PATH')) {
-            $phpFinder = new PhpExecutableFinder();
-            $processBuilder->setPrefix($phpFinder->find(false));
-            $processBuilder->add($phpPath . '/composer.phar');
-        } else {
-            $processBuilder->setPrefix('composer');
-        }
-        foreach ($arguments as $argument) {
-            $processBuilder->add($argument);
-        }
-        $processBuilder->add('--no-ansi');
-        $processBuilder->add('-d');
-        $processBuilder->add(getenv('TYPO3_PATH_COMPOSER_ROOT'));
-
-        $process = $processBuilder->setTimeout(null)->getProcess();
-        $process->run();
-        if (!$process->isSuccessful()) {
-            $this->fail(sprintf('Composer command "%s" failed with message: "%s", output: "%s"', $process->getCommandLine(), $process->getErrorOutput(), $process->getOutput()));
-        }
-        return $process->getOutput() . $process->getErrorOutput();
-    }
-
-    protected function executeConsoleCommand($command, array $arguments = [])
+    protected function executeConsoleCommand($command, array $arguments = [], array $environment = [])
     {
         try {
-            return $this->commandDispatcher->executeCommand($command, $arguments);
+            return $this->commandDispatcher->executeCommand($command, $arguments, $environment);
         } catch (FailedSubProcessCommandException $e) {
             $this->fail(sprintf('Console command "%s" failed with message: "%s", output: "%s"', $e->getCommandLine(), $e->getErrorMessage(), $e->getOutputMessage()));
         }
