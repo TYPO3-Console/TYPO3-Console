@@ -23,7 +23,7 @@
     "license": "GPL-2.0-or-later",
     "require": {
         "ext-Phar": "*",
-        "php": ">=5.5.0 <7.2",
+        "php": ">=5.5.0 <7.3",
         "helhum/typo3-console-plugin": "^1.7.5 || ^2.0.2",
 
         "typo3/cms-backend": "^7.6 || ^8.7",
@@ -41,7 +41,7 @@
         "typo3-console/create-reference-command": "^1.0",
         "typo3/cms": "^8.7",
         "symfony/filesystem": "^3.2",
-        "nimut/testing-framework": "^1.0",
+        "nimut/testing-framework": "^2.0 || ^3.0",
         "mikey179/vfsStream": "~1.6.0"
     },
     "autoload": {
