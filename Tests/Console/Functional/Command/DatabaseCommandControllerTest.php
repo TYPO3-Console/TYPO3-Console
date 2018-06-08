@@ -137,6 +137,52 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
+    public function sqlCanBeImportedWithSpecifiedConnection()
+    {
+        $sql = 'SELECT username from be_users where username="_cli_";';
+        $output = $this->executeConsoleCommand('database:import', ['--connection', 'Default'], [], $sql);
+        $this->assertSame('_cli_', trim($output));
+    }
+
+    /**
+     * @test
+     */
+    public function databaseImportFailsWithNotExistingConnection()
+    {
+        $sql = 'SELECT username from be_users where username="_cli_";';
+        try {
+            $output = $this->commandDispatcher->executeCommand('database:import', ['--connection', 'foo'], [], $sql);
+        } catch (FailedSubProcessCommandException $e) {
+            $output = $e->getOutputMessage();
+        }
+        $this->assertContains('No suitable MySQL connection found for import', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function databaseExportFailsWithNotExistingConnection()
+    {
+        try {
+            $output = $this->commandDispatcher->executeCommand('database:export', ['--connection', 'foo']);
+        } catch (FailedSubProcessCommandException $e) {
+            $output = $e->getOutputMessage();
+        }
+        $this->assertContains('No MySQL connections found to export. Given connection "foo" is not configured as MySQL connection', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function databaseExportWorksWithGivenConnection()
+    {
+        $output = $this->executeConsoleCommand('database:export', ['--connection', 'Default']);
+        $this->assertContains('-- Dump of TYPO3 Connection "Default"', $output);
+    }
+
+    /**
+     * @test
+     */
     public function databaseExportCanExcludeTables()
     {
         $output = $this->executeConsoleCommand('database:export', ['--exclude-tables' => 'sys_log']);
