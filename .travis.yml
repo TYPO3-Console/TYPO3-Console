@@ -28,6 +28,8 @@ notifications:
 # This is executed for all stages
 before_install:
   - if php -i | grep -q xdebug; then phpenv config-rm xdebug.ini; fi
+  - mkdir -p .Build/external
+  - git clone https://github.com/helhum/TYPO3-testing-framework.git .Build/external/nimut-testing-framework -b typo3-93-compat
 
 install:
   - export COMPOSER_ROOT_VERSION=5.3.0
@@ -57,7 +59,7 @@ script:
 jobs:
   fast_finish: true
   allow_failures:
-    - env: TYPO3_VERSION="9.2.*@dev"
+    - env: TYPO3_VERSION="9.4.*@dev"
   include:
     - &lint
       stage: test
@@ -93,7 +95,10 @@ jobs:
       env: TYPO3_VERSION="~9.2.0"
     - stage: test
       php: 7.2
-      env: TYPO3_VERSION="9.3.*@dev"
+      env: TYPO3_VERSION="~9.3.0"
+    - stage: test
+      php: 7.2
+      env: TYPO3_VERSION="9.4.*@dev"
 
     - stage: test
       php: 7.1
