@@ -32,7 +32,7 @@ before_install:
   - git clone https://github.com/helhum/TYPO3-testing-framework.git .Build/external/nimut-testing-framework -b typo3-93-compat
 
 install:
-  - export COMPOSER_ROOT_VERSION=5.3.0
+  - export COMPOSER_ROOT_VERSION=5.3.1
   - |
     composer require \
       typo3/cms-backend="$TYPO3_VERSION" \
@@ -122,7 +122,7 @@ jobs:
       before_script:
       script:
         - git fetch --unshallow
-        - export COMPOSER_ROOT_VERSION=5.3.0
+        - export COMPOSER_ROOT_VERSION=5.3.1
         - composer install
         - .Build/bin/phpunit --whitelist Classes --coverage-clover clover.xml --log-junit junit.xml
         - >
