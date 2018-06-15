@@ -1,14 +1,14 @@
 {
-    "repositories": [
-        {
+    "repositories": {
+        "local": {
             "type": "path",
             "url": "Packages/*"
         },
-        {
+        "testing-framework": {
             "type": "vcs",
-            "url": ".Build/external/nimut-testing-framework/"
+            "url": "https://github.com/helhum/TYPO3-testing-framework.git"
         }
-    ],
+    },
     "name": "helhum/typo3-console",
     "description": "A reliable and powerful command line interface for TYPO3 CMS",
     "keywords": [

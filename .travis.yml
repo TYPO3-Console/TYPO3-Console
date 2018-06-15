@@ -30,6 +30,7 @@ before_install:
   - if php -i | grep -q xdebug; then phpenv config-rm xdebug.ini; fi
   - mkdir -p .Build/external
   - git clone https://github.com/helhum/TYPO3-testing-framework.git .Build/external/nimut-testing-framework -b typo3-93-compat
+  - composer config repositories.testing-framework vcs .Build/external/nimut-testing-framework
 
 install:
   - export COMPOSER_ROOT_VERSION=5.3.2
@@ -129,7 +130,7 @@ jobs:
             sonar-scanner
           fi
 
-    - stage: publish in ter
+    - stage: 🚢 to TER
       if: tag IS present
       php: 7.0
       install: skip
