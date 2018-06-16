@@ -27,6 +27,7 @@ use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 /**
  * This class acts as facade for the install tool step actions.
  * It glues together the execution of these actions with the user interaction on the command line
+ * @deprecated With 5.4 will be removed with 6.0. Use \Helhum\Typo3Console\Install\Action\InstallActionDispatcher instead.
  */
 class CliSetupRequestHandler
 {

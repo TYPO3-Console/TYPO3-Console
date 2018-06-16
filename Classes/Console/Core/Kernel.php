@@ -86,11 +86,14 @@ class Kernel
      * If detected TYPO3 version does not match the main supported version,
      * overlay compatibility classes for the detected branch, by registering
      * an autoloader and aliasing the compatibility class with the original class name.
+     *
+     * @param ClassLoader $classLoader
+     * @internal
      */
-    private function initializeCompatibilityLayer()
+    public static function initializeCompatibilityLayer(ClassLoader $classLoader)
     {
         $typo3Branch = '92';
-        if (method_exists($this->bootstrap, 'setCacheHashOptions')) {
+        if (method_exists(Bootstrap::class, 'setCacheHashOptions')) {
             $typo3Branch = '87';
         } elseif (!class_exists(Environment::class)) {
             $typo3Branch = '91';
@@ -99,13 +102,13 @@ class Kernel
             return;
         }
         $compatibilityNamespace = 'Helhum\\Typo3Console\\TYPO3v' . $typo3Branch . '\\';
-        spl_autoload_register(function ($className) use ($compatibilityNamespace) {
+        spl_autoload_register(function ($className) use ($classLoader, $compatibilityNamespace) {
             if (strpos($className, 'Helhum\\Typo3Console\\') !== 0) {
                 // We don't care about classes that are not within our namespace
                 return;
             }
             $compatibilityClassName = str_replace('Helhum\\Typo3Console\\', $compatibilityNamespace, $className);
-            if ($file = $this->classLoader->findFile($compatibilityClassName)) {
+            if ($file = $classLoader->findFile($compatibilityClassName)) {
                 require $file;
                 class_alias($compatibilityClassName, $className);
             }
@@ -123,7 +126,7 @@ class Kernel
     public function initialize(string $runLevel = null)
     {
         if (!$this->initialized) {
-            $this->initializeCompatibilityLayer();
+            self::initializeCompatibilityLayer($this->classLoader);
             Scripts::baseSetup($this->bootstrap);
             $this->initialized = true;
         }

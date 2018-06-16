@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\Mvc\Cli;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Helhum\Typo3Console\Annotation\Command\Definition\Argument;
+use Helhum\Typo3Console\Annotation\Command\Definition\Option;
 use Helhum\Typo3Console\Annotation\Command\Definition\Validate;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -275,7 +276,8 @@ class Command
         $commandParameters = $this->commandReflection->getParameters();
         $commandParameterTags = $this->commandReflection->getTagsValues()['param'];
         $i = 0;
-        $argumentNames = $this->getDefinedArgumentNames();
+        $definedArguments = $this->getDefinedArguments();
+        $definedOptions = $this->getDefinedOptions();
         foreach ($commandParameters as $commandParameterName => $commandParameterDefinition) {
             $description = '';
             if (isset($commandParameterTags[$i])) {
@@ -288,7 +290,7 @@ class Command
             }
             $default = $commandParameterDefinition['defaultValue'] ?? null;
             $required = $commandParameterDefinition['optional'] !== true;
-            $isArgument = $required || in_array($commandParameterName, $argumentNames, true);
+            $isArgument = isset($definedArguments[$commandParameterName]) || ($required && !isset($definedOptions[$commandParameterName]));
             $argumentDefinition = new CommandArgumentDefinition($commandParameterName, $required, $description, $dataType, $default, $isArgument);
             if ($isArgument) {
                 $this->arguments[] = $argumentDefinition;
@@ -383,17 +385,32 @@ class Command
         return $this->inputDefinitions[$key] = $definitions;
     }
 
-    private function getDefinedArgumentNames(): array
+    private function getDefinedArguments(): array
     {
-        if (empty($definedArguments = $this->getCommandMethodDefinitions()['Argument'])) {
+        $argumentDefinitions = $this->getCommandMethodDefinitions()['Argument'] ?? [];
+        if (empty($argumentDefinitions)) {
             return [];
         }
-        $argumentNames = [];
-        foreach ($definedArguments as $definedArgument) {
-            $argumentNames[$definedArgument->name] = $definedArgument->name;
+        $definedArguments = [];
+        foreach ($argumentDefinitions as $definedArgument) {
+            $definedArguments[$definedArgument->name] = $definedArgument;
         }
 
-        return $argumentNames;
+        return $definedArguments;
+    }
+
+    private function getDefinedOptions(): array
+    {
+        $optionDefinitions = $this->getCommandMethodDefinitions()['Option'] ?? [];
+        if (empty($optionDefinitions)) {
+            return [];
+        }
+        $definedOptions = [];
+        foreach ($optionDefinitions as $definedOption) {
+            $definedOptions[$definedOption->name] = $definedOption;
+        }
+
+        return $definedOptions;
     }
 
     private function getCommandMethodDefinitions(): array
@@ -418,6 +435,9 @@ class Command
         $reader = new AnnotationReader();
         $method = new \ReflectionMethod($this->controllerClassName, $this->controllerCommandMethod);
         foreach ($reader->getMethodAnnotations($method) as $annotation) {
+            if ($annotation instanceof Option) {
+                $definitions['Option'][] = $annotation;
+            }
             if ($annotation instanceof Argument) {
                 $definitions['Argument'][] = $annotation;
             }

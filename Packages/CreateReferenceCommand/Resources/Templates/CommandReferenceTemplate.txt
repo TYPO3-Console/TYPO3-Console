@@ -60,7 +60,7 @@ Available Commands
 - Accept value: {description.acceptValue}
 - Is value required: {description.isValueRequired}
 - Is multiple: {description.isMultiple}
-- Default: {description.default -> f:format.raw()}
+<f:if condition="{description.default} != 'NULL'">- Default: {description.default -> f:format.raw()}</f:if>
 
 </f:for>
 </f:if>

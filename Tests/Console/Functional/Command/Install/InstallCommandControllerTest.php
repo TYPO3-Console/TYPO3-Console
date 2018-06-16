@@ -53,7 +53,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
             ]
         );
         $this->assertContains('Successfully installed TYPO3 CMS!', $output);
-        $this->assertNotContains('Set up extensions', $output);
+        $this->assertContains('<comment>Skipped</comment> Set up extensions', $output);
     }
 
     /**
