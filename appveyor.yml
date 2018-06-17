@@ -50,10 +50,6 @@ install:
   - IF NOT EXIST php-installed.txt type nul >> php-installed.txt
 
   - cd c:\t3c
-  - md .Build
-  - md .Build\external
-  - git clone https://github.com/helhum/TYPO3-testing-framework.git .Build/external/nimut-testing-framework -b typo3-93-compat
-  - composer config repositories.testing-framework vcs .Build/external/nimut-testing-framework
   - composer require "typo3/cms-backend=%TYPO3_VERSION%" "typo3/cms-core=%TYPO3_VERSION%" "typo3/cms-extbase=%TYPO3_VERSION%" "typo3/cms-extensionmanager=%TYPO3_VERSION%" "typo3/cms-fluid=%TYPO3_VERSION%" "typo3/cms-frontend=%TYPO3_VERSION%" "typo3/cms-install=%TYPO3_VERSION%" "typo3/cms-saltedpasswords=%TYPO3_VERSION%" "typo3/cms-scheduler=%TYPO3_VERSION%" --prefer-dist --no-progress --ansi
   - git checkout .
 

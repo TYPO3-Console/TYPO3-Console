@@ -3,10 +3,6 @@
         "local": {
             "type": "path",
             "url": "Packages/*"
-        },
-        "testing-framework": {
-            "type": "vcs",
-            "url": "https://github.com/helhum/TYPO3-testing-framework.git"
         }
     },
     "name": "helhum/typo3-console",
@@ -57,7 +53,7 @@
         "typo3-console/php-server-command": "^0.2",
         "typo3-console/create-reference-command": "@dev",
         "symfony/filesystem": "^3.2",
-        "nimut/testing-framework": "dev-typo3-93-compat"
+        "nimut/testing-framework": "dev-master"
     },
     "conflict": {
         "typo3-ter/dbal": "*",
