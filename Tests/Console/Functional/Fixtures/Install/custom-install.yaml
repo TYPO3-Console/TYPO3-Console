@@ -1,0 +1,5 @@
+customStep:
+    type: commands
+    description: 'Custom step'
+    commands:
+        - command: 'install:fixfolderstructure'

@@ -1,0 +1,11 @@
+--- src/Util/Configuration.php	2018-06-18 15:26:03.000000000 +0200
++++ src/Util/Configuration_fixed.php	2018-06-18 15:18:09.000000000 +0200
+@@ -568,6 +568,8 @@
+                 \putenv("{$name}={$value}");
+             }
+
++            $value = \getenv($name);
++
+             if (!isset($_ENV[$name])) {
+                 $_ENV[$name] = $value;
+             }

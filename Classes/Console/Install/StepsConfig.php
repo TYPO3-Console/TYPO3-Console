@@ -31,7 +31,8 @@ class StepsConfig
 
     public function getInstallSteps(string $stepsConfigFile = null): array
     {
-        $stepsConfigFile = $stepsConfigFile ?? $this->baseConfigFile;
+        $stepsConfigFile = $stepsConfigFile ?: (string)getenv('TYPO3_INSTALL_SETUP_STEPS') ?: $this->baseConfigFile;
+        $stepsConfigFile = (string)realpath($stepsConfigFile);
 
         return (new PlaceholderValue(false))->processConfig(
             $this->createConfigFactory($stepsConfigFile)
