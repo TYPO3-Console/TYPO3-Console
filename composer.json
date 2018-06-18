@@ -53,7 +53,8 @@
         "typo3-console/php-server-command": "^0.2",
         "typo3-console/create-reference-command": "@dev",
         "symfony/filesystem": "^3.2",
-        "nimut/testing-framework": "dev-master"
+        "nimut/testing-framework": "dev-master",
+        "cweagans/composer-patches": "^1.6"
     },
     "conflict": {
         "typo3-ter/dbal": "*",
@@ -110,6 +111,7 @@
             "@extension-build",
             "rm -rf Packages/",
             "rm -rf Resources/Private/ExtensionArtifacts/",
+            "rm -rf Resources/Private/Patches/",
             "rm -rf Tests/",
             "rm .gitattributes",
             "rm -rf .github/",
@@ -127,6 +129,7 @@
         ]
     },
     "extra": {
+        "patches-file": "Resources/Private/Patches/patches.json",
         "branch-alias": {
             "dev-master": "5.x-dev"
         },

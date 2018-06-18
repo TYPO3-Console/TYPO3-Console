@@ -41,15 +41,6 @@ class InstallCommandControllerTest extends AbstractCommandTest
             [
                 '--no-interaction',
                 '--skip-extension-setup',
-                '--database-user-name' => getenv('TYPO3_INSTALL_DB_USER'),
-                '--database-user-password' => getenv('TYPO3_INSTALL_DB_PASSWORD'),
-                '--database-host-name' => getenv('TYPO3_INSTALL_DB_HOST'),
-                '--database-port' => '3306',
-                '--database-name' => getenv('TYPO3_INSTALL_DB_DBNAME'),
-                '--admin-user-name' => 'admin',
-                '--admin-password' => 'password',
-                '--site-name' => 'Travis Install',
-                '--site-setup-type' => 'createsite',
             ]
         );
         $this->assertContains('Successfully installed TYPO3 CMS!', $output);
@@ -68,19 +59,71 @@ class InstallCommandControllerTest extends AbstractCommandTest
             'install:setup',
             [
                 '--no-interaction',
-                '--database-user-name' => getenv('TYPO3_INSTALL_DB_USER'),
-                '--database-user-password' => getenv('TYPO3_INSTALL_DB_PASSWORD'),
-                '--database-host-name' => getenv('TYPO3_INSTALL_DB_HOST'),
-                '--database-port' => '3306',
-                '--database-name' => getenv('TYPO3_INSTALL_DB_DBNAME'),
-                '--admin-user-name' => 'admin',
-                '--admin-password' => 'password',
-                '--site-name' => 'Travis Install',
-                '--site-setup-type' => 'createsite',
             ]
         );
         $this->assertContains('Successfully installed TYPO3 CMS!', $output);
         $this->assertContains('Set up extensions', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function setupEvaluatesStepFileIfGiven()
+    {
+        $output = $this->executeConsoleCommand(
+            'install:setup',
+            [
+                '--no-interaction',
+                '--skip-integrity-check',
+            ],
+            [
+                'TYPO3_INSTALL_SETUP_STEPS' => __DIR__ . '/../../Fixtures/Install/custom-install.yaml',
+            ]
+        );
+        $this->assertContains('Successfully installed TYPO3 CMS!', $output);
+        $this->assertContains('Custom step', $output);
+        $this->assertNotContains('Set up extensions', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function setupEvaluatesStepFileIfGivenWithRelativePath()
+    {
+        $output = $this->executeConsoleCommand(
+            'install:setup',
+            [
+                '--no-interaction',
+                '--skip-integrity-check',
+            ],
+            [
+                'TYPO3_INSTALL_SETUP_STEPS' => 'Tests/Console/Functional/Fixtures/Install/custom-install.yaml',
+            ]
+        );
+        $this->assertContains('Successfully installed TYPO3 CMS!', $output);
+        $this->assertContains('Custom step', $output);
+        $this->assertNotContains('Set up extensions', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function individualStepFilesCanImportDefaultsAndSkipDefaultActions()
+    {
+        $output = $this->executeConsoleCommand(
+            'install:setup',
+            [
+                '--no-interaction',
+                '--skip-integrity-check',
+            ],
+            [
+                'TYPO3_INSTALL_SETUP_STEPS' => 'Tests/Console/Functional/Fixtures/Install/custom-install-import.yaml',
+            ]
+        );
+        $this->assertContains('Successfully installed TYPO3 CMS!', $output);
+        $this->assertContains('Check environment and create folders', $output);
+        $this->assertContains('Custom step', $output);
+        $this->assertNotContains('Set up extensions', $output);
     }
 
     /**
@@ -141,6 +184,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
         $this->assertTrue(file_exists($packageStatesFile));
         $packageConfig = require $packageStatesFile;
         copy($packageStatesFile . '_', $packageStatesFile);
+        @unlink($packageStatesFile . '_');
         $this->assertArrayHasKey('reports', $packageConfig['packages']);
     }
 }

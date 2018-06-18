@@ -1,0 +1,22 @@
+imports:
+    - { resource: 'InstallSteps.yaml', type: console }
+
+prepareInstall:
+    skip: true
+environmentAndFolders:
+    skip: false
+databaseConnect:
+    skip: true
+databaseSelect:
+    skip: true
+databaseData:
+    skip: true
+defaultConfiguration:
+    skip: true
+extensionSetup:
+    skip: true
+customStep:
+    type: commands
+    description: 'Custom step'
+    commands:
+        - command: 'install:fixfolderstructure'
