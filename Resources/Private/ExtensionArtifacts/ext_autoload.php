@@ -7,22 +7,22 @@ return (function () {
         return $classLoader;
     }
 
-    $typo3AutoLoadFile = realpath(($rootPath = dirname(__DIR__, 6)) . '/typo3') . '/../vendor/autoload.php';
+    $typo3AutoLoadFile = realpath(($rootPath = dirname(__DIR__, 3)) . '/typo3') . '/../vendor/autoload.php';
     putenv('TYPO3_PATH_ROOT=' . $rootPath);
     $classLoader = require $typo3AutoLoadFile;
 
-    $extensionBaseDir = dirname(__DIR__, 3) . '/';
-    $autoloadDefinition = json_decode(file_get_contents($extensionBaseDir . 'composer.json'), true)['autoload']['psr-4'];
+    $extensionBaseDir = __DIR__;
+    $autoloadDefinition = json_decode(file_get_contents($extensionBaseDir . '/composer.json'), true)['autoload']['psr-4'];
     foreach ($autoloadDefinition as $prefix => $paths) {
         $paths = array_map(
             function ($path) use ($extensionBaseDir) {
-                return $extensionBaseDir . $path;
+                return $extensionBaseDir . '/' . $path;
             },
             (array)$paths
         );
         $classLoader->addPsr4($prefix, $paths);
     }
-    $pharFile = __DIR__ . '/../../../Libraries/symfony-process.phar';
+    $pharFile = __DIR__ . '/Libraries/symfony-process.phar';
     require 'phar://' . $pharFile . '/vendor/autoload.php';
 
     return $classLoader;
