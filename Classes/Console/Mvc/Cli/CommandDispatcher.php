@@ -54,17 +54,24 @@ class CommandDispatcher
     /**
      * Create the dispatcher from within a composer plugin context
      *
-     * Just provide the composer script event to cover most cases
-     *
-     * @param ScriptEvent $event
-     * @param array $commandLine
-     * @param array $environmentVars
-     * @param PhpExecutableFinder $phpFinder
-     * @throws RuntimeException
+     * @param array $arguments
+     * @internal param ScriptEvent $event (deprecated) Possibly given but deprecated event
+     * @internal param array $commandLine
+     * @internal param array $environmentVars
+     * @internal param PhpExecutableFinder $phpFinder
      * @return CommandDispatcher
      */
-    public static function createFromComposerRun(ScriptEvent $event, array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null): self
+    public static function createFromComposerRun(...$arguments): self
     {
+        if (isset($arguments[0]) && $arguments[0] instanceof ScriptEvent) {
+            // Calling createFromComposerRun with ScriptEvent as first argument is deprecated and will be removed with 6.0
+            array_shift($arguments);
+        }
+
+        $commandLine = $arguments[0] ?? [];
+        $environmentVars = $arguments[1] ?? [];
+        $phpFinder = $arguments[2] ?? null;
+
         // should be Application::COMMAND_NAME, but our Application class currently conflicts with symfony/console 2.7, which is used by Composer
         $typo3CommandPath = dirname(__DIR__, 4) . '/typo3cms';
         $environmentVars['TYPO3_CONSOLE_PLUGIN_RUN'] = true;
