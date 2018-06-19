@@ -30,7 +30,7 @@ before_install:
   - if php -i | grep -q xdebug; then phpenv config-rm xdebug.ini; fi
 
 install:
-  - export COMPOSER_ROOT_VERSION=5.3.2
+  - export COMPOSER_ROOT_VERSION=5.4.0
   - |
     composer require \
       typo3/cms-backend="$TYPO3_VERSION" \
@@ -118,7 +118,7 @@ jobs:
       before_script:
       script:
         - git fetch --unshallow
-        - export COMPOSER_ROOT_VERSION=5.3.2
+        - export COMPOSER_ROOT_VERSION=5.4.0
         - composer install
         - .Build/bin/phpunit --whitelist Classes --coverage-clover .Build/clover.xml --log-junit .Build/junit.xml
         - >
