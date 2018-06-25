@@ -1152,6 +1152,14 @@ Options
 - Is multiple: no
 - Default: false
 
+``--install-steps-config``
+  Override install steps with the ones given in this file
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+
+
 ``--database-user-name``
   User name for database server
 

@@ -57,6 +57,7 @@ class InstallCommandController extends CommandController
      * @param bool $force Force installation of TYPO3, even if <code>LocalConfiguration.php</code> file already exists.
      * @param bool $skipIntegrityCheck Skip the checking for clean state before executing setup. This allows a pre-defined <code>LocalConfiguration.php</code> to be present. Handle with care. It might lead to unexpected or broken installation results.
      * @param bool $skipExtensionSetup Skip setting up extensions after TYPO3 is set up. Defaults to false in composer setups and to true in non composer setups.
+     * @param string $installStepsConfig Override install steps with the ones given in this file
      * @param string $databaseUserName User name for database server
      * @param string $databaseUserPassword User password for database server
      * @param string $databaseHostName Host name of database server
@@ -74,6 +75,7 @@ class InstallCommandController extends CommandController
         $force = false,
         $skipIntegrityCheck = false,
         $skipExtensionSetup = false,
+        $installStepsConfig = null,
         $databaseUserName = '',
         $databaseUserPassword = '',
         $databaseHostName = '127.0.0.1',
@@ -106,7 +108,8 @@ class InstallCommandController extends CommandController
                 'forceInstall' => $force,
                 'interactive' => $isInteractive,
                 'extensionSetup' => !$skipExtensionSetup && Bootstrap::usesComposerClassLoading(),
-            ]
+            ],
+            $installStepsConfig
         );
 
         if (!$installationSucceeded) {
