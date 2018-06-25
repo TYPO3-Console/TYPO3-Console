@@ -53,40 +53,46 @@ class InstallActionDispatcher
         $this->installActionFactory = $installActionFactory ?: new InstallActionFactory($this->output, $commandDispatcher);
     }
 
-    public function dispatch(array $givenArguments, array $options = [], string $stepsConfigFile = null)
+    public function dispatch(array $givenArguments, array $options = [], string $stepsConfigFile = null): bool
     {
-        $installSteps = $this->stepsConfig->getInstallSteps($stepsConfigFile);
-        $interactiveSetup = $options['interactive'] ?? $this->output->getSymfonyConsoleInput()->isInteractive();
-        $consoleOutput = $this->output->getSymfonyConsoleOutput();
+        try {
+            $installSteps = $this->stepsConfig->getInstallSteps($stepsConfigFile);
+            $interactiveSetup = $options['interactive'] ?? $this->output->getSymfonyConsoleInput()->isInteractive();
+            $consoleOutput = $this->output->getSymfonyConsoleOutput();
 
-        foreach ($installSteps as $actionName => $actionDefinition) {
-            $skipAction = $actionDefinition['skip'] ?? false;
-            if ($skipAction) {
-                continue;
+            foreach ($installSteps as $actionName => $actionDefinition) {
+                $skipAction = $actionDefinition['skip'] ?? false;
+                if ($skipAction) {
+                    continue;
+                }
+
+                $action = $this->installActionFactory->create($actionDefinition['type']);
+                $success = true;
+                $errorCount = 0;
+                $options['actionName'] = $actionName;
+                $options['givenArguments'] = $givenArguments;
+
+                do {
+                    $this->output->outputLine(sprintf('➤ <info>%s</info>', $actionDefinition['description'] ?? $actionName));
+                    $consoleOutput->startTracking();
+
+                    $shouldExecute = $action->shouldExecute($actionDefinition, $options);
+                    if ($shouldExecute) {
+                        $success = $action->execute($actionDefinition, $options);
+                    }
+
+                    if (!$interactiveSetup && !$success && $errorCount++ > 10) {
+                        throw new RuntimeException(sprintf('Tried to dispatch "%s" %d times.', $actionName, $errorCount), 1405269518);
+                    }
+                } while (!$success);
+
+                $this->outputSuccessMessage($consoleOutput, $shouldExecute, $actionDefinition['description'] ?? $actionName);
             }
-
-            $action = $this->installActionFactory->create($actionDefinition['type']);
-            $success = true;
-            $errorCount = 0;
-            $options['actionName'] = $actionName;
-            $options['givenArguments'] = $givenArguments;
-
-            do {
-                $this->output->outputLine(sprintf('➤ <info>%s</info>', $actionDefinition['description'] ?? $actionName));
-                $consoleOutput->startTracking();
-
-                $shouldExecute = $action->shouldExecute($actionDefinition, $options);
-                if ($shouldExecute) {
-                    $success = $action->execute($actionDefinition, $options);
-                }
-
-                if (!$interactiveSetup && !$success && $errorCount++ > 10) {
-                    throw new RuntimeException(sprintf('Tried to dispatch "%s" %d times.', $actionName, $errorCount), 1405269518);
-                }
-            } while (!$success);
-
-            $this->outputSuccessMessage($consoleOutput, $shouldExecute, $actionDefinition['description'] ?? $actionName);
+        } catch (InstallationFailedException $e) {
+            return false;
         }
+
+        return true;
     }
 
     private function outputSuccessMessage(TrackableOutput $consoleOutput, bool $shouldExecute, string $description)
