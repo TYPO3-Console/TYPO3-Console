@@ -11,44 +11,40 @@
 [![License](https://poser.pugx.org/helhum/typo3-console/license)](https://packagist.org/packages/helhum/typo3-console)
 
 TYPO3 Console provides a clean way to register commands and
-a sane way to call these commands through a command line tool called "typo3cms".
+a sane way to call these commands through a command line tool called `typo3cms`.
 
-It is shipped with many commands to execute TYPO3 actions, which otherwise would
-only be accessible via a web ui. This makes TYPO3 Console a perfect companion for development, deployment,
-docker setups, continuous integration workflows or anything else where automation is required or beneficial.
+It ships many commands to execute TYPO3 actions, which otherwise would only be accessible via the TYPO3 backend. This makes TYPO3 Console a perfect companion for development, deployment, Docker setups, continuous integration workflows or anything else where automation is required or beneficial.
 
 Examples for such commands are:
 
-* `typo3cms install:setup` To completely set up TYPO3 from command line
-* `typo3cms upgrade:all` To execute upgrades from command line
-* `typo3cms extension:setupactive` To set up all active extensions (database schema update, data import, …)
+* `typo3cms install:setup` to completely set up TYPO3 from command line
+* `typo3cms upgrade:all` to execute upgrades from command line
+* `typo3cms extension:setupactive` to set up all active extensions (database schema update, data import, …)
 
 ## Features
-* TYPO3 installation from command line
-* TYPO3 upgrade from command line
+* TYPO3 installation and upgrades from command line
 * Flexible bootstrap for commands (not every command needs a fully bootstrapped framework)
 * Reliable cache flush commands
 * Many commands useful for deployment
-* Support for command controllers and Symfony commands registered within TYPO3 extensions
-* Support for command controllers and Symfony commands registered within composer packages
-
+* Support for command controllers and Symfony commands registered within TYPO3 extensions and Composer packages
 
 ## Installation
 
 ### Installation using Composer
 
-The recommended way to install TYPO3 Console is by using [Composer](https://getcomposer.org).
-In your Composer based TYPO3 project root, just do `composer require helhum/typo3-console`.
-The `typo3cms` binary will be installed by Composer in the specified bin-dir (by default `vendor/bin`).
-TYPO3 Console is a perfect companion for Composer based, enjoyable [TYPO3 projects](https://github.com/helhum/TYPO3-Distribution).
+The recommended way to install TYPO3 Console is by using [Composer](https://getcomposer.org):
+
+    composer require helhum/typo3-console
+
+The `typo3cms` binary will be installed by Composer in the specified `bin-dir` (by default `vendor/bin`).
+TYPO3 Console is a perfect companion for Composer-based, enjoyable [TYPO3 projects](https://github.com/helhum/TYPO3-Distribution).
 
 ### Installation as extension from TYPO3 Extension Repository (TER)
 
-Download and install the extension with the extension manager module.
-For the extension to work, it **must** be installed in the typo3conf/ext/ directory **not** in any other possible extension location.
+Download and install the extension with the *Extensions* module.
+For the extension to work, it **must** be installed in the `typo3conf/ext` directory **not** in any other extension location.
 This directory **must not** be a symlink to another location!
-The extension manager, will copy the `typo3cms` command line tool
-into the installation root directory during activation.
+The `typo3cms` command line tool will be copied into the installation root directory during activation.
 
 ## Submit bug reports or feature requests
 
