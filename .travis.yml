@@ -77,7 +77,7 @@ jobs:
       php: 5.5
       env: TYPO3_VERSION=^7.6
 
-    - stage: publish in ter
+    - stage: 🚢 to TER
       if: tag IS present
       php: 7.1
       env: TYPO3_VERSION=
