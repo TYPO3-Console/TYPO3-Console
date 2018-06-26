@@ -45,12 +45,7 @@ call_user_func(function () {
     }
 
     define('PATH_site', \TYPO3\CMS\Core\Utility\GeneralUtility::fixWindowsFilePath(getenv('TYPO3_PATH_ROOT')) . '/');
-    if (file_exists(PATH_site . 'typo3/sysext/core/bin/typo3')) {
-        define('PATH_thisScript', PATH_site . 'typo3/sysext/core/bin/typo3');
-    } else {
-        // @deprecated will be removed once 7.6 support is removed
-        define('PATH_thisScript', PATH_site . 'typo3/cli_dispatch.phpsh');
-    }
+    define('PATH_thisScript', PATH_site . 'typo3/index.php');
 
     $log('PATH_site: ' . PATH_site, true);
     $log('PATH_thisScript: ' . PATH_thisScript, true);
