@@ -22,6 +22,7 @@ use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Helhum\Typo3Console\Service\Database\SchemaService;
 use Symfony\Component\Process\Process;
+use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 
 /**
@@ -163,8 +164,9 @@ class DatabaseCommandController extends CommandController
      * If this imposes a security risk for you, then refrain from using this command!
      *
      * @param array $excludeTables Comma-separated list of table names to exclude from the export
+     * @param bool $excludeVolatile Exclude cache and session tables
      */
-    public function exportCommand(array $excludeTables = [])
+    public function exportCommand(array $excludeTables = [], $excludeVolatile = false)
     {
         $dbConfig = $this->connectionConfiguration->build();
         $additionalArguments = [
@@ -174,6 +176,16 @@ class DatabaseCommandController extends CommandController
 
         if ($this->output->getSymfonyConsoleOutput()->isVerbose()) {
             $additionalArguments[] = '--verbose';
+        }
+
+        if ($excludeVolatile) {
+            array_push($excludeTables, 'fe_sessions', 'be_sessions');
+            array_push($excludeTables, 'cache_md5params', 'cache_treelist');
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'] as $name => $configuration) {
+                if (is_a($configuration['backend'], Typo3DatabaseBackend::class, true)) {
+                    array_push($excludeTables, 'cf_' . $name, 'cf_' . $name . '_tags');
+                }
+            }
         }
 
         foreach ($excludeTables as $table) {
