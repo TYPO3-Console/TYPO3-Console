@@ -23,6 +23,7 @@ use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Helhum\Typo3Console\Service\Database\SchemaService;
 use Symfony\Component\Process\Process;
 use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
+use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 
 /**
@@ -184,10 +185,17 @@ class DatabaseCommandController extends CommandController
             $excludeTables[] = 'cache_md5params';
             $excludeTables[] = 'cache_treelist';
             foreach ($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'] as $name => $configuration) {
-                if (is_a($configuration['backend'], Typo3DatabaseBackend::class, true)) {
-                    $excludeTables[] = 'cf_' . $name;
-                    $excludeTables[] = 'cf_' . $name . '_tags';
+                $cacheBackendClass = '\\' . ltrim($configuration['backend'] ?? Typo3DatabaseBackend::class, '\\');
+                $cacheFrontendClass = '\\' . ltrim($configuration['frontend'] ?? VariableFrontend::class, '\\');
+                if (!is_a($configuration['backend'], Typo3DatabaseBackend::class, true)) {
+                    continue;
                 }
+
+                /** @var Typo3DatabaseBackend $cacheBackend */
+                $cacheBackend = new $cacheBackendClass('production', $configuration['options'] ?? []);
+                $cacheBackend->setCache(new $cacheFrontendClass($name, $cacheBackend));
+                $excludeTables[] = $cacheBackend->getCacheTable();
+                $excludeTables[] = $cacheBackend->getTagsTable();
             }
         }
 
