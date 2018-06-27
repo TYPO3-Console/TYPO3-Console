@@ -172,6 +172,10 @@ class DatabaseCommandController extends CommandController
             '--single-transaction',
         ];
 
+        if ($this->output->getSymfonyConsoleOutput()->isVerbose()) {
+            $additionalArguments[] = '--verbose';
+        }
+
         foreach ($excludeTables as $table) {
             $additionalArguments[] = sprintf('--ignore-table=%s.%s', $dbConfig['dbname'], $table);
         }
