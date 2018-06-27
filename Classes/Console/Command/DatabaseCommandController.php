@@ -187,7 +187,7 @@ class DatabaseCommandController extends CommandController
             foreach ($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'] as $name => $configuration) {
                 $cacheBackendClass = '\\' . ltrim($configuration['backend'] ?? Typo3DatabaseBackend::class, '\\');
                 $cacheFrontendClass = '\\' . ltrim($configuration['frontend'] ?? VariableFrontend::class, '\\');
-                if (!is_a($configuration['backend'], Typo3DatabaseBackend::class, true)) {
+                if (!is_a($cacheBackendClass, Typo3DatabaseBackend::class, true)) {
                     continue;
                 }
 
