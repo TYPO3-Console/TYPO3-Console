@@ -108,6 +108,25 @@ class InstallCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
+    public function setupEvaluatesStepFileIfGivenWithRelativePathAsCommandOption()
+    {
+        $output = $this->executeConsoleCommand(
+            'install:setup',
+            [
+                '--no-interaction',
+                '--skip-integrity-check',
+                '--install-steps-config',
+                'Tests/Console/Functional/Fixtures/Install/custom-install.yaml',
+            ]
+        );
+        $this->assertContains('Successfully installed TYPO3 CMS!', $output);
+        $this->assertContains('Custom step', $output);
+        $this->assertNotContains('Set up extensions', $output);
+    }
+
+    /**
+     * @test
+     */
     public function individualStepFilesCanImportDefaultsAndSkipDefaultActions()
     {
         $output = $this->executeConsoleCommand(

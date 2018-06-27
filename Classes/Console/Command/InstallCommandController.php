@@ -57,6 +57,7 @@ class InstallCommandController extends CommandController
      * @param bool $force Force installation of TYPO3, even if <code>LocalConfiguration.php</code> file already exists.
      * @param bool $skipIntegrityCheck Skip the checking for clean state before executing setup. This allows a pre-defined <code>LocalConfiguration.php</code> to be present. Handle with care. It might lead to unexpected or broken installation results.
      * @param bool $skipExtensionSetup Skip setting up extensions after TYPO3 is set up. Defaults to false in composer setups and to true in non composer setups.
+     * @param string $installStepsConfig Override install steps with the ones given in this file
      * @param string $databaseUserName User name for database server
      * @param string $databaseUserPassword User password for database server
      * @param string $databaseHostName Host name of database server
@@ -74,6 +75,7 @@ class InstallCommandController extends CommandController
         $force = false,
         $skipIntegrityCheck = false,
         $skipExtensionSetup = false,
+        $installStepsConfig = null,
         $databaseUserName = '',
         $databaseUserPassword = '',
         $databaseHostName = '127.0.0.1',
@@ -98,19 +100,21 @@ class InstallCommandController extends CommandController
         $this->outputLine('<i>Welcome to the TYPO3 Console installer!</i>');
         $this->outputLine();
 
-        if (!$skipIntegrityCheck) {
-            $this->ensureInstallationPossible($isInteractive, $force);
-        }
-        $skipExtensionSetup = $skipExtensionSetup || !Bootstrap::usesComposerClassLoading();
-
         $installActionDispatcher = new InstallActionDispatcher($this->output);
-        $installActionDispatcher->dispatch(
+        $installationSucceeded = $installActionDispatcher->dispatch(
             $this->request->getArguments(),
             [
+                'integrityCheck' => !$skipIntegrityCheck,
+                'forceInstall' => $force,
                 'interactive' => $isInteractive,
-                'extensionSetup' => !$skipExtensionSetup,
-            ]
+                'extensionSetup' => !$skipExtensionSetup && Bootstrap::usesComposerClassLoading(),
+            ],
+            $installStepsConfig
         );
+
+        if (!$installationSucceeded) {
+            $this->quit(2);
+        }
 
         $this->outputLine();
         $this->outputLine('<i>Successfully installed TYPO3 CMS!</i>');
@@ -352,42 +356,5 @@ class InstallCommandController extends CommandController
     private function executeActionWithArguments($actionName, array $arguments = [], $dryRun = false)
     {
         $this->outputLine(serialize($this->installStepActionExecutor->executeActionWithArguments($actionName, $arguments, $dryRun)));
-    }
-
-    /**
-     * Handles the case when LocalConfiguration.php file already exists
-     *
-     * @param bool $isInteractive
-     * @param bool $force
-     */
-    private function ensureInstallationPossible(bool $isInteractive, bool $force)
-    {
-        $localConfFile = PATH_typo3conf . 'LocalConfiguration.php';
-        $packageStatesFile = PATH_typo3conf . 'PackageStates.php';
-        if (!$force && file_exists($localConfFile)) {
-            $this->outputLine();
-            $this->outputLine('<error>TYPO3 seems to be already set up!</error>');
-            $proceed = $isInteractive;
-            if ($isInteractive) {
-                $this->outputLine();
-                $this->outputLine('<info>If you continue, your <code>typo3conf/LocalConfiguration.php</code></info>');
-                $this->outputLine('<info>and <code>typo3conf/PackageStates.php</code> files will be deleted!</info>');
-                $this->outputLine();
-                $proceed = $this->output->askConfirmation('<info>Do you really want to proceed?</info> (<comment>no</comment>) ', false);
-            }
-            if (!$proceed) {
-                $this->outputLine('<error>Installation aborted!</error>');
-                $this->quit(2);
-            }
-        }
-        @unlink($localConfFile);
-        @unlink($packageStatesFile);
-        clearstatcache();
-        if (file_exists($localConfFile)) {
-            $this->outputLine();
-            $this->outputLine('<error>Unable to delete configuration file!</error>');
-            $this->outputLine('<error>Installation aborted!</error>');
-            $this->quit(3);
-        }
     }
 }

@@ -46,11 +46,11 @@ class PrepareInstallAction implements InstallActionInterface
 
     public function execute(array $actionDefinition, array $options = []): bool
     {
+        $this->ensureInstallationIsPossible($options);
+
         $typo3RootPath = rtrim(defined('PATH_site') ? PATH_site : getenv('TYPO3_PATH_ROOT'), '/');
         $firstInstallPath = $typo3RootPath . '/FIRST_INSTALL';
-        if (!file_exists($firstInstallPath)) {
-            touch($firstInstallPath);
-        }
+        touch($firstInstallPath);
 
         if (isset($options['extensionSetup']) && !$options['extensionSetup']) {
             return true;
@@ -64,5 +64,50 @@ class PrepareInstallAction implements InstallActionInterface
         $this->commandDispatcher->executeCommand('install:generatepackagestates', $packageStatesArguments);
 
         return true;
+    }
+
+    /**
+     * Handles the case when LocalConfiguration.php file already exists
+     *
+     * @param array $options
+     * @throws InstallationFailedException
+     */
+    private function ensureInstallationIsPossible(array $options)
+    {
+        $integrityCheck = $options['integrityCheck'] ?? false;
+        if (!$integrityCheck) {
+            return;
+        }
+
+        $isInteractive = $options['interactive'] ?? $this->output->getSymfonyConsoleInput()->isInteractive();
+        $forceInstall = $options['forceInstall'] ?? false;
+
+        $localConfFile = PATH_typo3conf . 'LocalConfiguration.php';
+        $packageStatesFile = PATH_typo3conf . 'PackageStates.php';
+        if (!$forceInstall && file_exists($localConfFile)) {
+            $this->output->outputLine();
+            $this->output->outputLine('<error>TYPO3 seems to be already set up!</error>');
+            $proceed = $isInteractive;
+            if ($isInteractive) {
+                $this->output->outputLine();
+                $this->output->outputLine('<info>If you continue, your <code>typo3conf/LocalConfiguration.php</code></info>');
+                $this->output->outputLine('<info>and <code>typo3conf/PackageStates.php</code> files will be deleted!</info>');
+                $this->output->outputLine();
+                $proceed = $this->output->askConfirmation('<info>Do you really want to proceed?</info> (<comment>no</comment>) ', false);
+            }
+            if (!$proceed) {
+                $this->output->outputLine('<error>Installation aborted!</error>');
+                throw new InstallationFailedException('Installation aborted by user', 1529926774);
+            }
+        }
+        @unlink($localConfFile);
+        @unlink($packageStatesFile);
+        clearstatcache();
+        if (file_exists($localConfFile)) {
+            $this->output->outputLine();
+            $this->output->outputLine('<error>Unable to delete configuration file!</error>');
+            $this->output->outputLine('<error>Installation aborted!</error>');
+            throw new InstallationFailedException('Installation aborted because of insufficient premissions', 1529926810);
+        }
     }
 }
