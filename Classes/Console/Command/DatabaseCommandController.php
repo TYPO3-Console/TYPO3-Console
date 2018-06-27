@@ -179,11 +179,14 @@ class DatabaseCommandController extends CommandController
         }
 
         if ($excludeVolatile) {
-            array_push($excludeTables, 'fe_sessions', 'be_sessions');
-            array_push($excludeTables, 'cache_md5params', 'cache_treelist');
+            $excludeTables[] = 'fe_sessions';
+            $excludeTables[] = 'be_sessions';
+            $excludeTables[] = 'cache_md5params';
+            $excludeTables[] = 'cache_treelist';
             foreach ($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'] as $name => $configuration) {
                 if (is_a($configuration['backend'], Typo3DatabaseBackend::class, true)) {
-                    array_push($excludeTables, 'cf_' . $name, 'cf_' . $name . '_tags');
+                    $excludeTables[] = 'cf_' . $name;
+                    $excludeTables[] = 'cf_' . $name . '_tags';
                 }
             }
         }
