@@ -22,6 +22,8 @@ use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Helhum\Typo3Console\Service\Database\SchemaService;
 use Symfony\Component\Process\Process;
+use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
+use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 
 /**
@@ -163,14 +165,39 @@ class DatabaseCommandController extends CommandController
      * If this imposes a security risk for you, then refrain from using this command!
      *
      * @param array $excludeTables Comma-separated list of table names to exclude from the export
+     * @param bool $excludeVolatile Exclude cache and session tables
      */
-    public function exportCommand(array $excludeTables = [])
+    public function exportCommand(array $excludeTables = [], $excludeVolatile = false)
     {
         $dbConfig = $this->connectionConfiguration->build();
         $additionalArguments = [
             '--opt',
             '--single-transaction',
         ];
+
+        if ($this->output->getSymfonyConsoleOutput()->isVerbose()) {
+            $additionalArguments[] = '--verbose';
+        }
+
+        if ($excludeVolatile) {
+            $excludeTables[] = 'fe_sessions';
+            $excludeTables[] = 'be_sessions';
+            $excludeTables[] = 'cache_md5params';
+            $excludeTables[] = 'cache_treelist';
+            foreach ($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'] as $name => $configuration) {
+                $cacheBackendClass = '\\' . ltrim($configuration['backend'] ?? Typo3DatabaseBackend::class, '\\');
+                $cacheFrontendClass = '\\' . ltrim($configuration['frontend'] ?? VariableFrontend::class, '\\');
+                if (!is_a($cacheBackendClass, Typo3DatabaseBackend::class, true)) {
+                    continue;
+                }
+
+                /** @var Typo3DatabaseBackend $cacheBackend */
+                $cacheBackend = new $cacheBackendClass('production', $configuration['options'] ?? []);
+                $cacheBackend->setCache(new $cacheFrontendClass($name, $cacheBackend));
+                $excludeTables[] = $cacheBackend->getCacheTable();
+                $excludeTables[] = $cacheBackend->getTagsTable();
+            }
+        }
 
         foreach ($excludeTables as $table) {
             $additionalArguments[] = sprintf('--ignore-table=%s.%s', $dbConfig['dbname'], $table);
