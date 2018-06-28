@@ -19,10 +19,13 @@ use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
 use Helhum\Typo3Console\Database\Process\MysqlCommand;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateResultRenderer;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
+use Helhum\Typo3Console\Database\Schema\TableMatcher;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Helhum\Typo3Console\Service\Database\SchemaService;
 use Symfony\Component\Process\Process;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Database command controller
@@ -155,14 +158,9 @@ class DatabaseCommandController extends CommandController
      *
      * A comma-separated list of tables can be passed to exclude from the export:
      *
-     * <b>Example:</b> <code>%command.full_name% --exclude-tables be_sessions,fe_sessions,sys_log</code>
+     * <b>Example:</b> <code>%command.full_name% --exclude-tables 'cf_*,cache_*,[bf]e_sessions,sys_log'</code>
      *
-     * <warning>This command passes the plain text database password to the command line process.</warning>
-     * This means, that users that have the permission to observe running processes,
-     * will be able to read your password.
-     * If this imposes a security risk for you, then refrain from using this command!
-     *
-     * @param array $excludeTables Comma-separated list of table names to exclude from the export
+     * @param array $excludeTables Comma-separated list of table names to exclude from the export. Wildcards are supported.
      */
     public function exportCommand(array $excludeTables = [])
     {
@@ -176,7 +174,7 @@ class DatabaseCommandController extends CommandController
             $additionalArguments[] = '--verbose';
         }
 
-        foreach ($excludeTables as $table) {
+        foreach ($this->matchTables($excludeTables) as $table) {
             $additionalArguments[] = sprintf('--ignore-table=%s.%s', $dbConfig['dbname'], $table);
         }
 
@@ -189,10 +187,20 @@ class DatabaseCommandController extends CommandController
         $this->quit($exitCode);
     }
 
+    private function matchTables(array $excludeTables): array
+    {
+        if (empty($excludeTables)) {
+            return [];
+        }
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName('Default');
+
+        return (new TableMatcher())->match($connection, ...$excludeTables);
+    }
+
     /**
      * @return \Closure
      */
-    protected function buildOutputClosure()
+    private function buildOutputClosure(): \Closure
     {
         return function ($type, $data) {
             $output = $this->output->getSymfonyConsoleOutput();
