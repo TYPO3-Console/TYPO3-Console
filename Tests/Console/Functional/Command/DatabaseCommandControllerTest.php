@@ -142,4 +142,13 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
         $output = $this->executeConsoleCommand('database:export', ['--exclude-tables' => 'sys_log']);
         $this->assertNotContains('CREATE TABLE `sys_log`', $output);
     }
+
+    /**
+     * @test
+     */
+    public function databaseExportCanExcludeTablesWithWildcards()
+    {
+        $output = $this->executeConsoleCommand('database:export', ['--exclude-tables' => 'cf_*']);
+        $this->assertNotContains('CREATE TABLE `cf_', $output);
+    }
 }

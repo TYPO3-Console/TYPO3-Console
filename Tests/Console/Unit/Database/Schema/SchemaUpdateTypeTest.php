@@ -17,9 +17,6 @@ namespace Helhum\Typo3Console\Tests\Unit\Database\Schema;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 
-/**
- * Class SchemaUpdateTypeTest
- */
 class SchemaUpdateTypeTest extends UnitTestCase
 {
     /**

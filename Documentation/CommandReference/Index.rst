@@ -617,12 +617,7 @@ This obviously only works when MySQL is used as DBMS.
 
 A comma-separated list of tables can be passed to exclude from the export:
 
-**Example:** ``typo3cms database:export --exclude-tables be_sessions,fe_sessions,sys_log``
-
-**This command passes the plain text database password to the command line process.**
-This means, that users that have the permission to observe running processes,
-will be able to read your password.
-If this imposes a security risk for you, then refrain from using this command!
+**Example:** ``typo3cms database:export --exclude-tables 'cf_*,cache_*,[bf]e_sessions,sys_log'``
 
 
 
@@ -630,7 +625,7 @@ Options
 ^^^^^^^
 
 ``--exclude-tables``
-  Comma-separated list of table names to exclude from the export
+  Comma-separated list of table names to exclude from the export. Wildcards are supported.
 
 - Accept value: yes
 - Is value required: yes
