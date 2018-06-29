@@ -22,7 +22,7 @@ use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use Helhum\Typo3Console\Database\Schema\TableMatcher;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Helhum\Typo3Console\Service\Database\SchemaService;
-use Symfony\Component\Process\Process;
+use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -118,7 +118,7 @@ class DatabaseCommandController extends CommandController
     }
 
     /**
-     * Import mysql from stdin
+     * Import mysql queries from stdin
      *
      * This means that this can not only be used to pass insert statements,
      * it but works as well to pass SELECT statements to it.
@@ -129,21 +129,23 @@ class DatabaseCommandController extends CommandController
      * <b>Example (select):</b> <code>echo 'SELECT username from be_users WHERE admin=1;' | %command.full_name%</code>
      * <b>Example (interactive):</b> <code>%command.full_name% --interactive</code>
      *
-     * <warning>This command passes the plain text database password to the command line process.</warning>
-     * This means, that users that have the permission to observe running processes,
-     * will be able to read your password.
-     * If this imposes a security risk for you, then refrain from using this command!
-     *
      * @param bool $interactive Open an interactive mysql shell using the TYPO3 connection settings.
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
      */
     public function importCommand($interactive = false)
     {
-        $mysqlCommand = new MysqlCommand($this->connectionConfiguration->build());
+        $connectionName = 'Default';
+        $availableMysqlConnectionNames = $this->connectionConfiguration->getAvailableConnectionNames('mysql');
+        if (empty($availableMysqlConnectionNames) || !in_array($connectionName, $availableMysqlConnectionNames, true)) {
+            $this->output('<error>No suitable MySQL connection found to import to</error>');
+            $this->quit(2);
+        }
+
+        $mysqlCommand = new MysqlCommand($this->connectionConfiguration->build($connectionName), [], $this->output->getSymfonyConsoleOutput());
         $exitCode = $mysqlCommand->mysql(
             $interactive ? [] : ['--skip-column-names'],
             STDIN,
-            $this->buildOutputClosure(),
+            null,
             $interactive
         );
         $this->quit($exitCode);
@@ -164,51 +166,47 @@ class DatabaseCommandController extends CommandController
      */
     public function exportCommand(array $excludeTables = [])
     {
-        $dbConfig = $this->connectionConfiguration->build();
-        $additionalArguments = [
-            '--opt',
-            '--single-transaction',
-        ];
-
-        if ($this->output->getSymfonyConsoleOutput()->isVerbose()) {
-            $additionalArguments[] = '--verbose';
+        $availableMysqlConnectionNames = $this->connectionConfiguration->getAvailableConnectionNames('mysql');
+        if (empty($availableMysqlConnectionNames)) {
+            $this->output('<error>No MySQL connections found to export</error>');
+            $this->quit(2);
         }
 
-        foreach ($this->matchTables($excludeTables) as $table) {
-            $additionalArguments[] = sprintf('--ignore-table=%s.%s', $dbConfig['dbname'], $table);
+        foreach ($availableMysqlConnectionNames as $mysqlConnectionName) {
+            $dbConfig = $this->connectionConfiguration->build($mysqlConnectionName);
+            $additionalArguments = [
+                '--opt',
+                '--single-transaction',
+            ];
+
+            if ($this->output->getSymfonyConsoleOutput()->isVerbose()) {
+                $additionalArguments[] = '--verbose';
+            }
+
+            foreach ($this->matchTables($excludeTables, $mysqlConnectionName) as $table) {
+                $additionalArguments[] = sprintf('--ignore-table=%s.%s', $dbConfig['dbname'], $table);
+            }
+
+            $mysqlCommand = new MysqlCommand($dbConfig, [], $this->output->getSymfonyConsoleOutput());
+            $exitCode = $mysqlCommand->mysqldump(
+                $additionalArguments,
+                null,
+                $mysqlConnectionName
+            );
+
+            if ($exitCode !== 0) {
+                throw new RuntimeException(sprintf('Could not dump SQL for connection "%s"', $mysqlConnectionName), $exitCode);
+            }
         }
-
-        $mysqlCommand = new MysqlCommand($this->connectionConfiguration->build());
-        $exitCode = $mysqlCommand->mysqldump(
-            $additionalArguments,
-            $this->buildOutputClosure()
-        );
-
-        $this->quit($exitCode);
     }
 
-    private function matchTables(array $excludeTables): array
+    private function matchTables(array $excludeTables, string $connectionName): array
     {
         if (empty($excludeTables)) {
             return [];
         }
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName('Default');
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName($connectionName);
 
         return (new TableMatcher())->match($connection, ...$excludeTables);
-    }
-
-    /**
-     * @return \Closure
-     */
-    private function buildOutputClosure(): \Closure
-    {
-        return function ($type, $data) {
-            $output = $this->output->getSymfonyConsoleOutput();
-            if (Process::OUT === $type) {
-                echo $data;
-            } elseif (Process::ERR === $type) {
-                $output->getErrorOutput()->write($data);
-            }
-        };
     }
 }
