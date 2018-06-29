@@ -114,6 +114,7 @@ return [
             'vendor' => 'typo3_console',
             'controller' => Helhum\Typo3Console\Command\DatabaseCommandController::class,
             'controllerCommandName' => 'export',
+            'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
         ],
         'database:import' => [
             'vendor' => 'typo3_console',

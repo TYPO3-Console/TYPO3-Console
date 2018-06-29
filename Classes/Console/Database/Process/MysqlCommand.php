@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Database\Process;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\InteractiveProcess;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Process;
 
 class MysqlCommand
@@ -34,16 +35,23 @@ class MysqlCommand
      */
     private static $mysqlTempFile;
 
-    public function __construct(array $dbConfig, array $commandLine = [])
+    /**
+     * @var ConsoleOutput
+     */
+    private $output;
+
+    public function __construct(array $dbConfig, array $commandLine = [], ConsoleOutput $output = null)
     {
         $this->dbConfig = $dbConfig;
+        // @deprecated commandline will be removed in 6.0
         $this->commandLine = $commandLine;
+        $this->output = $output ?: new ConsoleOutput(); // output being optional is @deprecated. Will become required in 6.0
     }
 
     /**
      * @param array $additionalArguments
      * @param resource $inputStream
-     * @param null $outputCallback
+     * @param null $outputCallback @deprecated will be removed with 6.0
      * @param bool $interactive
      * @return int
      */
@@ -66,16 +74,19 @@ class MysqlCommand
 
     /**
      * @param array $additionalArguments
-     * @param null $outputCallback
+     * @param callable|null $outputCallback @deprecated will be removed with 6.0
+     * @param string $connectionName
      * @return int
      */
-    public function mysqldump(array $additionalArguments = [], $outputCallback = null): int
+    public function mysqldump(array $additionalArguments = [], $outputCallback = null, string $connectionName = 'Default'): int
     {
         $commandLine = $this->commandLine;
         array_unshift($commandLine, 'mysqldump');
         $commandLine = array_merge($commandLine, $this->buildConnectionArguments(), $additionalArguments);
         $process = new Process($commandLine, null, null, null, 0.0);
         $process->inheritEnvironmentVariables();
+
+        echo sprintf('-- Dump of TYPO3 Connection "%s"', $connectionName) . chr(10);
 
         return $process->run($this->buildDefaultOutputCallback($outputCallback));
     }
@@ -87,10 +98,11 @@ class MysqlCommand
     private function buildDefaultOutputCallback($outputCallback): callable
     {
         if (!is_callable($outputCallback)) {
-            $outputCallback = function ($type, $output) {
+            $outputCallback = function ($type, $data) {
                 if (Process::OUT === $type) {
-                    // Explicitly just echo out for now (avoid symfony console formatting)
-                    echo $output;
+                    echo $data;
+                } elseif (Process::ERR === $type) {
+                    $this->output->getErrorOutput()->write($data);
                 }
             };
         }
