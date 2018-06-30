@@ -632,6 +632,14 @@ Options
 - Is multiple: no
 - Default: array ()
 
+``--connection``
+  TYPO3 database connection name (defaults to all configured MySQL connections)
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+
+
 
 
 
@@ -665,6 +673,14 @@ Options
 - Is value required: no
 - Is multiple: no
 - Default: false
+
+``--connection``
+  TYPO3 database connection name
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: 'Default'
 
 
 

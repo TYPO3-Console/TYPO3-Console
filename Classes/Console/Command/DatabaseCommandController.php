@@ -130,18 +130,18 @@ class DatabaseCommandController extends CommandController
      * <b>Example (interactive):</b> <code>%command.full_name% --interactive</code>
      *
      * @param bool $interactive Open an interactive mysql shell using the TYPO3 connection settings.
+     * @param string $connection TYPO3 database connection name
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
      */
-    public function importCommand($interactive = false)
+    public function importCommand($interactive = false, string $connection = 'Default')
     {
-        $connectionName = 'Default';
-        $availableMysqlConnectionNames = $this->connectionConfiguration->getAvailableConnectionNames('mysql');
-        if (empty($availableMysqlConnectionNames) || !in_array($connectionName, $availableMysqlConnectionNames, true)) {
-            $this->output('<error>No suitable MySQL connection found to import to</error>');
+        $availableConnectionNames = $this->connectionConfiguration->getAvailableConnectionNames('mysql');
+        if (empty($availableConnectionNames) || !in_array($connection, $availableConnectionNames, true)) {
+            $this->output('<error>No suitable MySQL connection found for import.</error>');
             $this->quit(2);
         }
 
-        $mysqlCommand = new MysqlCommand($this->connectionConfiguration->build($connectionName), [], $this->output->getSymfonyConsoleOutput());
+        $mysqlCommand = new MysqlCommand($this->connectionConfiguration->build($connection), [], $this->output->getSymfonyConsoleOutput());
         $exitCode = $mysqlCommand->mysql(
             $interactive ? [] : ['--skip-column-names'],
             STDIN,
@@ -163,16 +163,22 @@ class DatabaseCommandController extends CommandController
      * <b>Example:</b> <code>%command.full_name% --exclude-tables 'cf_*,cache_*,[bf]e_sessions,sys_log'</code>
      *
      * @param array $excludeTables Comma-separated list of table names to exclude from the export. Wildcards are supported.
+     * @param string $connection TYPO3 database connection name (defaults to all configured MySQL connections)
      */
-    public function exportCommand(array $excludeTables = [])
+    public function exportCommand(array $excludeTables = [], string $connection = null)
     {
-        $availableMysqlConnectionNames = $this->connectionConfiguration->getAvailableConnectionNames('mysql');
-        if (empty($availableMysqlConnectionNames)) {
-            $this->output('<error>No MySQL connections found to export</error>');
+        $availableConnectionNames = $connectionNames = $this->connectionConfiguration->getAvailableConnectionNames('mysql');
+        $failureReason = '';
+        if ($connection !== null) {
+            $availableConnectionNames = array_intersect($connectionNames, [$connection]);
+            $failureReason = sprintf(' Given connection "%s" is not configured as MySQL connection.', $connection);
+        }
+        if (empty($availableConnectionNames)) {
+            $this->output('<error>No MySQL connections found to export.%s</error>', [$failureReason]);
             $this->quit(2);
         }
 
-        foreach ($availableMysqlConnectionNames as $mysqlConnectionName) {
+        foreach ($availableConnectionNames as $mysqlConnectionName) {
             $dbConfig = $this->connectionConfiguration->build($mysqlConnectionName);
             $additionalArguments = [
                 '--opt',
@@ -200,12 +206,12 @@ class DatabaseCommandController extends CommandController
         }
     }
 
-    private function matchTables(array $excludeTables, string $connectionName): array
+    private function matchTables(array $excludeTables, string $connection): array
     {
         if (empty($excludeTables)) {
             return [];
         }
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName($connectionName);
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName($connection);
 
         return (new TableMatcher())->match($connection, ...$excludeTables);
     }

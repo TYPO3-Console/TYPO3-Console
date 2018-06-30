@@ -86,7 +86,7 @@ class MysqlCommand
         $process = new Process($commandLine, null, null, null, 0.0);
         $process->inheritEnvironmentVariables();
 
-        echo sprintf('-- Dump of TYPO3 Connection "%s"', $connectionName) . chr(10);
+        echo  chr(10) . sprintf('-- Dump of TYPO3 Connection "%s"', $connectionName) . chr(10);
 
         return $process->run($this->buildDefaultOutputCallback($outputCallback));
     }
