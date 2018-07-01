@@ -54,7 +54,8 @@
         "typo3-console/create-reference-command": "@dev",
         "symfony/filesystem": "^3.2",
         "nimut/testing-framework": "dev-master",
-        "cweagans/composer-patches": "^1.6"
+        "cweagans/composer-patches": "^1.6",
+        "jakub-onderka/php-parallel-lint": "^1.0"
     },
     "conflict": {
         "typo3-ter/dbal": "*",
