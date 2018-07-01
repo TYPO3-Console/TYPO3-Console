@@ -47,11 +47,10 @@ install:
 
 # Test scripts
 script:
+  - .Build/bin/parallel-lint --exclude .Build .
   # This fails when command reference is not up to date
   - ./typo3cms commandreference:render > /dev/null 2>&1 && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
-  - >
-    echo "Running unit and functional tests…";
-    .Build/bin/phpunit;
+  - .Build/bin/phpunit;
 
 # Configure build stages (with build matrix above, test stage is implicitly defined)
 jobs:
@@ -59,19 +58,6 @@ jobs:
   allow_failures:
     - env: TYPO3_VERSION="9.4.*@dev"
   include:
-    - &lint
-      stage: test
-      php: 7.2
-      env: PHP Lint
-      install: skip
-      before_script: skip
-      script:
-        - errors=$(find . -name \*.php ! -path "./.Build/*" -exec php -d display_errors=stderr -l {} 2>&1 >/dev/null \;) && echo "$errors" && test -z "$errors"
-    - <<: *lint
-      php: 7.1
-    - <<: *lint
-      php: 7.0
-
     - stage: test
       php: 7.2
       env: TYPO3_VERSION=^8.7.10
