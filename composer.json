@@ -78,13 +78,7 @@
             "cp -f ext_icon.png Resources/Public/Icons/Extension.png"
         ],
         "extension-create-libs": [
-            "mkdir -p Libraries/temp",
-            "[ -f $HOME/.composer/vendor/bin/phar-composer ] || composer global require clue/phar-composer",
-            "if [ ! -f Libraries/symfony-process.phar ]; then cd Libraries/temp && composer require symfony/process=~2.7.0 && composer config classmap-authoritative true && composer config prepend-autoloader false && composer dump-autoload; fi",
-            "[ -f Libraries/symfony-process.phar ] || $HOME/.composer/vendor/bin/phar-composer build Libraries/temp/ Libraries/symfony-process.phar",
-            "chmod -x Libraries/*.phar",
-            "rm -f php_cs.cache",
-            "rm -rf Libraries/temp"
+            "@composer install -d Libraries"
         ],
         "extension-build": [
             "@extension-create-libs",
@@ -95,6 +89,7 @@
             "rm Resources/Private/ExtensionArtifacts/ext_*",
             "rm -rf Tests/",
             "rm .gitattributes",
+            "rm -rf .github",
             "rm .gitignore",
             "rm .php_cs.dist",
             "rm .styleci.yml",
@@ -103,7 +98,7 @@
             "rm .travis.yml"
         ],
         "extension-clean": [
-            "rm -rf Libraries Resources/Public/Icons",
+            "rm -rf Libraries/vendor Resources/Public/Icons",
             "rm -f ext_*"
         ]
     },

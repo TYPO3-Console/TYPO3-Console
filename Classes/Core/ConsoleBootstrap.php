@@ -310,8 +310,8 @@ class ConsoleBootstrap extends Bootstrap
      */
     protected function requireLibraries()
     {
-        if (@file_exists($pharFile = dirname(dirname(__DIR__)) . '/Libraries/symfony-process.phar')) {
-            include 'phar://' . $pharFile . '/vendor/autoload.php';
+        if (@file_exists($libAutoload = dirname(dirname(__DIR__)) . '/Libraries/vendor/autoload.php')) {
+            require $libAutoload;
         }
     }
 

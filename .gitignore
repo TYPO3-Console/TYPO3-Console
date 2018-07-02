@@ -3,7 +3,7 @@
 /typo3cms
 
 /Configuration/Console/AllCommands.php
-/Libraries/*
+/Libraries/vendor
 /ext_emconf.php
 /ext_icon.png
 /Resources/Public/Icons/Extension.png

@@ -1,0 +1,12 @@
+{
+    "config": {
+        "platform": {
+            "php": "5.5"
+        },
+        "classmap-authoritative": true,
+        "prepend-autoloader": false
+    },
+    "require": {
+        "symfony/process": "~2.7.0"
+    }
+}
