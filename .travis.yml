@@ -94,7 +94,8 @@ jobs:
             composer set-version $TRAVIS_TAG
             test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
           fi
-        - composer extension-create-libs && ls -la Libraries/*.phar | grep -v ^-rwx
+        - composer extension-verify-composer-json
+        - composer extension-create-libs
 
     - stage: sonar code scanner
       if: type = push AND branch IN (master, develop)
@@ -121,10 +122,8 @@ jobs:
         - |
           if [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
             echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n";
-            # Install requirements
-            composer require --dev helhum/ter-client dev-master
-            # Cleanup before we upload
-            git reset --hard HEAD && git clean -fx
+            # Install ter client
+            composer require --global helhum/ter-client
 
             # Build extension files
             composer extension-release
@@ -132,5 +131,5 @@ jobs:
             # Upload
             TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
             echo "Uploading release ${TRAVIS_TAG} to TER"
-            .Build/bin/ter-client upload typo3_console . -u "$TYPO3_ORG_USERNAME" -p "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
+            $HOME/.composer/vendor/bin/ter-client upload typo3_console . -u "$TYPO3_ORG_USERNAME" -p "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
           fi;

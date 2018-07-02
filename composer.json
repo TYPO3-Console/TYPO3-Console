@@ -89,7 +89,10 @@
     ],
     "scripts": {
         "set-version": [
-            "Helhum\\Typo3Console\\Composer\\InstallerScripts::setVersion"
+            "Helhum\\Typo3Console\\Composer\\ScriptHelper::setVersion"
+        ],
+        "extension-verify-composer-json": [
+            "Helhum\\Typo3Console\\Composer\\ScriptHelper::verifyAutoloadInfoInLibraries"
         ],
         "extension-copy-artifacts": [
             "cp -f Resources/Private/ExtensionArtifacts/ext_* .",
@@ -97,12 +100,7 @@
             "cp -rf Resources/Private/ExtensionArtifacts/Classes/Console/* Classes/Console/"
         ],
         "extension-create-libs": [
-            "mkdir -p Libraries/temp",
-            "[ -f $HOME/.composer/vendor/bin/phar-composer ] || composer global require clue/phar-composer",
-            "if [ ! -f Libraries/symfony-process.phar ]; then cd Libraries/temp && composer require symfony/console=^3.4.4 symfony/process=^3.4.4 helhum/config-loader=^0.9.0 && composer config classmap-authoritative true && composer config prepend-autoloader true && composer dump-autoload -o; fi",
-            "[ -f Libraries/symfony-process.phar ] || $HOME/.composer/vendor/bin/phar-composer build Libraries/temp/ Libraries/symfony-process.phar",
-            "chmod -x Libraries/*.phar",
-            "rm -rf Libraries/temp"
+            "@composer install -d Libraries"
         ],
         "extension-build": [
             "@extension-create-libs",
@@ -125,7 +123,7 @@
             "rm sonar-project.properties"
         ],
         "extension-clean": [
-            "rm -rf Libraries Resources/Public/Icons",
+            "rm -rf Libraries/vendor Resources/Public/Icons",
             "rm -f ext_*"
         ]
     },
