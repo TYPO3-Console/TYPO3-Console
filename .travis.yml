@@ -123,7 +123,7 @@ jobs:
           if [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
             echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n";
             # Install ter client
-            composer require --global helhum/ter-client
+            composer global require helhum/ter-client
 
             # Build extension files
             composer extension-release
