@@ -1,6 +1,6 @@
 {
     "config": {
-        "patform": {
+        "platform": {
             "php": "7.0.8"
         },
         "classmap-authoritative": true,
