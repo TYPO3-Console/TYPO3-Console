@@ -1,3 +1,4 @@
+/Libraries/ export-ignore
 /Resources/Private/ExtensionArtifacts/src/ export-ignore
 /Resources/Private/ExtensionArtifacts/ext_localconf.php export-ignore
 /Tests/ export-ignore
