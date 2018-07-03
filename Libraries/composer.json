@@ -1,0 +1,22 @@
+{
+    "config": {
+        "patform": {
+            "php": "7.0.8"
+        },
+        "classmap-authoritative": true,
+        "prepend-autoloader": true
+    },
+    "autoload": {
+        "psr-4": {
+            "Helhum\\Typo3Console\\": [
+                "../Classes/Console/",
+                "../Classes/Compatibility/"
+            ]
+        }
+    },
+    "require": {
+        "symfony/console": "^3.4.4",
+        "symfony/process": "^3.4.4",
+        "helhum/config-loader": "^0.9.0"
+    }
+}
