@@ -185,7 +185,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
      */
     public function databaseExportCanExcludeTables()
     {
-        $output = $this->executeConsoleCommand('database:export', ['--exclude-tables' => 'sys_log']);
+        $output = $this->executeConsoleCommand('database:export', ['--exclude', 'sys_log']);
         $this->assertNotContains('CREATE TABLE `sys_log`', $output);
     }
 
@@ -194,7 +194,27 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
      */
     public function databaseExportCanExcludeTablesWithWildcards()
     {
-        $output = $this->executeConsoleCommand('database:export', ['--exclude-tables' => 'cf_*']);
+        $output = $this->executeConsoleCommand('database:export', ['--exclude', 'cf_*', '-e', 'cache_*']);
         $this->assertNotContains('CREATE TABLE `cf_', $output);
+        $this->assertNotContains('CREATE TABLE `cache_', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function databaseExportCanExcludeTablesWithDeprecatedOption()
+    {
+        $output = $this->executeConsoleCommand('database:export', ['--exclude-tables', 'sys_log']);
+        $this->assertNotContains('CREATE TABLE `sys_log`', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function databaseExportCanExcludeTablesWithWildcardsWithDeprecatedOption()
+    {
+        $output = $this->executeConsoleCommand('database:export', ['--exclude-tables', 'cf_*,cache_*']);
+        $this->assertNotContains('CREATE TABLE `cf_', $output);
+        $this->assertNotContains('CREATE TABLE `cache_', $output);
     }
 }
