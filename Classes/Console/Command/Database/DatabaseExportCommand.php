@@ -174,11 +174,11 @@ EOH
         $messages = null;
         if ($input->getArgument('excludeTables')) {
             $excludeTables = explode(',', $input->getArgument('excludeTables'));
-            $messages[] = '<warning>Passing excluded tables as argument is deprecated. Please use --exclude-table instead.</warning>';
+            $messages[] = '<warning>Passing excluded tables as argument is deprecated. Please use --exclude instead.</warning>';
         }
         if ($input->getOption('exclude-tables')) {
             $excludeTables = explode(',', $input->getOption('exclude-tables'));
-            $messages[] = '<warning>Option --exclude-tables is deprecated. Please use --exclude-table for each exclude instead.</warning>';
+            $messages[] = '<warning>Option --exclude-tables is deprecated. Please use --exclude for each exclude instead.</warning>';
         }
         if ($messages !== null && $excludeTables !== null) {
             $input->setOption('exclude', $excludeTables);
