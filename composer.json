@@ -50,8 +50,9 @@
         "typo3/cms-reports": "^8.7.10 || >=9.1.0 <9.4 || 9.4.*@dev",
         "typo3/cms-filemetadata": "^8.7.10 || >=9.1.0 <9.4 || 9.4.*@dev",
 
-        "typo3-console/php-server-command": "^0.2",
+        "typo3-console/convert-command-controller-command": "@dev",
         "typo3-console/create-reference-command": "@dev",
+        "typo3-console/php-server-command": "^0.2",
         "symfony/filesystem": "^3.2",
         "nimut/testing-framework": "dev-master",
         "cweagans/composer-patches": "^1.6",
