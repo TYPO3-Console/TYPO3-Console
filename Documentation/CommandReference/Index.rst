@@ -615,24 +615,24 @@ Export the database (all tables) directly to stdout.
 The mysqldump binary must be available in the path for this command to work.
 This obviously only works when MySQL is used as DBMS.
 
-A comma-separated list of tables can be passed to exclude from the export:
+Tables to be excluded from the export can be specified fully qualified or with wildcards:
 
-**Example:** ``typo3cms database:export --exclude-tables 'cf_*,cache_*,[bf]e_sessions,sys_log'``
+**Example:** ``typo3cms database:export -c Default -e 'cf_*' -e 'cache_*' -e '[bf]e_sessions' -e sys_log``
 
 
 
 Options
 ^^^^^^^
 
-``--exclude-tables``
-  Comma-separated list of table names to exclude from the export. Wildcards are supported.
+``--exclude|-e``
+  Full table name or wildcard expression to exclude from the export.
 
 - Accept value: yes
 - Is value required: yes
-- Is multiple: no
+- Is multiple: yes
 - Default: array ()
 
-``--connection``
+``--connection|-c``
   TYPO3 database connection name (defaults to all configured MySQL connections)
 
 - Accept value: yes

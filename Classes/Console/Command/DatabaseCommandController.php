@@ -19,13 +19,9 @@ use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
 use Helhum\Typo3Console\Database\Process\MysqlCommand;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateResultRenderer;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
-use Helhum\Typo3Console\Database\Schema\TableMatcher;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Helhum\Typo3Console\Service\Database\SchemaService;
-use Symfony\Component\Console\Exception\RuntimeException;
-use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Database command controller
@@ -149,70 +145,5 @@ class DatabaseCommandController extends CommandController
             $interactive
         );
         $this->quit($exitCode);
-    }
-
-    /**
-     * Export database to stdout
-     *
-     * Export the database (all tables) directly to stdout.
-     * The mysqldump binary must be available in the path for this command to work.
-     * This obviously only works when MySQL is used as DBMS.
-     *
-     * A comma-separated list of tables can be passed to exclude from the export:
-     *
-     * <b>Example:</b> <code>%command.full_name% --exclude-tables 'cf_*,cache_*,[bf]e_sessions,sys_log'</code>
-     *
-     * @param array $excludeTables Comma-separated list of table names to exclude from the export. Wildcards are supported.
-     * @param string $connection TYPO3 database connection name (defaults to all configured MySQL connections)
-     */
-    public function exportCommand(array $excludeTables = [], string $connection = null)
-    {
-        $availableConnectionNames = $connectionNames = $this->connectionConfiguration->getAvailableConnectionNames('mysql');
-        $failureReason = '';
-        if ($connection !== null) {
-            $availableConnectionNames = array_intersect($connectionNames, [$connection]);
-            $failureReason = sprintf(' Given connection "%s" is not configured as MySQL connection.', $connection);
-        }
-        if (empty($availableConnectionNames)) {
-            $this->output('<error>No MySQL connections found to export.%s</error>', [$failureReason]);
-            $this->quit(2);
-        }
-
-        foreach ($availableConnectionNames as $mysqlConnectionName) {
-            $dbConfig = $this->connectionConfiguration->build($mysqlConnectionName);
-            $additionalArguments = [
-                '--opt',
-                '--single-transaction',
-            ];
-
-            if ($this->output->getSymfonyConsoleOutput()->isVerbose()) {
-                $additionalArguments[] = '--verbose';
-            }
-
-            foreach ($this->matchTables($excludeTables, $mysqlConnectionName) as $table) {
-                $additionalArguments[] = sprintf('--ignore-table=%s.%s', $dbConfig['dbname'], $table);
-            }
-
-            $mysqlCommand = new MysqlCommand($dbConfig, [], $this->output->getSymfonyConsoleOutput());
-            $exitCode = $mysqlCommand->mysqldump(
-                $additionalArguments,
-                null,
-                $mysqlConnectionName
-            );
-
-            if ($exitCode !== 0) {
-                throw new RuntimeException(sprintf('Could not dump SQL for connection "%s"', $mysqlConnectionName), $exitCode);
-            }
-        }
-    }
-
-    private function matchTables(array $excludeTables, string $connection): array
-    {
-        if (empty($excludeTables)) {
-            return [];
-        }
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName($connection);
-
-        return (new TableMatcher())->match($connection, ...$excludeTables);
     }
 }

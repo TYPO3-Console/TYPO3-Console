@@ -43,6 +43,7 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
 {
     private $skipCommands = [
         'commandreference:render',
+        'convert-command-controller',
         'language:update',
         'server:run',
         'swiftmailer:spool:send',
