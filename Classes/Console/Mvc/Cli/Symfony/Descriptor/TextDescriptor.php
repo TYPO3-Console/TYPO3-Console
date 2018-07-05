@@ -47,24 +47,25 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
      */
     protected function describeInputArgument(InputArgument $argument, array $options = [])
     {
-        if (null !== $argument->getDefault() && (!is_array($argument->getDefault()) || count($argument->getDefault()))) {
-            $default = sprintf('<comment> [default: %s]</comment>', $this->formatDefaultValue($argument->getDefault()));
-        } else {
-            $default = '';
-        }
-
         $totalWidth = isset($options['total_width']) ? $options['total_width'] : Helper::strlen($argument->getName());
         $spacingWidth = $totalWidth - strlen($argument->getName());
 
         // + 4 = 2 spaces before <info>, 2 spaces after </info>
         $indent = $totalWidth + 4;
+        if (null !== $argument->getDefault() && (!is_array($argument->getDefault()) || count($argument->getDefault()))) {
+            $default = "\n" . str_repeat(' ', $indent) . sprintf('<comment> • [default: %s]</comment>', $this->formatDefaultValue($argument->getDefault()));
+        } else {
+            $default = '';
+        }
+
         $maxWidth = isset($options['screen_width']) ? ($options['screen_width'] - $indent) : null;
         $this->writeText(sprintf(
-            '  <info>%s</info>  %s%s%s',
+            '  <info>%s</info>  %s%s%s%s',
             $argument->getName(),
             str_repeat(' ', $spacingWidth),
             $this->wordWrap($argument->getDescription(), $indent, $maxWidth),
-            $default
+            $default,
+            $argument->isArray() ? "\n" . str_repeat(' ', $indent) . '<comment> • (can be specified multiple times)</comment>' : ''
         ), $options);
     }
 
@@ -73,8 +74,12 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
      */
     protected function describeInputOption(InputOption $option, array $options = [])
     {
+        $totalWidth = $options['total_width'] ?? $this->calculateTotalWidthForOptions([$option]);
+        // + 4 = 2 spaces before <info>, 2 spaces after </info>
+        $indent = $totalWidth + 4;
+
         if ($option->acceptValue() && null !== $option->getDefault() && (!is_array($option->getDefault()) || count($option->getDefault()))) {
-            $default = sprintf('<comment> [default: %s]</comment>', $this->formatDefaultValue($option->getDefault()));
+            $default = "\n" . str_repeat(' ', $indent) . sprintf('<comment> • [default: %s]</comment>', $this->formatDefaultValue($option->getDefault()));
         } else {
             $default = '';
         }
@@ -88,7 +93,6 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
             }
         }
 
-        $totalWidth = isset($options['total_width']) ? $options['total_width'] : $this->calculateTotalWidthForOptions([$option]);
         $synopsis = sprintf(
             '%s%s',
             $option->getShortcut() ? sprintf('-%s, ', $option->getShortcut()) : '    ',
@@ -96,9 +100,6 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
         );
 
         $spacingWidth = $totalWidth - Helper::strlen($synopsis);
-
-        // + 4 = 2 spaces before <info>, 2 spaces after </info>
-        $indent = $totalWidth + 4;
         $maxWidth = isset($options['screen_width']) ? ($options['screen_width'] - $indent) : null;
         $this->writeText(sprintf(
             '  <info>%s</info>  %s%s%s%s',
@@ -106,7 +107,7 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
             str_repeat(' ', $spacingWidth),
             $this->wordWrap($option->getDescription(), $indent, $maxWidth),
             $default,
-            $option->isArray() ? '<comment> (multiple values allowed)</comment>' : ''
+            $option->isArray() ? "\n" . str_repeat(' ', $indent) . '<comment> • (can be specified multiple times)</comment>' : ''
         ), $options);
     }
 
