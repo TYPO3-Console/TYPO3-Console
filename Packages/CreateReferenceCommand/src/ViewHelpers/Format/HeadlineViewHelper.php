@@ -25,7 +25,8 @@ namespace Typo3Console\CreateReferenceCommand\ViewHelpers\Format;
  *                                                                        */
 
 /**
- * Returns the string as reStructuredText headline the string using lineCharacter
+ * Returns the string as reStructuredText headline
+ * using $lineCharacter and optionally $withOverline
  */
 class HeadlineViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
 {
