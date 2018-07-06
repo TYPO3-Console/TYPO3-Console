@@ -25,14 +25,15 @@ namespace Typo3Console\CreateReferenceCommand\ViewHelpers\Format;
  *                                                                        */
 
 /**
- * Returns the string, a newline character and an underline made of
- * $withCharacter as long as the original string.
+ * Returns the string as reStructuredText headline
+ * using $lineCharacter and optionally $withOverline
  */
-class UnderlineViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
+class HeadlineViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
 {
     public function initializeArguments()
     {
-        $this->registerArgument('withCharacter', 'string', 'The padding string', false, '-');
+        $this->registerArgument('lineCharacter', 'string', 'The headline string', false, '-');
+        $this->registerArgument('withOverline', 'bool', 'Add overline', false, false);
     }
 
     /**
@@ -40,9 +41,15 @@ class UnderlineViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewH
      */
     public function render()
     {
-        $withCharacter = $this->arguments['withCharacter'];
+        $lineCharacter = $this->arguments['lineCharacter'];
+        $withOverline = $this->arguments['withOverline'];
         $string = $this->renderChildren();
+        $headLine = str_repeat($lineCharacter, strlen($string));
 
-        return $string . chr(10) . str_repeat($withCharacter, strlen($string));
+        if ($withOverline) {
+            $string = $headLine . "\n" . $string;
+        }
+
+        return $string . "\n" . $headLine;
     }
 }

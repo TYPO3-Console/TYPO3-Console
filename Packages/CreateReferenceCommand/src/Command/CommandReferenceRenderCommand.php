@@ -201,8 +201,8 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
         $output = preg_replace('|\<comment>(((?!\</comment>).)*)\</comment>|', '**$1**', $output);
         $output = preg_replace('|\<warning>(((?!\</warning>).)*)\</warning>|', '**$1**', $output);
         $output = preg_replace('|\<strike>(((?!\</strike>).)*)\</strike>|', '[$1]', $output);
-        $output = preg_replace('|\<code>(((?!\</code>).)*)\</code>|', '``$1``', $output);
-        $output = preg_replace('|\<info>(((?!\</info>).)*)\</info>|', '``$1``', $output);
+        $output = preg_replace('|\<code>(((?!\</code>).)*)\</code>|', '`$1`', $output);
+        $output = preg_replace('|\<info>(((?!\</info>).)*)\</info>|', '`$1`', $output);
 
         return $output;
     }
