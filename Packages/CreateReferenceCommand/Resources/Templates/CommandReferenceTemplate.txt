@@ -2,60 +2,57 @@
 .. include:: ../Includes.txt
 
 
+
 .. _typo3_console-command-reference:
 
-{title -> d:format.underline(withCharacter: '=')}
+{title -> d:format.headline(lineCharacter: '=', withOverline: 1)}
 
 .. note::
 
-  This reference uses ``{commandName}`` as the command to invoke. If you are on
-  Windows, this will probably not work, there you need to use ``{commandName}.bat``
-  instead.
-  In Composer based installations, the ``{commandName}`` binary will be located
-  in the binary directory specified in the root composer.json (by default ``vendor/bin``)
+   This reference uses `{commandName}` as the command to invoke. If you are on
+   Windows, this will probably not work, there you need to use `{commandName}.bat`
+   instead. In Composer based installations, the `{commandName}` binary will be
+   located in the binary directory specified in the root composer.json (by
+   default `vendor/bin`)
 
 
 The following reference was automatically generated from code.
 
-<d:format.underline withCharacter="-">*TYPO3 Console*</d:format.underline>
 
-Application Options
-*******************
+
+<d:format.headline>Application Options</d:format.headline>
 
 The following options can be used with every command:
 
-<f:for each="{applicationOptions}" key="name" as="description">``{name}``
-  {description.description -> f:format.raw()}
-</f:for>
+<f:for each="{applicationOptions}" key="name" as="description">`{name}`
+   {description.description -> f:format.raw()}
 
+</f:for>
 <f:for each="{allCommandsByPackageKey}" as="allCommands" key="packageKey">
 .. _`{title}: {packageKey}`:
 
-Available Commands
-******************
+<d:format.headline>Available Commands</d:format.headline>
 
 <f:for each="{allCommands}" as="command">
 .. _`{title}: {packageKey} {command.identifier}`:
 
-<d:format.underline withCharacter="*">``{command.identifier}``</d:format.underline>
+<d:format.headline>`{command.identifier}`</d:format.headline>
 
 **{command.shortDescription}**
 
 {command.description -> f:format.raw()}
 
-<f:if condition="{command.arguments}">Arguments
-^^^^^^^^^
+<f:if condition="{command.arguments}"><d:format.headline lineCharacter="~">Arguments</d:format.headline>
 
-<f:for each="{command.arguments}" key="name" as="description">``{name}``
-  {description -> f:format.raw()}
+<f:for each="{command.arguments}" key="name" as="description">`{name}`
+   {description -> f:format.raw()}
 </f:for>
 </f:if>
 
-<f:if condition="{command.options}">Options
-^^^^^^^
+<f:if condition="{command.options}"><d:format.headline lineCharacter="~">Options</d:format.headline>
 
-<f:for each="{command.options}" key="name" as="description">``{name}``
-  {description.description -> f:format.raw()}
+<f:for each="{command.options}" key="name" as="description">`{name}`
+   {description.description -> f:format.raw()}
 
 - Accept value: {description.acceptValue}
 - Is value required: {description.isValueRequired}
@@ -65,10 +62,9 @@ Available Commands
 </f:for>
 </f:if>
 
-<f:if condition="{command.relatedCommands}">Related commands
-^^^^^^^^^^^^^^^^
+<f:if condition="{command.relatedCommands}"><d:format.headline lineCharacter="~">Related commands</d:format.headline>
 
-<f:for each="{command.relatedCommands}" key="relatedCommandIdentifier" as="relatedCommandDescription">``{relatedCommandIdentifier}``
+<f:for each="{command.relatedCommands}" key="relatedCommandIdentifier" as="relatedCommandDescription">`{relatedCommandIdentifier}`
   {relatedCommandDescription -> f:format.raw()}
 </f:for>
 </f:if>
