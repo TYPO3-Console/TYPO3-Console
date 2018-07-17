@@ -56,12 +56,12 @@
         "symfony/filesystem": "^3.2",
         "nimut/testing-framework": "dev-master",
         "cweagans/composer-patches": "^1.6",
-        "jakub-onderka/php-parallel-lint": "^1.0"
+        "jakub-onderka/php-parallel-lint": "^1.0",
+        "doctrine/dbal": "< 2.8"
     },
     "conflict": {
         "typo3-ter/dbal": "*",
-        "friendsoftypo3/dbal": "*",
-        "symfony/finder": "2.7.44 || 2.8.37 || 3.4.7 || 4.0.7"
+        "friendsoftypo3/dbal": "*"
     },
     "autoload": {
         "psr-4": {
@@ -129,7 +129,6 @@
         ]
     },
     "extra": {
-        "patches-file": "Resources/Private/Patches/patches.json",
         "branch-alias": {
             "dev-master": "5.x-dev"
         },

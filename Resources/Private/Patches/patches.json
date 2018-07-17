@@ -1,7 +1,0 @@
-{
-  "patches": {
-    "phpunit/phpunit": {
-      "Fix environment setting in PHPUnit": "Resources/Private/Patches/phpunit-env.diff"
-    }
-  }
-}
