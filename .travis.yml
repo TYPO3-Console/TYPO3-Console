@@ -85,7 +85,7 @@ jobs:
       env: TYPO3_VERSION="9.4.*@dev"
 
     - stage: test
-      php: 7.1
+      php: 7.0
       env: Consistency checks
       install: skip
       before_script: skip
