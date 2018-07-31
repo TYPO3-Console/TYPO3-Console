@@ -105,6 +105,9 @@ class CommandArgumentDefinition
      */
     public function getOptionName(): string
     {
+        if (strlen($this->name) === 1) {
+            return strtolower($this->name);
+        }
         $dashedName = ucfirst($this->name);
         $dashedName = preg_replace('/([A-Z][a-z0-9]+)/', '$1-', $dashedName);
 
