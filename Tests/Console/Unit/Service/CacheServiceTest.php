@@ -18,14 +18,12 @@ use Helhum\Typo3Console\Service\CacheService;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Core\Bootstrap;
 
-/**
- * Class CacheServiceTest
- */
 class CacheServiceTest extends UnitTestCase
 {
     /**
-     * @var \Helhum\Typo3Console\Service\CacheService|\PHPUnit_Framework_MockObject_MockObject|\TYPO3\CMS\Core\Tests\AccessibleObjectInterface
+     * @var \Helhum\Typo3Console\Service\CacheService
      */
     protected $subject;
 
@@ -33,7 +31,8 @@ class CacheServiceTest extends UnitTestCase
     {
         $cacheManagerMock = $this->getMockBuilder(CacheManager::class)->disableOriginalConstructor()->getMock();
         $configurationServiceMock = $this->getMockBuilder(ConfigurationService::class)->disableOriginalConstructor()->getMock();
-        $this->subject = new CacheService($cacheManagerMock, $configurationServiceMock);
+        $bootstrapMock = $this->getMockBuilder(Bootstrap::class)->disableOriginalConstructor()->getMock();
+        $this->subject = new CacheService($cacheManagerMock, $configurationServiceMock, $bootstrapMock);
     }
 
     /**

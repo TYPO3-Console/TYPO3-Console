@@ -56,6 +56,7 @@ class Kernel
 
     public function __construct(\Composer\Autoload\ClassLoader $classLoader)
     {
+        error_reporting(E_ALL & ~E_USER_DEPRECATED);
         $this->classLoader = $classLoader;
         $this->ensureRequiredEnvironment();
         $this->bootstrap = Bootstrap::getInstance();
