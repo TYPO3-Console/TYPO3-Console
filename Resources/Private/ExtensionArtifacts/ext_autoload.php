@@ -10,7 +10,8 @@ return (function () {
     $typo3AutoLoadFile = realpath(($rootPath = dirname(__DIR__, 3)) . '/typo3') . '/../vendor/autoload.php';
     putenv('TYPO3_PATH_ROOT=' . $rootPath);
     $classLoader = require $typo3AutoLoadFile;
-    require __DIR__ . '/Libraries/vendor/autoload.php';
+    $compatClassLoader = require __DIR__ . '/Libraries/vendor/autoload.php';
+    \Helhum\Typo3Console\Core\Kernel::$nonComposerCompatClassLoader = $compatClassLoader;
 
     return $classLoader;
 })();
