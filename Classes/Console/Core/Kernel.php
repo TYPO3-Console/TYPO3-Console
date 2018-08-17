@@ -54,6 +54,11 @@ class Kernel
      */
     private $initialized = false;
 
+    /**
+     * @var ClassLoader
+     */
+    public static $nonComposerCompatClassLoader;
+
     public function __construct(\Composer\Autoload\ClassLoader $classLoader)
     {
         $this->classLoader = $classLoader;
@@ -101,6 +106,7 @@ class Kernel
         if ($typo3Branch === '92') {
             return;
         }
+        $classLoader = self::$nonComposerCompatClassLoader ?? $classLoader;
         $compatibilityNamespace = 'Helhum\\Typo3Console\\TYPO3v' . $typo3Branch . '\\';
         spl_autoload_register(function ($className) use ($classLoader, $compatibilityNamespace) {
             if (strpos($className, 'Helhum\\Typo3Console\\') !== 0) {
