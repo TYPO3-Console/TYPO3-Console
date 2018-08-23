@@ -14,12 +14,12 @@ namespace Helhum\Typo3Console\Command;
  *
  */
 
+use Helhum\Typo3Console\Core\Booting\CompatibilityScripts;
 use Helhum\Typo3Console\Extension\ExtensionSetup;
 use Helhum\Typo3Console\Extension\ExtensionSetupResultRenderer;
 use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Helhum\Typo3Console\Service\CacheService;
-use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\ClassLoadingInformation;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
@@ -140,7 +140,7 @@ class ExtensionCommandController extends CommandController
 
     private function showDeprecationMessageIfApplicable()
     {
-        if (Bootstrap::usesComposerClassLoading()) {
+        if (CompatibilityScripts::isComposerMode()) {
             $this->output->outputLine('<warning>This command is deprecated when TYPO3 is composer managed.</warning>');
             $this->output->outputLine('<warning>It might lead to unexpected results.</warning>');
             $this->output->outputLine('<warning>The PackageStates.php file that tracks which extension should be active,</warning>');

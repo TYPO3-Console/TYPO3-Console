@@ -42,7 +42,7 @@ class Scripts
         $bootstrap->populateLocalConfiguration();
         \Closure::bind(function () use ($bootstrap) {
             $method = 'initializeRuntimeActivatedPackagesFromConfiguration';
-            if (!Bootstrap::usesComposerClassLoading()) {
+            if (!CompatibilityScripts::isComposerMode()) {
                 $bootstrap->$method();
             }
             $method = 'setDefaultTimezone';

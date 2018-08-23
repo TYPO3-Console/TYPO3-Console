@@ -15,12 +15,18 @@ namespace Helhum\Typo3Console\TYPO3v91\Core\Booting;
  */
 
 use Helhum\Typo3Console\Package\UncachedPackageManager;
+use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\DependencyResolver;
 use TYPO3\CMS\Core\Service\DependencyOrderingService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CompatibilityScripts
 {
+    public static function isComposerMode(): bool
+    {
+        return Bootstrap::usesComposerClassLoading();
+    }
+
     public static function createPackageManager(): UncachedPackageManager
     {
         $packageManager = new UncachedPackageManager();

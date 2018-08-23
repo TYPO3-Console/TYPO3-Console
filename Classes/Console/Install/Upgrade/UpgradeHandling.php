@@ -14,13 +14,13 @@ namespace Helhum\Typo3Console\Install\Upgrade;
  *
  */
 
+use Helhum\Typo3Console\Core\Booting\CompatibilityScripts;
 use Helhum\Typo3Console\Extension\ExtensionCompatibilityCheck;
 use Helhum\Typo3Console\Extension\ExtensionConstraintCheck;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
-use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Updates\AbstractDownloadExtensionUpdate;
@@ -138,7 +138,7 @@ class UpgradeHandling
                         if ($this->wizardHasArgument($shortIdentifier, $argumentName, $arguments)) {
                             continue;
                         }
-                        if (Bootstrap::usesComposerClassLoading()) {
+                        if (CompatibilityScripts::isComposerMode()) {
                             // In composer mode, skip all install extension wizards!
                             $arguments[] = sprintf('%s[%s]=%s', $shortIdentifier, $argumentName, $argumentDefault);
                             $messages[] = '<warning>Wizard "' . $shortIdentifier . '" was not executed but only marked as executed due to composer mode.</warning>';

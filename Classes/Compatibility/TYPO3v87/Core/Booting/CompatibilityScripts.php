@@ -23,6 +23,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CompatibilityScripts
 {
+    public static function isComposerMode(): bool
+    {
+        return Bootstrap::usesComposerClassLoading();
+    }
+
     public static function createPackageManager(): UncachedPackageManager
     {
         $packageManager = new UncachedPackageManager();
