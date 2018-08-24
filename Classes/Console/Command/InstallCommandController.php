@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Helhum\Typo3Console\Annotation\Command\Definition;
+use Helhum\Typo3Console\Core\Booting\CompatibilityScripts;
 use Helhum\Typo3Console\Install\Action\InstallActionDispatcher;
 use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Helhum\Typo3Console\Install\InstallStepActionExecutor;
@@ -22,7 +23,6 @@ use Helhum\Typo3Console\Install\PackageStatesGenerator;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
-use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 
@@ -107,7 +107,7 @@ class InstallCommandController extends CommandController
                 'integrityCheck' => !$skipIntegrityCheck,
                 'forceInstall' => $force,
                 'interactive' => $isInteractive,
-                'extensionSetup' => !$skipExtensionSetup && Bootstrap::usesComposerClassLoading(),
+                'extensionSetup' => !$skipExtensionSetup && CompatibilityScripts::isComposerMode(),
             ],
             $installStepsConfig
         );
@@ -147,7 +147,7 @@ class InstallCommandController extends CommandController
      */
     public function generatePackageStatesCommand(array $frameworkExtensions = [], array $excludedExtensions = [], $activateDefault = false)
     {
-        if ($activateDefault && Bootstrap::usesComposerClassLoading()) {
+        if ($activateDefault && CompatibilityScripts::isComposerMode()) {
             // @deprecated for composer usage in 5.0 will be removed with 6.0
             $this->outputLine('<warning>Using --activate-default is deprecated in composer managed TYPO3 installations.</warning>');
             $this->outputLine('<warning>Instead of requiring typo3/cms in your project, you should consider only requiring individual packages you need.</warning>');

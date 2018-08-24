@@ -15,11 +15,17 @@ namespace Helhum\Typo3Console\Core\Booting;
  */
 
 use Helhum\Typo3Console\Package\UncachedPackageManager;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Service\DependencyOrderingService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CompatibilityScripts
 {
+    public static function isComposerMode(): bool
+    {
+        return Environment::isComposerMode();
+    }
+
     public static function createPackageManager(): UncachedPackageManager
     {
         return new UncachedPackageManager(GeneralUtility::makeInstance(DependencyOrderingService::class));

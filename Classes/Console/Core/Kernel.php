@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\Core;
 
 use Composer\Autoload\ClassLoader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use Helhum\Typo3Console\Core\Booting\CompatibilityScripts;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\Booting\Scripts;
 use Helhum\Typo3Console\Exception;
@@ -158,7 +159,7 @@ class Kernel
             new CommandConfiguration(GeneralUtility::makeInstance(PackageManager::class))
         );
 
-        $application = new Application($this->runLevel, Bootstrap::usesComposerClassLoading());
+        $application = new Application($this->runLevel, CompatibilityScripts::isComposerMode());
         $application->setCommandLoader($commandCollection);
 
         // Try to resolve short command names and aliases
