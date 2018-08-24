@@ -59,9 +59,9 @@ class Scripts
         define('PATH_thisScript', PATH_site . 'typo3/index.php');
 
         $bootstrap->setRequestType(TYPO3_REQUESTTYPE_BE | TYPO3_REQUESTTYPE_CLI);
-        $bootstrap->baseSetup();
-        // Mute notices
-        error_reporting(E_ALL & ~E_NOTICE);
+        $bootstrap->baseSetup(0);
+        // Mute notices and deprecations
+        error_reporting(E_ALL & ~(E_USER_DEPRECATED | E_NOTICE));
         $exceptionHandler = new ExceptionHandler();
         set_exception_handler([$exceptionHandler, 'handleException']);
 
@@ -160,6 +160,8 @@ class Scripts
      */
     public static function initializeExtensionConfiguration(Bootstrap $bootstrap)
     {
+        // Un-Mute deprecations
+        error_reporting(E_ALL & ~E_NOTICE);
         CompatibilityScripts::initializeExtensionConfiguration($bootstrap);
         ExtensionManagementUtility::loadExtLocalconf();
         $bootstrap->setFinalCachingFrameworkCacheConfiguration();
