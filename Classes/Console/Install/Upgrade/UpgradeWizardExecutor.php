@@ -16,6 +16,8 @@ namespace Helhum\Typo3Console\Install\Upgrade;
 
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\DummyUpgradeWizard;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Install\Service\UpgradeWizardsService;
+use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
 
 /**
  * Executes a single upgrade wizard
@@ -39,8 +41,13 @@ class UpgradeWizardExecutor
 
         if ($force) {
             $closure = \Closure::bind(function () use ($upgradeWizard) {
-                /** @var DummyUpgradeWizard $upgradeWizard here to avoid annoying (and wrong) protected method inspection in PHPStorm */
-                $upgradeWizard->markWizardAsDone(0);
+                if ($upgradeWizard instanceof UpgradeWizardInterface) {
+                    // @todo you probably don't want an instance of the UpgradWizardsService here, that's why adding this here plain
+                    GeneralUtility::makeInstance(Registry::class)->set('installUpdate', $upgradeWizard->getIdentifier(), 1);
+                } else {
+                    /** @var DummyUpgradeWizard $upgradeWizard here to avoid annoying (and wrong) protected method inspection in PHPStorm */
+                    $upgradeWizard->markWizardAsDone(0);
+                }
             }, null, $upgradeWizard);
             $closure();
         }
@@ -62,7 +69,12 @@ class UpgradeWizardExecutor
 
         $dbQueries = [];
         $message = '';
-        $hasPerformed = $upgradeWizard->performUpdate($dbQueries, $message);
+        if ($upgradeWizard instanceof UpgradeWizardInterface) {
+            $hasPerformed = $upgradeWizard->executeUpdate();
+        } else {
+            $hasPerformed = $upgradeWizard->performUpdate($dbQueries, $message);
+
+        }
 
         return new UpgradeWizardResult($hasPerformed, $dbQueries, [$message]);
     }
@@ -71,7 +83,11 @@ class UpgradeWizardExecutor
     {
         $upgradeWizard = $this->factory->create($identifier);
 
-        return $upgradeWizard->shouldRenderWizard();
+        if ($upgradeWizard instanceof UpgradeWizardInterface) {
+            return $upgradeWizard->updateNecessary();
+        } else {
+            return $upgradeWizard->shouldRenderWizard();
+        }
     }
 
     private function processRawArguments(string $identifier, array $rawArguments = [])

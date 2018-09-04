@@ -54,11 +54,13 @@ class UpgradeWizardFactory
      * @throws RuntimeException
      * @return AbstractUpdate Newly instantiated upgrade wizard
      */
-    public function create(string $identifier): AbstractUpdate
+    public function create(string $identifier)
     {
         /** @var AbstractUpdate $upgradeWizard */
         $upgradeWizard = $this->objectManager->get($this->getClassNameFromIdentifier($identifier));
-        $upgradeWizard->setIdentifier($identifier);
+        if (method_exists($upgradeWizard, 'setIdentifier')) {
+            $upgradeWizard->setIdentifier($identifier);
+        }
 
         return $upgradeWizard;
     }
