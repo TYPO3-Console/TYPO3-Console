@@ -40,7 +40,6 @@ install:
       typo3/cms-fluid="$TYPO3_VERSION" \
       typo3/cms-frontend="$TYPO3_VERSION" \
       typo3/cms-install="$TYPO3_VERSION" \
-      typo3/cms-saltedpasswords="$TYPO3_VERSION" \
       typo3/cms-scheduler="$TYPO3_VERSION" \
       $PREFER_LOWEST
   - git checkout composer.json
@@ -57,7 +56,7 @@ script:
 jobs:
   fast_finish: true
   allow_failures:
-    - env: TYPO3_VERSION="9.4.*@dev"
+    - env: TYPO3_VERSION="9.5.*@dev"
   include:
     - stage: test
       php: 7.2
@@ -82,7 +81,10 @@ jobs:
       env: TYPO3_VERSION="~9.3.0"
     - stage: test
       php: 7.2
-      env: TYPO3_VERSION="9.4.*@dev"
+      env: TYPO3_VERSION="9.4.0 as 9.3.0"
+    - stage: test
+      php: 7.2
+      env: TYPO3_VERSION="9.5.*@dev"
 
     - stage: test
       php: 7.0

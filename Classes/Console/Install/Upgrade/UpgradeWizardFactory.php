@@ -18,6 +18,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Install\Updates\AbstractUpdate;
+use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
 
 /**
  * Creates a single upgrade wizard
@@ -52,13 +53,15 @@ class UpgradeWizardFactory
      *
      * @param string $identifier The identifier or class name of an upgrade wizard
      * @throws RuntimeException
-     * @return AbstractUpdate Newly instantiated upgrade wizard
+     * @return AbstractUpdate|UpgradeWizardInterface Newly instantiated upgrade wizard
      */
-    public function create(string $identifier): AbstractUpdate
+    public function create(string $identifier)
     {
-        /** @var AbstractUpdate $upgradeWizard */
+        /** @var AbstractUpdate|UpgradeWizardInterface $upgradeWizard */
         $upgradeWizard = $this->objectManager->get($this->getClassNameFromIdentifier($identifier));
-        $upgradeWizard->setIdentifier($identifier);
+        if ($upgradeWizard instanceof AbstractUpdate) {
+            $upgradeWizard->setIdentifier($identifier);
+        }
 
         return $upgradeWizard;
     }

@@ -11,7 +11,7 @@ environment:
   TYPO3_INSTALL_DB_DBNAME: 'appveyor_console_test'
 
   matrix:
-    - TYPO3_VERSION: '~9.3.0'
+    - TYPO3_VERSION: '9.4.0 as 9.3.0'
       PHP_VERSION: '7.2.1-Win32-VC15'
     - TYPO3_VERSION: '~8.7'
       PHP_VERSION: '7.1.13-Win32-VC14'
@@ -50,7 +50,7 @@ install:
   - IF NOT EXIST php-installed.txt type nul >> php-installed.txt
 
   - cd c:\t3c
-  - composer require "typo3/cms-backend=%TYPO3_VERSION%" "typo3/cms-core=%TYPO3_VERSION%" "typo3/cms-extbase=%TYPO3_VERSION%" "typo3/cms-extensionmanager=%TYPO3_VERSION%" "typo3/cms-fluid=%TYPO3_VERSION%" "typo3/cms-frontend=%TYPO3_VERSION%" "typo3/cms-install=%TYPO3_VERSION%" "typo3/cms-saltedpasswords=%TYPO3_VERSION%" "typo3/cms-scheduler=%TYPO3_VERSION%" --prefer-dist --no-progress --ansi
+  - composer require "typo3/cms-backend=%TYPO3_VERSION%" "typo3/cms-core=%TYPO3_VERSION%" "typo3/cms-extbase=%TYPO3_VERSION%" "typo3/cms-extensionmanager=%TYPO3_VERSION%" "typo3/cms-fluid=%TYPO3_VERSION%" "typo3/cms-frontend=%TYPO3_VERSION%" "typo3/cms-install=%TYPO3_VERSION%" "typo3/cms-scheduler=%TYPO3_VERSION%" --prefer-dist --no-progress --ansi
   - git checkout .
 
 test_script:
