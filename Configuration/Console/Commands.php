@@ -142,10 +142,12 @@ return [
             'controllerCommandName' => 'activate',
             'replace' => [
                 'extensionmanager:extension:install',
+                'extensionmanager:extension:activate',
             ],
             'aliases' => [
                 'extension:install',
                 'extensionmanager:extension:install',
+                'extensionmanager:extension:activate',
             ],
         ],
         'extension:deactivate' => [
@@ -154,10 +156,12 @@ return [
             'controllerCommandName' => 'deactivate',
             'replace' => [
                 'extensionmanager:extension:uninstall',
+                'extensionmanager:extension:deactivate',
             ],
             'aliases' => [
                 'extension:uninstall',
                 'extensionmanager:extension:uninstall',
+                'extensionmanager:extension:deactivate',
             ],
         ],
         'extension:dumpautoload' => [
@@ -177,6 +181,9 @@ return [
             'vendor' => 'typo3_console',
             'controller' => Helhum\Typo3Console\Command\ExtensionCommandController::class,
             'controllerCommandName' => 'list',
+            'replace' => [
+                'core:extension:list',
+            ],
         ],
         'extension:removeinactive' => [
             'vendor' => 'typo3_console',
@@ -279,6 +286,9 @@ return [
             'controller' => Helhum\Typo3Console\Command\UpgradeCommandController::class,
             'controllerCommandName' => 'all',
             'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
+            'replace' => [
+                'install:upgrade:run',
+            ],
         ],
         'upgrade:checkextensionconstraints' => [
             'vendor' => 'typo3_console',
@@ -291,6 +301,12 @@ return [
             'controller' => Helhum\Typo3Console\Command\UpgradeCommandController::class,
             'controllerCommandName' => 'list',
             'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
+            'replace' => [
+                'install:upgrade:list',
+            ],
+            'aliases' => [
+                'install:upgrade:list',
+            ],
         ],
         'upgrade:wizard' => [
             'vendor' => 'typo3_console',

@@ -47,6 +47,8 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
         'language:update',
         'server:run',
         'swiftmailer:spool:send',
+        'site:list',
+        'site:show',
     ];
 
     protected function configure()

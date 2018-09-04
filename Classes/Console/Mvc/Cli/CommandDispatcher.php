@@ -177,9 +177,7 @@ class CommandDispatcher
         $process = $this->getProcess($commandLine, $envVars, $input);
         $process->run();
 
-        // @todo after this unserialize fails on win 10 // powershell
-        //$output = str_replace("\r\n", "\n", trim($process->getOutput()));
-        $output = $process->getOutput();
+        $output = str_replace("\r\n", "\n", trim($process->getOutput()));
 
         if (!$process->isSuccessful()) {
             throw FailedSubProcessCommandException::forProcess($command, $process);

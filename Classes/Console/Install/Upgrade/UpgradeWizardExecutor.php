@@ -15,8 +15,8 @@ namespace Helhum\Typo3Console\Install\Upgrade;
  */
 
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\DummyUpgradeWizard;
+use TYPO3\CMS\Core\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Install\Service\UpgradeWizardsService;
 use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
 
 /**
@@ -38,21 +38,24 @@ class UpgradeWizardExecutor
     public function executeWizard(string $identifier, array $rawArguments = [], bool $force = false): UpgradeWizardResult
     {
         $upgradeWizard = $this->factory->create($identifier);
-
+        $wizardImplementsInterface = $upgradeWizard instanceof UpgradeWizardInterface;
         if ($force) {
-            $closure = \Closure::bind(function () use ($upgradeWizard) {
-                if ($upgradeWizard instanceof UpgradeWizardInterface) {
-                    // @todo you probably don't want an instance of the UpgradWizardsService here, that's why adding this here plain
-                    GeneralUtility::makeInstance(Registry::class)->set('installUpdate', $upgradeWizard->getIdentifier(), 1);
-                } else {
+            if ($wizardImplementsInterface) {
+                GeneralUtility::makeInstance(Registry::class)->set('installUpdate', $upgradeWizard->getIdentifier(), 0);
+            } else {
+                $closure = \Closure::bind(function () use ($upgradeWizard) {
                     /** @var DummyUpgradeWizard $upgradeWizard here to avoid annoying (and wrong) protected method inspection in PHPStorm */
                     $upgradeWizard->markWizardAsDone(0);
-                }
-            }, null, $upgradeWizard);
-            $closure();
+                }, null, $upgradeWizard);
+                $closure();
+            }
         }
 
-        if (!$upgradeWizard->shouldRenderWizard()) {
+        if (!$wizardImplementsInterface && !$upgradeWizard->shouldRenderWizard()) {
+            return new UpgradeWizardResult(false);
+        }
+
+        if ($wizardImplementsInterface && !$upgradeWizard->updateNecessary()) {
             return new UpgradeWizardResult(false);
         }
 
@@ -69,11 +72,11 @@ class UpgradeWizardExecutor
 
         $dbQueries = [];
         $message = '';
-        if ($upgradeWizard instanceof UpgradeWizardInterface) {
+        if ($wizardImplementsInterface) {
             $hasPerformed = $upgradeWizard->executeUpdate();
+            GeneralUtility::makeInstance(Registry::class)->set('installUpdate', $upgradeWizard->getIdentifier(), 1);
         } else {
             $hasPerformed = $upgradeWizard->performUpdate($dbQueries, $message);
-
         }
 
         return new UpgradeWizardResult($hasPerformed, $dbQueries, [$message]);
@@ -85,9 +88,9 @@ class UpgradeWizardExecutor
 
         if ($upgradeWizard instanceof UpgradeWizardInterface) {
             return $upgradeWizard->updateNecessary();
-        } else {
-            return $upgradeWizard->shouldRenderWizard();
         }
+
+        return $upgradeWizard->shouldRenderWizard();
     }
 
     private function processRawArguments(string $identifier, array $rawArguments = [])
