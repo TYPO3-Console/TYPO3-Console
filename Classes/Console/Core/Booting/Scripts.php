@@ -43,7 +43,7 @@ class Scripts
         \Closure::bind(function () use ($bootstrap) {
             $method = 'initializeRuntimeActivatedPackagesFromConfiguration';
             if (!CompatibilityScripts::isComposerMode()) {
-                $bootstrap->$method();
+                $bootstrap->$method(GeneralUtility::makeInstance(PackageManager::class));
             }
             $method = 'setDefaultTimezone';
             $bootstrap->$method();
