@@ -21,7 +21,6 @@ $EM_CONF[$_EXTKEY] = [
       'fluid' => '8.7.10-9.4.99',
       'install' => '8.7.10-9.4.99',
       'scheduler' => '8.7.10-9.4.99',
-      'saltedpasswords' => '8.7.10-9.4.99',
     ],
     'conflicts' => [
         'dbal' => '',
