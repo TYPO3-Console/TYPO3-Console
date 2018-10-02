@@ -131,20 +131,23 @@ class CommandDispatcher
      */
     public static function create($typo3CommandPath, array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null): self
     {
+        $environmentVars['TYPO3_CONSOLE_SUB_PROCESS'] = true;
         $phpFinder = $phpFinder ?: new PhpExecutableFinder();
         if (!($php = $phpFinder->find(false))) {
             throw new RuntimeException('The "php" binary could not be found.', 1485128615);
         }
         array_unshift($commandLine, $typo3CommandPath);
-        if (!empty($phpArguments = $phpFinder->findArguments())) {
-            array_unshift($commandLine, ...$phpArguments);
-        }
-        array_unshift($commandLine, $php);
+        $phpArguments = $phpFinder->findArguments();
         if (getenv('PHP_INI_PATH')) {
-            $commandLine[] = '-c';
-            $commandLine[] = getenv('PHP_INI_PATH');
+            $phpArguments[] = '-c';
+            $phpArguments[] = getenv('PHP_INI_PATH');
         }
-        $environmentVars['TYPO3_CONSOLE_SUB_PROCESS'] = true;
+        // Ensure we do not output PHP startup errors for sub-processes to not have them interfere with process output
+        // Later, very early in booting the error reporting is set to an appropriate value anyway
+        $phpArguments[] = '-d';
+        $phpArguments[] = 'error_reporting=0';
+        array_unshift($commandLine, ...$phpArguments);
+        array_unshift($commandLine, $php);
 
         return new self($commandLine, $environmentVars);
     }
