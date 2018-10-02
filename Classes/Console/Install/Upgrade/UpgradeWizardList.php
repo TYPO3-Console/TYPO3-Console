@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\Install\Upgrade;
 
 use TYPO3\CMS\Core\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Install\Updates\AbstractUpdate;
 use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
 
 /**
@@ -79,7 +80,7 @@ class UpgradeWizardList
                     'done' => false,
                 ];
                 $explanation = '';
-                $wizardImplementsInterface = $updateObject instanceof UpgradeWizardInterface;
+                $wizardImplementsInterface = $updateObject instanceof UpgradeWizardInterface && !$updateObject instanceof AbstractUpdate;
                 $markedAsDone = $this->registry->get('installUpdate', $className, false) || $this->registry->get('installUpdate', $identifier, false);
                 if ($wizardImplementsInterface) {
                     $explanation = $updateObject->getDescription();
