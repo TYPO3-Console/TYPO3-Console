@@ -17,6 +17,7 @@ namespace Helhum\Typo3Console\Install\Upgrade;
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\DummyUpgradeWizard;
 use TYPO3\CMS\Core\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Install\Updates\AbstractUpdate;
 use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
 
 /**
@@ -38,7 +39,7 @@ class UpgradeWizardExecutor
     public function executeWizard(string $identifier, array $rawArguments = [], bool $force = false): UpgradeWizardResult
     {
         $upgradeWizard = $this->factory->create($identifier);
-        $wizardImplementsInterface = $upgradeWizard instanceof UpgradeWizardInterface;
+        $wizardImplementsInterface = $upgradeWizard instanceof UpgradeWizardInterface && !$upgradeWizard instanceof AbstractUpdate;
         if ($force) {
             if ($wizardImplementsInterface) {
                 GeneralUtility::makeInstance(Registry::class)->set('installUpdate', $upgradeWizard->getIdentifier(), 0);
@@ -60,7 +61,7 @@ class UpgradeWizardExecutor
         }
 
         // OMG really?
-        GeneralUtility::_GETset(
+        @GeneralUtility::_GETset(
             [
                 'values' => [
                     $identifier => $this->processRawArguments($identifier, $rawArguments),
@@ -86,7 +87,7 @@ class UpgradeWizardExecutor
     {
         $upgradeWizard = $this->factory->create($identifier);
 
-        if ($upgradeWizard instanceof UpgradeWizardInterface) {
+        if ($upgradeWizard instanceof UpgradeWizardInterface && !$upgradeWizard instanceof AbstractUpdate) {
             return $upgradeWizard->updateNecessary();
         }
 
