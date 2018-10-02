@@ -34,7 +34,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class Application extends BaseApplication
 {
-    const TYPO3_CONSOLE_VERSION = '5.5.4';
+    const TYPO3_CONSOLE_VERSION = '5.5.5';
     const COMMAND_NAME = 'typo3cms';
 
     /**
