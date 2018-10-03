@@ -15,9 +15,11 @@ namespace Helhum\Typo3Console\Install\Upgrade;
  */
 
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\DummyUpgradeWizard;
+use Symfony\Component\Console\Output\BufferedOutput;
 use TYPO3\CMS\Core\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Updates\AbstractUpdate;
+use TYPO3\CMS\Install\Updates\ChattyInterface;
 use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
 
 /**
@@ -71,6 +73,11 @@ class UpgradeWizardExecutor
             'install'
         );
 
+        $output = new BufferedOutput();
+        if ($upgradeWizard instanceof ChattyInterface) {
+            $upgradeWizard->setOutput($output);
+        }
+
         $dbQueries = [];
         $message = '';
         if ($wizardImplementsInterface) {
@@ -79,6 +86,8 @@ class UpgradeWizardExecutor
         } else {
             $hasPerformed = $upgradeWizard->performUpdate($dbQueries, $message);
         }
+
+        $message = trim($message . PHP_EOL . $output->fetch());
 
         return new UpgradeWizardResult($hasPerformed, $dbQueries, [$message]);
     }
