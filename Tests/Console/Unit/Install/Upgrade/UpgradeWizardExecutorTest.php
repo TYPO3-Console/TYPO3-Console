@@ -48,7 +48,7 @@ class UpgradeWizardExecutorTest extends UnitTestCase
     {
         $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
         $upgradeWizardProphecy = $this->prophesize(DummyUpgradeWizard::class);
-        $this->expectOutputInitForChattyWizard($upgradeWizardProphecy);
+        $this->assertOutputInitForChattyWizard($upgradeWizardProphecy);
         $upgradeWizardProphecy->shouldRenderWizard()->willReturn(true);
         $upgradeWizardProphecy->performUpdate($queries = [], $message = '')->willReturn(true);
 
@@ -66,7 +66,7 @@ class UpgradeWizardExecutorTest extends UnitTestCase
     {
         $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
         $upgradeWizardProphecy = $this->prophesize(DummyUpgradeWizard::class);
-        $this->expectOutputInitForChattyWizard($upgradeWizardProphecy);
+        $this->assertOutputInitForChattyWizard($upgradeWizardProphecy);
         $upgradeWizardProphecy->shouldRenderWizard()->willReturn(true);
         $upgradeWizardProphecy->performUpdate($queries = [], $message = '')->willReturn(false);
 
@@ -98,7 +98,7 @@ class UpgradeWizardExecutorTest extends UnitTestCase
     /**
      * @param DummyUpgradeWizard|ObjectProphecy $upgradeWizardProphecy
      */
-    private function expectOutputInitForChattyWizard(ObjectProphecy $upgradeWizardProphecy)
+    private function assertOutputInitForChattyWizard(ObjectProphecy $upgradeWizardProphecy)
     {
         if (!interface_exists('TYPO3\\CMS\\Install\\Updates\\ChattyInterface')) {
             return;
