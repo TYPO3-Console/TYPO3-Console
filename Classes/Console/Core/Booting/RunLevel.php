@@ -164,7 +164,7 @@ class RunLevel
         $sequence = new Sequence($identifier);
         $this->addStep($sequence, 'helhum.typo3console:coreconfiguration');
         $this->addStep($sequence, 'helhum.typo3console:providecleanclassimplementations');
-        $this->addStep($sequence, 'helhum.typo3console:caching');
+        $this->addStep($sequence, 'helhum.typo3console:disabledcaching');
         $this->addStep($sequence, 'helhum.typo3console:errorhandling');
 
         return $sequence;
@@ -178,8 +178,6 @@ class RunLevel
     private function buildCompiletimeSequence(): Sequence
     {
         $sequence = $this->buildEssentialSequence(self::LEVEL_COMPILE);
-
-        $this->addStep($sequence, 'helhum.typo3console:disablecorecaches');
 
         $sequence->addStep(new Step('helhum.typo3console:loadextbaseconfiguration', function () {
             // TODO: hack alarm :) We remove this in order to prevent double inclusion of the ext_localconf.php
@@ -217,10 +215,9 @@ class RunLevel
     {
         $sequence = $this->buildBasicRuntimeSequence(self::LEVEL_FULL);
 
-        // @deprecated can be removed if TYPO3 8 support is removed
+        $this->addStep($sequence, 'helhum.typo3console:caching');
+        // @deprecated helhum.typo3console:database can be removed when TYPO3 8 support is removed
         $this->addStep($sequence, 'helhum.typo3console:database');
-        // Fix core caches that were disabled beforehand
-        $this->addStep($sequence, 'helhum.typo3console:enablecorecaches');
         $this->addStep($sequence, 'helhum.typo3console:persistence');
         $this->addStep($sequence, 'helhum.typo3console:authentication');
 
@@ -251,16 +248,11 @@ class RunLevel
             case 'helhum.typo3console:providecleanclassimplementations':
                 $sequence->addStep(new Step('helhum.typo3console:providecleanclassimplementations', [Scripts::class, 'provideCleanClassImplementations']), 'helhum.typo3console:coreconfiguration');
                 break;
-            case 'helhum.typo3console:caching':
-                $sequence->addStep(new Step('helhum.typo3console:caching', [Scripts::class, 'initializeCachingFramework']));
+            case 'helhum.typo3console:disabledcaching':
+                $sequence->addStep(new Step('helhum.typo3console:disabledcaching', [Scripts::class, 'initializeDisabledCaching']), 'helhum.typo3console:coreconfiguration');
                 break;
             case 'helhum.typo3console:errorhandling':
                 $sequence->addStep(new Step('helhum.typo3console:errorhandling', [Scripts::class, 'initializeErrorHandling']));
-                break;
-
-            // Part of compiletime sequence
-            case 'helhum.typo3console:disablecorecaches':
-                $sequence->addStep(new Step('helhum.typo3console:disablecorecaches', [Scripts::class, 'disableCoreCaches']), 'helhum.typo3console:coreconfiguration');
                 break;
 
             // Part of basic runtime
@@ -269,11 +261,12 @@ class RunLevel
                 break;
 
             // Part of full runtime
-            case 'helhum.typo3console:enablecorecaches':
-                $sequence->addStep(new Step('helhum.typo3console:enablecorecaches', [Scripts::class, 'reEnableOriginalCoreCaches']), 'helhum.typo3console:extensionconfiguration');
+            case 'helhum.typo3console:caching':
+                $sequence->removeStep('helhum.typo3console:disabledcaching');
+                $sequence->addStep(new Step('helhum.typo3console:caching', [Scripts::class, 'initializeCaching']), 'helhum.typo3console:coreconfiguration');
                 break;
-            // @deprecated can be removed if TYPO3 8 support is removed
             case 'helhum.typo3console:database':
+                // @deprecated can be removed if TYPO3 8 support is removed
                 $sequence->addStep(new Step('helhum.typo3console:database', [CompatibilityScripts::class, 'initializeDatabaseConnection']), 'helhum.typo3console:errorhandling');
                 break;
             case 'helhum.typo3console:persistence':

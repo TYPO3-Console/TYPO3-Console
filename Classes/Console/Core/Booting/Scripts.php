@@ -14,13 +14,10 @@ namespace Helhum\Typo3Console\Core\Booting;
  *
  */
 
-use Helhum\Typo3Console\Core\Cache\FakeDatabaseBackend;
 use Helhum\Typo3Console\Error\ErrorHandler;
 use Helhum\Typo3Console\Error\ExceptionHandler;
 use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
-use TYPO3\CMS\Core\Cache\Backend\NullBackend;
-use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageManager;
@@ -29,11 +26,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Scripts
 {
-    /**
-     * @var array
-     */
-    private static $earlyCachesConfiguration = [];
-
     /**
      * @param Bootstrap $bootstrap
      */
@@ -49,7 +41,6 @@ class Scripts
             $bootstrap->$method();
         }, null, $bootstrap)();
         CompatibilityScripts::initializeConfigurationManagement($bootstrap);
-        self::disableCachesForObjectManagement();
     }
 
     public static function baseSetup(Bootstrap $bootstrap)
@@ -83,30 +74,6 @@ class Scripts
         $packageManager->init();
     }
 
-    public static function disableCachesForObjectManagement()
-    {
-        $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
-        foreach (
-            [
-                'extbase_object',
-                'extbase_reflection',
-                'extbase_typo3dbbackend_tablecolumns',
-                'extbase_typo3dbbackend_queries',
-                'extbase_datamapfactory_datamap',
-            ] as $id) {
-            if (!isset($cacheConfigurations[$id])) {
-                continue;
-            }
-            self::$earlyCachesConfiguration[$id] = $cacheConfigurations[$id];
-            if (empty($cacheConfigurations[$id]['backend']) || $cacheConfigurations[$id]['backend'] === Typo3DatabaseBackend::class) {
-                $cacheConfigurations[$id]['backend'] = FakeDatabaseBackend::class;
-            } else {
-                $cacheConfigurations[$id]['backend'] = NullBackend::class;
-            }
-            $cacheConfigurations[$id]['options'] = [];
-        }
-    }
-
     public static function initializeErrorHandling()
     {
         $errorHandler = new ErrorHandler();
@@ -114,45 +81,21 @@ class Scripts
         set_error_handler([$errorHandler, 'handleError']);
     }
 
-    /**
-     * @param Bootstrap $bootstrap
-     */
-    public static function disableCoreCaches(Bootstrap $bootstrap)
+    public static function initializeDisabledCaching(Bootstrap $bootstrap)
     {
-        $cacheConfigurations = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];
-        self::$earlyCachesConfiguration['cache_core'] = $cacheConfigurations['cache_core'];
-        $bootstrap->disableCoreCache();
+        self::initializeCachingFramework($bootstrap, true);
     }
 
-    /**
-     * Reset the internal caches array in the object manager to
-     * make it rebuild the caches with new configuration.
-     *
-     * @param Bootstrap $bootstrap
-     */
-    public static function reEnableOriginalCoreCaches(Bootstrap $bootstrap)
+    public static function initializeCaching(Bootstrap $bootstrap)
     {
-        $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'] = array_replace_recursive($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'], self::$earlyCachesConfiguration);
-
-        /** @var CacheManager $cacheManager */
-        $cacheManager = $bootstrap->getEarlyInstance(\TYPO3\CMS\Core\Cache\CacheManager::class);
-        $cacheManager->setCacheConfigurations($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']);
-
-        $reflectionObject = new \ReflectionObject($cacheManager);
-        $property = $reflectionObject->getProperty('caches');
-        $property->setAccessible(true);
-        $property->setValue($cacheManager, []);
+        self::initializeCachingFramework($bootstrap);
     }
 
-    /**
-     * @param Bootstrap $bootstrap
-     */
-    public static function initializeCachingFramework(Bootstrap $bootstrap)
+    private static function initializeCachingFramework(Bootstrap $bootstrap, bool $disableCaching = false)
     {
-        $cacheManager = new \TYPO3\CMS\Core\Cache\CacheManager();
-        $cacheManager->setCacheConfigurations($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']);
-        \TYPO3\CMS\Core\Utility\GeneralUtility::setSingletonInstance(\TYPO3\CMS\Core\Cache\CacheManager::class, $cacheManager);
-        $bootstrap->setEarlyInstance(\TYPO3\CMS\Core\Cache\CacheManager::class, $cacheManager);
+        $cacheManager = CompatibilityScripts::createCacheManager($disableCaching);
+        \TYPO3\CMS\Core\Utility\GeneralUtility::setSingletonInstance(CacheManager::class, $cacheManager);
+        $bootstrap->setEarlyInstance(CacheManager::class, $cacheManager);
     }
 
     /**

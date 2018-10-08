@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Core\Booting;
  */
 
 use Helhum\Typo3Console\Package\UncachedPackageManager;
+use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Service\DependencyOrderingService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -24,6 +25,14 @@ class CompatibilityScripts
     public static function isComposerMode(): bool
     {
         return Environment::isComposerMode();
+    }
+
+    public static function createCacheManager(bool $disableCaching): CacheManager
+    {
+        $cacheManager = new CacheManager($disableCaching);
+        $cacheManager->setCacheConfigurations($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']);
+
+        return $cacheManager;
     }
 
     public static function createPackageManager(): UncachedPackageManager

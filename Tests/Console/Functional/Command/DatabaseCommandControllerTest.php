@@ -76,6 +76,25 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
+    public function databaseSchemaCanBeUpdatedWithExtensionsAccessingDatabaseCaches()
+    {
+        $this->installFixtureExtensionCode('ext_test_cache');
+        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
+        $this->executeMysqlQuery('DROP TABLE IF EXISTS `cf_cache_rootline`');
+        $this->executeMysqlQuery('DROP TABLE IF EXISTS `cf_extbase_datamapfactory_datamap`');
+
+        $output = $this->executeConsoleCommand('database:updateschema', ['--verbose']);
+
+        $this->assertContains('CREATE TABLE `cf_cache_rootline`', $output);
+        $this->assertContains('CREATE TABLE `cf_extbase_datamapfactory_datamap`', $output);
+
+        $this->removeFixtureExtensionCode('ext_test_cache');
+        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
+    }
+
+    /**
+     * @test
+     */
     public function schemaUpdateCanBePerformedWithoutAnyTables()
     {
         $this->backupDatabase();
