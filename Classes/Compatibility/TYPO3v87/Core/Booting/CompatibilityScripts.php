@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\TYPO3v87\Core\Booting;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Helhum\Typo3Console\Package\UncachedPackageManager;
+use Helhum\Typo3Console\TYPO3v87\Cache\CacheManager;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\DependencyResolver;
 use TYPO3\CMS\Core\Service\DependencyOrderingService;
@@ -26,6 +27,14 @@ class CompatibilityScripts
     public static function isComposerMode(): bool
     {
         return Bootstrap::usesComposerClassLoading();
+    }
+
+    public static function createCacheManager(bool $disableCaching): CacheManager
+    {
+        $cacheManager = new CacheManager($disableCaching);
+        $cacheManager->setCacheConfigurations($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']);
+
+        return $cacheManager;
     }
 
     public static function createPackageManager(): UncachedPackageManager

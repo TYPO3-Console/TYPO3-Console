@@ -56,12 +56,13 @@ class CacheService implements SingletonInterface
     /**
      * Builds the dependencies correctly
      *
-     * @param CacheManager $cacheManager
      * @param ConfigurationService $configurationService
      */
-    public function __construct(CacheManager $cacheManager, ConfigurationService $configurationService, Bootstrap $bootstrap = null, CacheLowLevelCleaner $lowLevelCleaner = null)
+    public function __construct(ConfigurationService $configurationService, Bootstrap $bootstrap = null, CacheLowLevelCleaner $lowLevelCleaner = null)
     {
-        $this->cacheManager = $cacheManager;
+        // We need a new instance here to get the real caches instead of the disabled ones
+        $this->cacheManager = new CacheManager();
+        $this->cacheManager->setCacheConfigurations($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']);
         $this->configurationService = $configurationService;
         $this->bootstrap = $bootstrap ?: Bootstrap::getInstance();
         $this->lowLevelCleaner = $lowLevelCleaner ?: new CacheLowLevelCleaner();
@@ -75,7 +76,6 @@ class CacheService implements SingletonInterface
     public function flush($force = false)
     {
         $this->ensureDatabaseIsInitialized();
-        $this->reEnableCoreCaches();
         if ($force) {
             $this->lowLevelCleaner->forceFlushCachesFiles();
             $this->lowLevelCleaner->forceFlushDatabaseCacheTables();
@@ -191,11 +191,6 @@ class CacheService implements SingletonInterface
         return array_unique($validGroups);
     }
 
-    private function reEnableCoreCaches()
-    {
-        Scripts::reEnableOriginalCoreCaches($this->bootstrap);
-    }
-
     /**
      * @deprecated can be removed when TYPO3 8 support is removed
      */
@@ -237,7 +232,6 @@ class CacheService implements SingletonInterface
      */
     private function getFileCaches()
     {
-        $this->reEnableCoreCaches();
         $fileCaches = [];
         foreach ($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'] as $identifier => $cacheConfiguration) {
             if (

@@ -17,38 +17,27 @@ namespace Helhum\Typo3Console\Tests\Unit\Service;
 use Helhum\Typo3Console\Service\CacheService;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
-use TYPO3\CMS\Core\Cache\CacheManager;
 
-/**
- * Class CacheServiceTest
- */
 class CacheServiceTest extends UnitTestCase
 {
     /**
-     * @var \Helhum\Typo3Console\Service\CacheService|\PHPUnit_Framework_MockObject_MockObject|\TYPO3\CMS\Core\Tests\AccessibleObjectInterface
+     * @var \Helhum\Typo3Console\Service\CacheService
      */
     protected $subject;
-
-    public function setup()
-    {
-        $cacheManagerMock = $this->getMockBuilder(CacheManager::class)->disableOriginalConstructor()->getMock();
-        $configurationServiceMock = $this->getMockBuilder(ConfigurationService::class)->disableOriginalConstructor()->getMock();
-        $this->subject = new CacheService($cacheManagerMock, $configurationServiceMock);
-    }
 
     /**
      * Initializes configuration mock and sets the given configuration to the subject
      *
      * @param array $mockedConfiguration
      */
-    protected function setCacheConfiguration($mockedConfiguration)
+    protected function createCacheManagerWithConfiguration($mockedConfiguration)
     {
         $configurationServiceMock = $this->getMockBuilder(ConfigurationService::class)->disableOriginalConstructor()->getMock();
         $configurationServiceMock
             ->expects($this->atLeastOnce())
             ->method('getActive')
             ->will($this->returnValue($mockedConfiguration));
-        $this->inject($this->subject, 'configurationService', $configurationServiceMock);
+        $this->subject = new CacheService($configurationServiceMock);
     }
 
     /**
@@ -56,7 +45,7 @@ class CacheServiceTest extends UnitTestCase
      */
     public function cacheGroupsAreRetrievedCorrectlyFromConfiguration()
     {
-        $this->setCacheConfiguration(
+        $this->createCacheManagerWithConfiguration(
             [
                 'cache_foo' => ['groups' => ['first', 'second']],
                 'cache_bar' => ['groups' => ['third', 'second']],
@@ -79,7 +68,7 @@ class CacheServiceTest extends UnitTestCase
      */
     public function flushByGroupThrowsExceptionForInvalidGroups()
     {
-        $this->setCacheConfiguration(
+        $this->createCacheManagerWithConfiguration(
             [
                 'cache_foo' => ['groups' => ['first', 'second']],
                 'cache_bar' => ['groups' => ['third', 'second']],
