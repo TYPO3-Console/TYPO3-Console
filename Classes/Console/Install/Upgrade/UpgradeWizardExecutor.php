@@ -83,11 +83,10 @@ class UpgradeWizardExecutor
         if ($wizardImplementsInterface) {
             $hasPerformed = $upgradeWizard->executeUpdate();
             GeneralUtility::makeInstance(Registry::class)->set('installUpdate', $upgradeWizard->getIdentifier(), 1);
+            $message = trim($message . PHP_EOL . $output->fetch());
         } else {
             $hasPerformed = $upgradeWizard->performUpdate($dbQueries, $message);
         }
-
-        $message = trim($message . PHP_EOL . $output->fetch());
 
         return new UpgradeWizardResult($hasPerformed, $dbQueries, [$message]);
     }
