@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eb9b77d7d080e7a14cd217db90fca34f",
+    "content-hash": "5adb1f05802f39f259773e53beb082e9",
     "packages": [
         {
             "name": "helhum/config-loader",
-            "version": "v0.9.0",
+            "version": "v0.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/helhum/config-loader.git",
-                "reference": "11188d23b3c5e1e3fb61de9d7e3d6ddaae3cf389"
+                "reference": "7748b96a80725fd8801075a4b75485889ac04779"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/helhum/config-loader/zipball/11188d23b3c5e1e3fb61de9d7e3d6ddaae3cf389",
-                "reference": "11188d23b3c5e1e3fb61de9d7e3d6ddaae3cf389",
+                "url": "https://api.github.com/repos/helhum/config-loader/zipball/7748b96a80725fd8801075a4b75485889ac04779",
+                "reference": "7748b96a80725fd8801075a4b75485889ac04779",
                 "shasum": ""
             },
             "require": {
@@ -48,7 +48,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Generic config loader with context and environment support.",
-            "time": "2018-06-14T12:33:08+00:00"
+            "time": "2018-09-02T15:46:19+00:00"
         },
         {
             "name": "psr/log",
