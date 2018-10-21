@@ -289,7 +289,7 @@ class RunLevel
     public function getRunLevelForCommand(string $commandIdentifier): string
     {
         if (in_array($commandIdentifier, ['help', 'list'], true)) {
-            return $this->getMaximumAvailableRunLevel();
+            return $this->getMaximumAvailableRunLevel() === self::LEVEL_COMPILE ? self::LEVEL_COMPILE : self::LEVEL_MINIMAL;
         }
         $options = $this->getOptionsForCommand($commandIdentifier);
 
