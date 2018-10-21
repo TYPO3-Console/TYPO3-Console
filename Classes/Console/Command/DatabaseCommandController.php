@@ -51,7 +51,10 @@ class DatabaseCommandController extends CommandController
     }
 
     /**
-     * Update database schema
+     * Update database schema (TYPO3 Database Compare)
+     *
+     * Compares the current database schema with schema definition
+     * from extensions's ext_tables.sql files and updates the schema based on the definition.
      *
      * Valid schema update types are:
      *

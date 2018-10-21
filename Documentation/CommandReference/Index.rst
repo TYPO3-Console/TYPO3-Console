@@ -698,7 +698,10 @@ Options
 `database:updateschema`
 -----------------------
 
-**Update database schema**
+**Update database schema (TYPO3 Database Compare)**
+
+Compares the current database schema with schema definition
+from extensions's ext_tables.sql files and updates the schema based on the definition.
 
 Valid schema update types are:
 
@@ -1134,6 +1137,22 @@ Options
 
 Use as command line replacement for the web installation process.
 Manually enter details on the command line or non interactive for automated setups.
+As an alternative for providing command line arguments, it is also possible to provide environment variables.
+Command line arguments take precedence over environment variables.
+The following environment variables are evaluated:
+
+- TYPO3_INSTALL_DB_USER
+- TYPO3_INSTALL_DB_PASSWORD
+- TYPO3_INSTALL_DB_HOST
+- TYPO3_INSTALL_DB_PORT
+- TYPO3_INSTALL_DB_UNIX_SOCKET
+- TYPO3_INSTALL_DB_USE_EXISTING
+- TYPO3_INSTALL_DB_DBNAME
+- TYPO3_INSTALL_ADMIN_USER
+- TYPO3_INSTALL_ADMIN_PASSWORD
+- TYPO3_INSTALL_SITE_NAME
+- TYPO3_INSTALL_SITE_SETUP_TYPE
+- TYPO3_INSTALL_WEB_SERVER_CONFIG
 
 
 

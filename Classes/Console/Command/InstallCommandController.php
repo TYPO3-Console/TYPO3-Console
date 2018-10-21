@@ -53,6 +53,22 @@ class InstallCommandController extends CommandController
      *
      * Use as command line replacement for the web installation process.
      * Manually enter details on the command line or non interactive for automated setups.
+     * As an alternative for providing command line arguments, it is also possible to provide environment variables.
+     * Command line arguments take precedence over environment variables.
+     * The following environment variables are evaluated:
+     *
+     * - TYPO3_INSTALL_DB_USER
+     * - TYPO3_INSTALL_DB_PASSWORD
+     * - TYPO3_INSTALL_DB_HOST
+     * - TYPO3_INSTALL_DB_PORT
+     * - TYPO3_INSTALL_DB_UNIX_SOCKET
+     * - TYPO3_INSTALL_DB_USE_EXISTING
+     * - TYPO3_INSTALL_DB_DBNAME
+     * - TYPO3_INSTALL_ADMIN_USER
+     * - TYPO3_INSTALL_ADMIN_PASSWORD
+     * - TYPO3_INSTALL_SITE_NAME
+     * - TYPO3_INSTALL_SITE_SETUP_TYPE
+     * - TYPO3_INSTALL_WEB_SERVER_CONFIG
      *
      * @param bool $force Force installation of TYPO3, even if <code>LocalConfiguration.php</code> file already exists.
      * @param bool $skipIntegrityCheck Skip the checking for clean state before executing setup. This allows a pre-defined <code>LocalConfiguration.php</code> to be present. Handle with care. It might lead to unexpected or broken installation results.
