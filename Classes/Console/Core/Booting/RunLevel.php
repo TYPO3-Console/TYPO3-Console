@@ -179,14 +179,7 @@ class RunLevel
     {
         $sequence = $this->buildEssentialSequence(self::LEVEL_COMPILE);
 
-        $sequence->addStep(new Step('helhum.typo3console:loadextbaseconfiguration', function () {
-            // TODO: hack alarm :) We remove this in order to prevent double inclusion of the ext_localconf.php
-            // This should be fine although not very nice
-            // We should change that to include all ext_localconf of required exts in configuration step and reset this array key there then
-            // OK, this does not work when there is a cached file... of course, but in compile time we do not have caches
-            unset($GLOBALS['TYPO3_LOADED_EXT']['extbase']['ext_localconf.php']);
-            require PATH_site . 'typo3/sysext/extbase/ext_localconf.php';
-        }));
+        $this->addStep($sequence, 'helhum.typo3console:loadextbaseconfiguration');
 
         return $sequence;
     }
@@ -243,37 +236,49 @@ class RunLevel
         switch ($stepIdentifier) {
             // Part of essential sequence
             case 'helhum.typo3console:coreconfiguration':
-                $sequence->addStep(new Step('helhum.typo3console:coreconfiguration', [Scripts::class, 'initializeConfigurationManagement']));
+                $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'initializeConfigurationManagement']));
                 break;
             case 'helhum.typo3console:providecleanclassimplementations':
-                $sequence->addStep(new Step('helhum.typo3console:providecleanclassimplementations', [Scripts::class, 'provideCleanClassImplementations']), 'helhum.typo3console:coreconfiguration');
+                $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'provideCleanClassImplementations']), 'helhum.typo3console:coreconfiguration');
                 break;
             case 'helhum.typo3console:disabledcaching':
-                $sequence->addStep(new Step('helhum.typo3console:disabledcaching', [Scripts::class, 'initializeDisabledCaching']), 'helhum.typo3console:coreconfiguration');
+                $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'initializeDisabledCaching']), 'helhum.typo3console:coreconfiguration');
                 break;
             case 'helhum.typo3console:errorhandling':
-                $sequence->addStep(new Step('helhum.typo3console:errorhandling', [Scripts::class, 'initializeErrorHandling']));
+                $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'initializeErrorHandling']));
+                break;
+
+            // Part of compile time
+            case 'helhum.typo3console:loadextbaseconfiguration':
+                $sequence->addStep(new Step($stepIdentifier, function () {
+                    // @deprecated in 5.5, will be removed in 6.0
+                    // Requirement for the removal is converting all command controllers to Symfony commands
+                    // and removing all usages of ObjectManager in our code, which is the reason we include
+                    // this file early, to get the ObjectManager configured properly
+                    unset($GLOBALS['TYPO3_LOADED_EXT']['extbase']['ext_localconf.php']);
+                    require PATH_site . 'typo3/sysext/extbase/ext_localconf.php';
+                }));
                 break;
 
             // Part of basic runtime
             case 'helhum.typo3console:extensionconfiguration':
-                $sequence->addStep(new Step('helhum.typo3console:extensionconfiguration', [Scripts::class, 'initializeExtensionConfiguration']));
+                $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'initializeExtensionConfiguration']));
                 break;
 
             // Part of full runtime
             case 'helhum.typo3console:caching':
                 $sequence->removeStep('helhum.typo3console:disabledcaching');
-                $sequence->addStep(new Step('helhum.typo3console:caching', [Scripts::class, 'initializeCaching']), 'helhum.typo3console:coreconfiguration');
+                $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'initializeCaching']), 'helhum.typo3console:coreconfiguration');
                 break;
             case 'helhum.typo3console:database':
                 // @deprecated can be removed if TYPO3 8 support is removed
-                $sequence->addStep(new Step('helhum.typo3console:database', [CompatibilityScripts::class, 'initializeDatabaseConnection']), 'helhum.typo3console:errorhandling');
+                $sequence->addStep(new Step($stepIdentifier, [CompatibilityScripts::class, 'initializeDatabaseConnection']), 'helhum.typo3console:errorhandling');
                 break;
             case 'helhum.typo3console:persistence':
-                $sequence->addStep(new Step('helhum.typo3console:persistence', [Scripts::class, 'initializePersistence']), 'helhum.typo3console:extensionconfiguration');
+                $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'initializePersistence']), 'helhum.typo3console:extensionconfiguration');
                 break;
             case 'helhum.typo3console:authentication':
-                $sequence->addStep(new Step('helhum.typo3console:authentication', [Scripts::class, 'initializeAuthenticatedOperations']), 'helhum.typo3console:extensionconfiguration');
+                $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'initializeAuthenticatedOperations']), 'helhum.typo3console:extensionconfiguration');
                 break;
 
             default:
