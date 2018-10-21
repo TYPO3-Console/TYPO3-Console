@@ -81,10 +81,10 @@ class InstallActionDispatcher
                         $success = $action->execute($actionDefinition, $options);
                     }
 
-                    if (!$interactiveSetup && !$success && $errorCount++ > 10) {
+                    if (!$interactiveSetup && !$success && $shouldExecute && $errorCount++ > 10) {
                         throw new RuntimeException(sprintf('Tried to dispatch "%s" %d times.', $actionName, $errorCount), 1405269518);
                     }
-                } while (!$success);
+                } while (!$success && $shouldExecute);
 
                 $this->outputSuccessMessage($consoleOutput, $shouldExecute, $actionDefinition['description'] ?? $actionName);
             }

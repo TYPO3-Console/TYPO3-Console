@@ -63,6 +63,8 @@ class InstallCommandControllerTest extends AbstractCommandTest
         );
         $this->assertContains('Successfully installed TYPO3 CMS!', $output);
         $this->assertContains('Set up extensions', $output);
+        $this->assertFileNotExists(getenv('TYPO3_PATH_WEB') . '/.htaccess');
+        $this->assertFileNotExists(getenv('TYPO3_PATH_WEB') . '/web.config');
     }
 
     /**
@@ -83,6 +85,50 @@ class InstallCommandControllerTest extends AbstractCommandTest
         $this->assertContains('Successfully installed TYPO3 CMS!', $output);
         $this->assertContains('Custom step', $output);
         $this->assertNotContains('Set up extensions', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function setupCreatesHtaccessIfRequested()
+    {
+        $output = $this->executeConsoleCommand(
+            'install:setup',
+            [
+                '--no-interaction',
+                '--skip-integrity-check',
+                '--site-setup-type',
+                'no',
+                '--web-server-config',
+                'apache',
+            ]
+        );
+        $this->assertContains('Successfully installed TYPO3 CMS!', $output);
+        $this->assertFileExists(getenv('TYPO3_PATH_WEB') . '/.htaccess');
+        unlink(getenv('TYPO3_PATH_WEB') . '/.htaccess');
+        $this->assertFileNotExists(getenv('TYPO3_PATH_WEB') . '/web.config');
+    }
+
+    /**
+     * @test
+     */
+    public function setupCreatesWebConfigIfRequested()
+    {
+        $output = $this->executeConsoleCommand(
+            'install:setup',
+            [
+                '--no-interaction',
+                '--skip-integrity-check',
+                '--site-setup-type',
+                'no',
+                '--web-server-config',
+                'iis',
+            ]
+        );
+        $this->assertContains('Successfully installed TYPO3 CMS!', $output);
+        $this->assertFileExists(getenv('TYPO3_PATH_WEB') . '/web.config');
+        unlink(getenv('TYPO3_PATH_WEB') . '/web.config');
+        $this->assertFileNotExists(getenv('TYPO3_PATH_WEB') . '/.htaccess');
     }
 
     /**

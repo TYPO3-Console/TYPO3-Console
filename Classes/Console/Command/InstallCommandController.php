@@ -68,6 +68,7 @@ class InstallCommandController extends CommandController
      * @param string $adminUserName User name of the administrative backend user account to be created
      * @param string $adminPassword Password of the administrative backend user account to be created
      * @param string $siteName Site Name
+     * @param string $webServerConfig Web server config file to install in document root (<code>none</code>, <code>apache</code>, <code>iis</code>)
      * @param string $siteSetupType Can be either <code>no</code> (which unsurprisingly does nothing at all) or <code>site</code> (which creates an empty root page and setup)
      * @param bool $nonInteractive Deprecated. Use <code>--no-interaction</code> instead.
      */
@@ -86,6 +87,7 @@ class InstallCommandController extends CommandController
         $adminUserName = null,
         $adminPassword = null,
         $siteName = 'New TYPO3 Console site',
+        $webServerConfig = 'none',
         $siteSetupType = 'no',
         $nonInteractive = false
     ) {

@@ -21,6 +21,7 @@
         <env name="TYPO3_INSTALL_ADMIN_USER" value="admin" />
         <env name="TYPO3_INSTALL_ADMIN_PASSWORD" value="password" />
         <env name="TYPO3_INSTALL_SITE_NAME" value="Travis Install" />
+        <env name="TYPO3_INSTALL_WEB_SERVER_SETUP_TYPE" value="none" />
         <env name="TYPO3_INSTALL_SITE_SETUP_TYPE" value="createsite" />
         <env name="TYPO3_VERSION" value="^9.1" />
     </php>
