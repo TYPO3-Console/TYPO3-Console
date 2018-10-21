@@ -99,14 +99,19 @@ class Sequence
      * Invokes a single step of this sequence and also invokes all steps registered
      * to be executed after the given step.
      *
-     * @param \Helhum\Typo3Console\Core\Booting\Step $step The step to invoke
+     * @param Step $step The step to invoke
      * @param Bootstrap $bootstrap
+     * @throws StepFailedException
      * @return void
      */
     protected function invokeStep(Step $step, Bootstrap $bootstrap)
     {
         $identifier = $step->getIdentifier();
-        $step($bootstrap);
+        try {
+            $step($bootstrap);
+        } catch (\Throwable $e) {
+            throw new StepFailedException($step, $e);
+        }
         if (isset($this->steps[$identifier])) {
             foreach ($this->steps[$identifier] as $followingStep) {
                 $this->invokeStep($followingStep, $bootstrap);

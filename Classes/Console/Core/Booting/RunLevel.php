@@ -39,6 +39,11 @@ class RunLevel
      */
     private $bootstrap;
 
+    /**
+     * @var \Throwable
+     */
+    private $error;
+
     public function __construct(Bootstrap $bootstrap)
     {
         $this->bootstrap = $bootstrap;
@@ -82,12 +87,44 @@ class RunLevel
 
     /**
      * @param string $commandIdentifier
-     * @throws InvalidArgumentException
+     * @throws \Exception
      * @internal
      */
     public function runSequenceForCommand(string $commandIdentifier)
     {
-        $this->buildSequenceForCommand($commandIdentifier)->invoke($this->bootstrap);
+        $sequence = $this->buildSequenceForCommand($commandIdentifier);
+        try {
+            $sequence->invoke($this->bootstrap);
+        } catch (StepFailedException $e) {
+            $failedStep = $e->getFailedStep();
+            if ($this->isLowLevelStep($failedStep) || !$this->isInternalCommand($commandIdentifier)) {
+                // This seems to be a severe error, so we directly throw to expose it
+                // We always expose the error, when a command is called directly
+                throw $e->getPrevious();
+            }
+
+            $this->error = $e->getPrevious();
+        }
+    }
+
+    /**
+     * @return \Throwable|null
+     */
+    public function getError()
+    {
+        return $this->error;
+    }
+
+    private function isInternalCommand(string $commandIdentifier): bool
+    {
+        return in_array($commandIdentifier, ['list', 'help'], true);
+    }
+
+    private function isLowLevelStep(Step $step): bool
+    {
+        $runLevelForStep = $this->executedSteps[$step->getIdentifier()];
+
+        return in_array($runLevelForStep, [self::LEVEL_ESSENTIAL, self::LEVEL_COMPILE], true);
     }
 
     /**
@@ -224,32 +261,36 @@ class RunLevel
      */
     private function addStep(Sequence $sequence, string $stepIdentifier)
     {
-        if (!empty($this->executedSteps[$stepIdentifier])) {
+        if (isset($this->executedSteps[$stepIdentifier])) {
             $sequence->addStep(new Step($stepIdentifier, function () {
                 // Don't do anything again, step has been executed already
             }));
 
             return;
         }
-        $this->executedSteps[$stepIdentifier] = true;
 
         switch ($stepIdentifier) {
             // Part of essential sequence
             case 'helhum.typo3console:coreconfiguration':
+                $this->executedSteps[$stepIdentifier] = self::LEVEL_ESSENTIAL;
                 $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'initializeConfigurationManagement']));
                 break;
             case 'helhum.typo3console:providecleanclassimplementations':
+                $this->executedSteps[$stepIdentifier] = self::LEVEL_ESSENTIAL;
                 $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'provideCleanClassImplementations']), 'helhum.typo3console:coreconfiguration');
                 break;
             case 'helhum.typo3console:disabledcaching':
+                $this->executedSteps[$stepIdentifier] = self::LEVEL_ESSENTIAL;
                 $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'initializeDisabledCaching']), 'helhum.typo3console:coreconfiguration');
                 break;
             case 'helhum.typo3console:errorhandling':
+                $this->executedSteps[$stepIdentifier] = self::LEVEL_ESSENTIAL;
                 $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'initializeErrorHandling']));
                 break;
 
             // Part of compile time
             case 'helhum.typo3console:loadextbaseconfiguration':
+                $this->executedSteps[$stepIdentifier] = self::LEVEL_COMPILE;
                 $sequence->addStep(new Step($stepIdentifier, function () {
                     // @deprecated in 5.5, will be removed in 6.0
                     // Requirement for the removal is converting all command controllers to Symfony commands
@@ -262,22 +303,27 @@ class RunLevel
 
             // Part of basic runtime
             case 'helhum.typo3console:extensionconfiguration':
+                $this->executedSteps[$stepIdentifier] = self::LEVEL_MINIMAL;
                 $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'initializeExtensionConfiguration']));
                 break;
 
             // Part of full runtime
             case 'helhum.typo3console:caching':
+                $this->executedSteps[$stepIdentifier] = self::LEVEL_FULL;
+                unset($this->executedSteps['helhum.typo3console:disabledcaching']);
                 $sequence->removeStep('helhum.typo3console:disabledcaching');
                 $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'initializeCaching']), 'helhum.typo3console:coreconfiguration');
                 break;
             case 'helhum.typo3console:database':
                 // @deprecated can be removed if TYPO3 8 support is removed
+                $this->executedSteps[$stepIdentifier] = self::LEVEL_FULL;
                 $sequence->addStep(new Step($stepIdentifier, [CompatibilityScripts::class, 'initializeDatabaseConnection']), 'helhum.typo3console:errorhandling');
                 break;
             case 'helhum.typo3console:persistence':
                 $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'initializePersistence']), 'helhum.typo3console:extensionconfiguration');
                 break;
             case 'helhum.typo3console:authentication':
+                $this->executedSteps[$stepIdentifier] = self::LEVEL_FULL;
                 $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'initializeAuthenticatedOperations']), 'helhum.typo3console:extensionconfiguration');
                 break;
 
@@ -293,7 +339,7 @@ class RunLevel
      */
     public function getRunLevelForCommand(string $commandIdentifier): string
     {
-        if (in_array($commandIdentifier, ['help', 'list'], true)) {
+        if ($this->isInternalCommand($commandIdentifier)) {
             return $this->getMaximumAvailableRunLevel() === self::LEVEL_COMPILE ? self::LEVEL_COMPILE : self::LEVEL_MINIMAL;
         }
         $options = $this->getOptionsForCommand($commandIdentifier);

@@ -27,6 +27,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -153,5 +154,14 @@ class Application extends BaseApplication
         $output->getFormatter()->setStyle('ins', new OutputFormatterStyle('green'));
         $output->getFormatter()->setStyle('del', new OutputFormatterStyle('red'));
         $output->getFormatter()->setStyle('code', new OutputFormatterStyle(null, null, ['bold']));
+        if ($e = $this->runLevel->getError()) {
+            if ($output->isVerbose()) {
+                throw $e;
+            }
+            if ($output instanceof ConsoleOutput) {
+                $errorOutput = $output->getErrorOutput();
+                $errorOutput->writeln(['', '<error>An error occurred. Some commands might not be available. Run with --verbose to see a detailed error message.</error>', '']);
+            }
+        }
     }
 }
