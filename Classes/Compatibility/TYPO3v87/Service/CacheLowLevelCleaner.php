@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace Helhum\Typo3Console\Service;
+namespace Helhum\Typo3Console\TYPO3v87\Service;
 
 /*
  * This file is part of the TYPO3 Console project.
@@ -14,7 +14,6 @@ namespace Helhum\Typo3Console\Service;
  *
  */
 
-use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -28,8 +27,8 @@ class CacheLowLevelCleaner
      */
     public function forceFlushCachesFiles()
     {
-        // Delete typo3temp/Cache
-        GeneralUtility::flushDirectory(Environment::getVarPath() . '/cache', true, true);
+        $cacheDirectory = PATH_site . 'typo3temp/var/Cache';
+        GeneralUtility::flushDirectory($cacheDirectory, true);
     }
 
     /**
