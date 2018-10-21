@@ -60,6 +60,9 @@ jobs:
   include:
     - stage: test
       php: 7.2
+      env: TYPO3_VERSION="~9.5.0"
+    - stage: test
+      php: 7.2
       env: TYPO3_VERSION=^8.7.10
     - stage: test
       php: 7.1
@@ -70,9 +73,6 @@ jobs:
     - stage: test
       php: 7.0
       env: TYPO3_VERSION=^8.7.10 PREFER_LOWEST="--prefer-lowest"
-    - stage: test
-      php: 7.2
-      env: TYPO3_VERSION="~9.5.0"
     - stage: test
       php: 7.2
       env: TYPO3_VERSION="dev-master"
