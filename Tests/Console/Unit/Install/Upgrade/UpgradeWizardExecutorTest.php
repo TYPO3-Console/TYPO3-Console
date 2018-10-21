@@ -18,6 +18,10 @@ use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardExecutor;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardFactory;
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\DummyUpgradeWizard;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
+use Prophecy\Argument;
+use Prophecy\Prophecy\MethodProphecy;
+use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class UpgradeWizardExecutorTest extends UnitTestCase
 {
@@ -44,6 +48,7 @@ class UpgradeWizardExecutorTest extends UnitTestCase
     {
         $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
         $upgradeWizardProphecy = $this->prophesize(DummyUpgradeWizard::class);
+        $this->assertOutputInitForChattyWizard($upgradeWizardProphecy);
         $upgradeWizardProphecy->shouldRenderWizard()->willReturn(true);
         $upgradeWizardProphecy->performUpdate($queries = [], $message = '')->willReturn(true);
 
@@ -61,6 +66,7 @@ class UpgradeWizardExecutorTest extends UnitTestCase
     {
         $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
         $upgradeWizardProphecy = $this->prophesize(DummyUpgradeWizard::class);
+        $this->assertOutputInitForChattyWizard($upgradeWizardProphecy);
         $upgradeWizardProphecy->shouldRenderWizard()->willReturn(true);
         $upgradeWizardProphecy->performUpdate($queries = [], $message = '')->willReturn(false);
 
@@ -87,5 +93,21 @@ class UpgradeWizardExecutorTest extends UnitTestCase
         $subject = new UpgradeWizardExecutor($factoryProphecy->reveal());
         $result = $subject->executeWizard('Foo\\Test', [], true);
         $this->assertFalse($result->hasPerformed());
+    }
+
+    /**
+     * @param DummyUpgradeWizard|ObjectProphecy $upgradeWizardProphecy
+     */
+    private function assertOutputInitForChattyWizard(ObjectProphecy $upgradeWizardProphecy)
+    {
+        if (!interface_exists('TYPO3\\CMS\\Install\\Updates\\ChattyInterface')) {
+            return;
+        }
+
+        /** @var OutputInterface $outputInterfaceArgument */
+        $outputInterfaceArgument = Argument::type(OutputInterface::class);
+        /** @var MethodProphecy $setOutputMethod */
+        $setOutputMethod = $upgradeWizardProphecy->setOutput($outputInterfaceArgument);
+        $setOutputMethod->shouldBeCalled();
     }
 }
