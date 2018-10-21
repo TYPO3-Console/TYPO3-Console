@@ -99,6 +99,20 @@ defaultConfiguration:
             value: '%env(TYPO3_INSTALL_SITE_SETUP_TYPE)%'
             default: 'no'
 
+writeWebserverConfiguration:
+    type: Helhum\Typo3Console\Install\Action\WriteWebServerConfigAction
+    description: 'Set up web server configuration'
+    arguments:
+        webServerConfig:
+            description: 'Specify the web server you want to write configuration for'
+            type: select
+            values:
+                'none': 'Do not write any configuration files'
+                apache: 'Create Apache .htaccess file'
+                iis: 'Create Microsoft-IIS web.config file'
+            value: '%env(TYPO3_INSTALL_WEB_SERVER_CONFIG)%'
+            default: 'none'
+
 extensionSetup:
     type: extensionSetup
     description: 'Set up extensions'

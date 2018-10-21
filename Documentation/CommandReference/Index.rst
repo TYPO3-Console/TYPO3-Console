@@ -1252,6 +1252,14 @@ Options
 - Is multiple: no
 - Default: 'New TYPO3 Console site'
 
+`--web-server-config`
+   Web server config file to install in document root (`none`, `apache`, `iis`)
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: 'none'
+
 `--site-setup-type`
    Can be either `no` (which unsurprisingly does nothing at all) or `site` (which creates an empty root page and setup)
 
