@@ -39,8 +39,9 @@ class SchedulerCommandController extends CommandController
      * @param int $task Uid of the task that should be executed (instead of all scheduled tasks)
      * @param bool $force The execution can be forced with this flag. The task will then be executed even if it is not scheduled for execution yet. Only works, when a task is specified.
      * @param int $taskId Deprecated option (same as --task)
+     * @param int $limit Limit the number of tasks to execute. If not set all tasks that are overdue will be executed in this run.
      */
-    public function runCommand($task = null, $force = false, $taskId = null)
+    public function runCommand($task = null, $force = false, $taskId = null, $limit = 0)
     {
         if ($taskId !== null) {
             // @deprecated in 5.0 will be removed in 6.0
@@ -58,17 +59,23 @@ class SchedulerCommandController extends CommandController
                 $this->outputLine('Execution can only be forced when a single task is specified.');
                 $this->quit(2);
             }
-            $this->executeScheduledTasks();
+            $this->executeScheduledTasks($limit);
         }
     }
 
     /**
      * Execute all scheduled tasks
+     * @param int $limit Limit the number of tasks to execute.
      */
-    protected function executeScheduledTasks()
+    protected function executeScheduledTasks(int $limit)
     {
+        $taskCount = 0;
         // Loop as long as there are tasks
         do {
+            if ($limit > 0 && $limit === $taskCount) {
+                break;
+            }
+            $taskCount++;
             // Try getting the next task and execute it
             // If there are no more tasks to execute, an exception is thrown by \TYPO3\CMS\Scheduler\Scheduler::fetchTask()
             try {
