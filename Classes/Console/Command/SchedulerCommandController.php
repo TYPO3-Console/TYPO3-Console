@@ -117,4 +117,42 @@ class SchedulerCommandController extends CommandController
             }
         }
     }
+
+    /**
+     * Enable a scheduler task
+     *
+     * <b>Example:</b> <code>typo3cms scheduler:enable 42</code>
+     *
+     * @param int $taskId Uid of the task that should be enabled
+     */
+    public function enableTaskCommand($taskId)
+    {
+        $task = $this->scheduler->fetchTask($taskId);
+        if ($this->scheduler->isValidTaskObject($task) && $task->isDisabled()) {
+            try {
+                $task->setDisabled(false);
+                $this->scheduler->saveTask($task);
+            } catch (\Exception $e) {
+            }
+        }
+    }
+
+    /**
+     * Disable a scheduler task
+     *
+     * <b>Example:</b> <code>typo3cms scheduler:disable 42</code>
+     *
+     * @param int $taskId Uid of the task that should be disabled
+     */
+    public function disableTaskCommand($taskId)
+    {
+        $task = $this->scheduler->fetchTask($taskId);
+        if ($this->scheduler->isValidTaskObject($task) && !$task->isDisabled()) {
+            try {
+                $task->setDisabled(true);
+                $this->scheduler->saveTask($task);
+            } catch (\Exception $e) {
+            }
+        }
+    }
 }

@@ -1300,6 +1300,48 @@ Options
 
 
 
+.. _`Command Reference: typo3_console scheduler:disabletask`:
+
+`scheduler:disabletask`
+-----------------------
+
+**Disable a scheduler task**
+
+**Example:** `typo3cms scheduler:disable 42`
+
+Arguments
+~~~~~~~~~
+
+`taskId`
+   Uid of the task that should be disabled
+
+
+
+
+
+
+
+.. _`Command Reference: typo3_console scheduler:enabletask`:
+
+`scheduler:enabletask`
+----------------------
+
+**Enable a scheduler task**
+
+**Example:** `typo3cms scheduler:enable 42`
+
+Arguments
+~~~~~~~~~
+
+`taskId`
+   Uid of the task that should be enabled
+
+
+
+
+
+
+
 .. _`Command Reference: typo3_console scheduler:run`:
 
 `scheduler:run`

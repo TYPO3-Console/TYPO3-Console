@@ -281,6 +281,16 @@ return [
                 'scheduler:scheduler:run',
             ],
         ],
+        'scheduler:enabletask' => [
+            'vendor' => 'typo3_console',
+            'controller' => Helhum\Typo3Console\Command\SchedulerCommandController::class,
+            'controllerCommandName' => 'enableTask',
+        ],
+        'scheduler:disabletask' => [
+            'vendor' => 'typo3_console',
+            'controller' => Helhum\Typo3Console\Command\SchedulerCommandController::class,
+            'controllerCommandName' => 'disableTask',
+        ],
         'upgrade:all' => [
             'vendor' => 'typo3_console',
             'controller' => Helhum\Typo3Console\Command\UpgradeCommandController::class,
