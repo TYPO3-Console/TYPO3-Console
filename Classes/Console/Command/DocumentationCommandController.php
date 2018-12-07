@@ -21,6 +21,8 @@ use TYPO3\CMS\Core\SingletonInterface;
 
 /**
  * Command controller for Fluid documentation rendering
+ *
+ * @deprecated will be removed in TYPO3 v6.0 as it is not in use anymore, see Documentation/GenerateXsdCommand class.
  */
 class DocumentationCommandController extends CommandController implements SingletonInterface
 {

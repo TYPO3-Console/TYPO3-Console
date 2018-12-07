@@ -793,7 +793,7 @@ Arguments
 Options
 ~~~~~~~
 
-`--xsd-namespace`
+`--xsd-namespace|-xsd`
    Unique target namespace used in the XSD schema (for example "http://yourdomain.org/ns/viewhelpers"). Defaults to "http://typo3.org/ns/<php namespace>".
 
 - Accept value: yes
@@ -801,7 +801,7 @@ Options
 - Is multiple: no
 
 
-`--target-file`
+`--target-file|-target`
    File path and name of the generated XSD schema. If not specified the schema will be output to standard output.
 
 - Accept value: yes
