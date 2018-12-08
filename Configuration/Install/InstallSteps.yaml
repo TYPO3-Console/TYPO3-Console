@@ -10,6 +10,18 @@ databaseConnect:
     type: install
     description: 'Set up database connection'
     arguments:
+        databaseDriver:
+            description: 'Database connection type'
+            option: '--database-driver'
+            type: select
+            values:
+                mysqli: 'MySQL connection'
+                pdo_sqlite: 'SQLite connection (TYPO3 9.5 or higher)'
+                pdo_pgsql: 'PostgreSQL connection'
+                mssql: 'MSSQL connection'
+            value: '%env(TYPO3_INSTALL_DB_DRIVER)%'
+            default: 'mysqli'
+
         databaseUserName:
             description: 'User name for database server'
             option: '--database-user-name'
