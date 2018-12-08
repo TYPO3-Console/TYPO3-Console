@@ -16,9 +16,10 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony;
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Error\ExceptionRenderer;
-use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\CommandControllerCommand;
+use Helhum\Typo3Console\Exception\CommandNotAvailableException;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\HelpCommand;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\ListCommand;
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Input\ArgvInput;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\LogicException;
@@ -27,8 +28,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Represents the complete console application
@@ -69,6 +70,16 @@ class Application extends BaseApplication
     }
 
     /**
+     * Whether errors occurred during booting
+     *
+     * @return bool
+     */
+    public function hasErrors(): bool
+    {
+        return $this->runLevel->getError() !== null;
+    }
+
+    /**
      * Whether this application is composer managed.
      * Can be used to enable or disable commands or arguments/ options
      *
@@ -87,27 +98,104 @@ class Application extends BaseApplication
      */
     public function isCommandAvailable(Command $command): bool
     {
-        return $this->runLevel->isCommandAvailable($command->getName());
-    }
-
-    /**
-     * Add commands, but check their availability against
-     * the current application state before doing so
-     *
-     * @param iterable $commands
-     */
-    public function addCommandsIfAvailable(/* iterable */ $commands)
-    {
-        foreach ($commands as $command) {
-            if ($command instanceof CommandControllerCommand || $this->isCommandAvailable($command)) {
-                $this->add($command);
-            }
+        if (!$this->isFullyCapable()
+            && in_array($command->getName(), [
+                // Although these commands are technically available
+                // they call other hidden commands in sub processes
+                // that need all capabilities. Therefore we disable these commands here.
+                // This can be removed, once they implement Symfony commands directly.
+                'upgrade:all',
+                'upgrade:list',
+                'upgrade:wizard',
+            ], true)
+        ) {
+            return false;
         }
+        if ($command->getName() === 'cache:flushcomplete') {
+            return true;
+        }
+
+        return $this->runLevel->isCommandAvailable($command->getName());
     }
 
     public function renderException(\Exception $exception, OutputInterface $output)
     {
+        if ($exception instanceof CommandNotAvailableException) {
+            $helper = new SymfonyStyle(new ArgvInput(), $output);
+            $helper->getErrorStyle()->block(
+                [
+                    sprintf(
+                        'Command "%s" cannot be run, because it needs a fully set up TYPO3 system.'
+                        . PHP_EOL
+                        . 'Your system currently lacks essential configuration files (LocalConfiguration.php, PackageStates.php).',
+                        $exception->getCommandName()
+                    ),
+                    'Try setting up your system using the "install:setup" command.',
+                ],
+                null,
+                'fg=white;bg=red',
+                ' ',
+                true
+            );
+
+            return;
+        }
+
         (new ExceptionRenderer())->render($exception, $output, $this);
+    }
+
+    /**
+     * @param Command $command
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @throws \Throwable
+     * @return int
+     */
+    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
+    {
+        $this->ensureCommandAvailable($command);
+        $this->ensureStableEnvironmentForCommand($command, $output->isVerbose());
+
+        $exitCode = parent::doRunCommand($command, $input, $output);
+
+        if ($bootingError = $this->runLevel->getError()) {
+            $messages = [
+                sprintf(
+                    'An error occurred while executing "%s".',
+                    str_replace('helhum.typo3console:', '', $bootingError->getFailedStep()->getIdentifier())
+                ),
+                sprintf(
+                    'Run "%s --verbose" to see a detailed error message.',
+                    $_SERVER['PHP_SELF']
+                ),
+            ];
+
+            $helper = new SymfonyStyle($input, $output);
+            $helper->getErrorStyle()->block(
+                $messages,
+                null,
+                'fg=black;bg=yellow',
+                ' ',
+                true
+            );
+        }
+
+        return $exitCode;
+    }
+
+    private function ensureCommandAvailable(Command $command)
+    {
+        if (!$this->runLevel->getError() && !$this->isCommandAvailable($command)) {
+            throw new CommandNotAvailableException($command->getName());
+        }
+    }
+
+    private function ensureStableEnvironmentForCommand(Command $command, bool $environmentIsVerbose)
+    {
+        $bootingError = $this->runLevel->getError();
+        if ($bootingError && ($environmentIsVerbose || !$this->runLevel->isInternalCommand($command->getName()))) {
+            throw $bootingError->getPrevious();
+        }
     }
 
     protected function getDefaultInputDefinition()
@@ -154,14 +242,5 @@ class Application extends BaseApplication
         $output->getFormatter()->setStyle('ins', new OutputFormatterStyle('green'));
         $output->getFormatter()->setStyle('del', new OutputFormatterStyle('red'));
         $output->getFormatter()->setStyle('code', new OutputFormatterStyle(null, null, ['bold']));
-        if ($e = $this->runLevel->getError()) {
-            if ($output->isVerbose()) {
-                throw $e;
-            }
-            if ($output instanceof ConsoleOutput) {
-                $errorOutput = $output->getErrorOutput();
-                $errorOutput->writeln(['', '<error>An error occurred. Some commands might not be available. Run with --verbose to see a detailed error message.</error>', '']);
-            }
-        }
     }
 }

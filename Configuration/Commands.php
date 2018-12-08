@@ -176,6 +176,20 @@ return [
         'controller' => \Helhum\Typo3Console\Command\DocumentationCommandController::class,
         'controllerCommandName' => 'generateXsd',
     ],
+    'dumpautoload' => [
+        'vendor' => 'typo3_console',
+        'class' => \Helhum\Typo3Console\Command\Extension\DumpAutoloadCommand::class,
+        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
+        'replace' => [
+            'core:dumpautoload',
+            'extensionmanager:extension:dumpclassloadinginformation',
+        ],
+        'aliases' => [
+            'extension:dumpautoload',
+            'extension:dumpclassloadinginformation',
+            'extensionmanager:extension:dumpclassloadinginformation',
+        ],
+    ],
     'extension:activate' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
@@ -206,21 +220,6 @@ return [
             'extension:uninstall',
             'extensionmanager:extension:uninstall',
             'extensionmanager:extension:deactivate',
-        ],
-    ],
-    'extension:dumpautoload' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
-        'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\ExtensionCommandController::class,
-        'controllerCommandName' => 'dumpAutoload',
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-        'replace' => [
-            'extensionmanager:extension:dumpclassloadinginformation',
-        ],
-        'aliases' => [
-            'extension:dumpclassloadinginformation',
-            'extensionmanager:extension:dumpclassloadinginformation',
         ],
     ],
     'extension:list' => [

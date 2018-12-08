@@ -44,14 +44,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CommandControllerCommand extends Command
 {
     /**
-     * Only use for rendering the reference
-     *
-     * @var bool
-     * @internal
-     */
-    public static $rendersReference = false;
-
-    /**
      * @var CommandDefinition
      */
     private $commandDefinition;
@@ -92,36 +84,6 @@ class CommandControllerCommand extends Command
     public function getRelatedCommandNames()
     {
         return $this->commandDefinition->getRelatedCommandIdentifiers();
-    }
-
-    public function isEnabled(): bool
-    {
-        if (self::$rendersReference) {
-            return true;
-        }
-        if ($this->application->isComposerManaged()
-            && $this->getName() === 'extension:dumpautoload'
-        ) {
-            return false;
-        }
-        if (!$this->application->isFullyCapable()
-            && in_array($this->getName(), [
-                // Although these commands are technically available
-                // they call other hidden commands in sub processes
-                // that need all capabilities. Therefore we disable these commands here.
-                // This can be removed, once they implement Symfony commands directly.
-                'upgrade:all',
-                'upgrade:list',
-                'upgrade:wizard',
-            ], true)
-        ) {
-            return false;
-        }
-        if ($this->getName() === 'cache:flushcomplete') {
-            return true;
-        }
-
-        return $this->application->isCommandAvailable($this);
     }
 
     /**
@@ -196,10 +158,6 @@ class CommandControllerCommand extends Command
                 'extension:removeinactive',
             ], true)
         ) {
-            if (self::$rendersReference) {
-                return false;
-            }
-
             return true;
         }
 

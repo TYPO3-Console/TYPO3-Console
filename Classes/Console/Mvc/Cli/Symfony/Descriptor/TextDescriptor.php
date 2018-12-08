@@ -26,7 +26,6 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony\Descriptor;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Descriptor\ApplicationDescription;
-use Symfony\Component\Console\Descriptor\Descriptor;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputArgument;
@@ -174,6 +173,16 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
             $this->writeText("\n");
 
             $commands = $description->getCommands();
+
+            if ($application instanceof \Helhum\Typo3Console\Mvc\Cli\Symfony\Application) {
+                $showUnavailable = $options['show_unavailable'] ?? false;
+                $commands = array_filter(
+                    $commands,
+                    function ($command) use ($application, $showUnavailable) {
+                        return $showUnavailable || $application->isCommandAvailable($command);
+                    }
+                );
+            }
             $namespaces = $description->getNamespaces();
             if ($describedNamespace && $namespaces) {
                 // make sure all alias commands are included when describing a specific namespace

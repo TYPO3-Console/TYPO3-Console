@@ -40,7 +40,7 @@ class RunLevel
     private $bootstrap;
 
     /**
-     * @var \Throwable
+     * @var StepFailedException
      */
     private $error;
 
@@ -97,25 +97,29 @@ class RunLevel
             $sequence->invoke($this->bootstrap);
         } catch (StepFailedException $e) {
             $failedStep = $e->getFailedStep();
-            if ($this->isLowLevelStep($failedStep) || !$this->isInternalCommand($commandIdentifier)) {
+            if ($this->isLowLevelStep($failedStep)) {
                 // This seems to be a severe error, so we directly throw to expose it
-                // We always expose the error, when a command is called directly
                 throw $e->getPrevious();
             }
 
-            $this->error = $e->getPrevious();
+            $this->error = $e;
         }
     }
 
     /**
-     * @return \Throwable|null
+     * @return StepFailedException|null
      */
     public function getError()
     {
         return $this->error;
     }
 
-    private function isInternalCommand(string $commandIdentifier): bool
+    /**
+     * @param string $commandIdentifier
+     * @return bool
+     * @internal
+     */
+    public function isInternalCommand(string $commandIdentifier): bool
     {
         return in_array($commandIdentifier, ['list', 'help'], true);
     }
@@ -131,6 +135,7 @@ class RunLevel
      * @param string $runLevel
      * @internal
      * @throws InvalidArgumentException
+     * @throws StepFailedException
      */
     public function runSequence(string $runLevel)
     {
@@ -148,7 +153,7 @@ class RunLevel
             return self::LEVEL_COMPILE;
         }
 
-        return self::LEVEL_FULL;
+        return $this->error ? self::LEVEL_COMPILE : self::LEVEL_FULL;
     }
 
     /**
