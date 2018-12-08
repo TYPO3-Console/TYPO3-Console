@@ -41,14 +41,6 @@ class CommandCollection implements CommandLoaderInterface
     private $commandConfiguration;
 
     /**
-     * Only use for rendering the reference
-     *
-     * @var bool
-     * @internal
-     */
-    public static $rendersReference = false;
-
-    /**
      * @var BaseCommand[]
      */
     private $commands = [];
@@ -107,7 +99,7 @@ class CommandCollection implements CommandLoaderInterface
      */
     public function get($name): BaseCommand
     {
-        if (!isset($this->commands[$name]) || !$this->isCommandAvailable($this->commands[$name]['name'])) {
+        if (!isset($this->commands[$name])) {
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name), [], 1518812618);
         }
         $commandConfig = $this->commands[$name];
@@ -133,7 +125,7 @@ class CommandCollection implements CommandLoaderInterface
      */
     public function has($name): bool
     {
-        return isset($this->commands[$name]) && $this->isCommandAvailable($this->commands[$name]['name']);
+        return isset($this->commands[$name]);
     }
 
     /**
@@ -147,15 +139,6 @@ class CommandCollection implements CommandLoaderInterface
     public function addCommandControllerCommands(array $commandControllers)
     {
         $this->populateCommands($this->commandConfiguration->addCommandControllerCommands($commandControllers));
-    }
-
-    private function isCommandAvailable(string $name): bool
-    {
-        if (self::$rendersReference) {
-            return true;
-        }
-
-        return $this->runLevel->isCommandAvailable($name);
     }
 
     private function populateCommands(array $definitions = null)

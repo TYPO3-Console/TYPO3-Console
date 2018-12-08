@@ -20,7 +20,6 @@ use Helhum\Typo3Console\Extension\ExtensionSetupResultRenderer;
 use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Helhum\Typo3Console\Service\CacheService;
-use TYPO3\CMS\Core\Core\ClassLoadingInformation;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -265,22 +264,6 @@ class ExtensionCommandController extends CommandController
             $this->outputLine('<warning>Operation not confirmed and has been skipped</warning>');
             $this->quit(1);
         }
-    }
-
-    /**
-     * Dump class auto-load
-     *
-     * Updates class loading information in non Composer managed TYPO3 installations.
-     *
-     * This command is only needed during development. The extension manager takes care
-     * creating or updating this info properly during extension (de-)activation.
-     *
-     * This command is only available in non composer mode.
-     */
-    public function dumpAutoloadCommand()
-    {
-        ClassLoadingInformation::dumpClassLoadingInformation();
-        $this->output->outputLine('Class Loading information has been updated.');
     }
 
     /**

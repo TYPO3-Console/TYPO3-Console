@@ -53,6 +53,26 @@ Available Commands
 ------------------
 
 
+.. _`Command Reference: typo3_console dumpautoload`:
+
+`dumpautoload`
+--------------
+
+**Dump class autoload information for extensions**
+
+Updates class loading information in non Composer managed TYPO3 installations.
+
+This command is only needed during development. The extension manager takes care
+creating or updating this info properly during extension (de-)activation.
+
+This command is not available in Composer mode.
+
+
+
+
+
+
+
 .. _`Command Reference: typo3_console help`:
 
 `help`
@@ -151,6 +171,14 @@ Options
 - Is value required: yes
 - Is multiple: no
 - Default: 'txt'
+
+`--all|-a`
+   Show all commands, even the ones not available
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
 
 
 
@@ -836,26 +864,6 @@ Arguments
 
 `extensionKeys`
    Extension keys to deactivate. Separate multiple extension keys with comma.
-
-
-
-
-
-
-
-.. _`Command Reference: typo3_console extension:dumpautoload`:
-
-`extension:dumpautoload`
-------------------------
-
-**Dump class auto-load**
-
-Updates class loading information in non Composer managed TYPO3 installations.
-
-This command is only needed during development. The extension manager takes care
-creating or updating this info properly during extension (de-)activation.
-
-This command is only available in non composer mode.
 
 
 

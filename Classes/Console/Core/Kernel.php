@@ -176,7 +176,7 @@ class Kernel
      */
     public function terminate(int $exitCode = 0)
     {
-        if ($exitCode > 255 || ($exitCode === 0 && $this->runLevel->getError())) {
+        if ($exitCode > 255) {
             $exitCode = 255;
         }
         exit($exitCode);

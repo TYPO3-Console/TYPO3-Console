@@ -24,9 +24,7 @@ namespace Typo3Console\CreateReferenceCommand\Command;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use Helhum\Typo3Console\Mvc\Cli\CommandCollection;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
-use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\CommandControllerCommand;
 use Symfony\Component\Console\Descriptor\ApplicationDescription;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -42,13 +40,22 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
 class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\Command
 {
     private $skipCommands = [
+        'cache:flushcomplete',
         'commandreference:render',
         'convert-command-controller',
+        'install:actionneedsexecution',
+        'install:databaseconnect',
+        'install:databasedata',
+        'install:databaseselect',
+        'install:defaultconfiguration',
+        'install:environmentandfolders',
         'language:update',
         'server:run',
         'swiftmailer:spool:send',
         'site:list',
         'site:show',
+        'upgrade:checkextensioncompatibility',
+        'upgrade:subprocess',
     ];
 
     protected function configure()
@@ -83,11 +90,10 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
      */
     protected function renderReference(OutputInterface $output): int
     {
-        CommandCollection::$rendersReference = true;
-        CommandControllerCommand::$rendersReference = true;
+        putenv('TYPO3_CONSOLE_RENDERING_REFERENCE=1');
         $_SERVER['PHP_SELF'] = Application::COMMAND_NAME;
         $application = $this->getApplication();
-        $applicationDescription = new ApplicationDescription($application);
+        $applicationDescription = new ApplicationDescription($application, null, true);
         $commands = $applicationDescription->getCommands();
         $allCommands = [];
         foreach ($commands as $command) {
@@ -147,8 +153,6 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
                 'relatedCommands' => $relatedCommands,
             ];
         }
-        CommandCollection::$rendersReference = false;
-        CommandControllerCommand::$rendersReference = false;
 
         $applicationOptions = [];
         foreach ($application->getDefinition()->getOptions() as $option) {
