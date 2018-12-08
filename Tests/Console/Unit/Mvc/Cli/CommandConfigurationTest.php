@@ -69,9 +69,11 @@ class CommandConfigurationTest extends TestCase
     public function unifyCommandConfigurationMovesGlobalOptionsToCommandConfiguration()
     {
         $expected = [
-            'bar:baz' => [
+            [
                 'class' => 'bla',
                 'vendor' => 'foobar',
+                'name' => 'bar:baz',
+                'nameSpacedName' => 'foobar:bar:baz',
                 'runLevel' => 'normal',
                 'bootingSteps' => ['one'],
                 'replace' => ['replaced:command'],
@@ -140,8 +142,10 @@ class CommandConfigurationTest extends TestCase
     public function unifyCommandConfigurationMovesGlobalRunLevelOptionsToCommandConfiguration(string $commandName, array $runLevels)
     {
         $expected = [
-            $commandName => [
+            [
                 'vendor' => 'baz',
+                'name' => $commandName,
+                'nameSpacedName' => 'baz:' . $commandName,
                 'runLevel' => 'normal',
             ],
         ];
@@ -165,10 +169,13 @@ class CommandConfigurationTest extends TestCase
     public function commandControllerCommandsAreResolved()
     {
         $expected = [
-            'test:hello' => [
+            [
                 'vendor' => 'typo3_console',
+                'name' => 'test:hello',
+                'nameSpacedName' => 'typo3_console:test:hello',
                 'controller' => TestCommandController::class,
                 'controllerCommandName' => 'hello',
+                'lateCommand' => false,
             ],
         ];
         $actual = CommandConfiguration::unifyCommandConfiguration(

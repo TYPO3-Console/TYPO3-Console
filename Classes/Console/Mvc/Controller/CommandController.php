@@ -28,6 +28,7 @@ namespace Helhum\Typo3Console\Mvc\Controller;
  */
 
 use Helhum\Typo3Console\Log\Writer\ConsoleWriter;
+use Helhum\Typo3Console\Mvc\Cli\CommandReflection;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Helhum\Typo3Console\Mvc\Cli\Response;
 use Psr\Log\LoggerInterface;
@@ -35,6 +36,7 @@ use TYPO3\CMS\Core\Log\Logger;
 use TYPO3\CMS\Core\Log\LogLevel;
 use TYPO3\CMS\Extbase\Mvc\Cli\CommandArgumentDefinition;
 use TYPO3\CMS\Extbase\Mvc\Cli\Request;
+use TYPO3\CMS\Extbase\Mvc\Controller\Argument;
 use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandControllerInterface;
 use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentTypeException;
@@ -182,7 +184,7 @@ abstract class CommandController implements CommandControllerInterface
     protected function initializeCommandMethodArguments()
     {
         $this->arguments->removeAll();
-        $methodParameters = $this->reflectionService->getMethodParameters(get_class($this), $this->commandMethodName);
+        $methodParameters = (new CommandReflection(get_class($this), $this->commandMethodName))->getParameters();
 
         foreach ($methodParameters as $parameterName => $parameterInfo) {
             $dataType = null;

@@ -14,9 +14,14 @@ namespace Helhum\Typo3Console\Tests\Unit\Fixtures\Command;
  *
  */
 
-class TestCommandController
+use Helhum\Typo3Console\Mvc\Controller\CommandController;
+
+class TestCommandController extends CommandController
 {
-    public function helloCommand()
+    /**
+     * @param string $foo Foo bar
+     */
+    public function helloCommand(string $foo = '')
     {
     }
 }

@@ -49,11 +49,14 @@ class PopulateCommandConfiguration implements InstallerScript
                 // Since meta packages have no code, thus cannot include any commands, we ignore them as well.
                 continue;
             }
-            $commandConfiguration = array_merge($commandConfiguration, $this->getConfigFromPackage($installPath, $packageName));
+            $packageConfig = $this->getConfigFromPackage($installPath, $packageName);
+            if ($packageConfig !== []) {
+                $commandConfiguration[] = $packageConfig;
+            }
         }
 
         $success = file_put_contents(
-            __DIR__ . '/../../../../Configuration/Console/ComposerPackagesCommands.php',
+            __DIR__ . '/../../../../Configuration/ComposerPackagesCommands.php',
             '<?php' . chr(10)
             . 'return '
             . var_export($commandConfiguration, true)
@@ -86,6 +89,7 @@ class PopulateCommandConfiguration implements InstallerScript
     {
         $commandConfiguration = [];
         if (file_exists($commandConfigurationFile = $installPath . '/Configuration/Console/Commands.php')) {
+            trigger_error($packageName . ': Configuration/Console/Commands.php for registering commands is deprecated and will be removed with 6.0. Register Symfony commands in Configuration/Commands.php instead.', E_USER_DEPRECATED);
             $commandConfiguration = require $commandConfigurationFile;
         }
         if (file_exists($commandConfigurationFile = $installPath . '/Configuration/Commands.php')) {
@@ -96,6 +100,6 @@ class PopulateCommandConfiguration implements InstallerScript
         }
         CommandConfiguration::ensureValidCommandRegistration($commandConfiguration, $packageName);
 
-        return [$packageName => CommandConfiguration::unifyCommandConfiguration($commandConfiguration, $packageName)];
+        return CommandConfiguration::unifyCommandConfiguration($commandConfiguration, $packageName);
     }
 }
