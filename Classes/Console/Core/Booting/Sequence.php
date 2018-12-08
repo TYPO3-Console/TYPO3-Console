@@ -84,6 +84,7 @@ class Sequence
      * Executes all steps of this sequence
      *
      * @param Bootstrap $bootstrap
+     * @throws StepFailedException
      * @return void
      */
     public function invoke(Bootstrap $bootstrap)

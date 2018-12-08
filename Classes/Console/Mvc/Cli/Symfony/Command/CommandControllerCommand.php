@@ -35,6 +35,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -60,10 +61,24 @@ class CommandControllerCommand extends Command
      */
     private $application;
 
-    public function __construct($name, CommandDefinition $commandDefinition)
+    /**
+     * @var bool
+     */
+    private $isLateCommand;
+
+    public function __construct($name, CommandDefinition $commandDefinition, bool $isLateCommand = false)
     {
         $this->commandDefinition = $commandDefinition;
         parent::__construct($name);
+        $this->isLateCommand = $isLateCommand;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLateCommand(): bool
+    {
+        return $this->isLateCommand;
     }
 
     public function getNativeDefinition()
@@ -155,9 +170,16 @@ class CommandControllerCommand extends Command
     {
         // @deprecated in 5.0 will be removed in 6.0
         $givenCommandName = $input->getArgument('command');
+        $debugOutput = $output;
+        if ($output instanceof ConsoleOutput) {
+            $debugOutput = $output->getErrorOutput();
+        }
         if ($givenCommandName === $this->getAliases()[0]) {
-            $output->writeln('<warning>Specifying the full command name is deprecated.</warning>');
-            $output->writeln(sprintf('<warning>Please use "%s" as command name instead.</warning>', $this->getName()));
+            $debugOutput->writeln('<warning>Specifying the full command name is deprecated.</warning>');
+            $debugOutput->writeln(sprintf('<warning>Please use "%s" as command name instead.</warning>', $this->getName()));
+        }
+        if ($this->isLateCommand && $output->isVerbose()) {
+            $debugOutput->writeln('<warning>Registering commands via $GLOBALS[\'TYPO3_CONF_VARS\'][\'SC_OPTIONS\'][\'extbase\'][\'commandControllers\'] is deprecated and will be removed with 6.0. Register Symfony commands in Configuration/Commands.php instead.</warning>');
         }
         $response = (new RequestHandler())->handle($this->commandDefinition, $input, $output);
 

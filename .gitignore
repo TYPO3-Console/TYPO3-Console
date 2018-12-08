@@ -1,6 +1,6 @@
 /.Build/*
 /Classes/Console/Hook/*
-/Configuration/Console/ComposerPackagesCommands.php
+/Configuration/ComposerPackagesCommands.php
 /Libraries/vendor
 /Resources/Public/*
 

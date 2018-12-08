@@ -28,16 +28,10 @@ class ExceptionHandler
      */
     protected $output;
 
-    /**
-     * @param ConsoleOutput $output
-     */
     public function __construct(ExceptionRenderer $exceptionRenderer = null, ConsoleOutput $output = null)
     {
         $this->exceptionRenderer = $exceptionRenderer ?: new ExceptionRenderer();
-        if ($output === null) {
-            $output = new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG);
-        }
-        $this->output = $output;
+        $this->output = $output ?? new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG);
     }
 
     /**

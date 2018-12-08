@@ -53,6 +53,11 @@ class CommandCollection implements CommandLoaderInterface
      */
     private $commands = [];
 
+    /**
+     * @var string[]
+     */
+    private $replaces = [];
+
     public function __construct(RunLevel $runLevel, CommandConfiguration $commandConfiguration)
     {
         $this->runLevel = $runLevel;
@@ -106,11 +111,11 @@ class CommandCollection implements CommandLoaderInterface
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name), [], 1518812618);
         }
         $commandConfig = $this->commands[$name];
-        if (isset($commandConfig['class'])) {
+        if (isset($commandConfig['controller'])) {
+            $command = GeneralUtility::makeInstance(CommandControllerCommand::class, $commandConfig['name'], new Command($commandConfig['controller'], $commandConfig['controllerCommandName']), $commandConfig['lateCommand'] ?? false);
+        } elseif (isset($commandConfig['class'])) {
             /** @var BaseCommand $command */
             $command = GeneralUtility::makeInstance($commandConfig['class'], $commandConfig['name']);
-        } elseif (isset($commandConfig['controller'])) {
-            $command = GeneralUtility::makeInstance(CommandControllerCommand::class, $commandConfig['name'], new Command($commandConfig['controller'], $commandConfig['controllerCommandName']));
         } else {
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name), [], 1520205204);
         }
@@ -155,9 +160,22 @@ class CommandCollection implements CommandLoaderInterface
 
     private function populateCommands(array $definitions = null)
     {
-        foreach ($definitions ?? $this->commandConfiguration->getCommandDefinitions() as $nameSpacedName => $commandConfig) {
-            $this->add($nameSpacedName, $commandConfig);
+        $definitions = $definitions ?? $this->commandConfiguration->getCommandDefinitions();
+        $this->extractReplaces($definitions);
+        foreach ($definitions as $commandConfig) {
+            $this->add($commandConfig);
         }
+    }
+
+    private function extractReplaces(array $definitions)
+    {
+        $replaces = [];
+        foreach ($definitions as $commandConfiguration) {
+            if (isset($commandConfiguration['replace'])) {
+                $replaces[] = $commandConfiguration['replace'];
+            }
+        }
+        $this->replaces = array_merge($this->replaces, ...$replaces);
     }
 
     private function initializeRunLevel()
@@ -174,25 +192,24 @@ class CommandCollection implements CommandLoaderInterface
         }
     }
 
-    private function add(string $nameSpacedName, array $commandConfig)
+    private function add(array $commandConfig)
     {
         $finalCommandName = $commandConfig['name'];
-        $replaces = $this->commandConfiguration->getReplaces();
-        if (in_array($commandConfig['name'], $replaces, true)
-            || in_array($nameSpacedName, $replaces, true)
+        if (in_array($commandConfig['name'], $this->replaces, true)
+            || in_array($commandConfig['nameSpacedName'], $this->replaces, true)
         ) {
             return;
         }
         if (isset($this->commands[$finalCommandName])) {
-            $finalCommandName = $nameSpacedName;
+            $finalCommandName = $commandConfig['nameSpacedName'];
         }
         if (isset($this->commands[$finalCommandName])) {
             throw new CommandNameAlreadyInUseException('Command "' . $finalCommandName . '" registered by "' . $commandConfig['vendor'] . '" is already in use', 1506531326);
         }
         $commandConfig['aliases'] = $commandConfig['aliases'] ?? [];
-        if ($finalCommandName !== $nameSpacedName) {
+        if ($finalCommandName !== $commandConfig['nameSpacedName']) {
             // Add alias to be able to call this command always with name spaced command name
-            $commandConfig['aliases'][] = $nameSpacedName;
+            $commandConfig['aliases'][] = $commandConfig['nameSpacedName'];
         }
         $commandConfig['name'] = $finalCommandName;
         $this->commands[$finalCommandName] = $commandConfig;

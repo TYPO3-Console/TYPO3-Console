@@ -15,7 +15,6 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 use Symfony\Component\Console\Exception\RuntimeException;
-use TYPO3\CMS\Core\Console\CommandNameAlreadyInUseException;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 
@@ -28,8 +27,6 @@ class CommandConfiguration
      * @var PackageManager
      */
     private $packageManager;
-
-    private $replaces = [];
 
     private $commandDefinitions = [];
 
@@ -60,40 +57,43 @@ class CommandConfiguration
 
     public static function unifyCommandConfiguration(array $commandConfiguration, string $packageName): array
     {
-        $commandDefinitions = array_replace($commandConfiguration['commands'] ?? [], self::extractCommandDefinitionsFromControllers($commandConfiguration['controllers'] ?? []));
+        $commandDefinitions = [];
 
-        foreach ($commandDefinitions as $commandName => $commandConfig) {
-            $commandDefinitions[$commandName]['vendor'] = $vendor = $commandConfig['vendor'] ?? $packageName;
+        foreach ($commandConfiguration['commands'] ?? [] as $commandName => $commandConfig) {
+            $vendor = $commandConfig['vendor'] ?? $packageName;
             $nameSpacedCommandName = $vendor . ':' . $commandName;
+            $commandConfig['vendor'] = $vendor;
+            $commandConfig['name'] = $commandName;
+            $commandConfig['nameSpacedName'] = $nameSpacedCommandName;
             $nameSpacedCommandCollection = $nameSpacedCommandName;
             if (strrpos($commandName, ':') !== false) {
                 $nameSpacedCommandCollection = $vendor . ':' . substr($commandName, 0, strrpos($commandName, ':')) . ':*';
             }
             if (isset($commandConfiguration['runLevels'][$nameSpacedCommandCollection])) {
-                $commandDefinitions[$commandName]['runLevel'] = $commandConfiguration['runLevels'][$nameSpacedCommandCollection];
+                $commandConfig['runLevel'] = $commandConfiguration['runLevels'][$nameSpacedCommandCollection];
             }
             if (isset($commandConfiguration['runLevels'][$commandName])) {
-                $commandDefinitions[$commandName]['runLevel'] = $commandConfiguration['runLevels'][$commandName];
+                $commandConfig['runLevel'] = $commandConfiguration['runLevels'][$commandName];
             }
             if (isset($commandConfiguration['runLevels'][$nameSpacedCommandName])) {
-                $commandDefinitions[$commandName]['runLevel'] = $commandConfiguration['runLevels'][$nameSpacedCommandName];
+                $commandConfig['runLevel'] = $commandConfiguration['runLevels'][$nameSpacedCommandName];
             }
             if (isset($commandConfiguration['bootingSteps'][$commandName])) {
-                $commandDefinitions[$commandName]['bootingSteps'] = $commandConfiguration['bootingSteps'][$commandName];
+                $commandConfig['bootingSteps'] = $commandConfiguration['bootingSteps'][$commandName];
             }
             if (isset($commandConfiguration['bootingSteps'][$nameSpacedCommandName])) {
-                $commandDefinitions[$commandName]['bootingSteps'] = $commandConfiguration['bootingSteps'][$nameSpacedCommandName];
+                $commandConfig['bootingSteps'] = $commandConfiguration['bootingSteps'][$nameSpacedCommandName];
             }
+            $commandDefinitions[] = $commandConfig;
         }
         if (isset($commandConfiguration['replace'])) {
-            $anyCommandName = key($commandDefinitions);
-            $commandDefinitions[$anyCommandName]['replace'] = array_merge($commandDefinitions[$anyCommandName]['replace'] ?? [], $commandConfiguration['replace']);
+            $commandDefinitions[0]['replace'] = array_merge($commandDefinitions[0]['replace'] ?? [], $commandConfiguration['replace']);
         }
 
-        return $commandDefinitions;
+        return array_replace($commandDefinitions, self::extractCommandDefinitionsFromControllers($commandConfiguration['controllers'] ?? [], $packageName === '_lateCommands'));
     }
 
-    private static function extractCommandDefinitionsFromControllers(array $controllers): array
+    private static function extractCommandDefinitionsFromControllers(array $controllers, bool $lateCommand): array
     {
         $commandDefinitions = [];
         foreach ($controllers as $controllerClassName) {
@@ -113,22 +113,20 @@ class CommandConfiguration
                     $vendor = \TYPO3\CMS\Core\Utility\GeneralUtility::camelCaseToLowerCaseUnderscored($classNameParts[1]);
                     $controllerCommandNameSpace = strtolower(substr($classNameParts[$numberOfClassNameParts - 1], 0, -17));
                     $commandName = $controllerCommandNameSpace . ':' . strtolower($controllerCommandName);
-                    $commandDefinitions[$commandName]['vendor'] = $vendor;
-                    $commandDefinitions[$commandName]['controller'] = $controllerClassName;
-                    $commandDefinitions[$commandName]['controllerCommandName'] = $controllerCommandName;
+                    $namespacedCommandName = $vendor . ':' . $commandName;
+                    $commandDefinitions[] = [
+                        'vendor' => $vendor,
+                        'name' => $commandName,
+                        'nameSpacedName' => $namespacedCommandName,
+                        'controller' => $controllerClassName,
+                        'controllerCommandName' => $controllerCommandName,
+                        'lateCommand' => $lateCommand,
+                    ];
                 }
             }
         }
 
         return $commandDefinitions;
-    }
-
-    /**
-     * @return array
-     */
-    public function getReplaces(): array
-    {
-        return $this->replaces;
     }
 
     /**
@@ -141,36 +139,19 @@ class CommandConfiguration
 
     public function addCommandControllerCommands(array $commandControllers): array
     {
-        $addedCommandDefinitions = $this->getCommandDefinitionsForCommands(self::unifyCommandConfiguration(['controllers' => $commandControllers], ''));
-        $this->commandDefinitions = array_replace($this->commandDefinitions, $addedCommandDefinitions);
+        $addedCommandDefinitions = self::unifyCommandConfiguration(['controllers' => $commandControllers], '_lateCommands');
+        $this->commandDefinitions = array_merge($this->commandDefinitions, $addedCommandDefinitions);
+
+        if (!empty($addedCommandDefinitions)) {
+            trigger_error('Registering commands via $GLOBALS[\'TYPO3_CONF_VARS\'][\'SC_OPTIONS\'][\'extbase\'][\'commandControllers\'] is deprecated and will be removed with 6.0. Register Symfony commands in Configuration/Commands.php instead.', E_USER_DEPRECATED);
+        }
 
         return $addedCommandDefinitions;
     }
 
     private function initialize()
     {
-        foreach ($this->gatherRawConfig() as $commandConfiguration) {
-            $this->commandDefinitions = array_replace($this->commandDefinitions, $this->getCommandDefinitionsForCommands($commandConfiguration));
-        }
-    }
-
-    private function getCommandDefinitionsForCommands(array $commands): array
-    {
-        $commandDefinitions = [];
-        foreach ($commands as $name => $singleCommandConfiguration) {
-            $vendor = $singleCommandConfiguration['vendor'];
-            if (isset($singleCommandConfiguration['replace'])) {
-                $this->replaces = array_merge($this->replaces, $singleCommandConfiguration['replace']);
-            }
-            $singleCommandConfiguration['name'] = $name;
-            $nameSpacedCommandName = $vendor . ':' . $name;
-            if (isset($this->commandDefinitions[$nameSpacedCommandName])) {
-                throw new CommandNameAlreadyInUseException('Command "' . $nameSpacedCommandName . '" registered by "' . $vendor . '" is already in use', 1520181870);
-            }
-            $commandDefinitions[$nameSpacedCommandName] = $singleCommandConfiguration;
-        }
-
-        return $commandDefinitions;
+        $this->commandDefinitions = array_merge([], ...$this->gatherRawConfig());
     }
 
     /**
@@ -178,18 +159,23 @@ class CommandConfiguration
      */
     private function gatherRawConfig(): array
     {
-        if (file_exists($commandConfigurationFile = __DIR__ . '/../../../../Configuration/Console/ComposerPackagesCommands.php')) {
+        if (file_exists($commandConfigurationFile = __DIR__ . '/../../../../Configuration/ComposerPackagesCommands.php')) {
             $configuration = require $commandConfigurationFile;
         } else {
             // We only reach this point in non composer mode
             // We ensure that our commands are present, even if we are not an active extension or even not being an extension at all
-            $configuration['typo3_console'] = self::unifyCommandConfiguration(require __DIR__ . '/../../../../Configuration/Console/Commands.php', 'typo3_console');
+            $configuration[] = require __DIR__ . '/../../../../Configuration/Commands.php';
         }
         foreach ($this->packageManager->getActivePackages() as $package) {
+            if ($package->getPackageKey() === 'typo3_console') {
+                // We only reach this point in non composer mode
+                // We registered our commands above already
+                continue;
+            }
             $packageConfig = $this->getConfigFromExtension($package);
             if (!empty($packageConfig)) {
                 self::ensureValidCommandRegistration($packageConfig, $package->getPackageKey());
-                $configuration[$package->getPackageKey()] = self::unifyCommandConfiguration($packageConfig, $package->getPackageKey());
+                $configuration[] = self::unifyCommandConfiguration($packageConfig, $package->getPackageKey());
             }
         }
 
@@ -200,6 +186,7 @@ class CommandConfiguration
     {
         $commandConfiguration = [];
         if (file_exists($commandConfigurationFile = $package->getPackagePath() . 'Configuration/Console/Commands.php')) {
+            trigger_error('Configuration/Console/Commands.php for registering commands is deprecated and will be removed with 6.0. Register Symfony commands in Configuration/Commands.php instead.', E_USER_DEPRECATED);
             $commandConfiguration = require $commandConfigurationFile;
         }
         if (file_exists($commandConfigurationFile = $package->getPackagePath() . 'Configuration/Commands.php')) {
