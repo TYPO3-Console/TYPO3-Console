@@ -159,6 +159,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
                 'typo3/cms-fluid=' . $typo3Version,
                 'typo3/cms-frontend=' . $typo3Version,
                 'typo3/cms-install=' . $typo3Version,
+                'typo3/cms-recordlist=' . $typo3Version,
                 'typo3/cms-saltedpasswords=*',
                 'typo3/cms-scheduler=' . $typo3Version,
                 '--no-update',
