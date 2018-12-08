@@ -41,6 +41,7 @@ install:
       typo3/cms-frontend="$TYPO3_VERSION" \
       typo3/cms-install="$TYPO3_VERSION" \
       typo3/cms-scheduler="$TYPO3_VERSION" \
+      typo3/cms-recordlist="$TYPO3_VERSION" \
       $PREFER_LOWEST
   - git checkout composer.json
 
