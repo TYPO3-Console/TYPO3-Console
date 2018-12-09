@@ -106,11 +106,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
 
         file_put_contents(
             $this->upgradeInstancePath . '/composer.json',
-            '{
-    "conflict": {
-        "symfony/finder": "2.7.44 || 2.8.37 || 3.4.7 || 4.0.7"
-    }
-}'
+            '{}'
         );
         $this->executeComposerCommand(['config', 'extra.typo3/cms.web-dir', 'public']);
         $this->copyDirectory($this->consoleRootPath, $this->upgradeInstancePath . '/typo3_console', ['.Build', '.git']);
@@ -118,7 +114,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         $consoleComposerJson = preg_replace('#"typo3/cms-([^"]*)": "([^"]*)"#', '"typo3/cms-\1": "\2 || ' . getenv('TYPO3_VERSION') . '"', $consoleComposerJson);
         file_put_contents($this->upgradeInstancePath . '/typo3_console/composer.json', $consoleComposerJson);
         $this->executeComposerCommand(['config', 'repositories.console', '{"type": "path", "url": "typo3_console", "options": {"symlink": false}}']);
-        $output = $this->executeComposerCommand(['require', 'typo3/cms-core=^8.7.10', 'helhum/typo3-console=@dev']);
+        $output = $this->executeComposerCommand(['require', 'typo3/cms-core=' . getenv('TYPO3_UPGRADE_FROM_VERSION'), 'helhum/typo3-console=@dev']);
         $this->assertContains('Mirroring from typo3_console', $output);
 
         $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . $this->upgradeInstanceDatabase, false);
