@@ -100,7 +100,10 @@ jobs:
     - stage: sonar code scanner
       if: type = push AND branch IN (master, develop)
       php: 7.2
-      before_install: skip
+      before_install:
+        - mkdir -p .Build/external
+        - git clone https://github.com/helhum/TYPO3-testing-framework.git .Build/external/nimut-testing-framework -b typo3-93-compat
+        - composer config repositories.testing-framework vcs .Build/external/nimut-testing-framework
       install: skip
       before_script:
       script:
