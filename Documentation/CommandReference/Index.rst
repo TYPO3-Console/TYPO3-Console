@@ -1149,6 +1149,7 @@ As an alternative for providing command line arguments, it is also possible to p
 Command line arguments take precedence over environment variables.
 The following environment variables are evaluated:
 
+- TYPO3_INSTALL_DB_DRIVER
 - TYPO3_INSTALL_DB_USER
 - TYPO3_INSTALL_DB_PASSWORD
 - TYPO3_INSTALL_DB_HOST
@@ -1198,6 +1199,14 @@ Options
 - Is value required: yes
 - Is multiple: no
 
+
+`--database-driver`
+   Database connection type (one of mysqli, pdo_sqlite, pdo_mysql, pdo_pgsql, mssql) Note: pdo_sqlite is only supported with TYPO3 9.5 or higher
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: 'mysqli'
 
 `--database-user-name`
    User name for database server

@@ -57,6 +57,7 @@ class InstallCommandController extends CommandController
      * Command line arguments take precedence over environment variables.
      * The following environment variables are evaluated:
      *
+     * - TYPO3_INSTALL_DB_DRIVER
      * - TYPO3_INSTALL_DB_USER
      * - TYPO3_INSTALL_DB_PASSWORD
      * - TYPO3_INSTALL_DB_HOST
@@ -74,6 +75,7 @@ class InstallCommandController extends CommandController
      * @param bool $skipIntegrityCheck Skip the checking for clean state before executing setup. This allows a pre-defined <code>LocalConfiguration.php</code> to be present. Handle with care. It might lead to unexpected or broken installation results.
      * @param bool $skipExtensionSetup Skip setting up extensions after TYPO3 is set up. Defaults to false in composer setups and to true in non composer setups.
      * @param string $installStepsConfig Override install steps with the ones given in this file
+     * @param string $databaseDriver Database connection type (one of mysqli, pdo_sqlite, pdo_mysql, pdo_pgsql, mssql) Note: pdo_sqlite is only supported with TYPO3 9.5 or higher
      * @param string $databaseUserName User name for database server
      * @param string $databaseUserPassword User password for database server
      * @param string $databaseHostName Host name of database server
@@ -93,6 +95,7 @@ class InstallCommandController extends CommandController
         $skipIntegrityCheck = false,
         $skipExtensionSetup = false,
         $installStepsConfig = null,
+        $databaseDriver = 'mysqli',
         $databaseUserName = '',
         $databaseUserPassword = '',
         $databaseHostName = '127.0.0.1',
@@ -284,11 +287,12 @@ class InstallCommandController extends CommandController
      * @param string $databaseHostName Host name of database server
      * @param string $databasePort TCP Port of database server
      * @param string $databaseSocket Unix Socket to connect to
+     * @param string $databaseDriver Database connection type
      * @internal
      */
-    public function databaseConnectCommand($databaseUserName = '', $databaseUserPassword = '', $databaseHostName = '127.0.0.1', $databasePort = '3306', $databaseSocket = '')
+    public function databaseConnectCommand($databaseUserName = '', $databaseUserPassword = '', $databaseHostName = '127.0.0.1', $databasePort = '3306', $databaseSocket = '', $databaseDriver = 'mysqli')
     {
-        $this->executeActionWithArguments('databaseConnect', ['host' => $databaseHostName, 'port' => $databasePort, 'username' => $databaseUserName, 'password' => $databaseUserPassword, 'socket' => $databaseSocket, 'driver' => 'mysqli']);
+        $this->executeActionWithArguments('databaseConnect', ['host' => $databaseHostName, 'port' => $databasePort, 'username' => $databaseUserName, 'password' => $databaseUserPassword, 'socket' => $databaseSocket, 'driver' => $databaseDriver]);
     }
 
     /**
