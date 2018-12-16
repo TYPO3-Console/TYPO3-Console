@@ -16,15 +16,33 @@ namespace Helhum\Typo3Console\Tests\Unit\Install\Upgrade;
 
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardExecutor;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardFactory;
+use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\ChattyUpgradeWizard;
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\DummyUpgradeWizard;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\MethodProphecy;
 use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\CMS\Core\Registry;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Install\Updates\ChattyInterface;
 
 class UpgradeWizardExecutorTest extends UnitTestCase
 {
+    private $singletonInstances = [];
+
+    protected function setUp()
+    {
+        $this->singletonInstances = GeneralUtility::getSingletonInstances();
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+        GeneralUtility::resetSingletonInstances($this->singletonInstances);
+    }
+
     /**
      * @test
      */
@@ -33,6 +51,9 @@ class UpgradeWizardExecutorTest extends UnitTestCase
         $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
         $upgradeWizardProphecy = $this->prophesize(DummyUpgradeWizard::class);
         $upgradeWizardProphecy->shouldRenderWizard()->willReturn(false);
+        if (interface_exists(ChattyInterface::class)) {
+            $upgradeWizardProphecy->setOutput(new BufferedOutput())->shouldBeCalled();
+        }
 
         $factoryProphecy->create('Foo\\Test')->willReturn($upgradeWizardProphecy->reveal());
 
@@ -57,6 +78,48 @@ class UpgradeWizardExecutorTest extends UnitTestCase
         $subject = new UpgradeWizardExecutor($factoryProphecy->reveal());
         $result = $subject->executeWizard('Foo\\Test');
         $this->assertTrue($result->hasPerformed());
+    }
+
+    /**
+     * @test
+     */
+    public function updateNecessaryOutputWillBeCapturedForChattyWizard()
+    {
+        if (!interface_exists(ChattyInterface::class)) {
+            $this->markTestSkipped('ChattyInterface not available on TYPO3 8.7');
+        }
+        $registryProphecy = $this->prophesize(Registry::class);
+        $registryProphecy->set('installUpdate', ChattyUpgradeWizard::class, 1)->shouldBeCalled();
+        GeneralUtility::setSingletonInstance(Registry::class, $registryProphecy->reveal());
+
+        $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
+        $upgradeWizard = new ChattyUpgradeWizard();
+
+        $factoryProphecy->create(ChattyUpgradeWizard::class)->willReturn($upgradeWizard);
+
+        $subject = new UpgradeWizardExecutor($factoryProphecy->reveal());
+        $result = $subject->executeWizard(ChattyUpgradeWizard::class);
+        $this->assertTrue($result->hasPerformed());
+        $this->assertSame('updateNecessaryexecuteUpdate', $result->getMessages()[0] ?? '');
+    }
+
+    /**
+     * @test
+     */
+    public function updateNecessaryOutputWillBeCapturedForChattyWizardEvenIfWizardIsNotPerformed()
+    {
+        if (!interface_exists(ChattyInterface::class)) {
+            $this->markTestSkipped('ChattyInterface not available on TYPO3 8.7');
+        }
+        $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
+        $upgradeWizard = new ChattyUpgradeWizard(false);
+
+        $factoryProphecy->create(ChattyUpgradeWizard::class)->willReturn($upgradeWizard);
+
+        $subject = new UpgradeWizardExecutor($factoryProphecy->reveal());
+        $result = $subject->executeWizard(ChattyUpgradeWizard::class);
+        $this->assertFalse($result->hasPerformed());
+        $this->assertSame('updateNecessary', $result->getMessages()[0] ?? '');
     }
 
     /**
@@ -87,6 +150,9 @@ class UpgradeWizardExecutorTest extends UnitTestCase
         $upgradeWizardProphecy->shouldRenderWizard()->willReturn(false);
         $upgradeWizardProphecy->markWizardAsDone(0)->shouldBeCalled();
         $upgradeWizardProphecy->performUpdate($queries = [], $message = '')->willReturn(true);
+        if (interface_exists(ChattyInterface::class)) {
+            $upgradeWizardProphecy->setOutput(new BufferedOutput())->shouldBeCalled();
+        }
 
         $factoryProphecy->create('Foo\\Test')->willReturn($upgradeWizardProphecy->reveal());
 
@@ -100,7 +166,7 @@ class UpgradeWizardExecutorTest extends UnitTestCase
      */
     private function assertOutputInitForChattyWizard(ObjectProphecy $upgradeWizardProphecy)
     {
-        if (!interface_exists('TYPO3\\CMS\\Install\\Updates\\ChattyInterface')) {
+        if (!interface_exists(ChattyInterface::class)) {
             return;
         }
 

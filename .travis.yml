@@ -27,7 +27,7 @@ notifications:
 
 # This is executed for all stages
 before_install:
-  - if php -i | grep -q xdebug; then phpenv config-rm xdebug.ini || true; fi
+  - if php -i | grep -v TRAVIS_CMD | grep -q xdebug; then phpenv config-rm xdebug.ini; fi
   - mkdir -p .Build/external
   - git clone https://github.com/helhum/TYPO3-testing-framework.git .Build/external/nimut-testing-framework -b allow-php73
   - composer config repositories.testing-framework vcs .Build/external/nimut-testing-framework
