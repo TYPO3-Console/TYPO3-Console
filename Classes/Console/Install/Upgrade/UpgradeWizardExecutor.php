@@ -41,6 +41,14 @@ class UpgradeWizardExecutor
     public function executeWizard(string $identifier, array $rawArguments = [], bool $force = false): UpgradeWizardResult
     {
         $upgradeWizard = $this->factory->create($identifier);
+        $dbQueries = [];
+        $messages = [];
+        // Create new buffered output to be able to capture it later on
+        $output = new BufferedOutput();
+        if ($upgradeWizard instanceof ChattyInterface) {
+            $upgradeWizard->setOutput($output);
+        }
+
         $wizardImplementsInterface = $upgradeWizard instanceof UpgradeWizardInterface && !$upgradeWizard instanceof AbstractUpdate;
         if ($force) {
             if ($wizardImplementsInterface) {
@@ -55,11 +63,13 @@ class UpgradeWizardExecutor
         }
 
         if (!$wizardImplementsInterface && !$upgradeWizard->shouldRenderWizard()) {
-            return new UpgradeWizardResult(false);
+            return new UpgradeWizardResult(false, $dbQueries, $messages);
         }
 
         if ($wizardImplementsInterface && !$upgradeWizard->updateNecessary()) {
-            return new UpgradeWizardResult(false);
+            $messages[] = $output->fetch();
+
+            return new UpgradeWizardResult(false, $dbQueries, $messages);
         }
 
         // OMG really?
@@ -73,22 +83,19 @@ class UpgradeWizardExecutor
             'install'
         );
 
-        $output = new BufferedOutput();
-        if ($upgradeWizard instanceof ChattyInterface) {
-            $upgradeWizard->setOutput($output);
-        }
-
-        $dbQueries = [];
-        $message = '';
         if ($wizardImplementsInterface) {
             $hasPerformed = $upgradeWizard->executeUpdate();
             GeneralUtility::makeInstance(Registry::class)->set('installUpdate', $upgradeWizard->getIdentifier(), 1);
-            $message = trim($message . PHP_EOL . $output->fetch());
+            $messages[] = $output->fetch();
         } else {
+            $message = '';
             $hasPerformed = $upgradeWizard->performUpdate($dbQueries, $message);
+            if ($message !== '') {
+                $messages[] = $message;
+            }
         }
 
-        return new UpgradeWizardResult($hasPerformed, $dbQueries, [$message]);
+        return new UpgradeWizardResult($hasPerformed, $dbQueries, $messages);
     }
 
     public function wizardNeedsExecution(string $identifier): bool
