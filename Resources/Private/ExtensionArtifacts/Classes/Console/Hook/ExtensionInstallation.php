@@ -15,7 +15,6 @@ namespace Helhum\Typo3Console\Hook;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
-use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -63,20 +62,15 @@ class ExtensionInstallation
      */
     protected function addFlashMessage($messageBody, $messageTitle = '', $severity = AbstractMessage::OK, $storeInSession = true)
     {
+        if (PHP_SAPI === 'cli') {
+            return;
+        }
         if (!is_string($messageBody)) {
             throw new \InvalidArgumentException('The message body must be of type string, "' . gettype($messageBody) . '" given.', 1418250286);
         }
         $flashMessage = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Messaging\FlashMessage::class, $messageBody, $messageTitle, $severity, $storeInSession);
         $queue = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Messaging\FlashMessageQueue::class, self::EM_FLASH_MESSAGE_QUEUE_ID);
         $queue->enqueue($flashMessage);
-    }
-
-    /**
-     * @return DatabaseConnection
-     */
-    protected function getDatabaseConnection()
-    {
-        return $GLOBALS['TYPO3_DB'];
     }
 
     /**
