@@ -20,7 +20,7 @@ use TYPO3\CMS\Core\Core\Bootstrap;
 class RunLevel
 {
     const LEVEL_ESSENTIAL = 'buildEssentialSequence';
-    const LEVEL_COMPILE = 'buildCompiletimeSequence';
+    const LEVEL_COMPILE = 'buildEssentialSequence';
     const LEVEL_MINIMAL = 'buildBasicRuntimeSequence';
     const LEVEL_FULL = 'buildExtendedRuntimeSequence';
 
@@ -213,20 +213,6 @@ class RunLevel
     }
 
     /**
-     * Minimal usable system with most core caches disabled
-     *
-     * @return Sequence
-     */
-    private function buildCompiletimeSequence(): Sequence
-    {
-        $sequence = $this->buildEssentialSequence(self::LEVEL_COMPILE);
-
-        $this->addStep($sequence, 'helhum.typo3console:loadextbaseconfiguration');
-
-        return $sequence;
-    }
-
-    /**
      * System with complete configuration, but no database
      *
      * @param string $identifier
@@ -291,19 +277,6 @@ class RunLevel
             case 'helhum.typo3console:errorhandling':
                 $this->executedSteps[$stepIdentifier] = self::LEVEL_ESSENTIAL;
                 $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'initializeErrorHandling']));
-                break;
-
-            // Part of compile time
-            case 'helhum.typo3console:loadextbaseconfiguration':
-                $this->executedSteps[$stepIdentifier] = self::LEVEL_COMPILE;
-                $sequence->addStep(new Step($stepIdentifier, function () {
-                    // @deprecated in 5.5, will be removed in 6.0
-                    // Requirement for the removal is converting all command controllers to Symfony commands
-                    // and removing all usages of ObjectManager in our code, which is the reason we include
-                    // this file early, to get the ObjectManager configured properly
-                    unset($GLOBALS['TYPO3_LOADED_EXT']['extbase']['ext_localconf.php']);
-                    require PATH_site . 'typo3/sysext/extbase/ext_localconf.php';
-                }));
                 break;
 
             // Part of basic runtime
