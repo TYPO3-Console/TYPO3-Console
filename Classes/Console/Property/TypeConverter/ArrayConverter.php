@@ -14,6 +14,9 @@ namespace Helhum\Typo3Console\Property\TypeConverter;
  *
  */
 
+use TYPO3\CMS\Extbase\Property\Exception\InvalidPropertyMappingConfigurationException;
+use TYPO3\CMS\Extbase\Property\PropertyMappingConfigurationInterface;
+
 /**
  * Converter which transforms arrays to arrays.
  *
@@ -44,7 +47,7 @@ class ArrayConverter extends \TYPO3\CMS\Extbase\Property\TypeConverter\AbstractT
     /**
      * @var int
      */
-    protected $priority = 2;
+    protected $priority = 15;
 
     /**
      * Convert from $source to $targetType, a noop if the source is an array.
@@ -53,11 +56,11 @@ class ArrayConverter extends \TYPO3\CMS\Extbase\Property\TypeConverter\AbstractT
      * @param string|array $source
      * @param string $targetType
      * @param array $convertedChildProperties
-     * @param \TYPO3\CMS\Extbase\Property\PropertyMappingConfigurationInterface $configuration
+     * @param PropertyMappingConfigurationInterface $configuration
+     * @throws InvalidPropertyMappingConfigurationException
      * @return array
-     * @api
      */
-    public function convertFrom($source, $targetType, array $convertedChildProperties = [], \TYPO3\CMS\Extbase\Property\PropertyMappingConfigurationInterface $configuration = null)
+    public function convertFrom($source, $targetType, array $convertedChildProperties = [], PropertyMappingConfigurationInterface $configuration = null): array
     {
         if (is_string($source)) {
             if ($source === '') {
@@ -71,20 +74,21 @@ class ArrayConverter extends \TYPO3\CMS\Extbase\Property\TypeConverter\AbstractT
     }
 
     /**
-     * @param \TYPO3\CMS\Extbase\Property\PropertyMappingConfigurationInterface $configuration
-     * @throws \TYPO3\CMS\Extbase\Property\Exception\InvalidPropertyMappingConfigurationException
+     * @param PropertyMappingConfigurationInterface $configuration
+     * @throws InvalidPropertyMappingConfigurationException
      * @return string
      */
-    protected function getConfiguredStringDelimiter(\TYPO3\CMS\Extbase\Property\PropertyMappingConfigurationInterface $configuration = null)
+    private function getConfiguredStringDelimiter(PropertyMappingConfigurationInterface $configuration = null): string
     {
         if ($configuration === null) {
             return self::DEFAULT_STRING_DELIMITER;
         }
-        $stringDelimiter = $configuration->getConfigurationValue(\Helhum\Typo3Console\Property\TypeConverter\ArrayConverter::class, self::CONFIGURATION_STRING_DELIMITER);
+        $stringDelimiter = $configuration->getConfigurationValue(self::class, self::CONFIGURATION_STRING_DELIMITER);
         if ($stringDelimiter === null) {
             return self::DEFAULT_STRING_DELIMITER;
-        } elseif (!is_string($stringDelimiter)) {
-            throw new \TYPO3\CMS\Extbase\Property\Exception\InvalidPropertyMappingConfigurationException('CONFIGURATION_STRING_DELIMITER must be of type string, "' . (is_object($stringDelimiter) ? get_class($stringDelimiter) : gettype($stringDelimiter)) . '" given', 1368433339);
+        }
+        if (!is_string($stringDelimiter)) {
+            throw new InvalidPropertyMappingConfigurationException('CONFIGURATION_STRING_DELIMITER must be of type string, "' . (is_object($stringDelimiter) ? get_class($stringDelimiter) : gettype($stringDelimiter)) . '" given', 1368433339);
         }
 
         return $stringDelimiter;

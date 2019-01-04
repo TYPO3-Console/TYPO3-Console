@@ -160,10 +160,20 @@ class Kernel
         $application->setCommandLoader($commandCollection);
 
         // Try to resolve short command names and aliases
-        $commandName = $commandCollection->find($input->getFirstArgument() ?: 'list');
-        if ($this->runLevel->isCommandAvailable($commandName)) {
-            $this->runLevel->runSequenceForCommand($commandName);
-            $commandCollection->addCommandControllerCommands($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] ?? []);
+        $givenCommandName = $input->getFirstArgument() ?: 'list';
+        $commandNameCandidate = $commandCollection->find($givenCommandName);
+        if ($this->runLevel->isCommandAvailable($commandNameCandidate)) {
+            $this->runLevel->runSequenceForCommand($commandNameCandidate);
+            // @deprecated will be removed once command controller support is removed
+            if ($this->runLevel->getRunLevelForCommand($commandNameCandidate) !== RunLevel::LEVEL_ESSENTIAL) {
+                $commandCollection->addCommandControllerCommands($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] ?? []);
+                $commandName = $commandCollection->find($givenCommandName);
+                if ($commandNameCandidate !== $commandName) {
+                    // Mitigate #779 and #778 at least when command controller commands conflict with non low level
+                    // previously registered commands
+                    $this->runLevel->runSequenceForCommand($commandName);
+                }
+            }
         }
 
         return $application->run($input);
