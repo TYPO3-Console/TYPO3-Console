@@ -15,7 +15,6 @@ namespace Helhum\Typo3Console\Tests\Unit\Service;
  */
 
 use Helhum\Typo3Console\Service\CacheService;
-use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 
 class CacheServiceTest extends UnitTestCase
@@ -30,14 +29,9 @@ class CacheServiceTest extends UnitTestCase
      *
      * @param array $mockedConfiguration
      */
-    protected function createCacheManagerWithConfiguration($mockedConfiguration)
+    protected function createCacheServiceWithConfiguration($mockedConfiguration)
     {
-        $configurationServiceMock = $this->getMockBuilder(ConfigurationService::class)->disableOriginalConstructor()->getMock();
-        $configurationServiceMock
-            ->expects($this->atLeastOnce())
-            ->method('getActive')
-            ->will($this->returnValue($mockedConfiguration));
-        $this->subject = new CacheService($configurationServiceMock);
+        $this->subject = new CacheService($mockedConfiguration);
     }
 
     /**
@@ -45,7 +39,7 @@ class CacheServiceTest extends UnitTestCase
      */
     public function cacheGroupsAreRetrievedCorrectlyFromConfiguration()
     {
-        $this->createCacheManagerWithConfiguration(
+        $this->createCacheServiceWithConfiguration(
             [
                 'cache_foo' => ['groups' => ['first', 'second']],
                 'cache_bar' => ['groups' => ['third', 'second']],
@@ -68,7 +62,7 @@ class CacheServiceTest extends UnitTestCase
      */
     public function flushByGroupThrowsExceptionForInvalidGroups()
     {
-        $this->createCacheManagerWithConfiguration(
+        $this->createCacheServiceWithConfiguration(
             [
                 'cache_foo' => ['groups' => ['first', 'second']],
                 'cache_bar' => ['groups' => ['third', 'second']],

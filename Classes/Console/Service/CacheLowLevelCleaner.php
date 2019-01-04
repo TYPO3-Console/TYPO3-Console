@@ -28,8 +28,7 @@ class CacheLowLevelCleaner
      */
     public function forceFlushCachesFiles()
     {
-        // Delete typo3temp/Cache
-        GeneralUtility::flushDirectory(Environment::getVarPath() . '/cache', true, true);
+        GeneralUtility::flushDirectory(Environment::getVarPath() . '/cache', true);
     }
 
     /**
@@ -46,7 +45,7 @@ class CacheLowLevelCleaner
                 $connection->truncate($tableName);
             }
         }
-        // check tables on other connections
+        // Check tables on other connections
         $remappedTables = isset($GLOBALS['TYPO3_CONF_VARS']['DB']['TableMapping'])
             ? array_keys((array)$GLOBALS['TYPO3_CONF_VARS']['DB']['TableMapping'])
             : [];

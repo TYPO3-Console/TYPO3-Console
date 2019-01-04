@@ -14,8 +14,6 @@ namespace Helhum\Typo3Console\Command;
  *
  */
 
-use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
-use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
 use Helhum\Typo3Console\Service\CacheService;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
@@ -30,86 +28,9 @@ class CacheCommandController extends CommandController
      */
     private $cacheService;
 
-    /**
-     * @var CommandDispatcher
-     */
-    private $commandDispatcher;
-
-    /**
-     * @param CacheService $cacheService
-     * @param CommandDispatcher $commandDispatcher
-     */
-    public function __construct(CacheService $cacheService, CommandDispatcher $commandDispatcher = null)
+    public function __construct(CacheService $cacheService)
     {
         $this->cacheService = $cacheService;
-        $this->commandDispatcher = $commandDispatcher ?: CommandDispatcher::createFromCommandRun();
-    }
-
-    /**
-     * Flush all caches
-     *
-     * Flushes TYPO3 core caches first and after that, flushes caches from extensions.
-     *
-     * @param bool $force Cache is forcibly flushed (low level operations are performed)
-     * @param bool $filesOnly Only file caches are flushed
-     * @throws FailedSubProcessCommandException
-     */
-    public function flushCommand($force = false, $filesOnly = false)
-    {
-        $exitCode = 0;
-        $isApplicationFullyCapable = $this->isApplicationFullyCapable();
-        if (!$isApplicationFullyCapable) {
-            $filesOnly = true;
-        }
-        if ($filesOnly) {
-            $this->cacheService->flushFileCaches($force);
-            try {
-                $this->commandDispatcher->executeCommand('cache:flushcomplete', ['--files-only']);
-            } catch (FailedSubProcessCommandException $e) {
-                if ($isApplicationFullyCapable) {
-                    throw $e;
-                }
-                $this->output->getSymfonyConsoleOutput()->getErrorOutput()->writeln('<warning>Could not load extension configuration.</warning>');
-                $this->output->getSymfonyConsoleOutput()->getErrorOutput()->writeln('<warning>Some caches might not have been flushed.</warning>');
-            }
-        } else {
-            $this->cacheService->flush($force);
-            $this->commandDispatcher->executeCommand('cache:flushcomplete');
-        }
-
-        $this->outputLine('%slushed all %scaches.', [$force ? 'Force f' : 'F', $filesOnly ? 'file ' : '']);
-        $this->quit($exitCode);
-    }
-
-    /**
-     * Check if we have all mandatory files to assume we have a fully configured / installed TYPO3
-     *
-     * @return bool
-     * @deprecated can be removed once this is converted into a native Symfony command. We can use the Application API then.
-     */
-    private function isApplicationFullyCapable(): bool
-    {
-        return file_exists(PATH_site . 'typo3conf/PackageStates.php') && file_exists(PATH_site . 'typo3conf/LocalConfiguration.php');
-    }
-
-    /**
-     * Called only internally in a sub process of the cache:flush command
-     *
-     * This command will then use the full TYPO3 bootstrap.
-     *
-     * @param bool $filesOnly Only file caches are flushed
-     * @internal
-     */
-    public function flushCompleteCommand($filesOnly = false)
-    {
-        // Flush a second time to have extension caches and previously disabled core caches cleared when clearing not forced
-        if ($filesOnly) {
-            $this->cacheService->flushFileCaches();
-        } else {
-            $this->cacheService->flush();
-            // Also call the data handler API to cover legacy hook subscriber code
-            $this->cacheService->flushCachesWithDataHandler();
-        }
     }
 
     /**
@@ -118,7 +39,6 @@ class CacheCommandController extends CommandController
      * Flushes all caches in specified groups.
      * Valid group names are by default:
      *
-     * - all
      * - lowlevel
      * - pages
      * - system
@@ -175,7 +95,7 @@ class CacheCommandController extends CommandController
 
         switch (count($groups)) {
             case 0:
-                $this->outputLine('No cache group is registered.');
+                $this->outputLine('No cache groups are registered.');
                 break;
             case 1:
                 $this->outputLine('The following cache group is registered: "' . implode('", "', $groups) . '".');

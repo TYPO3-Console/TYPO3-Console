@@ -319,14 +319,6 @@ Flushes TYPO3 core caches first and after that, flushes caches from extensions.
 Options
 ~~~~~~~
 
-`--force`
-   Cache is forcibly flushed (low level operations are performed)
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Default: false
-
 `--files-only`
    Only file caches are flushed
 
@@ -350,7 +342,6 @@ Options
 Flushes all caches in specified groups.
 Valid group names are by default:
 
-- all
 - lowlevel
 - pages
 - system
