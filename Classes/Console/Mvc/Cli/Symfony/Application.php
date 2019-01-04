@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony;
  */
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
+use Helhum\Typo3Console\Core\Booting\StepFailedException;
 use Helhum\Typo3Console\Error\ExceptionRenderer;
 use Helhum\Typo3Console\Exception\CommandNotAvailableException;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\HelpCommand;
@@ -77,6 +78,15 @@ class Application extends BaseApplication
     public function hasErrors(): bool
     {
         return $this->runLevel->getError() !== null;
+    }
+
+    /**
+     * @param string $runLevel
+     * @throws StepFailedException
+     */
+    public function boot(string $runLevel)
+    {
+        $this->runLevel->runSequence($runLevel);
     }
 
     /**

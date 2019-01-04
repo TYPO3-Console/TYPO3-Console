@@ -56,19 +56,9 @@ return [
     ],
     'cache:flush' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Cache\CacheFlushCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\CacheCommandController::class,
-        'controllerCommandName' => 'flush',
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-    ],
-    'cache:flushcomplete' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
-        'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\CacheCommandController::class,
-        'controllerCommandName' => 'flushComplete',
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
     ],
     'cache:flushgroups' => [
         'vendor' => 'typo3_console',
