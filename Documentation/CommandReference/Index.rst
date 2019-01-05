@@ -786,14 +786,14 @@ Arguments
 ~~~~~~~~~
 
 `phpNamespace`
-   Namespace of the Fluid ViewHelpers without leading backslash (for example 'TYPO3\Fluid\ViewHelpers' or 'Tx_News_ViewHelpers'). NOTE: Quote and/or escape this argument as needed to avoid backslashes from being interpreted!
+   Namespace of the Fluid ViewHelpers without leading backslash (for example "TYPO3\Fluid\ViewHelpers" or "Tx_News_ViewHelpers"). NOTE: Quote and/or escape this argument as needed to avoid backslashes from being interpreted!
 
 
 
 Options
 ~~~~~~~
 
-`--xsd-namespace|-xsd`
+`--xsd-namespace|-x`
    Unique target namespace used in the XSD schema (for example "http://yourdomain.org/ns/viewhelpers"). Defaults to "http://typo3.org/ns/<php namespace>".
 
 - Accept value: yes
@@ -801,7 +801,7 @@ Options
 - Is multiple: no
 
 
-`--target-file|-target`
+`--target-file|-t`
    File path and name of the generated XSD schema. If not specified the schema will be output to standard output.
 
 - Accept value: yes

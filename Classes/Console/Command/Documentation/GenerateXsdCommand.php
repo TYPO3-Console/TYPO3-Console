@@ -21,6 +21,12 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use TYPO3\CMS\Core\Package\PackageManager;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Extbase\Reflection\DocCommentParser;
+use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 
 class GenerateXsdCommand extends AbstractConvertedCommand
 {
@@ -29,10 +35,16 @@ class GenerateXsdCommand extends AbstractConvertedCommand
      */
     protected $xsdGenerator;
 
-    public function __construct(string $name = null, XsdGenerator $xsdGenerator= null)
+    public function __construct(string $name = null, XsdGenerator $xsdGenerator = null)
     {
         parent::__construct($name);
-        $this->xsdGenerator = $xsdGenerator;
+        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        $this->xsdGenerator = $xsdGenerator ?? new XsdGenerator(
+            GeneralUtility::makeInstance(PackageManager::class),
+            $objectManager,
+            $objectManager->get(DocCommentParser::class),
+            $objectManager->get(ReflectionService::class)
+        );
     }
 
     protected function configure()
@@ -56,17 +68,17 @@ EOH
             new InputArgument(
                 'phpNamespace',
                 InputArgument::REQUIRED,
-                'Namespace of the Fluid ViewHelpers without leading backslash (for example \'TYPO3\Fluid\ViewHelpers\' or \'Tx_News_ViewHelpers\'). NOTE: Quote and/or escape this argument as needed to avoid backslashes from being interpreted!'
+                'Namespace of the Fluid ViewHelpers without leading backslash (for example "TYPO3\Fluid\ViewHelpers" or "Tx_News_ViewHelpers"). NOTE: Quote and/or escape this argument as needed to avoid backslashes from being interpreted!'
             ),
             new InputOption(
                 'xsd-namespace',
-                '-xsd',
+                '-x',
                 InputOption::VALUE_REQUIRED,
                 'Unique target namespace used in the XSD schema (for example "http://yourdomain.org/ns/viewhelpers"). Defaults to "http://typo3.org/ns/<php namespace>".'
             ),
             new InputOption(
                 'target-file',
-                '-target',
+                '-t',
                 InputOption::VALUE_REQUIRED,
                 'File path and name of the generated XSD schema. If not specified the schema will be output to standard output.'
             )
@@ -75,9 +87,9 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $phpNamespace = $input->getOption('phpNamespace');
-        $xsdNamespace = $input->getOption('xsdNamespace');
-        $targetFile = $input->getOption('targetFile');
+        $phpNamespace = $input->getArgument('phpNamespace');
+        $xsdNamespace = $input->getOption('xsd-namespace');
+        $targetFile = $input->getOption('target-file');
         if ($xsdNamespace === null) {
             $phpNamespace = rtrim($phpNamespace, '_\\');
             if (strpos($phpNamespace, '\\') === false) {
