@@ -114,13 +114,9 @@ EOH
      */
     protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
     {
-        if ($input->getArgument('force')
-        || $input->getArgument('filesOnly')
-        || $input->getOption('files-only')
-        || $input->getOption('force')
-        ) {
+        if ($input->getOption('force')) {
             $io = new SymfonyStyle($input, $output);
-            $io->getErrorStyle()->writeln('<warning>All options and arguments are deprecated and have no effect any more.</warning>');
+            $io->getErrorStyle()->writeln('<warning>Using "--force" is deprecated and has no effect any more.</warning>');
         }
     }
 }
