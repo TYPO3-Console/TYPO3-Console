@@ -113,18 +113,8 @@ EOH
         } else {
             file_put_contents($targetFile, $xsdSchema);
         }
-    }
 
-
-
-    /**
-     * @deprecated will be removed with 6.0
-     *
-     * @return array
-     */
-    protected function createDeprecatedDefinition(): array
-    {
-        return [];
+        return 0;
     }
 
     /**
