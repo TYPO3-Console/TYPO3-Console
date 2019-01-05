@@ -161,10 +161,7 @@ return [
     ],
     'documentation:generatexsd' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
-        'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\DocumentationCommandController::class,
-        'controllerCommandName' => 'generateXsd',
+        'class' => \Helhum\Typo3Console\Command\Documentation\GenerateXsdCommand::class,
     ],
     'dumpautoload' => [
         'vendor' => 'typo3_console',

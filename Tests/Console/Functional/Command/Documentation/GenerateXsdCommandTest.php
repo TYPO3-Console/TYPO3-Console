@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace Helhum\Typo3Console\Tests\Functional\Command;
+namespace Helhum\Typo3Console\Tests\Functional\Command\Documentation;
 
 /*
  * This file is part of the TYPO3 Console project.
@@ -14,7 +14,9 @@ namespace Helhum\Typo3Console\Tests\Functional\Command;
  *
  */
 
-class DocumentationCommandControllerTest extends AbstractCommandTest
+use Helhum\Typo3Console\Tests\Functional\Command\AbstractCommandTest;
+
+class GenerateXsdCommandTest extends AbstractCommandTest
 {
     /**
      * @test

@@ -15,9 +15,12 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * @deprecated Will be removed with 6.0
@@ -52,12 +55,104 @@ abstract class AbstractConvertedCommand extends Command
 
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
+        $messages = null;
+        $deprecatedDefinition = new InputDefinition($this->createDeprecatedDefinition());
+        $nativeDefinition = new InputDefinition($this->createNativeDefinition());
+        foreach ($deprecatedDefinition->getOptions() as $option) {
+            $dashedName = $option->getName();
+            $casedName = $this->casedFromDashed($dashedName);
+            if (!$nativeDefinition->hasArgument($casedName)) {
+                continue;
+            }
+            if ($deprecatedValue = $input->getOption($dashedName)) {
+                $messages[] = '<warning>Using named arguments is deprecated.</warning>';
+                $messages[] = sprintf('<warning>Gracefully setting argument "%s" for given option "%s".</warning>', $casedName, $dashedName);
+                $input->setArgument($casedName, $deprecatedValue);
+            }
+        }
+        foreach ($deprecatedDefinition->getArguments() as $argument) {
+            $casedName = $argument->getName();
+            $dashedName = $this->dashedFromCased($casedName);
+            if (!$nativeDefinition->hasOption($dashedName)) {
+                continue;
+            }
+            if ($deprecatedValue = $input->getArgument($casedName)) {
+                $messages[] = '<warning>Using named arguments is deprecated.</warning>';
+                $messages[] = sprintf('<warning>Gracefully setting argument "%s" for given option "%s".</warning>', $casedName, $dashedName);
+                $messages[] = '<warning>Specifying argument values for options is deprecated.</warning>';
+                $messages[] = sprintf('<warning>Gracefully setting option "%s" to "%s".</warning>', $dashedName, $deprecatedValue);
+                $input->setOption($dashedName, $deprecatedValue);
+            }
+        }
+
+        if ($messages !== null) {
+            $io = new SymfonyStyle($input, $output);
+            $io->getErrorStyle()->writeln($messages);
+        }
+
         $this->handleDeprecatedArgumentsAndOptions($input, $output);
+    }
+
+    protected function interact(InputInterface $input, OutputInterface $output)
+    {
+        $definition = $this->getDefinition();
+        $givenArguments = array_filter($input->getArguments(), function ($argumentName) use ($input) {
+            return $input->hasGivenArgument($argumentName);
+        }, ARRAY_FILTER_USE_KEY);
+        $missingArguments = array_filter(array_keys($definition->getArguments()), function ($argument) use ($definition, $givenArguments) {
+            return !array_key_exists($argument, $givenArguments) && $definition->getArgument($argument)->isRequired();
+        });
+
+        $argumentValue = null;
+        $io = new SymfonyStyle($input, $output);
+        foreach ($missingArguments as $missingArgument) {
+            while ($argumentValue === null) {
+                $argumentValue = $io->ask(sprintf('Please specify the required argument "%s"', $missingArgument));
+            }
+            $input->setArgument($missingArgument, $argumentValue);
+        }
     }
 
     abstract protected function createNativeDefinition(): array;
 
-    abstract protected function createDeprecatedDefinition(): array;
+    protected function createDeprecatedDefinition(): array
+    {
+        $nativeDefinition = new InputDefinition($this->createNativeDefinition());
+        $deprecatedDefinition = [];
+        foreach ($nativeDefinition->getOptions() as $option) {
+            $dashedName = $option->getName();
+            $casedName = $this->casedFromDashed($dashedName);
+            $deprecatedDefinition[] = new InputArgument(
+                $casedName,
+                InputArgument::OPTIONAL,
+                $option->getDescription(),
+                $option->getDefault()
+            );
+        }
+        foreach ($nativeDefinition->getArguments() as $argument) {
+            $casedName = $argument->getName();
+            $dashedName = $this->dashedFromCased($casedName);
+            $deprecatedDefinition[] = new InputOption(
+                $dashedName,
+                null,
+                InputOption::VALUE_REQUIRED,
+                $argument->getDescription(),
+                $argument->getDefault()
+            );
+        }
+
+        return $deprecatedDefinition;
+    }
 
     abstract protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output);
+
+    private function dashedFromCased(string $casedName): string
+    {
+        return mb_strtolower(preg_replace('/(?<=\\w)([A-Z])/', '-\\1', $casedName));
+    }
+
+    private function casedFromDashed(string $dashedName): string
+    {
+        return lcfirst(str_replace(' ', '', ucwords(str_replace('-', ' ', $dashedName))));
+    }
 }
