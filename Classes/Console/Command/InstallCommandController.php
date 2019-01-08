@@ -17,6 +17,7 @@ namespace Helhum\Typo3Console\Command;
 use Helhum\Typo3Console\Annotation\Command\Definition;
 use Helhum\Typo3Console\Core\Booting\CompatibilityScripts;
 use Helhum\Typo3Console\Install\Action\InstallActionDispatcher;
+use Helhum\Typo3Console\Install\Action\WriteWebServerConfigAction;
 use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Helhum\Typo3Console\Install\InstallStepActionExecutor;
 use Helhum\Typo3Console\Install\PackageStatesGenerator;
@@ -238,6 +239,26 @@ class InstallCommandController extends CommandController
                 $this->outputLine($fixedStatusObject->getTitle());
             }
         }
+    }
+
+    /**
+     * Install web server configuration
+     *
+     * Either creates .htaccess file (apache) or web.config (microsoft-iis).
+     *
+     * @param string string $webServerConfig Web server config file to install in document root (<code>none</code>, <code>apache</code>, <code>iis</code>)
+     */
+    public function writeWebserverConfigurationCommand(string $webServerConfig = 'none')
+    {
+        $action = new WriteWebServerConfigAction();
+        $action->setOutput($this->output);
+        $action->execute([
+            'arguments' => [
+                'webServerConfig' => [
+                    'value' => $webServerConfig,
+                ]
+            ]
+        ]);
     }
 
     /**

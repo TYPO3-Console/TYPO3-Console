@@ -271,6 +271,14 @@ return [
         'controllerCommandName' => 'fixFolderStructure',
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
     ],
+    'install:webserverconfiguration' => [
+        'vendor' => 'typo3_console',
+        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'schedulable' => false,
+        'controller' => \Helhum\Typo3Console\Command\InstallCommandController::class,
+        'controllerCommandName' => 'writeWebserverConfiguration',
+        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
+    ],
     'install:extensionsetupifpossible' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
