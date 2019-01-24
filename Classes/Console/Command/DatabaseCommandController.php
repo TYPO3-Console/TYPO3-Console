@@ -71,9 +71,9 @@ class DatabaseCommandController extends CommandController
      *
      * The list of schema update types supports wildcards to specify multiple types, e.g.:
      *
-     * - "*" (all updates)
-     * - "field.*" (all field updates)
-     * - "*.add,*.change" (all add/change updates)
+     * - "<code>*</code>" (all updates)
+     * - "<code>field.*</code>" (all field updates)
+     * - "<code>*.add,*.change</code>" (all add/change updates)
      *
      * To avoid shell matching all types with wildcards should be quoted.
      *

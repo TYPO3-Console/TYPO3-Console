@@ -737,9 +737,9 @@ Valid schema update types are:
 
 The list of schema update types supports wildcards to specify multiple types, e.g.:
 
-- "*" (all updates)
-- "field.*" (all field updates)
-- "*.add,*.change" (all add/change updates)
+- "`*`" (all updates)
+- "`field.*`" (all field updates)
+- "`*.add,*.change`" (all add/change updates)
 
 To avoid shell matching all types with wildcards should be quoted.
 
