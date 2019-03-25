@@ -101,21 +101,21 @@ Arguments
 Options
 ~~~~~~~
 
-`--format`
-   The output format (txt, xml, json, or md)
+--format
+  The output format (txt, xml, json, or md)
 
-- Accept value: yes
-- Is value required: yes
-- Is multiple: no
-- Default: 'txt'
+  - Accept value: yes
+  - Is value required: yes
+  - Is multiple: no
+  - Default: 'txt'
 
-`--raw`
-   To output raw command help
+--raw
+  To output raw command help
 
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Default: false
+  - Accept value: no
+  - Is value required: no
+  - Is multiple: no
+  - Default: false
 
 
 
