@@ -95,7 +95,7 @@ class ConfigurationCommandController extends CommandController implements Single
         if ($hasActive) {
             $active = $this->configurationService->getActive($path);
         }
-        if ($this->configurationService->localIsActive($path) && $hasActive) {
+        if ($hasActive && $this->configurationService->localIsActive($path)) {
             $this->outputLine($this->consoleRenderer->render($active));
         } else {
             $local = null;

@@ -185,7 +185,8 @@ class ConfigurationService implements SingletonInterface
     public function localIsActive($path)
     {
         if ($this->hasLocal($path)) {
-            return $this->hasActive($path) && $this->getLocal($path) === $this->getActive($path);
+            // Weak comparison to ignore differences in ordering of keys
+            return $this->hasActive($path) && $this->getLocal($path) == $this->getActive($path);
         }
 
         return !$this->hasActive($path);
