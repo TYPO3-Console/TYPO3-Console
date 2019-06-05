@@ -18,7 +18,7 @@ branches:
   only:
     - master
     - develop
-    - /^([0-9]+\.){1,2}(x|[0-9]+)$/
+    - /^v?([0-9]+\.){1,2}(x|[0-9]+)$/
 
 # Inform me about failures
 notifications:
@@ -91,11 +91,11 @@ jobs:
       script:
         - >
           if [ -n "$TRAVIS_TAG" ]; then
-            composer set-version $TRAVIS_TAG
+            composer set-version $(echo $TRAVIS_TAG | sed s/^v//g)
             test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
           fi
         - composer extension-verify-composer-json
-        - composer extension-create-libs
+        - composer extension-release
 
     - stage: sonar code scanner
       if: type = push AND branch IN (master, develop)
@@ -116,6 +116,33 @@ jobs:
             sonar-scanner
           fi
 
+    - stage: update extension repo
+      if: type = push
+      php: 7.2
+      before_install: skip
+      install: skip
+      before_script:
+        - mkdir -p ~/.ssh
+        - openssl aes-256-cbc -K $encrypted_85bf36ae99bb_key -iv $encrypted_85bf36ae99bb_iv -in Resources/Private/deploy_rsa.enc -out ~/.ssh/id_rsa -d
+        - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+        - chmod 600 ~/.ssh/id_rsa
+        - git clone git@github.com:TYPO3-Console/Extension.git ../extension -b template
+        - cd ../extension && git checkout origin/$TRAVIS_BRANCH || true && cd -
+        - composer extension-release
+        - cd ../extension
+        - git checkout README.md
+        - git add .
+      script:
+        - |
+          if [ -n "$TRAVIS_TAG" ]; then
+              git commit -m "Release extension version $TRAVIS_TAG" --author "Helmut Hummel <typo3@helhum.io>"
+              git tag $TRAVIS_TAG
+              git push --tags
+            else
+              git commit -m "Update extension based on commit $TRAVIS_COMMIT" --author "Helmut Hummel <typo3@helhum.io>"
+              git push origin HEAD:$TRAVIS_BRANCH
+          fi;
+
     - stage: 🚢 to TER
       if: tag IS present
       php: 7.0
@@ -134,5 +161,5 @@ jobs:
             # Upload
             TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
             echo "Uploading release ${TRAVIS_TAG} to TER"
-            $HOME/.composer/vendor/bin/ter-client upload typo3_console . -u "$TYPO3_ORG_USERNAME" -p "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
+            $HOME/.composer/vendor/bin/ter-client upload typo3_console ../extension -u "$TYPO3_ORG_USERNAME" -p "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
           fi;

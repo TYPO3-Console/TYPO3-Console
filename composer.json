@@ -81,7 +81,6 @@
         }
     },
     "replace": {
-        "typo3_console": "self.version",
         "typo3-ter/typo3-console": "self.version"
     },
     "config": {
@@ -99,39 +98,33 @@
             "Helhum\\Typo3Console\\Composer\\ScriptHelper::setVersion"
         ],
         "extension-verify-composer-json": [
-            "Helhum\\Typo3Console\\Composer\\ScriptHelper::verifyAutoloadInfoInLibraries"
+            "Helhum\\Typo3Console\\Composer\\ScriptHelper::verifyComposerJsonOfExtension"
         ],
-        "extension-copy-artifacts": [
-            "cp -f Resources/Private/ExtensionArtifacts/ext_* .",
-            "cp -rf Resources/Private/ExtensionArtifacts/Resources/Public Resources/",
-            "cp -rf Resources/Private/ExtensionArtifacts/Classes/Console/* Classes/Console/"
-        ],
-        "extension-create-libs": [
-            "@composer install -d Libraries"
+        "extension-copy": [
+            "@extension-clean",
+            "mkdir -p ../extension",
+            "cp -r Resources/Private/ExtensionArtifacts/* ../extension/"
         ],
         "extension-build": [
-            "@extension-create-libs",
-            "@extension-copy-artifacts"
+            "@extension-copy",
+            "@composer config repositories.console '{\"type\": \"path\", \"url\": \"'$(pwd)'\", \"options\": {\"symlink\": false}}' -d ../extension",
+            "@composer install -d ../extension/"
         ],
         "extension-release": [
             "@extension-build",
-            "rm -rf Packages/",
-            "rm -rf Resources/Private/ExtensionArtifacts/",
-            "rm -rf Resources/Private/Patches/",
-            "rm -rf Tests/",
-            "rm .gitattributes",
-            "rm -rf .github/",
-            "rm .gitignore",
-            "rm .php_cs.dist",
-            "rm .styleci.yml",
-            "rm .travis.yml",
-            "rm appveyor.yml",
-            "rm phpunit.xml.dist",
-            "rm sonar-project.properties"
+            "sed -i -e 's/\"typo3-console\\/extension\"/\"helhum\\/typo3-console\"/g' ../extension/composer.json",
+            "rm -rf ../extension/composer.lock",
+            "rm -rf ../extension/composer.json.bak",
+            "rm -rf ../extension/Libraries/bin/",
+            "rm -rf ../extension/Libraries/helhum/typo3-console/Packages/",
+            "rm -rf ../extension/Libraries/helhum/typo3-console/Resources/Private/ExtensionArtifacts/",
+            "rm -rf ../extension/Libraries/helhum/typo3-console/Resources/Private/Patches/",
+            "rm -rf ../extension/Libraries/helhum/typo3-console/Tests/",
+            "rm -rf ../extension/Libraries/helhum/typo3-console/.github/",
+            "mv ../extension/Libraries/helhum/typo3-console/Documentation/ ../extension/"
         ],
         "extension-clean": [
-            "rm -rf Libraries/vendor Resources/Public/Icons",
-            "rm -f ext_*"
+            "rm -rf ../extension/*"
         ]
     },
     "extra": {
@@ -140,10 +133,7 @@
         },
         "typo3/cms": {
             "app-dir": ".Build",
-            "web-dir": ".Build/public",
-            "Package": {
-                "partOfMinimalUsableSystem": true
-            }
+            "web-dir": ".Build/public"
         }
     }
 }

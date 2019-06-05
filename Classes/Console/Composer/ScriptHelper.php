@@ -38,6 +38,11 @@ class ScriptHelper
         $content = preg_replace('/(version|release): \d+\.\d+\.\d+/', '$1: ' . $version, $content);
         file_put_contents($docConfigFile, $content);
 
+        $docConfigFile = __DIR__ . '/../../../Documentation/Settings.cfg';
+        $content = file_get_contents($docConfigFile);
+        $content = preg_replace('/(version|release) = \d+\.\d+\.\d+/', '$1: ' . $version, $content);
+        file_put_contents($docConfigFile, $content);
+
         $extEmConfFile = __DIR__ . '/../../../Resources/Private/ExtensionArtifacts/ext_emconf.php';
         $content = file_get_contents($extEmConfFile);
         $content = preg_replace('/(\'version\' => )\'\d+\.\d+\.\d+/', '$1\'' . $version, $content);
@@ -59,28 +64,17 @@ class ScriptHelper
         file_put_contents($sonarConfigFile, $content);
     }
 
-    public static function verifyAutoloadInfoInLibraries()
+    public static function verifyComposerJsonOfExtension()
     {
-        $main = json_decode(file_get_contents('composer.json'), true)['autoload'];
-        $lib = json_decode(file_get_contents('Libraries/composer.json'), true)['autoload'];
-        if (count($main) !== count($lib)) {
-            throw new Exception('Count of autoload definition mismatch');
-        }
-        if (count($main['psr-4']) !== count($lib['psr-4'])) {
-            throw new Exception('Count of psr-4 definition mismatch');
-        }
-        foreach ($main['psr-4'] as $prefix => $paths) {
-            if (
-                count($paths) !== count($lib['psr-4'][$prefix])
-                || empty($lib['psr-4'][$prefix])
-            ) {
-                throw new Exception('Count of psr-4 paths mismatch');
+        $main = json_decode(file_get_contents('composer.json'), true);
+        $extension = json_decode(file_get_contents('Resources/Private/ExtensionArtifacts/composer.json'), true);
+        foreach (['description', 'keywords', 'support', 'homepage', 'authors', 'license'] as $name) {
+            if ($main[$name] !== $extension[$name]) {
+                throw new Exception(sprintf('Property "%s" is not the same', $name));
             }
-            foreach ($paths as $index => $path) {
-                if ('../' . $path !== $lib['psr-4'][$prefix][$index]) {
-                    throw new Exception('Different psr-4 paths defined');
-                }
-            }
+        }
+        if ($main['require']['typo3/cms-core'] !== $extension['require']['typo3/cms-core']) {
+            throw new Exception('Extension core version does not match main core version');
         }
     }
 }

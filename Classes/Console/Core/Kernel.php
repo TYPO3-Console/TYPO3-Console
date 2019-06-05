@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\Core;
 
 use Composer\Autoload\ClassLoader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use Helhum\Typo3Console\CompatibilityClassLoader;
 use Helhum\Typo3Console\Core\Booting\CompatibilityScripts;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\Booting\Scripts;
@@ -35,11 +36,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class Kernel
 {
     /**
-     * @var ClassLoader
-     */
-    private $classLoader;
-
-    /**
      * @var Bootstrap
      */
     private $bootstrap;
@@ -54,17 +50,11 @@ class Kernel
      */
     private $initialized = false;
 
-    /**
-     * @var ClassLoader
-     */
-    public static $nonComposerCompatClassLoader;
-
-    public function __construct(\Composer\Autoload\ClassLoader $classLoader)
+    public function __construct(CompatibilityClassLoader $classLoader)
     {
-        $this->classLoader = $classLoader;
         $this->ensureRequiredEnvironment();
         $this->bootstrap = Bootstrap::getInstance();
-        $this->bootstrap->initializeClassLoader($classLoader);
+        $this->bootstrap->initializeClassLoader($classLoader->getTypo3ClassLoader());
         // Initialize basic annotation loader until TYPO3 does so as well
         AnnotationRegistry::registerLoader('class_exists');
         $this->runLevel = new RunLevel($this->bootstrap);
@@ -88,35 +78,15 @@ class Kernel
     }
 
     /**
-     * If detected TYPO3 version does not match the main supported version,
-     * overlay compatibility classes for the detected branch, by registering
-     * an autoloader and aliasing the compatibility class with the original class name.
+     * Legacy method called by old composer plugins
      *
      * @param ClassLoader $classLoader
      * @internal
+     * @deprecated will be removed with 6.0
      */
     public static function initializeCompatibilityLayer(ClassLoader $classLoader)
     {
-        $typo3Branch = '95';
-        if (method_exists(Bootstrap::class, 'setCacheHashOptions')) {
-            $typo3Branch = '87';
-        }
-        if ($typo3Branch === '95') {
-            return;
-        }
-        $classLoader = self::$nonComposerCompatClassLoader ?? $classLoader;
-        $compatibilityNamespace = 'Helhum\\Typo3Console\\TYPO3v' . $typo3Branch . '\\';
-        spl_autoload_register(function ($className) use ($classLoader, $compatibilityNamespace) {
-            if (strpos($className, 'Helhum\\Typo3Console\\') !== 0) {
-                // We don't care about classes that are not within our namespace
-                return;
-            }
-            $compatibilityClassName = str_replace('Helhum\\Typo3Console\\', $compatibilityNamespace, $className);
-            if ($file = $classLoader->findFile($compatibilityClassName)) {
-                require $file;
-                class_alias($compatibilityClassName, $className);
-            }
-        }, true, true);
+        new CompatibilityClassLoader($classLoader);
     }
 
     /**
@@ -130,7 +100,6 @@ class Kernel
     public function initialize(string $runLevel = null)
     {
         if (!$this->initialized) {
-            self::initializeCompatibilityLayer($this->classLoader);
             Scripts::baseSetup($this->bootstrap);
             $this->initialized = true;
         }
