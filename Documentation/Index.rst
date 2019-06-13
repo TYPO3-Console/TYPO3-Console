@@ -12,7 +12,7 @@ TYPO3 Console
 :Language:        en
 :Description:     A reliable and powerful command line interface for TYPO3 CMS
 :Keywords:        command line,console
-:Copyright:       2016
+:Copyright:       2019
 :Author:          Helmut Hummel <info@helhum.io>
 :License:         This document is published under the Open Content License available from
                   http://www.opencontent.org/opl.shtml

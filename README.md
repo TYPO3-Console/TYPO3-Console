@@ -44,7 +44,11 @@ TYPO3 Console is a perfect companion for Composer-based, enjoyable [TYPO3 projec
 Download and install the extension with the *Extensions* module.
 For the extension to work, it **must** be installed in the `typo3conf/ext` directory **not** in any other extension location.
 This directory **must not** be a symlink to another location!
-The `typo3cms` command line tool will be copied into the installation root directory during activation.
+The `typo3cms` command line tool will be copied into the installation root directory during activation,
+in case it is not present as a symlink to `typo3conf/ext/typo3_console/Libraries/helhum/typo3-console/typo3cms`.
+The build extension is automatically published to [TER](https://extensions.typo3.org/extension/typo3_console/)
+and to a [read only repository](https://github.com/TYPO3-Console/Extension) representing the released state as tags,
+as well as current state of development in the respective branches.
 
 ## Submit bug reports or feature requests
 
