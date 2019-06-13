@@ -1,0 +1,79 @@
+{
+    "extra": {
+        "Hint": "This composer.json is automatically generated and invalid after the process. Don't rely on its content whatsoever.",
+        "typo3/cms": {
+            "extension-key": "typo3_console",
+            "Package": {
+                "partOfMinimalUsableSystem": true
+            }
+        }
+    },
+    "repositories": {
+        "console": {"type": "path", "url": "../typo3_console/", "options": {"symlink": false}}
+    },
+    "name": "typo3-console/extension",
+    "description": "A reliable and powerful command line interface for TYPO3 CMS",
+    "type": "typo3-cms-extension",
+    "keywords": [
+        "TYPO3",
+        "cli",
+        "console",
+        "command",
+        "commandline"
+    ],
+    "homepage": "http://insight.helhum.io/post/104528981610/about-the-beauty-and-power-of-typo3-console",
+    "support": {
+        "issues": "https://github.com/TYPO3-Console/typo3_console/issues"
+    },
+    "authors": [
+        {
+            "name": "Helmut Hummel",
+            "email": "info@helhum.io",
+            "role": "Developer",
+            "homepage": "http://helhum.io"
+        }
+    ],
+    "license": "GPL-2.0-or-later",
+    "config": {
+        "vendor-dir": "Libraries",
+        "preferred-install": {
+            "*": "dist"
+        },
+        "classmap-authoritative": true,
+        "platform": {
+            "php": "7.0.8"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Helhum\\Typo3Console\\": [
+                "Classes/Console/"
+            ]
+        }
+    },
+    "require": {
+        "helhum/typo3-console": "@dev",
+        "typo3/cms-core": "~8.7.22 || ~9.5.0"
+    },
+    "replace": {
+        "helhum/typo3-console-plugin": "*",
+
+        "typo3/cms-backend": "*",
+        "typo3/cms-core": "*",
+        "typo3/cms-extbase": "*",
+        "typo3/cms-extensionmanager": "*",
+        "typo3/cms-fluid": "*",
+        "typo3/cms-frontend": "*",
+        "typo3/cms-install": "*",
+        "typo3/cms-scheduler": "*",
+        "typo3/cms-saltedpasswords": "*",
+
+        "doctrine/annotations": "*",
+        "psr/log": "*",
+        "symfony/debug": "*",
+        "symfony/polyfill-mbstring": "*"
+    },
+    "scripts": {
+        "post-autoload-dump": "Helhum\\Typo3Console\\Composer\\PopulateCommands::populate"
+    }
+}

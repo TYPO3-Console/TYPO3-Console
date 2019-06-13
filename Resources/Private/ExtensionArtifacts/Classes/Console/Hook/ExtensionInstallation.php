@@ -23,7 +23,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class ExtensionInstallation
 {
-    const BINARY_PATH = 'typo3conf/ext/typo3_console/';
+    const BINARY_PATH = 'typo3conf/ext/typo3_console/Libraries/helhum/typo3-console/';
     const COPY_FAILED_MESSAGE_TITLE = 'Could not copy %s script to TYPO3 root directory (%s)!';
     const COPY_FAILED_MESSAGE = 'Check the permissions of your root directory. Is there a file or directory named %s inside this directory?';
     const COPY_SUCCESS_MESSAGE = 'Successfully copied the %s script to TYPO3 root directory. Let\'s dance!';
@@ -101,7 +101,7 @@ class ExtensionInstallation
             $proxyFileContent = str_replace(
                 'require __DIR__ . \'/Scripts/typo3-console.php\';',
                 '// In non Composer mode we\'re copied into TYPO3 web root
-require __DIR__ . \'/typo3conf/ext/typo3_console/Scripts/typo3-console.php\';',
+require __DIR__ . \'/typo3conf/ext/typo3_console/Libraries/helhum/typo3-console/Scripts/typo3-console.php\';',
                 $proxyFileContent
             );
             $success = file_put_contents($fullTargetPath, $proxyFileContent);

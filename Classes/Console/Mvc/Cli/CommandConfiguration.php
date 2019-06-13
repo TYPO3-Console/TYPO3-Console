@@ -159,19 +159,8 @@ class CommandConfiguration
      */
     private function gatherRawConfig(): array
     {
-        if (file_exists($commandConfigurationFile = __DIR__ . '/../../../../Configuration/ComposerPackagesCommands.php')) {
-            $configuration = require $commandConfigurationFile;
-        } else {
-            // We only reach this point in non composer mode
-            // We ensure that our commands are present, even if we are not an active extension or even not being an extension at all
-            $configuration[] = require __DIR__ . '/../../../../Configuration/Commands.php';
-        }
+        $configuration = require __DIR__ . '/../../../../Configuration/ComposerPackagesCommands.php';
         foreach ($this->packageManager->getActivePackages() as $package) {
-            if ($package->getPackageKey() === 'typo3_console') {
-                // We only reach this point in non composer mode
-                // We registered our commands above already
-                continue;
-            }
             $packageConfig = $this->getConfigFromExtension($package);
             if (!empty($packageConfig)) {
                 self::ensureValidCommandRegistration($packageConfig, $package->getPackageKey());

@@ -1,7 +1,7 @@
 /Libraries/ export-ignore
 /Packages/ export-ignore
 /Resources/Private/ExtensionArtifacts/ export-ignore
-/Resources/Private/Patches/ export-ignore
+/Resources/Private/deploy_rsa.enc export-ignore
 /Tests/ export-ignore
 /.gitattributes export-ignore
 /.github/ export-ignore
