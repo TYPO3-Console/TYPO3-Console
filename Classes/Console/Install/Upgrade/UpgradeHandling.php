@@ -159,9 +159,7 @@ class UpgradeHandling
                         }
                     }
                 }
-                $wizardMessages = [];
-                $results[$shortIdentifier] = $this->executeInSubProcess('executeWizard', [$shortIdentifier, $arguments], $wizardMessages);
-                $messages = array_merge($messages, $wizardMessages);
+                $results[$shortIdentifier] = $this->executeInSubProcess('executeWizard', [$shortIdentifier, $arguments]);
             }
         }
 
@@ -222,15 +220,14 @@ class UpgradeHandling
      *
      * @param string $command
      * @param array $arguments
-     * @param array &$messages
      * @throws FailedSubProcessCommandException
      * @throws \UnexpectedValueException
      * @throws \RuntimeException
      * @return mixed
      */
-    public function executeInSubProcess($command, array $arguments = [], array &$messages = [])
+    public function executeInSubProcess($command, array $arguments = [])
     {
-        $messages = $this->ensureUpgradeIsPossible();
+        $this->ensureUpgradeIsPossible();
 
         return @unserialize($this->commandDispatcher->executeCommand('upgrade:subprocess', [$command, serialize($arguments)]));
     }
@@ -239,38 +236,38 @@ class UpgradeHandling
      * @throws FailedSubProcessCommandException
      * @throws \UnexpectedValueException
      * @throws \RuntimeException
-     * @return string[]
      */
     private function ensureUpgradeIsPossible()
     {
-        $messages = [];
-        if (!$this->initialUpgradeDone
-            && (
-                    !$this->configurationService->hasLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone')
-                    || TYPO3_branch !== $this->configurationService->getLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone')
-                )
-        ) {
-            $this->initialUpgradeDone = true;
-            $this->configurationService->setLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone', TYPO3_branch, 'string');
-            $this->commandDispatcher->executeCommand('install:fixfolderstructure');
-            $messages = $this->ensureExtensionCompatibility();
-            $this->silentConfigurationUpgrade->executeSilentConfigurationUpgradesIfNeeded();
-            // TODO: Check what we can do here to get TYPO3 9 support for this feature
-            if (class_exists(DatabaseCharsetUpdate::class)) {
-                $this->commandDispatcher->executeCommand('upgrade:wizard', [DatabaseCharsetUpdate::class]);
-            }
-            $this->commandDispatcher->executeCommand('cache:flush');
-            $this->commandDispatcher->executeCommand('database:updateschema');
+        if ($this->isInitialUpgradeDone()) {
+            return;
         }
-
-        return $messages;
+        $this->initialUpgradeDone = true;
+        $this->configurationService->setLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone', TYPO3_branch, 'string');
+        $this->commandDispatcher->executeCommand('install:fixfolderstructure');
+        $this->silentConfigurationUpgrade->executeSilentConfigurationUpgradesIfNeeded();
+        // TODO: Check what we can do here to get TYPO3 9 support for this feature
+        if (class_exists(DatabaseCharsetUpdate::class)) {
+            $this->commandDispatcher->executeCommand('upgrade:wizard', [DatabaseCharsetUpdate::class]);
+        }
+        $this->commandDispatcher->executeCommand('cache:flush');
+        $this->commandDispatcher->executeCommand('database:updateschema');
     }
 
-    /**
-     * @return string[]
-     */
-    private function ensureExtensionCompatibility()
+    private function isInitialUpgradeDone(): bool
     {
+        return $this->initialUpgradeDone
+            || (
+                $this->configurationService->hasLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone')
+                && $this->configurationService->getLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone') === TYPO3_branch
+            );
+    }
+
+    public function ensureExtensionCompatibility(): array
+    {
+        if ($this->isInitialUpgradeDone()) {
+            return [];
+        }
         $messages = [];
         $failedPackageMessages = $this->matchAllExtensionConstraints(TYPO3_version);
         foreach ($failedPackageMessages as $extensionKey => $constraintMessage) {
