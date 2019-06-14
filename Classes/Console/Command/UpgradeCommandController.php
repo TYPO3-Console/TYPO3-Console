@@ -81,6 +81,7 @@ class UpgradeCommandController extends CommandController
      */
     public function listCommand($all = false)
     {
+        $this->ensureExtensionCompatibility();
         $verbose = $this->output->getSymfonyConsoleOutput()->isVerbose();
         $messages = [];
         $wizards = $this->upgradeHandling->executeInSubProcess('listWizards', [], $messages);
@@ -108,6 +109,7 @@ class UpgradeCommandController extends CommandController
      */
     public function wizardCommand($identifier, array $arguments = [], $force = false)
     {
+        $this->ensureExtensionCompatibility();
         $messages = [];
         $result = $this->upgradeHandling->executeInSubProcess('executeWizard', [$identifier, $arguments, $force], $messages);
         (new UpgradeWizardResultRenderer())->render([$identifier => $result], $this->output);
@@ -124,6 +126,7 @@ class UpgradeCommandController extends CommandController
      */
     public function allCommand(array $arguments = [])
     {
+        $this->ensureExtensionCompatibility();
         $verbose = $this->output->getSymfonyConsoleOutput()->isVerbose();
         $this->outputLine(PHP_EOL . '<i>Initiating TYPO3 upgrade</i>' . PHP_EOL);
 
@@ -140,6 +143,18 @@ class UpgradeCommandController extends CommandController
         $this->outputLine();
         foreach ($messages as $message) {
             $this->outputLine($message);
+        }
+    }
+
+    private function ensureExtensionCompatibility()
+    {
+        $messages = $this->upgradeHandling->ensureExtensionCompatibility();
+        if (!empty($messages)) {
+            $this->outputLine('<error>Incompatible extensions found, aborting.</error>');
+            foreach ($messages as $message) {
+                $this->outputLine($message);
+            }
+            $this->quit(1);
         }
     }
 
