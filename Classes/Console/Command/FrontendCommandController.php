@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Command;
  */
 
 use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpProcess;
 
 class FrontendCommandController extends CommandController
@@ -46,7 +47,7 @@ class FrontendCommandController extends CommandController
             $this->quit(1);
         }
 
-        $this->output($rawResponse->content);
+        $this->output->getSymfonyConsoleOutput()->write($rawResponse->content, false, OutputInterface::OUTPUT_RAW);
     }
 
     /**
