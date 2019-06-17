@@ -112,6 +112,34 @@ class BackendCommandControllerTest extends AbstractCommandTest
         $this->executeMysqlQuery('DELETE FROM be_users WHERE username LIKE "test\_%"');
     }
 
+    public function createAdminUserCreatesUserWithShortNamesDataProvider(): array
+    {
+        return [
+           '3 chars' => [
+               'foo',
+           ],
+           '2 chars' => [
+               'fo',
+           ],
+           '1 char' => [
+               'f',
+           ],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider createAdminUserCreatesUserWithShortNamesDataProvider
+     * @param string $username
+     */
+    public function createAdminUserCreatesUserWithShortNames(string $username)
+    {
+        $this->executeConsoleCommand('backend:createadmin', [$username, 'password']);
+        $queryResult = $this->executeMysqlQuery(sprintf('SELECT username FROM be_users WHERE username="%s";', $username));
+        $this->assertSame($username, trim($queryResult));
+        $this->executeMysqlQuery(sprintf('DELETE FROM be_users WHERE username="%s"', $username));
+    }
+
     /**
      * @test
      */
@@ -121,7 +149,7 @@ class BackendCommandControllerTest extends AbstractCommandTest
             $this->commandDispatcher->executeCommand('backend:createadmin', ['', 'bar']);
             $this->fail('Command did not fail as expected (user is created)');
         } catch (FailedSubProcessCommandException $e) {
-            $this->assertContains('Username must be at least 1 character', $e->getOutputMessage());
+            $this->assertContains('Username must have at least 1 character', $e->getOutputMessage());
         }
     }
 
@@ -134,7 +162,7 @@ class BackendCommandControllerTest extends AbstractCommandTest
             $this->commandDispatcher->executeCommand('backend:createadmin', ['foobar', 'baz']);
             $this->fail('Command did not fail as expected (user is created)');
         } catch (FailedSubProcessCommandException $e) {
-            $this->assertContains('Password must be at least 8 characters', $e->getOutputMessage());
+            $this->assertContains('Password must have at least 8 characters', $e->getOutputMessage());
         }
     }
 

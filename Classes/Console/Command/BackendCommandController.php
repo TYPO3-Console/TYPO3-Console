@@ -149,11 +149,11 @@ class BackendCommandController extends CommandController
         }
 
         if ($username === '') {
-            $this->outputLine('<error>Username must be at least 1 character.</error>');
+            $this->outputLine('<error>Username must have at least 1 character.</error>');
             $this->quit(1);
         }
         if (strlen($password) < 8) {
-            $this->outputLine('<error>Password must be at least 8 characters.</error>');
+            $this->outputLine('<error>Password must have at least 8 characters.</error>');
             $this->quit(1);
         }
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
