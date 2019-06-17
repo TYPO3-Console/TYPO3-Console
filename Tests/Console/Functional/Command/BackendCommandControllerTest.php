@@ -118,10 +118,10 @@ class BackendCommandControllerTest extends AbstractCommandTest
     public function adminUserWithTooShortUsernameWillBeRejected()
     {
         try {
-            $this->commandDispatcher->executeCommand('backend:createadmin', ['foo', 'bar']);
+            $this->commandDispatcher->executeCommand('backend:createadmin', ['', 'bar']);
             $this->fail('Command did not fail as expected (user is created)');
         } catch (FailedSubProcessCommandException $e) {
-            $this->assertContains('Username must be at least 4 characters', $e->getOutputMessage());
+            $this->assertContains('Username must be at least 1 character', $e->getOutputMessage());
         }
     }
 

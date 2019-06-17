@@ -148,8 +148,8 @@ class BackendCommandController extends CommandController
             $this->outputLine('<warning>Given username "%s" contains invalid characters. Using "%s" instead.</warning>', [$givenUsername, $username]);
         }
 
-        if (strlen($username) < 4) {
-            $this->outputLine('<error>Username must be at least 4 characters.</error>');
+        if ($username === '') {
+            $this->outputLine('<error>Username must be at least 1 character.</error>');
             $this->quit(1);
         }
         if (strlen($password) < 8) {
