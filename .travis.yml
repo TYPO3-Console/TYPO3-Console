@@ -86,6 +86,7 @@ jobs:
     - stage: test
       php: 7.0
       env: Consistency checks
+      before_install: skip
       install: skip
       before_script: skip
       script:
