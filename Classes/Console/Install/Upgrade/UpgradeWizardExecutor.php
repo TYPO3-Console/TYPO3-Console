@@ -20,6 +20,7 @@ use TYPO3\CMS\Core\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Updates\AbstractUpdate;
 use TYPO3\CMS\Install\Updates\ChattyInterface;
+use TYPO3\CMS\Install\Updates\RepeatableInterface;
 use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
 
 /**
@@ -85,7 +86,11 @@ class UpgradeWizardExecutor
 
         if ($wizardImplementsInterface) {
             $hasPerformed = $upgradeWizard->executeUpdate();
-            GeneralUtility::makeInstance(Registry::class)->set('installUpdate', get_class($upgradeWizard), 1);
+
+            if (!$upgradeWizard instanceof RepeatableInterface) {
+                GeneralUtility::makeInstance(Registry::class)->set('installUpdate', get_class($upgradeWizard), 1);
+            }
+
             $messages[] = $output->fetch();
         } else {
             $message = '';
