@@ -8,6 +8,8 @@ addons:
       - develop
 jdk:
   - oraclejdk8
+services:
+  - mysql
 cache:
   directories:
     - $HOME/.composer/cache
