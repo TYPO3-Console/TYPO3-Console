@@ -8,6 +8,8 @@ addons:
       - develop
 jdk:
   - oraclejdk8
+services:
+  - mysql
 cache:
   directories:
     - $HOME/.composer/cache
@@ -86,6 +88,7 @@ jobs:
     - stage: test
       php: 7.0
       env: Consistency checks
+      before_install: skip
       install: skip
       before_script: skip
       script:
