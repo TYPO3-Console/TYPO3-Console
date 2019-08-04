@@ -81,7 +81,7 @@ class UpgradeWizardList
                 ];
                 $explanation = '';
                 $wizardImplementsInterface = $updateObject instanceof UpgradeWizardInterface && !$updateObject instanceof AbstractUpdate;
-                $markedAsDone = $this->registry->get('installUpdate', $className, false) || $this->registry->get('installUpdate', $identifier, false);
+                $markedAsDone = $this->registry->get('installUpdate', $className, false);
                 if ($wizardImplementsInterface) {
                     $explanation = $updateObject->getDescription();
                     $wizardClaimsExecution = $updateObject->updateNecessary();
