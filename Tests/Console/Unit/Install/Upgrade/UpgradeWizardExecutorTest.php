@@ -18,6 +18,7 @@ use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardExecutor;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardFactory;
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\ChattyUpgradeWizard;
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\DummyUpgradeWizard;
+use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\RepeatableUpgradeWizard;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 use TYPO3\CMS\Core\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -109,6 +110,26 @@ class UpgradeWizardExecutorTest extends UnitTestCase
         $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $registryProphecy->reveal());
         $result = $subject->executeWizard('Foo\\Test', [], true);
         $this->assertFalse($result->hasPerformed());
+    }
+
+    /**
+     * @test
+     */
+    public function repeatableWizardsAreNotMarkedDoneAfterExecution()
+    {
+        $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
+        $upgradeWizardProphecy = $this->prophesize(RepeatableUpgradeWizard::class);
+        $upgradeWizardProphecy->updateNecessary()->willReturn(true);
+        $upgradeWizardProphecy->executeUpdate()->shouldBeCalled()->willReturn(true);
+        $upgradeWizardProphet = $upgradeWizardProphecy->reveal();
+        $factoryProphecy->create('Foo\\Test')->willReturn($upgradeWizardProphet);
+
+        $registryProphecy = $this->prophesize(Registry::class);
+        $registryProphecy->set('installUpdate', get_class($upgradeWizardProphet), 1)->shouldNotBeCalled();
+
+        $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $registryProphecy->reveal());
+        $result = $subject->executeWizard('Foo\\Test');
+        $this->assertTrue($result->hasPerformed());
     }
 
     /**
