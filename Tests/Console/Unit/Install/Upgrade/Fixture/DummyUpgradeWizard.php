@@ -14,22 +14,53 @@ namespace Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture;
  *
  */
 
-use TYPO3\CMS\Install\Updates\AbstractUpdate;
+use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
 
-class DummyUpgradeWizard extends AbstractUpdate
+class DummyUpgradeWizard implements UpgradeWizardInterface
 {
-    public function checkForUpdate(&$description)
+    /**
+     * @var bool
+     */
+    private $needsUpdate;
+
+    /**
+     * @var bool
+     */
+    private $succeedsUpdate;
+
+    public function __construct(bool $needsUpdate = true, bool $succeedsUpdate = true)
     {
-        // Dummy
+        $this->needsUpdate = $needsUpdate;
+        $this->succeedsUpdate = $succeedsUpdate;
     }
 
-    public function performUpdate(array &$dbQueries, &$customMessage)
+    public function getIdentifier(): string
     {
-        // Dummy
+        return 'dummy-identifier';
     }
 
-    public function markWizardAsDone($confValue = 1)
+    public function getTitle(): string
     {
-        parent::markWizardAsDone($confValue);
+        return self::class;
+    }
+
+    public function getDescription(): string
+    {
+        return self::class;
+    }
+
+    public function executeUpdate(): bool
+    {
+        return $this->succeedsUpdate;
+    }
+
+    public function updateNecessary(): bool
+    {
+        return $this->needsUpdate;
+    }
+
+    public function getPrerequisites(): array
+    {
+        return [];
     }
 }
