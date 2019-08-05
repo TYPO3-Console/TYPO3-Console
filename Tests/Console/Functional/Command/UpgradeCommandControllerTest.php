@@ -161,7 +161,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
                 '--no-update',
             ]
         );
-        $output = $this->executeComposerCommand(['update', 'typo3/*', 'doctrine/dbal', 'doctrine/instantiator', 'helhum/typo3-composer-setup']);
+        $output = $this->executeComposerCommand(['update']);
         if (DIRECTORY_SEPARATOR === '\\') {
             $output = preg_replace('/[^\x09-\x0d\x1b\x20-\xff]/', '', $output);
         }
