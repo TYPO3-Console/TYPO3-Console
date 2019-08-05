@@ -65,10 +65,10 @@ jobs:
   include:
     - stage: test
       php: 7.3
-      env: TYPO3_VERSION="~9.5.0" TYPO3_UPGRADE_FROM_VERSION="~9.5.0"
+      env: TYPO3_VERSION="~9.5.8" TYPO3_UPGRADE_FROM_VERSION="~9.5.8"
     - stage: test
       php: 7.2
-      env: TYPO3_VERSION="~9.5.0"
+      env: TYPO3_VERSION="~9.5.8"
     - stage: test
       php: 7.2
       env: TYPO3_VERSION=^8.7.22

@@ -20,6 +20,7 @@ use TYPO3\CMS\Core\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Updates\AbstractUpdate;
 use TYPO3\CMS\Install\Updates\ChattyInterface;
+use TYPO3\CMS\Install\Updates\RepeatableInterface;
 use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
 
 /**
@@ -33,9 +34,15 @@ class UpgradeWizardExecutor
      */
     private $factory;
 
-    public function __construct(UpgradeWizardFactory $factory = null)
+    /**
+     * @var Registry
+     */
+    private $registry;
+
+    public function __construct(UpgradeWizardFactory $factory = null, Registry $registry = null)
     {
-        $this->factory = $factory ?: new UpgradeWizardFactory();
+        $this->factory = $factory ?? new UpgradeWizardFactory();
+        $this->registry = $registry ?? GeneralUtility::makeInstance(Registry::class);
     }
 
     public function executeWizard(string $identifier, array $rawArguments = [], bool $force = false): UpgradeWizardResult
@@ -52,7 +59,7 @@ class UpgradeWizardExecutor
         $wizardImplementsInterface = $upgradeWizard instanceof UpgradeWizardInterface && !$upgradeWizard instanceof AbstractUpdate;
         if ($force) {
             if ($wizardImplementsInterface) {
-                GeneralUtility::makeInstance(Registry::class)->set('installUpdate', $upgradeWizard->getIdentifier(), 0);
+                $this->registry->set('installUpdate', get_class($upgradeWizard), 0);
             } else {
                 $closure = \Closure::bind(function () use ($upgradeWizard) {
                     /** @var DummyUpgradeWizard $upgradeWizard here to avoid annoying (and wrong) protected method inspection in PHPStorm */
@@ -85,7 +92,11 @@ class UpgradeWizardExecutor
 
         if ($wizardImplementsInterface) {
             $hasPerformed = $upgradeWizard->executeUpdate();
-            GeneralUtility::makeInstance(Registry::class)->set('installUpdate', get_class($upgradeWizard), 1);
+
+            if (!$upgradeWizard instanceof RepeatableInterface) {
+                $this->registry->set('installUpdate', get_class($upgradeWizard), 1);
+            }
+
             $messages[] = $output->fetch();
         } else {
             $message = '';

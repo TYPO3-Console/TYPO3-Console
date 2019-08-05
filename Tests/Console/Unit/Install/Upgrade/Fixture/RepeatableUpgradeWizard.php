@@ -14,9 +14,10 @@ namespace Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture;
  *
  */
 
+use TYPO3\CMS\Install\Updates\RepeatableInterface;
 use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
 
-class DummyUpgradeWizard implements UpgradeWizardInterface
+class RepeatableUpgradeWizard implements UpgradeWizardInterface, RepeatableInterface
 {
     /**
      * @var bool
@@ -36,7 +37,7 @@ class DummyUpgradeWizard implements UpgradeWizardInterface
 
     public function getIdentifier(): string
     {
-        return 'dummy-identifier';
+        return self::class;
     }
 
     public function getTitle(): string

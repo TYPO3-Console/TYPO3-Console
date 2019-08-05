@@ -18,29 +18,21 @@ use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardExecutor;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardFactory;
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\ChattyUpgradeWizard;
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\DummyUpgradeWizard;
+use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\RepeatableUpgradeWizard;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
-use Prophecy\Argument;
-use Prophecy\Prophecy\MethodProphecy;
-use Prophecy\Prophecy\ObjectProphecy;
-use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Updates\ChattyInterface;
 
 class UpgradeWizardExecutorTest extends UnitTestCase
 {
-    private $singletonInstances = [];
-
     protected function setUp()
     {
+        if (!interface_exists(ChattyInterface::class)) {
+            // @deprecated will be removed with 6.0
+            $this->markTestSkipped('Skipping new upgrade tests on TYPO3 8.7');
+        }
         $this->singletonInstances = GeneralUtility::getSingletonInstances();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-        GeneralUtility::resetSingletonInstances($this->singletonInstances);
     }
 
     /**
@@ -50,10 +42,7 @@ class UpgradeWizardExecutorTest extends UnitTestCase
     {
         $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
         $upgradeWizardProphecy = $this->prophesize(DummyUpgradeWizard::class);
-        $upgradeWizardProphecy->shouldRenderWizard()->willReturn(false);
-        if (interface_exists(ChattyInterface::class)) {
-            $upgradeWizardProphecy->setOutput(new BufferedOutput())->shouldBeCalled();
-        }
+        $upgradeWizardProphecy->updateNecessary()->willReturn(false);
 
         $factoryProphecy->create('Foo\\Test')->willReturn($upgradeWizardProphecy->reveal());
 
@@ -65,61 +54,21 @@ class UpgradeWizardExecutorTest extends UnitTestCase
     /**
      * @test
      */
-    public function wizardIsCalledWhenNotDone()
+    public function wizardIsCalledWhenNotDoneAndMarkedExecuted()
     {
         $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
         $upgradeWizardProphecy = $this->prophesize(DummyUpgradeWizard::class);
-        $this->assertOutputInitForChattyWizard($upgradeWizardProphecy);
-        $upgradeWizardProphecy->shouldRenderWizard()->willReturn(true);
-        $upgradeWizardProphecy->performUpdate($queries = [], $message = '')->willReturn(true);
+        $upgradeWizardProphecy->updateNecessary()->willReturn(true);
+        $upgradeWizardProphecy->executeUpdate()->shouldBeCalled()->willReturn(true);
+        $upgradeWizardProphet = $upgradeWizardProphecy->reveal();
+        $factoryProphecy->create('Foo\\Test')->willReturn($upgradeWizardProphet);
 
-        $factoryProphecy->create('Foo\\Test')->willReturn($upgradeWizardProphecy->reveal());
+        $registryProphecy = $this->prophesize(Registry::class);
+        $registryProphecy->set('installUpdate', get_class($upgradeWizardProphet), 1)->shouldBeCalled();
 
-        $subject = new UpgradeWizardExecutor($factoryProphecy->reveal());
+        $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $registryProphecy->reveal());
         $result = $subject->executeWizard('Foo\\Test');
         $this->assertTrue($result->hasPerformed());
-    }
-
-    /**
-     * @test
-     */
-    public function updateNecessaryOutputWillBeCapturedForChattyWizard()
-    {
-        if (!interface_exists(ChattyInterface::class)) {
-            $this->markTestSkipped('ChattyInterface not available on TYPO3 8.7');
-        }
-        $registryProphecy = $this->prophesize(Registry::class);
-        $registryProphecy->set('installUpdate', ChattyUpgradeWizard::class, 1)->shouldBeCalled();
-        GeneralUtility::setSingletonInstance(Registry::class, $registryProphecy->reveal());
-
-        $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
-        $upgradeWizard = new ChattyUpgradeWizard();
-
-        $factoryProphecy->create(ChattyUpgradeWizard::class)->willReturn($upgradeWizard);
-
-        $subject = new UpgradeWizardExecutor($factoryProphecy->reveal());
-        $result = $subject->executeWizard(ChattyUpgradeWizard::class);
-        $this->assertTrue($result->hasPerformed());
-        $this->assertSame('updateNecessaryexecuteUpdate', $result->getMessages()[0] ?? '');
-    }
-
-    /**
-     * @test
-     */
-    public function updateNecessaryOutputWillBeCapturedForChattyWizardEvenIfWizardIsNotPerformed()
-    {
-        if (!interface_exists(ChattyInterface::class)) {
-            $this->markTestSkipped('ChattyInterface not available on TYPO3 8.7');
-        }
-        $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
-        $upgradeWizard = new ChattyUpgradeWizard(false);
-
-        $factoryProphecy->create(ChattyUpgradeWizard::class)->willReturn($upgradeWizard);
-
-        $subject = new UpgradeWizardExecutor($factoryProphecy->reveal());
-        $result = $subject->executeWizard(ChattyUpgradeWizard::class);
-        $this->assertFalse($result->hasPerformed());
-        $this->assertSame('updateNecessary', $result->getMessages()[0] ?? '');
     }
 
     /**
@@ -129,13 +78,15 @@ class UpgradeWizardExecutorTest extends UnitTestCase
     {
         $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
         $upgradeWizardProphecy = $this->prophesize(DummyUpgradeWizard::class);
-        $this->assertOutputInitForChattyWizard($upgradeWizardProphecy);
-        $upgradeWizardProphecy->shouldRenderWizard()->willReturn(true);
-        $upgradeWizardProphecy->performUpdate($queries = [], $message = '')->willReturn(false);
+        $upgradeWizardProphecy->updateNecessary()->willReturn(true);
+        $upgradeWizardProphecy->executeUpdate()->shouldBeCalled()->willReturn(false);
+        $upgradeWizardProphet = $upgradeWizardProphecy->reveal();
+        $factoryProphecy->create('Foo\\Test')->willReturn($upgradeWizardProphet);
 
-        $factoryProphecy->create('Foo\\Test')->willReturn($upgradeWizardProphecy->reveal());
+        $registryProphecy = $this->prophesize(Registry::class);
+        $registryProphecy->set('installUpdate', get_class($upgradeWizardProphet), 1)->shouldBeCalled();
 
-        $subject = new UpgradeWizardExecutor($factoryProphecy->reveal());
+        $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $registryProphecy->reveal());
         $result = $subject->executeWizard('Foo\\Test');
         $this->assertFalse($result->hasPerformed());
     }
@@ -147,33 +98,71 @@ class UpgradeWizardExecutorTest extends UnitTestCase
     {
         $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
         $upgradeWizardProphecy = $this->prophesize(DummyUpgradeWizard::class);
-        $upgradeWizardProphecy->shouldRenderWizard()->willReturn(false);
-        $upgradeWizardProphecy->markWizardAsDone(0)->shouldBeCalled();
-        $upgradeWizardProphecy->performUpdate($queries = [], $message = '')->willReturn(true);
-        if (interface_exists(ChattyInterface::class)) {
-            $upgradeWizardProphecy->setOutput(new BufferedOutput())->shouldBeCalled();
-        }
+        $upgradeWizardProphecy->updateNecessary()->willReturn(true);
+        $upgradeWizardProphecy->executeUpdate()->shouldBeCalled()->willReturn(false);
+        $upgradeWizardProphet = $upgradeWizardProphecy->reveal();
+        $factoryProphecy->create('Foo\\Test')->willReturn($upgradeWizardProphet);
 
-        $factoryProphecy->create('Foo\\Test')->willReturn($upgradeWizardProphecy->reveal());
+        $registryProphecy = $this->prophesize(Registry::class);
+        $registryProphecy->set('installUpdate', get_class($upgradeWizardProphet), 0)->shouldBeCalled();
+        $registryProphecy->set('installUpdate', get_class($upgradeWizardProphet), 1)->shouldBeCalled();
 
-        $subject = new UpgradeWizardExecutor($factoryProphecy->reveal());
+        $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $registryProphecy->reveal());
         $result = $subject->executeWizard('Foo\\Test', [], true);
         $this->assertFalse($result->hasPerformed());
     }
 
     /**
-     * @param DummyUpgradeWizard|ObjectProphecy $upgradeWizardProphecy
+     * @test
      */
-    private function assertOutputInitForChattyWizard(ObjectProphecy $upgradeWizardProphecy)
+    public function repeatableWizardsAreNotMarkedDoneAfterExecution()
     {
-        if (!interface_exists(ChattyInterface::class)) {
-            return;
-        }
+        $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
+        $upgradeWizardProphecy = $this->prophesize(RepeatableUpgradeWizard::class);
+        $upgradeWizardProphecy->updateNecessary()->willReturn(true);
+        $upgradeWizardProphecy->executeUpdate()->shouldBeCalled()->willReturn(true);
+        $upgradeWizardProphet = $upgradeWizardProphecy->reveal();
+        $factoryProphecy->create('Foo\\Test')->willReturn($upgradeWizardProphet);
 
-        /** @var OutputInterface $outputInterfaceArgument */
-        $outputInterfaceArgument = Argument::type(OutputInterface::class);
-        /** @var MethodProphecy $setOutputMethod */
-        $setOutputMethod = $upgradeWizardProphecy->setOutput($outputInterfaceArgument);
-        $setOutputMethod->shouldBeCalled();
+        $registryProphecy = $this->prophesize(Registry::class);
+        $registryProphecy->set('installUpdate', get_class($upgradeWizardProphet), 1)->shouldNotBeCalled();
+
+        $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $registryProphecy->reveal());
+        $result = $subject->executeWizard('Foo\\Test');
+        $this->assertTrue($result->hasPerformed());
+    }
+
+    /**
+     * @test
+     */
+    public function updateNecessaryOutputWillBeCapturedForChattyWizard()
+    {
+        $registryProphecy = $this->prophesize(Registry::class);
+        $registryProphecy->set('installUpdate', ChattyUpgradeWizard::class, 1)->shouldBeCalled();
+
+        $upgradeWizard = new ChattyUpgradeWizard();
+        $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
+        $factoryProphecy->create(ChattyUpgradeWizard::class)->willReturn($upgradeWizard);
+
+        $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $registryProphecy->reveal());
+        $result = $subject->executeWizard(ChattyUpgradeWizard::class);
+        $this->assertTrue($result->hasPerformed());
+        $this->assertSame('updateNecessaryexecuteUpdate', $result->getMessages()[0] ?? '');
+    }
+
+    /**
+     * @test
+     */
+    public function updateNecessaryOutputWillBeCapturedForChattyWizardEvenIfWizardIsNotPerformed()
+    {
+        $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
+        $upgradeWizard = new ChattyUpgradeWizard(false);
+
+        $factoryProphecy->create(ChattyUpgradeWizard::class)->willReturn($upgradeWizard);
+
+        $subject = new UpgradeWizardExecutor($factoryProphecy->reveal());
+        $result = $subject->executeWizard(ChattyUpgradeWizard::class);
+        $this->assertFalse($result->hasPerformed());
+        $this->assertSame('updateNecessary', $result->getMessages()[0] ?? '');
     }
 }
