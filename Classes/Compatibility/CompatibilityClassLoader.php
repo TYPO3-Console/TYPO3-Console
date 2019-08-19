@@ -34,7 +34,7 @@ class CompatibilityClassLoader
     public function __construct(ClassLoader $originalClassLoader)
     {
         $this->originalClassLoader = $this->typo3ClassLoader = $originalClassLoader;
-        $this->handleExtensionCompatibility();
+        $this->handleExtensionCompatibility($originalClassLoader);
         $this->handleTypo3Compatibility();
     }
 
@@ -60,7 +60,7 @@ class CompatibilityClassLoader
         return $this->typo3ClassLoader;
     }
 
-    private function handleExtensionCompatibility()
+    private function handleExtensionCompatibility(ClassLoader $originalClassLoader)
     {
         if (class_exists(Bootstrap::class)) {
             return;
@@ -69,7 +69,9 @@ class CompatibilityClassLoader
         putenv('TYPO3_PATH_ROOT=' . $rootPath);
         $_ENV['TYPO3_PATH_ROOT'] = $rootPath;
         $_SERVER['TYPO3_PATH_ROOT'] = $rootPath;
+        $originalClassLoader->unregister();
         $this->typo3ClassLoader = require $typo3AutoLoadFile;
+        $originalClassLoader->register(true);
     }
 
     private function handleTypo3Compatibility()
