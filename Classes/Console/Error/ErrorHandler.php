@@ -14,23 +14,40 @@ namespace Helhum\Typo3Console\Error;
  *
  */
 
+use TYPO3\CMS\Core\Log\LogManager;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Global error handler for TYPO3 Console
  */
 class ErrorHandler
 {
     /**
-     * @var array
+     * @var int
      */
-    protected $exceptionalErrors = [];
+    private $errorsToHandle;
+
+    /**
+     * @var int
+     */
+    private $exceptionalErrors;
+
+    /**
+     * Sets which error should be handled by the error handler
+     *
+     * @param int $errorsToHandle
+     */
+    public function setErrorsToHandle(int $errorsToHandle)
+    {
+        $this->errorsToHandle = $errorsToHandle;
+    }
 
     /**
      * Defines which error levels result should result in an exception thrown.
      *
-     * @param array $exceptionalErrors An array of E_* error levels
-     * @return void
+     * @param int $exceptionalErrors E_* error levels
      */
-    public function setExceptionalErrors(array $exceptionalErrors)
+    public function setExceptionalErrors(int $exceptionalErrors)
     {
         $this->exceptionalErrors = $exceptionalErrors;
     }
@@ -46,26 +63,41 @@ class ErrorHandler
      * @param string $errorFile Name of the file the error occurred in
      * @param int $errorLine Line number where the error occurred
      * @throws \TYPO3\CMS\Core\Error\Exception with the data passed to this method
-     * @return void
+     * @return bool
      */
-    public function handleError($errorLevel, $errorMessage, $errorFile, $errorLine)
+    public function handleError($errorLevel, $errorMessage, $errorFile, $errorLine): bool
     {
-        if (error_reporting() === 0) {
-            return;
+        $configuredErrorReporting = error_reporting();
+        if (($configuredErrorReporting & $errorLevel) === 0 || ($errorLevel & $this->errorsToHandle) === 0) {
+            return false;
         }
 
         $errorLevels = [
             E_WARNING => 'Warning',
-            E_NOTICE => 'Notice',
             E_USER_ERROR => 'User Error',
             E_USER_WARNING => 'User Warning',
             E_USER_NOTICE => 'User Notice',
             E_STRICT => 'Runtime Notice',
             E_RECOVERABLE_ERROR => 'Catchable Fatal Error',
+            E_USER_DEPRECATED => 'Deprecation Notice',
         ];
 
-        if (in_array($errorLevel, (array)$this->exceptionalErrors, true)) {
+        if ($errorLevel & $this->exceptionalErrors) {
             throw new \TYPO3\CMS\Core\Error\Exception($errorLevels[$errorLevel] . ': ' . $errorMessage . ' in ' . $errorFile . ' line ' . $errorLine, 1);
         }
+
+        if ($errorLevel === E_USER_DEPRECATED) {
+            $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger('TYPO3.CMS.deprecations');
+            $logger->notice($errorMessage, ['file' => $errorFile, 'line' => $errorLine]);
+
+            return true;
+        }
+
+        // Since all other severities are enforced to throw an exception (see: \Helhum\Typo3Console\Core\Booting\Scripts::initializeErrorHandling)
+        // we can just log a notice here.
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+        $logger->notice($errorMessage, ['file' => $errorFile, 'line' => $errorLine]);
+
+        return true;
     }
 }
