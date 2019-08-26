@@ -23,6 +23,7 @@ use TYPO3\CMS\Extbase\Reflection\DocCommentParser;
 use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
 use TYPO3\CMS\Fluid\Core\ViewHelper\ArgumentDefinition;
+use TYPO3Fluid\Fluid\ViewHelpers\IfViewHelper;
 
 /**
  * XML Schema (XSD) Generator. Will generate an XML schema which can be used for auto-completion
@@ -257,7 +258,9 @@ class XsdGenerator
         $packageKey = $this->getPackageKeyFromNamespace($namespace);
         $viewHelperClassFilePaths[] = $this->packageManager->getPackage($packageKey)->getPackagePath() . 'Classes/ViewHelpers/';
         if ($packageKey === 'fluid') {
-            $viewHelperClassFilePaths[] = realpath(PATH_site . 'typo3/') . '/../vendor/typo3fluid/fluid/src/ViewHelpers/';
+            $fluidClassReflection = new \ReflectionClass(IfViewHelper::class);
+            $fluidClassPath = $fluidClassReflection->getFileName();
+            $viewHelperClassFilePaths[] = substr($fluidClassPath, 0, stripos($fluidClassPath, 'IfViewHelper.php'));
         }
 
         return $this->getClassNamesInPaths($viewHelperClassFilePaths);
