@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 use Symfony\Component\Console\Exception\RuntimeException;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 
@@ -137,12 +138,18 @@ class CommandConfiguration
         return $this->commandDefinitions;
     }
 
+    /**
+     * @deprecated will be removed with 6.0
+     *
+     * @param array $commandControllers
+     * @return array
+     */
     public function addCommandControllerCommands(array $commandControllers): array
     {
         $addedCommandDefinitions = self::unifyCommandConfiguration(['controllers' => $commandControllers], '_lateCommands');
         $this->commandDefinitions = array_merge($this->commandDefinitions, $addedCommandDefinitions);
 
-        if (!empty($addedCommandDefinitions)) {
+        if (!empty($addedCommandDefinitions[1]) && $addedCommandDefinitions[0]['name'] !== 'help:error') {
             trigger_error('Registering commands via $GLOBALS[\'TYPO3_CONF_VARS\'][\'SC_OPTIONS\'][\'extbase\'][\'commandControllers\'] is deprecated and will be removed with 6.0. Register Symfony commands in Configuration/Commands.php instead.', E_USER_DEPRECATED);
         }
 
@@ -174,8 +181,11 @@ class CommandConfiguration
     private function getConfigFromExtension(PackageInterface $package): array
     {
         $commandConfiguration = [];
+        // @deprecated will be removed with 6.0
         if (file_exists($commandConfigurationFile = $package->getPackagePath() . 'Configuration/Console/Commands.php')) {
-            trigger_error('Configuration/Console/Commands.php for registering commands is deprecated and will be removed with 6.0. Register Symfony commands in Configuration/Commands.php instead.', E_USER_DEPRECATED);
+            if (class_exists(Environment::class)) {
+                trigger_error($package->getPackageKey() . ': Configuration/Console/Commands.php for registering commands is deprecated and will be removed with 6.0. Register Symfony commands in Configuration/Commands.php instead.', E_USER_DEPRECATED);
+            }
             $commandConfiguration = require $commandConfigurationFile;
         }
         if (file_exists($commandConfigurationFile = $package->getPackagePath() . 'Configuration/Commands.php')) {

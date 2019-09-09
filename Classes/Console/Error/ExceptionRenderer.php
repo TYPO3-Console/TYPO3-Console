@@ -21,6 +21,8 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
+use TYPO3\CMS\Core\Log\LogManager;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ExceptionRenderer
 {
@@ -43,6 +45,7 @@ class ExceptionRenderer
      */
     public function render(\Throwable $exception, OutputInterface $output, Application $application = null)
     {
+        $this->writeLog($exception);
         if (getenv('TYPO3_CONSOLE_SUB_PROCESS')) {
             $output->write(\json_encode($this->serializeException($exception)), false, OutputInterface::VERBOSITY_QUIET);
 
@@ -64,6 +67,15 @@ class ExceptionRenderer
         } while ($exception);
 
         $this->outputSynopsis($output, $application);
+    }
+
+    private function writeLog(\Throwable $exception)
+    {
+        if (empty($GLOBALS['TYPO3_CONF_VARS']['LOG'])) {
+            return;
+        }
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+        $logger->critical($exception->getMessage(), ['exception' => $exception]);
     }
 
     /**
