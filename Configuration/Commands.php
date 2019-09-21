@@ -75,10 +75,9 @@ return [
     ],
     'cache:listgroups' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Cache\CacheListGroupsCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\CacheCommandController::class,
-        'controllerCommandName' => 'listGroups',
+        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
     ],
     'cleanup:updatereferenceindex' => [
         'vendor' => 'typo3_console',
