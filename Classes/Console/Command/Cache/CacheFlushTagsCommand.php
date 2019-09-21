@@ -38,8 +38,9 @@ class CacheFlushTagsCommand extends Command
         );
         $this->addOption(
             'groups',
-            'g',
-            InputOption::VALUE_OPTIONAL,
+            null,
+            null,
+            InputOption::VALUE_REQUIRED,
             'Optional array of groups (specified as comma separated values) for which to flush tags. If no group is specified, caches of all groups are flushed.',
             null
         );
