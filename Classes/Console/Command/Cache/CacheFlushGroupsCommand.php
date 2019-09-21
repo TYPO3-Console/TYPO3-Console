@@ -51,7 +51,6 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $groups = GeneralUtility::trimExplode(',', $input->getArgument('groups'), true);
         $application = $this->getApplication();
         if (!$application instanceof Application) {
             throw new \RuntimeException('Fatal error. Application is not properly initialized.', 1546617606);
@@ -59,6 +58,8 @@ EOH
 
         $io = new SymfonyStyle($input, $output);
         $application->boot(RunLevel::LEVEL_FULL);
+
+        $groups = GeneralUtility::trimExplode(',', $input->getArgument('groups'), true);
 
         try {
             $cacheService = new CacheService();
