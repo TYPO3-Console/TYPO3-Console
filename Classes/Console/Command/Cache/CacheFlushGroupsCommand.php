@@ -65,10 +65,12 @@ EOH
             $cacheService->flushGroups($groups);
         } catch (NoSuchCacheGroupException $e) {
             $io->writeln($e->getMessage());
+
             return 1;
         }
 
         $io->writeln('Flushed all caches for group(s): "' . implode('","', $groups) . '".');
+
         return 0;
     }
 }
