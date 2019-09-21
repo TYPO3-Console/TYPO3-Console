@@ -62,10 +62,9 @@ return [
     ],
     'cache:flushgroups' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Cache\CacheFlushGroupsCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\CacheCommandController::class,
-        'controllerCommandName' => 'flushGroups',
+        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
     ],
     'cache:flushtags' => [
         'vendor' => 'typo3_console',

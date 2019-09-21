@@ -34,31 +34,6 @@ class CacheCommandController extends CommandController
     }
 
     /**
-     * Flush all caches in specified groups
-     *
-     * Flushes all caches in specified groups.
-     * Valid group names are by default:
-     *
-     * - lowlevel
-     * - pages
-     * - system
-     *
-     * <b>Example:</b> <code>%command.full_name% pages,all</code>
-     *
-     * @param array $groups An array of names (specified as comma separated values) of cache groups to flush
-     */
-    public function flushGroupsCommand(array $groups)
-    {
-        try {
-            $this->cacheService->flushGroups($groups);
-            $this->outputLine('Flushed all caches for group(s): "' . implode('","', $groups) . '".');
-        } catch (NoSuchCacheGroupException $e) {
-            $this->outputLine($e->getMessage());
-            $this->quit(1);
-        }
-    }
-
-    /**
      * Flush cache by tags
      *
      * Flushes caches by tags, optionally only caches in specified groups.
