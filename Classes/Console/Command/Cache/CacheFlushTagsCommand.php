@@ -14,14 +14,12 @@ namespace Helhum\Typo3Console\Command\Cache;
  *
  */
 
-use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Helhum\Typo3Console\Service\CacheService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -53,13 +51,6 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $application = $this->getApplication();
-        if (!$application instanceof Application) {
-            throw new \RuntimeException('Fatal error. Application is not properly initialized.', 1546617606);
-        }
-
-        $io = new SymfonyStyle($input, $output);
-
         $tags = GeneralUtility::trimExplode(',', $input->getArgument('tags'), true);
         if ($input->getOption('groups') !== null) {
             $groups = GeneralUtility::trimExplode(',', $input->getOption('groups'), true);
@@ -71,12 +62,12 @@ EOH
             $cacheService = new CacheService();
             $cacheService->flushByTagsAndGroups($tags, $groups);
             if ($groups === null) {
-                $io->writeln('Flushed caches by tags "' . implode('","', $tags) . '".');
+                $output->writeln('Flushed caches by tags "' . implode('","', $tags) . '".');
             } else {
-                $io->writeln('Flushed caches by tags "' . implode('","', $tags) . '" in groups: "' . implode('","', $groups) . '".');
+                $output->writeln('Flushed caches by tags "' . implode('","', $tags) . '" in groups: "' . implode('","', $groups) . '".');
             }
         } catch (NoSuchCacheGroupException $e) {
-            $io->writeln($e->getMessage());
+            $output->writeln($e->getMessage());
 
             return 1;
         }

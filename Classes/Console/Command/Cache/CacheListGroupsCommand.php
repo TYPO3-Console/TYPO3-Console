@@ -14,12 +14,10 @@ namespace Helhum\Typo3Console\Command\Cache;
  *
  */
 
-use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Helhum\Typo3Console\Service\CacheService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 class CacheListGroupsCommand extends Command
 {
@@ -31,26 +29,19 @@ class CacheListGroupsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $application = $this->getApplication();
-        if (!$application instanceof Application) {
-            throw new \RuntimeException('Fatal error. Application is not properly initialized.', 1546617606);
-        }
-
-        $io = new SymfonyStyle($input, $output);
-
         $cacheService = new CacheService();
         $groups = $cacheService->getValidCacheGroups();
         sort($groups);
 
         switch (count($groups)) {
             case 0:
-                $io->writeln('No cache groups are registered.');
+                $output->writeln('No cache groups are registered.');
                 break;
             case 1:
-                $io->writeln('The following cache group is registered: "' . implode('", "', $groups) . '".');
+                $output->writeln('The following cache group is registered: "' . implode('", "', $groups) . '".');
                 break;
             default:
-                $io->writeln('The following cache groups are registered: "' . implode('", "', $groups) . '".');
+                $output->writeln('The following cache groups are registered: "' . implode('", "', $groups) . '".');
                 break;
         }
 

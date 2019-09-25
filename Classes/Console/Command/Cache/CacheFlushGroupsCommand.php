@@ -14,13 +14,11 @@ namespace Helhum\Typo3Console\Command\Cache;
  *
  */
 
-use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Helhum\Typo3Console\Service\CacheService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -50,25 +48,18 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $application = $this->getApplication();
-        if (!$application instanceof Application) {
-            throw new \RuntimeException('Fatal error. Application is not properly initialized.', 1546617606);
-        }
-
-        $io = new SymfonyStyle($input, $output);
-
         $groups = GeneralUtility::trimExplode(',', $input->getArgument('groups'), true);
 
         try {
             $cacheService = new CacheService();
             $cacheService->flushGroups($groups);
         } catch (NoSuchCacheGroupException $e) {
-            $io->writeln($e->getMessage());
+            $output->writeln($e->getMessage());
 
             return 1;
         }
 
-        $io->writeln('Flushed all caches for group(s): "' . implode('","', $groups) . '".');
+        $output->writeln('Flushed all caches for group(s): "' . implode('","', $groups) . '".');
 
         return 0;
     }
