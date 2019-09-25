@@ -62,24 +62,18 @@ return [
     ],
     'cache:flushgroups' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Cache\CacheFlushGroupsCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\CacheCommandController::class,
-        'controllerCommandName' => 'flushGroups',
     ],
     'cache:flushtags' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Cache\CacheFlushTagsCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\CacheCommandController::class,
-        'controllerCommandName' => 'flushTags',
     ],
     'cache:listgroups' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Cache\CacheListGroupsCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\CacheCommandController::class,
-        'controllerCommandName' => 'listGroups',
     ],
     'cleanup:updatereferenceindex' => [
         'vendor' => 'typo3_console',
