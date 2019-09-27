@@ -77,10 +77,8 @@ return [
     ],
     'cleanup:updatereferenceindex' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Cleanup\UpdateReferenceIndexCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\CleanupCommandController::class,
-        'controllerCommandName' => 'updateReferenceIndex',
         'replace' => [
             'backend:referenceindex:update',
         ],
