@@ -650,7 +650,7 @@ Options
 ~~~~~~~
 
 `--exclude|-e`
-   Full table name or wildcard expression to exclude from the export.
+   Full table name or wildcard expression to exclude from the export
 
 - Accept value: yes
 - Is value required: yes
@@ -692,7 +692,7 @@ Options
 ~~~~~~~
 
 `--interactive`
-   Open an interactive mysql shell using the TYPO3 connection settings.
+   Open an interactive mysql shell using the TYPO3 connection settings
 
 - Accept value: no
 - Is value required: no

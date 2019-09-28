@@ -135,18 +135,14 @@ return [
     ],
     'database:import' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Database\ImportCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\DatabaseCommandController::class,
-        'controllerCommandName' => 'import',
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
     ],
     'database:updateschema' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Database\UpdateSchemaCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\DatabaseCommandController::class,
-        'controllerCommandName' => 'updateSchema',
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
         'bootingSteps' => [
             'helhum.typo3console:database',
