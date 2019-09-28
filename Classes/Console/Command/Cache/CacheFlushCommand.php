@@ -14,18 +14,17 @@ namespace Helhum\Typo3Console\Command\Cache;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Helhum\Typo3Console\Service\CacheLowLevelCleaner;
 use Helhum\Typo3Console\Service\CacheService;
-use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class CacheFlushCommand extends AbstractConvertedCommand
+class CacheFlushCommand extends Command
 {
     protected function configure()
     {
@@ -35,23 +34,12 @@ class CacheFlushCommand extends AbstractConvertedCommand
 Flushes TYPO3 core caches first and after that, flushes caches from extensions.
 EOH
         );
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [
-            new InputOption(
-                'files-only',
-                null,
-                InputOption::VALUE_NONE,
-                'Only file caches are flushed'
-            ),
-        ];
+        $this->addOption(
+            'files-only',
+            null,
+            InputOption::VALUE_NONE,
+            'Only file caches are flushed'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -83,45 +71,5 @@ EOH
         $io->writeln('Flushed all caches.');
 
         return 0;
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     *
-     * @return array
-     */
-    protected function createDeprecatedDefinition(): array
-    {
-        return [
-            new InputOption(
-                'force',
-                null,
-                InputOption::VALUE_NONE,
-                'Cache is forcibly flushed (low level operations are performed)'
-            ),
-            new InputArgument(
-                'force',
-                null,
-                'Cache is forcibly flushed (low level operations are performed)',
-                false
-            ),
-            new InputArgument(
-                'filesOnly',
-                null,
-                'Only file caches are flushed',
-                false
-            ),
-        ];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        if ($input->getOption('force')) {
-            $io = new SymfonyStyle($input, $output);
-            $io->getErrorStyle()->writeln('<warning>Using "--force" is deprecated and has no effect any more.</warning>');
-        }
     }
 }
