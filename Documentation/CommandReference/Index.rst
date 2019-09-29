@@ -1007,7 +1007,7 @@ Arguments
 ~~~~~~~~~
 
 `requestUrl`
-   URL to make a frontend request.
+   URL to make a frontend request
 
 
 

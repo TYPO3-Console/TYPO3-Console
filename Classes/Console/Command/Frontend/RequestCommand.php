@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace Helhum\Typo3Console\Command;
+namespace Helhum\Typo3Console\Command\Frontend;
 
 /*
  * This file is part of the TYPO3 Console project.
@@ -14,40 +14,55 @@ namespace Helhum\Typo3Console\Command;
  *
  */
 
-use Helhum\Typo3Console\Mvc\Controller\CommandController;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpProcess;
 
-class FrontendCommandController extends CommandController
+class RequestCommand extends Command
 {
-    /**
-     * Submit frontend request
-     *
-     * Submits a frontend request to TYPO3 on the specified URL.
-     *
-     * @param string $requestUrl URL to make a frontend request.
-     */
-    public function requestCommand($requestUrl)
+    protected function configure()
     {
+        $this->setDescription('Submit frontend request');
+        $this->setHelp(
+            <<<'EOH'
+Submits a frontend request to TYPO3 on the specified URL.
+EOH
+        );
+        $this->addArgument(
+            'requestUrl',
+            InputArgument::REQUIRED,
+            'URL to make a frontend request'
+        );
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $requestUrl = $input->getArgument('requestUrl');
+
         // TODO: this needs heavy cleanup!
-        $template = file_get_contents(__DIR__ . '/../../../Resources/Private/Templates/request.tpl');
+        $template = file_get_contents(__DIR__ . '/../../../../Resources/Private/Templates/request.tpl');
         $arguments = [
             'documentRoot' => getenv('TYPO3_PATH_WEB') ?: PATH_site,
             'requestUrl' => $this->makeAbsolute($requestUrl),
         ];
+
         // No other solution atm than to fake a CLI request type
         $code = str_replace('{arguments}', var_export($arguments, true), $template);
         $process = new PhpProcess($code, null, null, 0);
         $process->mustRun();
         $rawResponse = json_decode($process->getOutput());
+
         if ($rawResponse === null || $rawResponse->status === 'failure') {
-            $this->outputLine('<error>An error occurred while trying to request the specified URL.</error>');
-            $this->outputLine(sprintf('<error>Error: %s</error>', !empty($rawResponse->error) ? $rawResponse->error : 'Could not decode response. Please check your error log!'));
-            $this->outputLine(sprintf('<error>Content: %s</error>', $process->getOutput()));
-            $this->quit(1);
+            $output->writeln('<error>An error occurred while trying to request the specified URL.</error>');
+            $output->writeln(sprintf('<error>Error: %s</error>', !empty($rawResponse->error) ? $rawResponse->error : 'Could not decode response. Please check your error log!'));
+            $output->writeln(sprintf('<error>Content: %s</error>', $process->getOutput()));
+
+            return 1;
         }
 
-        $this->output->getSymfonyConsoleOutput()->write($rawResponse->content, false, OutputInterface::OUTPUT_RAW);
+        $output->write($rawResponse->content, false, OutputInterface::OUTPUT_RAW);
     }
 
     /**

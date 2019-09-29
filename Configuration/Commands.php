@@ -232,10 +232,8 @@ return [
     ],
     'frontend:request' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Frontend\RequestCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\FrontendCommandController::class,
-        'controllerCommandName' => 'request',
     ],
     'install:setup' => [
         'vendor' => 'typo3_console',
