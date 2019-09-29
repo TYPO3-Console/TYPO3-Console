@@ -278,10 +278,8 @@ return [
     ],
     'upgrade:all' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeAllCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\UpgradeCommandController::class,
-        'controllerCommandName' => 'all',
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
         'replace' => [
             'install:upgrade:run',
@@ -289,18 +287,14 @@ return [
     ],
     'upgrade:checkextensionconstraints' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeCheckExtensionConstraintsCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\UpgradeCommandController::class,
-        'controllerCommandName' => 'checkExtensionConstraints',
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
     ],
     'upgrade:list' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeListCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\UpgradeCommandController::class,
-        'controllerCommandName' => 'list',
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
         'replace' => [
             'install:upgrade:list',
@@ -311,25 +305,19 @@ return [
     ],
     'upgrade:wizard' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeWizardCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\UpgradeCommandController::class,
-        'controllerCommandName' => 'wizard',
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
     ],
     'upgrade:subprocess' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeSubProcessCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\UpgradeCommandController::class,
-        'controllerCommandName' => 'subProcess',
     ],
     'upgrade:checkextensioncompatibility' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeCheckExtensionCompatibilityCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\UpgradeCommandController::class,
-        'controllerCommandName' => 'checkExtensionCompatibility',
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
     ],
 ];

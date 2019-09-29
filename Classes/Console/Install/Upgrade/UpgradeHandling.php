@@ -123,7 +123,7 @@ class UpgradeHandling
         $consoleOutput->progressStart(rand(6, 9));
         $consoleOutput->progressAdvance();
 
-        $wizards = $this->executeInSubProcess('listWizards', [], $messages);
+        $wizards = $this->executeInSubProcess('listWizards', []);
 
         $consoleOutput->progressStart(count($wizards['scheduled']) + 2);
 
