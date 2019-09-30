@@ -232,7 +232,7 @@ return [
     ],
     'frontend:request' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Frontend\RequestCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Frontend\FrontendRequestCommand::class,
         'schedulable' => false,
     ],
     'install:setup' => [

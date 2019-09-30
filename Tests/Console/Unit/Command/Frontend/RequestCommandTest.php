@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace  Helhum\Typo3Console\Tests\Unit\Command\Frontend;
 
-use Helhum\Typo3Console\Command\Frontend\RequestCommand;
+use Helhum\Typo3Console\Command\Frontend\FrontendRequestCommand;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 
 class RequestCommandTest extends UnitTestCase
@@ -33,8 +33,8 @@ class RequestCommandTest extends UnitTestCase
      */
     public function makeAbsoluteTest($expected, $given)
     {
-        /** @var RequestCommand $frontendRequest */
-        $frontendRequest = new RequestCommand();
+        /** @var FrontendRequestCommand $frontendRequest */
+        $frontendRequest = new FrontendRequestCommand();
         $parameter = [ $given ];
         $this->assertEquals($expected, $this->invokeMethod($frontendRequest, 'makeAbsolute', $parameter));
     }

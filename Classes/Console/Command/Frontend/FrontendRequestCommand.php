@@ -20,7 +20,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpProcess;
 
-class RequestCommand extends Command
+class FrontendRequestCommand extends Command
 {
     protected function configure()
     {
@@ -63,6 +63,8 @@ EOH
         }
 
         $output->write($rawResponse->content, false, OutputInterface::OUTPUT_RAW);
+
+        return 0;
     }
 
     /**
