@@ -330,7 +330,7 @@ return [
     ],
     'scheduler:run' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Scheduler\RunCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Scheduler\SchedulerRunCommand::class,
         'schedulable' => false,
         'replace' => [
             'scheduler:scheduler:run',

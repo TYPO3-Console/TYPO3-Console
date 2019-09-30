@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace Helhum\Typo3Console\Command\Scheduler;
+
 /*
  * This file is part of the TYPO3 Console project.
  *
@@ -16,21 +17,15 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Scheduler\Scheduler;
 
-class RunCommand extends Command
+class SchedulerRunCommand extends Command
 {
     /**
      * @var Scheduler
      */
     private $scheduler;
-
-    public function __construct(string $name = null, Scheduler $scheduler = null)
-    {
-        parent::__construct($name);
-        $this->scheduler = $scheduler;
-    }
 
     protected function configure()
     {
@@ -60,29 +55,32 @@ class RunCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io = new SymfonyStyle($input, $output);
-        $task = $input->hasOption('task') ? $input->getOption('task') : null;
-        $force = $input->hasOption('force') ? $input->getOption('force') : false;
-        if ($input->hasOption('task-id')) {
+        $this->scheduler = GeneralUtility::makeInstance(Scheduler::class);
+        $task = $input->getOption('task');
+        $force = $input->getOption('force');
+        if ($task === null && $task = $input->getOption('task-id')) {
             // @deprecated in 5.0 will be removed in 6.0
-            $io->warning('Using --task-id is deprecated. Please use --task instead.');
+            $output->writeln('<warning>Using --task-id is deprecated. Please use --task instead.</warning>');
             $task = $input->getOption('task-id');
         }
-        if ($task !== null) {
-            if ($task <= 0) {
-                $io->error('Task Id must be higher than zero.');
-
-                return 1;
-            }
-            $this->executeSingleTask($task, $force);
-        } else {
+        if ($task === null) {
             if ($force) {
-                $io->error('Execution can only be forced when a single task is specified.');
+                $output->writeln('Execution can only be forced when a single task is specified.');
 
                 return 2;
             }
             $this->executeScheduledTasks();
+
+            return 0;
         }
+        if ($task <= 0) {
+            $output->writeln('Task Id must be higher than zero.');
+
+            return 1;
+        }
+        $this->executeSingleTask($task, $force);
+
+        return 0;
     }
 
     /**
