@@ -135,13 +135,13 @@ return [
     ],
     'database:import' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Database\ImportCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Database\DatabaseImportCommand::class,
         'schedulable' => false,
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
     ],
     'database:updateschema' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Database\UpdateSchemaCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Database\DatabaseUpdateSchemaCommand::class,
         'schedulable' => false,
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
         'bootingSteps' => [

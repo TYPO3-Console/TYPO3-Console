@@ -27,32 +27,8 @@ use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 
-class UpdateSchemaCommand extends Command
+class DatabaseUpdateSchemaCommand extends Command
 {
-    /**
-     * @var SchemaService
-     */
-    protected $schemaService;
-
-    /**
-     * @var SchemaUpdateResultRenderer
-     */
-    protected $schemaUpdateResultRenderer;
-
-    public function __construct(
-        string $name = null,
-        SchemaService $schemaService = null,
-        SchemaUpdateResultRenderer $schemaUpdateResultRenderer = null
-    ) {
-        parent::__construct($name);
-
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->schemaService = $schemaService
-            ?? $objectManager->get(SchemaService::class);
-        $this->schemaUpdateResultRenderer = $schemaUpdateResultRenderer
-            ?? $objectManager->get(SchemaUpdateResultRenderer::class);
-    }
-
     protected function configure()
     {
         $this->setDescription('Update database schema (TYPO3 Database Compare)');
@@ -101,6 +77,10 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        $schemaService = $objectManager->get(SchemaService::class);
+        $schemaUpdateResultRenderer = new SchemaUpdateResultRenderer();
+
         $schemaUpdateTypes = (array)$input->getArgument('schemaUpdateTypes');
         $dryRun = $input->getOption('dry-run');
         $verbose = $output->isVerbose();
@@ -116,14 +96,14 @@ EOH
             return 1;
         }
 
-        $result = $this->schemaService->updateSchema($expandedSchemaUpdateTypes, $dryRun);
+        $result = $schemaService->updateSchema($expandedSchemaUpdateTypes, $dryRun);
 
         if ($result->hasPerformedUpdates()) {
             $output->writeln(sprintf(
                 '<info>The following database schema updates %s performed:</info>',
                 $dryRun ? 'should be' : 'were'
             ));
-            $this->schemaUpdateResultRenderer->render($result, $consoleOutput, $verbose);
+            $schemaUpdateResultRenderer->render($result, $consoleOutput, $verbose);
         } else {
             $output->writeln(sprintf(
                 '<info>No schema updates %s performed for update type%s:%s</info>',
@@ -136,9 +116,11 @@ EOH
         if ($result->hasErrors()) {
             $output->writeln('');
             $output->writeln('<error>The following errors occurred:</error>');
-            $this->schemaUpdateResultRenderer->renderErrors($result, $consoleOutput, $verbose);
+            $schemaUpdateResultRenderer->renderErrors($result, $consoleOutput, $verbose);
 
             return 1;
         }
+
+        return 0;
     }
 }

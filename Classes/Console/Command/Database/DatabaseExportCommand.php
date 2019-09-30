@@ -64,7 +64,7 @@ EOH
                 'exclude',
                 '-e',
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Full table name or wildcard expression to exclude from the export.',
+                'Full table name or wildcard expression to exclude from the export',
                 []
             ),
             new InputOption(
