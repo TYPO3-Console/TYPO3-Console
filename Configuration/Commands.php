@@ -330,10 +330,8 @@ return [
     ],
     'scheduler:run' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Scheduler\SchedulerRunCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\SchedulerCommandController::class,
-        'controllerCommandName' => 'run',
         'replace' => [
             'scheduler:scheduler:run',
         ],
