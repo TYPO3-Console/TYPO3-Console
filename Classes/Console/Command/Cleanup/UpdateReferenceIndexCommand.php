@@ -24,31 +24,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\CMS\Core\Log\Logger;
 use TYPO3\CMS\Core\Log\LogLevel;
+use TYPO3\CMS\Core\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 class UpdateReferenceIndexCommand extends Command
 {
-    const OPT_DRY_RUN = 'dry-run';
-    const OPT_SHOW_PROGRESS = 'show-progress';
-
-    /**
-     * @var PersistenceIntegrityService
-     */
-    private $persistenceIntegrityService;
-
     /**
      * @var SymfonyStyle
      */
     private $io;
-
-    public function __construct(string $name = null, PersistenceIntegrityService $persistenceIntegrityService = null)
-    {
-        parent::__construct($name);
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->persistenceIntegrityService = $persistenceIntegrityService
-            ?? $objectManager->get(PersistenceIntegrityService::class);
-    }
 
     protected function configure()
     {
@@ -61,13 +46,13 @@ Updates reference index to ensure data integrity
 EOH
         );
         $this->addOption(
-            self::OPT_DRY_RUN,
+            'dry-run',
             null,
             InputOption::VALUE_NONE,
             'If set, index is only checked without performing any action'
         );
         $this->addOption(
-            self::OPT_SHOW_PROGRESS,
+            'show-progress',
             null,
             InputOption::VALUE_NONE,
             'Whether or not to output a progress bar'
@@ -76,10 +61,12 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        $persistenceIntegrityService = $objectManager->get(PersistenceIntegrityService::class);
         $this->io = new SymfonyStyle($input, $output);
 
-        $dryRun = $input->getOption(self::OPT_DRY_RUN);
-        $showProgress = $input->getOption(self::OPT_SHOW_PROGRESS);
+        $dryRun = $input->getOption('dry-run');
+        $showProgress = $input->getOption('show-progress');
         $verbose = $this->io->isVerbose();
 
         $this->io->writeln(
@@ -88,7 +75,7 @@ EOH
 
         $operation = $dryRun ? 'checkReferenceIndex' : 'updateReferenceIndex';
 
-        list($errorCount, $recordCount, $processedTables) = $this->persistenceIntegrityService->{$operation}(
+        list($errorCount, $recordCount, $processedTables) = $persistenceIntegrityService->{$operation}(
             $this->createReferenceIndexDelegateWithOptions($dryRun, $verbose, $showProgress)
         );
 
@@ -104,6 +91,8 @@ EOH
             $this->io->newLine();
             $this->io->writeln('<info>Index integrity was perfect!</info>');
         }
+
+        return 0;
     }
 
     /**
@@ -116,23 +105,22 @@ EOH
     {
         $delegate = new ReferenceIndexUpdateDelegate($this->createLogger($verbose, $showProgress));
         if ($showProgress) {
-            $io = $this->io;
             $delegate->subscribeEvent(
                 'willStartOperation',
-                function ($max) use ($io) {
-                    $io->progressStart($max);
+                function ($max) {
+                    $this->io->progressStart($max);
                 }
             );
             $delegate->subscribeEvent(
                 'willUpdateRecord',
-                function () use ($io) {
-                    $io->progressAdvance();
+                function () {
+                    $this->io->progressAdvance();
                 }
             );
             $delegate->subscribeEvent(
                 'operationHasEnded',
-                function () use ($io) {
-                    $io->progressFinish();
+                function () {
+                    $this->io->progressFinish();
                 }
             );
         }
@@ -141,7 +129,7 @@ EOH
             $delegate->subscribeEvent(
                 'operationHasEnded',
                 function () {
-                    GeneralUtility::makeInstance(\TYPO3\CMS\Core\Registry::class)->set(
+                    GeneralUtility::makeInstance(Registry::class)->set(
                         'core',
                         'sys_refindex_lastUpdate',
                         $GLOBALS['EXEC_TIME']
