@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace Helhum\Typo3Console\Command\Delegation;
+namespace Helhum\Typo3Console\Command\Cleanup;
 
 /*
  * This file is part of the TYPO3 Console project.
