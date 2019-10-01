@@ -830,7 +830,7 @@ Arguments
 ~~~~~~~~~
 
 `extensionKeys`
-   Extension keys to activate. Separate multiple extension keys with comma.
+   Extension keys to activate. Separate multiple extension keys with comma
 
 
 
@@ -854,7 +854,7 @@ Arguments
 ~~~~~~~~~
 
 `extensionKeys`
-   Extension keys to deactivate. Separate multiple extension keys with comma.
+   Extension keys to deactivate. Separate multiple extension keys with comma
 
 
 
@@ -876,7 +876,7 @@ Arguments
 Options
 ~~~~~~~
 
-`--active`
+`--active|-a`
    Only show active extensions
 
 - Accept value: no
@@ -884,7 +884,7 @@ Options
 - Is multiple: no
 - Default: false
 
-`--inactive`
+`--inactive|-i`
    Only show inactive extensions
 
 - Accept value: no
@@ -892,7 +892,7 @@ Options
 - Is multiple: no
 - Default: false
 
-`--raw`
+`--raw|-r`
    Enable machine readable output (just extension keys separated by line feed)
 
 - Accept value: no
@@ -924,7 +924,7 @@ Instead of adding extensions and then removing them, just don't add them in the 
 Options
 ~~~~~~~
 
-`--force`
+`--force|-f`
    The option has to be specified, otherwise nothing happens
 
 - Accept value: no
@@ -955,7 +955,7 @@ Arguments
 ~~~~~~~~~
 
 `extensionKeys`
-   Extension keys to set up. Separate multiple extension keys with comma.
+   Extension keys to set up. Separate multiple extension keys with comma
 
 
 
@@ -980,8 +980,6 @@ and avoids unnecessary cache clearing.
 
 
 
-
-
 Related commands
 ~~~~~~~~~~~~~~~~
 
@@ -991,6 +989,10 @@ Related commands
   Generate PackageStates.php file
 `cache:flush`
   Flush all caches
+
+
+
+
 
 
 

@@ -167,10 +167,8 @@ return [
     ],
     'extension:activate' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Extension\ExtensionActivateCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\ExtensionCommandController::class,
-        'controllerCommandName' => 'activate',
         'replace' => [
             'extensionmanager:extension:install',
             'extensionmanager:extension:activate',
@@ -183,10 +181,8 @@ return [
     ],
     'extension:deactivate' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Extension\ExtensionDeactivateCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\ExtensionCommandController::class,
-        'controllerCommandName' => 'deactivate',
         'replace' => [
             'extensionmanager:extension:uninstall',
             'extensionmanager:extension:deactivate',
@@ -199,34 +195,26 @@ return [
     ],
     'extension:list' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Extension\ExtensionListCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\ExtensionCommandController::class,
-        'controllerCommandName' => 'list',
         'replace' => [
             'core:extension:list',
         ],
     ],
     'extension:removeinactive' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Extension\ExtensionRemoveInactiveCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\ExtensionCommandController::class,
-        'controllerCommandName' => 'removeInactive',
     ],
     'extension:setup' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Extension\ExtensionSetupCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\ExtensionCommandController::class,
-        'controllerCommandName' => 'setup',
     ],
     'extension:setupactive' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Extension\ExtensionSetupActiveCommand::class,
         'schedulable' => false,
-        'controller' => \Helhum\Typo3Console\Command\ExtensionCommandController::class,
-        'controllerCommandName' => 'setupActive',
     ],
     'frontend:request' => [
         'vendor' => 'typo3_console',
