@@ -542,7 +542,7 @@ Arguments
 ~~~~~~~~~
 
 `path`
-   Path to system configuration option
+   Path to system configuration
 
 
 
@@ -599,6 +599,16 @@ Note that this value could be overridden. Use `typo3cms configuration:show <path
 
 **Example:** `typo3cms configuration:showlocal DB`
 
+
+
+Related commands
+~~~~~~~~~~~~~~~~
+
+`configuration:show`
+  Show configuration value
+
+
+
 Arguments
 ~~~~~~~~~
 
@@ -620,12 +630,6 @@ Options
 
 
 
-
-Related commands
-~~~~~~~~~~~~~~~~
-
-`configuration:show`
-  Show configuration value
 
 
 
