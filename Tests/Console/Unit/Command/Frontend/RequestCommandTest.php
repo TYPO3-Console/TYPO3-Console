@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
-namespace  Helhum\Typo3Console\Tests\Unit\Command;
+namespace  Helhum\Typo3Console\Tests\Unit\Command\Frontend;
 
-use Helhum\Typo3Console\Command\FrontendCommandController;
+use Helhum\Typo3Console\Command\Frontend\FrontendRequestCommand;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 
-class FrontendCommandControllerTest extends UnitTestCase
+class RequestCommandTest extends UnitTestCase
 {
     /**
      * Call protected/private method of a class.
@@ -33,8 +33,8 @@ class FrontendCommandControllerTest extends UnitTestCase
      */
     public function makeAbsoluteTest($expected, $given)
     {
-        /** @var FrontendCommandController $frontendRequest */
-        $frontendRequest = new FrontendCommandController();
+        /** @var FrontendRequestCommand $frontendRequest */
+        $frontendRequest = new FrontendRequestCommand();
         $parameter = [ $given ];
         $this->assertEquals($expected, $this->invokeMethod($frontendRequest, 'makeAbsolute', $parameter));
     }
