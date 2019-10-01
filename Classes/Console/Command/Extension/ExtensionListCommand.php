@@ -21,35 +21,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 class ExtensionListCommand extends Command
 {
-    use EmitPackagesMayHaveChangedSignalTrait;
-
-    /**
-     * @var Dispatcher
-     */
-    protected $signalSlotDispatcher;
-
-    /**
-     * @var PackageManager
-     */
-    protected $packageManager;
-
-    public function __construct(
-        string $name = null,
-        Dispatcher $signalSlotDispatcher = null,
-        PackageManager $packageManager = null
-    ) {
-        parent::__construct($name);
-
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->signalSlotDispatcher = $signalSlotDispatcher ?? $objectManager->get(Dispatcher::class);
-        $this->packageManager = $packageManager ?? $objectManager->get(PackageManager::class);
-    }
-
     protected function configure()
     {
         $this->setDescription('List extensions that are available in the system');
@@ -82,16 +56,16 @@ class ExtensionListCommand extends Command
         $raw = $input->getOption('raw');
 
         $extensionInformation = [];
-
+        $packageManager = GeneralUtility::makeInstance(PackageManager::class);
         if (!$active || $inactive) {
-            $this->emitPackagesMayHaveChangedSignal();
-            $packages = $this->packageManager->getAvailablePackages();
+            $packageManager->scanAvailablePackages();
+            $packages = $packageManager->getAvailablePackages();
         } else {
-            $packages = $this->packageManager->getActivePackages();
+            $packages = $packageManager->getActivePackages();
         }
 
         foreach ($packages as $package) {
-            if ($inactive && $this->packageManager->isPackageActive($package->getPackageKey())) {
+            if ($inactive && $packageManager->isPackageActive($package->getPackageKey())) {
                 continue;
             }
             $metaData = $package->getPackageMetaData();

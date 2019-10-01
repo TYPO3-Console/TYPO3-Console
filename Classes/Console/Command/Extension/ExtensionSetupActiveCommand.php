@@ -17,46 +17,9 @@ namespace Helhum\Typo3Console\Command\Extension;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Core\Package\PackageManager;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 class ExtensionSetupActiveCommand extends Command
 {
-    use SetupExtensionsTrait;
-
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
-
-    /**
-     * @var Dispatcher
-     */
-    protected $signalSlotDispatcher;
-
-    /**
-     * @var PackageManager
-     */
-    protected $packageManager;
-
-    /**
-     * @var OutputInterface
-     */
-    protected $output;
-
-    public function __construct(
-        string $name = null,
-        PackageManager $packageManager = null
-    ) {
-        parent::__construct($name);
-
-        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->signalSlotDispatcher = $signalSlotDispatcher ?? $this->objectManager->get(Dispatcher::class);
-        $this->packageManager = $packageManager ?? $this->objectManager->get(PackageManager::class);
-    }
-
     protected function configure()
     {
         $this->setDescription('Set up all active extensions');
@@ -87,8 +50,6 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->output = $output;
-        $verbose = $output->isVerbose();
-        $this->setupExtensions($this->packageManager->getActivePackages(), $verbose);
+        (new ExtensionStateCommandsHelper($output))->setupActiveExtensions();
     }
 }

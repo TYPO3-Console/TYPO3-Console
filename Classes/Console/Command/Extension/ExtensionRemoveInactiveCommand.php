@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Command\Extension;
  *
  */
 
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -21,25 +22,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 class ExtensionRemoveInactiveCommand extends Command
 {
-    /**
-     * @var PackageManager
-     */
-    protected $packageManager;
-
-    public function __construct(
-        string $name = null,
-        PackageManager $packageManager = null
-    ) {
-        parent::__construct($name);
-
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->packageManager = $packageManager ?? $objectManager->get(PackageManager::class);
-    }
-
     protected function configure()
     {
         $this->setDescription('Removes all extensions that are not marked as active');
@@ -63,24 +48,24 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // @deprecated for composer usage in 5.0 will be removed with 6.0
+        // @deprecated in 5.0 will be removed with 6.0
         $force = $input->getOption('force');
 
         $output->writeln('<warning>This command is deprecated and will be removed with TYPO3 Console 6.0</warning>');
-
+        $packageManager = GeneralUtility::makeInstance(PackageManager::class);
         if ($force) {
-            $activePackages = $this->packageManager->getActivePackages();
-            $this->packageManager->scanAvailablePackages();
-            foreach ($this->packageManager->getAvailablePackages() as $package) {
+            $activePackages = $packageManager->getActivePackages();
+            $packageManager->scanAvailablePackages();
+            foreach ($packageManager->getAvailablePackages() as $package) {
                 if (empty($activePackages[$package->getPackageKey()])) {
-                    $this->packageManager->unregisterPackage($package);
+                    $packageManager->unregisterPackage($package);
                     if (is_dir($package->getPackagePath())) {
                         GeneralUtility::flushDirectory($package->getPackagePath());
                         $removedPaths[] = PathUtility::stripPathSitePrefix($package->getPackagePath());
                     }
                 }
             }
-            $this->packageManager->forceSortAndSavePackageStates();
+            $packageManager->forceSortAndSavePackageStates();
             if (!empty($removedPaths)) {
                 $output->writeln(
                     '<info>The following directories have been removed:</info>' . chr(10) . implode(chr(10), $removedPaths)
@@ -93,9 +78,11 @@ EOH
 
             return 1;
         }
+
+        return 0;
     }
 
-    public function isEnabled(): bool
+    public function isHidden(): bool
     {
         $application = $this->getApplication();
         if (!$application instanceof Application || getenv('TYPO3_CONSOLE_RENDERING_REFERENCE')) {

@@ -14,51 +14,15 @@ namespace Helhum\Typo3Console\Command\Extension;
  *
  */
 
+use Helhum\Typo3Console\Core\Booting\CompatibilityScripts;
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Core\Package\PackageManager;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 class ExtensionDeactivateCommand extends Command
 {
-    use SetupExtensionsTrait, ShowDeprecationMessageTrait;
-
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
-
-    /**
-     * @var Dispatcher
-     */
-    protected $signalSlotDispatcher;
-
-    /**
-     * @var PackageManager
-     */
-    protected $packageManager;
-
-    /**
-     * @var OutputInterface
-     */
-    protected $output;
-
-    public function __construct(
-        string $name = null,
-        Dispatcher $signalSlotDispatcher = null,
-        PackageManager $packageManager = null
-    ) {
-        parent::__construct($name);
-
-        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->signalSlotDispatcher = $signalSlotDispatcher ?? $this->objectManager->get(Dispatcher::class);
-        $this->packageManager = $packageManager ?? $this->objectManager->get(PackageManager::class);
-    }
-
     protected function configure()
     {
         $this->setDescription('Deactivate extension(s)');
@@ -79,24 +43,25 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // @deprecated for composer usage in 5.0 will be removed with 6.0
-        $this->output = $output;
-
         $extensionKeys = explode(',', $input->getArgument('extensionKeys'));
 
-        $this->showDeprecationMessageIfApplicable();
-        foreach ($extensionKeys as $extensionKey) {
-            $this->getExtensionInstaller()->uninstall($extensionKey);
-        }
-        $extensionKeysAsString = implode('", "', $extensionKeys);
-        if (count($extensionKeys) === 1) {
-            $output->writeln(sprintf('<info>Extension "%s" is now inactive.</info>', $extensionKeysAsString));
-        } else {
-            $output->writeln(sprintf('<info>Extensions "%s" are now inactive.</info>', $extensionKeysAsString));
+        $this->showDeprecationMessageIfApplicable($output);
+        (new ExtensionStateCommandsHelper($output))->deactivateExtensions($extensionKeys);
+    }
+
+    private function showDeprecationMessageIfApplicable(OutputInterface $output)
+    {
+        if (CompatibilityScripts::isComposerMode()) {
+            $output->writeln('<warning>This command is deprecated when TYPO3 is composer managed.</warning>');
+            $output->writeln('<warning>It might lead to unexpected results.</warning>');
+            $output->writeln('<warning>The PackageStates.php file that tracks which extension should be active,</warning>');
+            $output->writeln('<warning>should be generated automatically using install:generatepackagestates.</warning>');
+            $output->writeln('<warning>To set up all active extensions, extension:setupactive should be used.</warning>');
+            $output->writeln('<warning>This command will be disabled, when TYPO3 is composer managed, in TYPO3 Console 6</warning>');
         }
     }
 
-    public function isEnabled(): bool
+    public function isHidden(): bool
     {
         $application = $this->getApplication();
         if (!$application instanceof Application || getenv('TYPO3_CONSOLE_RENDERING_REFERENCE')) {

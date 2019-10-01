@@ -18,47 +18,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Core\Package\PackageManager;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 class ExtensionSetupCommand extends Command
 {
-    use SetupExtensionsTrait;
-
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
-
-    /**
-     * @var Dispatcher
-     */
-    protected $signalSlotDispatcher;
-
-    /**
-     * @var PackageManager
-     */
-    protected $packageManager;
-
-    /**
-     * @var OutputInterface
-     */
-    protected $output;
-
-    public function __construct(
-        string $name = null,
-        Dispatcher $signalSlotDispatcher = null,
-        PackageManager $packageManager = null
-    ) {
-        parent::__construct($name);
-
-        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->signalSlotDispatcher = $signalSlotDispatcher ?? $this->objectManager->get(Dispatcher::class);
-        $this->packageManager = $packageManager ?? $this->objectManager->get(PackageManager::class);
-    }
-
     protected function configure()
     {
         $this->setDescription('Set up extension(s)');
@@ -81,17 +43,8 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->output = $output;
+        $extensionKeys = explode(',', $input->getArgument('extensionKeys'));
 
-        $extensionKeys = $input->getArgument('extensionKeys');
-        $verbose = $output->isVerbose();
-
-        $packages = [];
-
-        foreach ($extensionKeys as $extensionKey) {
-            $packages[] = $this->packageManager->getPackage($extensionKey);
-        }
-
-        $this->setupExtensions($packages, $verbose);
+        (new ExtensionStateCommandsHelper($output))->setupExtensions($extensionKeys);
     }
 }
