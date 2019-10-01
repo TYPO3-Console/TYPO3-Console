@@ -20,25 +20,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 class ConfigurationSetCommand extends Command
 {
-    /**
-     * @var ConfigurationService
-     */
-    protected $configurationService;
-
-    public function __construct(string $name = null, ConfigurationService $configurationService = null)
-    {
-        parent::__construct($name);
-
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->configurationService = $configurationService
-            ?? $objectManager->get(ConfigurationService::class);
-    }
-
     protected function configure()
     {
         $this->setDescription('Set configuration value');
@@ -75,8 +59,9 @@ EOH
         $path = $input->getArgument('path');
         $value = $input->getArgument('value');
         $json = $input->getOption('json');
+        $configurationService = new ConfigurationService();
 
-        if (!$this->configurationService->localIsActive($path)) {
+        if (!$configurationService->localIsActive($path)) {
             $output->writeln(sprintf(
                 '<warning>It seems that configuration for path "%s" is overridden.</warning>',
                 $path
@@ -95,8 +80,8 @@ EOH
             return 2;
         }
 
-        $setWasAllowed = $this->configurationService->setLocal($path, $encodedValue);
-        $isApplied = $this->configurationService->hasLocal($path);
+        $setWasAllowed = $configurationService->setLocal($path, $encodedValue);
+        $isApplied = $configurationService->hasLocal($path);
 
         if (!$setWasAllowed) {
             $output->writeln(sprintf(
@@ -104,11 +89,7 @@ EOH
                 $value,
                 $path
             ));
-            $output->writeln(sprintf(
-                '<warning>Possible reasons: configuration path is not allowed, configuration is not writable or type of value does not match given type.</warning>',
-                $value,
-                $path
-            ));
+            $output->writeln('<warning>Possible reasons: configuration path is not allowed, configuration is not writable or type of value does not match given type.</warning>');
 
             return 1;
         }
@@ -123,5 +104,7 @@ EOH
             ));
             $output->writeln('<warning>Possible reasons: changed value in AdditionalConfiguration.php or extension ext_localconf.php</warning>');
         }
+
+        return 0;
     }
 }

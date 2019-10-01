@@ -20,35 +20,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 class ConfigurationShowCommand extends Command
 {
-    /**
-     * @var ConfigurationService
-     */
-    protected $configurationService;
-
-    /**
-     * @var ConsoleRenderer
-     */
-    protected $consoleRenderer;
-
-    public function __construct(
-        string $name = null,
-        ConfigurationService $configurationService = null,
-        ConsoleRenderer $consoleRenderer = null
-    ) {
-        parent::__construct($name);
-
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->configurationService = $configurationService
-            ?? $objectManager->get(ConfigurationService::class);
-        $this->consoleRenderer = $consoleRenderer
-            ?? $objectManager->get(ConsoleRenderer::class);
-    }
-
     protected function configure()
     {
         $this->setDescription('Show configuration value');
@@ -71,9 +45,11 @@ EOH
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $path = $input->getArgument('path');
+        $configurationService = new ConfigurationService();
+        $consoleRenderer = new ConsoleRenderer();
 
-        $hasActive = $this->configurationService->hasActive($path);
-        $hasLocal = $this->configurationService->hasLocal($path);
+        $hasActive = $configurationService->hasActive($path);
+        $hasLocal = $configurationService->hasLocal($path);
 
         if (!$hasActive && !$hasLocal) {
             $output->writeln(sprintf('<error>No configuration found for path "%s"</error>', $path));
@@ -84,17 +60,19 @@ EOH
         $active = null;
 
         if ($hasActive) {
-            $active = $this->configurationService->getActive($path);
+            $active = $configurationService->getActive($path);
         }
 
-        if ($hasActive && $this->configurationService->localIsActive($path)) {
-            $output->writeln($this->consoleRenderer->render($active));
+        if ($hasActive && $configurationService->localIsActive($path)) {
+            $output->writeln($consoleRenderer->render($active));
         } else {
             $local = null;
             if ($hasLocal) {
-                $local = $this->configurationService->getLocal($path);
+                $local = $configurationService->getLocal($path);
             }
-            $output->writeln($this->consoleRenderer->renderDiff($local, $active));
+            $output->writeln($consoleRenderer->renderDiff($local, $active));
         }
+
+        return 0;
     }
 }

@@ -20,31 +20,11 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 class ConfigurationRemoveCommand extends Command
 {
-    /**
-     * @var ConfigurationService
-     */
-    protected $configurationService;
-
-    /**
-     * @var SymfonyStyle
-     */
-    private $io;
-
-    public function __construct(string $name = null, ConfigurationService $configurationService = null)
-    {
-        parent::__construct($name);
-
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->configurationService = $configurationService
-            ?? $objectManager->get(ConfigurationService::class);
-    }
-
     protected function configure()
     {
         $this->setDescription('Remove configuration option');
@@ -73,37 +53,38 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->io = new SymfonyStyle($input, $output);
-
-        $paths = (array)$input->getArgument('paths');
+        $paths = explode(',', $input->getArgument('paths'));
         $force = $input->getOption('force');
-
+        $io = new SymfonyStyle($input, $output);
+        $configurationService = new ConfigurationService();
         foreach ($paths as $path) {
-            if (!$this->configurationService->localIsActive($path)) {
-                $this->io->writeln(sprintf(
+            if (!$configurationService->localIsActive($path)) {
+                $io->writeln(sprintf(
                     '<warning>It seems that configuration for path "%s" is overridden.</warning>',
                     $path
                 ));
-                $this->io->writeln('<warning>Removing the new value might have no effect.</warning>');
+                $io->writeln('<warning>Removing the new value might have no effect.</warning>');
             }
-            if (!$force && $this->configurationService->hasLocal($path)) {
-                $reallyDelete = $this->io->askConfirmation('Remove ' . $path . ' from system configuration (TYPO3_CONF_VARS)? (yes/<b>no</b>): ', false);
+            if (!$force && $configurationService->hasLocal($path)) {
+                $reallyDelete = $io->askQuestion(new ConfirmationQuestion('Remove ' . $path . ' from system configuration (TYPO3_CONF_VARS)?', false));
                 if (!$reallyDelete) {
                     continue;
                 }
             }
-            $removed = $this->configurationService->removeLocal($path);
+            $removed = $configurationService->removeLocal($path);
             if ($removed) {
-                $this->io->writeln(sprintf(
+                $io->writeln(sprintf(
                     '<info>Removed "%s" from system configuration.</info>',
                     $path
                 ));
             } else {
-                $this->io->writeln(sprintf(
+                $io->writeln(sprintf(
                     '<warning>Path "%s" seems invalid or empty. Nothing done!</warning>',
                     $path
                 ));
             }
         }
+
+        return 0;
     }
 }

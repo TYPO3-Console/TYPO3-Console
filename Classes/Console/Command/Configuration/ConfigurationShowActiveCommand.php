@@ -21,35 +21,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 class ConfigurationShowActiveCommand extends Command
 {
-    /**
-     * @var ConfigurationService
-     */
-    protected $configurationService;
-
-    /**
-     * @var ConsoleRenderer
-     */
-    protected $consoleRenderer;
-
-    public function __construct(
-        string $name = null,
-        ConfigurationService $configurationService = null,
-        ConsoleRenderer $consoleRenderer = null
-    ) {
-        parent::__construct($name);
-
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->configurationService = $configurationService
-            ?? $objectManager->get(ConfigurationService::class);
-        $this->consoleRenderer = $consoleRenderer
-            ?? $objectManager->get(ConsoleRenderer::class);
-    }
-
     protected function configure()
     {
         $this->setDescription('Show active configuration value');
@@ -78,14 +52,17 @@ EOH
     {
         $path = $input->getArgument('path');
         $json = $input->getOption('json');
-
-        if (!$this->configurationService->hasActive($path)) {
+        $configurationService = new ConfigurationService();
+        $consoleRenderer = new ConsoleRenderer();
+        if (!$configurationService->hasActive($path)) {
             $output->writeln(sprintf('<error>No configuration found for path "%s"</error>', $path));
 
             return 1;
         }
 
-        $active = $this->configurationService->getActive($path);
-        $output->writeln($this->consoleRenderer->render($active, $json));
+        $active = $configurationService->getActive($path);
+        $output->writeln($consoleRenderer->render($active, $json));
+
+        return 0;
     }
 }
