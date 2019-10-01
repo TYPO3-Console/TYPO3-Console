@@ -233,12 +233,6 @@ Options
 
 
 
-Related commands
-~~~~~~~~~~~~~~~~
-
-`backend:unlock`
-  Unlock backend
-
 
 
 .. _`Command Reference: typo3_console backend:lockforeditors`:
@@ -255,12 +249,6 @@ Admins will still be able to log in and work with the backend.
 
 
 
-Related commands
-~~~~~~~~~~~~~~~~
-
-`backend:unlockforeditors`
-  Unlock backend for editors
-
 
 
 .. _`Command Reference: typo3_console backend:unlock`:
@@ -276,12 +264,6 @@ Allow backend access again (e.g. after having been locked with backend:lock comm
 
 
 
-Related commands
-~~~~~~~~~~~~~~~~
-
-`backend:lock`
-  Lock backend
-
 
 
 .. _`Command Reference: typo3_console backend:unlockforeditors`:
@@ -296,12 +278,6 @@ Allow backend access for editors again (e.g. after having been locked with backe
 
 
 
-
-Related commands
-~~~~~~~~~~~~~~~~
-
-`backend:lockforeditors`
-  Lock backend for editors
 
 
 
