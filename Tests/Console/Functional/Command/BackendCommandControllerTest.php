@@ -77,7 +77,7 @@ class BackendCommandControllerTest extends AbstractCommandTest
     public function createAdminUserRemovesSpacesFromUserNameAndLowerCasesIt(string $username)
     {
         $output = $this->executeConsoleCommand('backend:createadmin', [$username, 'password']);
-        $message = sprintf('[WARNING] Given username "%s" contains', $username);
+        $message = sprintf('Given username "%s" contains invalid characters.', $username);
         $this->assertContains($message, $output);
         $this->executeMysqlQuery('DELETE FROM be_users WHERE username LIKE "test\_%"');
     }
@@ -105,7 +105,7 @@ class BackendCommandControllerTest extends AbstractCommandTest
     public function createAdminUserCreatesUserWithSpecialCharactersInUserName(string $username)
     {
         $output = $this->executeConsoleCommand('backend:createadmin', [$username, 'password']);
-        $message = sprintf('[WARNING] Given username "%s" contains', $username);
+        $message = sprintf('Given username "%s" contains invalid characters.', $username);
         $this->assertNotContains($message, $output);
         $queryResult = $this->executeMysqlQuery('SELECT username FROM be_users WHERE username="' . $username . '"');
         $this->assertSame($username, trim($queryResult));

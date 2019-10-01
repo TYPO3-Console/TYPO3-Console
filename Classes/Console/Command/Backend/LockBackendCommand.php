@@ -18,10 +18,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class LockCommand extends Command
+class LockBackendCommand extends Command
 {
     protected function configure()
     {
@@ -38,22 +37,23 @@ class LockCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $redirectUrl = $input->getOption('redirect-url');
-        $io = new SymfonyStyle($input, $output);
         $fileName = PATH_typo3conf . 'LOCK_BACKEND';
         if (@is_file($fileName)) {
-            $io->warning('Backend is already locked.');
+            $output->writeln('<info>Backend is already locked.</info>');
 
             return 0;
         }
         GeneralUtility::writeFile($fileName, (string)$redirectUrl);
         if (!@is_file($fileName)) {
-            $io->error('Could not create lock file \'typo3conf/LOCK_BACKEND\'.');
+            $output->writeln('<error>Could not create lock file \'typo3conf/LOCK_BACKEND\'.</error>');
 
             return 2;
         }
-        $io->note('Backend has been locked. Access is denied for every user until it is unlocked again.');
+        $output->writeln('<info>Backend has been locked. Access is denied for every user until it is unlocked again.</info>');
         if ($redirectUrl !== null) {
-            $io->note('Any access to the backend will be redirected to: \'' . $redirectUrl . '\'');
+            $output->writeln('Any access to the backend will be redirected to: \'' . $redirectUrl . '\'');
         }
+
+        return 0;
     }
 }

@@ -15,12 +15,12 @@ return [
     ],
     'backend:createadmin' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Backend\CreateAdminCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Backend\CreateBackendAdminUserCommand::class,
         'schedulable' => false,
     ],
     'backend:lock' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Backend\LockCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Backend\LockBackendCommand::class,
         'schedulable' => false,
         'replace' => [
             'backend:backend:lock',
@@ -28,12 +28,12 @@ return [
     ],
     'backend:lockforeditors' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Backend\LockForEditorsCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Backend\LockBackendForEditorsCommand::class,
         'schedulable' => false,
     ],
     'backend:unlock' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Backend\UnlockCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Backend\UnlockBackendCommand::class,
         'schedulable' => false,
         'replace' => [
             'backend:backend:unlock',
@@ -41,7 +41,7 @@ return [
     ],
     'backend:unlockforeditors' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Backend\UnlockForEditorsCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Backend\UnlockBackendForEditorsCommand::class,
         'schedulable' => false,
     ],
     'cache:flush' => [

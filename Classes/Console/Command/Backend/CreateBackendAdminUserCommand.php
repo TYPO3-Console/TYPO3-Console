@@ -18,25 +18,12 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Saltedpasswords\Salt\SaltFactory;
-use TYPO3\CMS\Saltedpasswords\Salt\SaltInterface;
 
-class CreateAdminCommand extends Command
+class CreateBackendAdminUserCommand extends Command
 {
-    /**
-     * @var SaltInterface
-     */
-    private $passwordHasher;
-
-    public function __construct(string $name = null, SaltInterface $passwordHasher = null)
-    {
-        parent::__construct($name);
-        $this->passwordHasher = $passwordHasher ?: SaltFactory::getSaltingInstance(null, 'BE');
-    }
-
     protected function configure()
     {
         $this->setDescription('Create admin backend user');
@@ -55,23 +42,23 @@ class CreateAdminCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io = new SymfonyStyle($input, $output);
+        $passwordHasher = SaltFactory::getSaltingInstance(null, 'BE');
         $username = $input->getArgument('username');
         $password = $input->getArgument('password');
         $givenUsername = $username;
         $username = strtolower(preg_replace('/\\s/i', '', $username));
 
         if ($givenUsername !== $username) {
-            $io->warning(sprintf('Given username "%s" contains invalid characters. Using "%s" instead.', $givenUsername, $username));
+            $output->writeln(sprintf('<warning>Given username "%s" contains invalid characters. Using "%s" instead.</warning>', $givenUsername, $username));
         }
 
         if ($username === '') {
-            $io->error('Username must have at least 1 character.');
+            $output->writeln('<error>Username must have at least 1 character.</error>');
 
             return 1;
         }
         if (strlen($password) < 8) {
-            $io->error('Password must have at least 8 characters.');
+            $output->writeln('<error>Password must have at least 8 characters.</error>');
 
             return 1;
         }
@@ -83,13 +70,13 @@ class CreateAdminCommand extends Command
                 ['username' => $username]
             );
         if ($userExists) {
-            $io->error(sprintf('A user with username "%s" already exists.', $username));
+            $output->writeln(sprintf('<error>A user with username "%s" already exists.</error>', $username));
 
             return 1;
         }
         $adminUserFields = [
             'username' => $username,
-            'password' => $this->passwordHasher->getHashedPassword($password),
+            'password' => $passwordHasher->getHashedPassword($password),
             'admin' => 1,
             'tstamp' => $GLOBALS['EXEC_TIME'],
             'crdate' => $GLOBALS['EXEC_TIME'],
@@ -97,6 +84,8 @@ class CreateAdminCommand extends Command
         $connectionPool->getConnectionForTable('be_users')
             ->insert('be_users', $adminUserFields);
 
-        $io->success(sprintf('Created admin user with username "%s".', $username));
+        $output->writeln(sprintf('<info>Created admin user with username "%s".</info>', $username));
+
+        return 0;
     }
 }

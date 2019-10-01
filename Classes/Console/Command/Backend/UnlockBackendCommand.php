@@ -17,9 +17,8 @@ namespace Helhum\Typo3Console\Command\Backend;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
-class UnlockCommand extends Command
+class UnlockBackendCommand extends Command
 {
     protected function configure()
     {
@@ -29,19 +28,20 @@ class UnlockCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io = new SymfonyStyle($input, $output);
         $fileName = PATH_typo3conf . 'LOCK_BACKEND';
         if (!@is_file($fileName)) {
-            $io->warning('Backend is already unlocked');
+            $output->writeln('<info>Backend is already unlocked.</info>');
 
             return 0;
         }
         unlink($fileName);
         if (@is_file($fileName)) {
-            $io->error('Could not remove lock file \'typo3conf/LOCK_BACKEND\'.');
+            $output->writeln('<error>Could not remove lock file \'typo3conf/LOCK_BACKEND\'.</error>');
 
             return 2;
         }
-        $io->success('Backend lock is removed. User can now access the backend again.');
+        $output->writeln('<info>Backend lock is removed. User can now access the backend again.</info>');
+
+        return 0;
     }
 }
