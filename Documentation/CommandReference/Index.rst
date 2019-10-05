@@ -1085,7 +1085,7 @@ Options
 ~~~~~~~
 
 `--framework-extensions`
-   TYPO3 system extensions that should be marked as active. Extension keys separated by comma
+   TYPO3 system extensions that should be marked as active. Extension keys separated by comma.
 
 - Accept value: yes
 - Is value required: yes
@@ -1093,7 +1093,7 @@ Options
 - Default: array ()
 
 `--excluded-extensions`
-   Extensions which should stay inactive. This does not affect provided framework extensions or framework extensions that are required or part as minimal usable system
+   Extensions which should stay inactive. This does not affect provided framework extensions or framework extensions that are required or part as minimal usable system.
 
 - Accept value: yes
 - Is value required: yes
@@ -1101,7 +1101,7 @@ Options
 - Default: array ()
 
 `--activate-default`
-   (DEPRECATED) If true, `typo3/cms` extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions
+   (DEPRECATED) If true, `typo3/cms` extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.
 
 - Accept value: no
 - Is value required: no
@@ -1146,7 +1146,7 @@ Options
 ~~~~~~~
 
 `--force|-f`
-   Force installation of TYPO3, even if `LocalConfiguration.php` file already exists
+   Force installation of TYPO3, even if `LocalConfiguration.php` file already exists.
 
 - Accept value: no
 - Is value required: no
@@ -1154,7 +1154,7 @@ Options
 - Default: false
 
 `--skip-integrity-check`
-   Skip the checking for clean state before executing setup. This allows a pre-defined `LocalConfiguration.php` to be present. Handle with care. It might lead to unexpected or broken installation results
+   Skip the checking for clean state before executing setup. This allows a pre-defined `LocalConfiguration.php` to be present. Handle with care. It might lead to unexpected or broken installation results.
 
 - Accept value: no
 - Is value required: no
@@ -1162,7 +1162,7 @@ Options
 - Default: false
 
 `--skip-extension-setup`
-   Skip setting up extensions after TYPO3 is set up. Defaults to false in composer setups and to true in non composer setups
+   Skip setting up extensions after TYPO3 is set up. Defaults to false in composer setups and to true in non composer setups.
 
 - Accept value: no
 - Is value required: no
@@ -1234,7 +1234,7 @@ Options
 
 
 `--use-existing-database`
-   If set an empty database with the specified name will be used. Otherwise a database with the specified name is created
+   If set an empty database with the specified name will be used. Otherwise a database with the specified name is created.
 
 - Accept value: no
 - Is value required: no
@@ -1282,7 +1282,7 @@ Options
 - Default: 'no'
 
 `--non-interactive`
-   Deprecated. Use `--no-interaction` instead
+   Deprecated. Use `--no-interaction` instead.
 
 - Accept value: no
 - Is value required: no

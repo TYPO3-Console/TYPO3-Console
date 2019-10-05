@@ -16,6 +16,8 @@ namespace Helhum\Typo3Console\Command\Install;
 use Helhum\Typo3Console\Core\Booting\CompatibilityScripts;
 use Helhum\Typo3Console\Install\Action\InstallActionDispatcher;
 
+use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Input\ArgvInput;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -53,19 +55,19 @@ EOH
             'force',
             'f',
             InputOption::VALUE_NONE,
-            'Force installation of TYPO3, even if `LocalConfiguration.php` file already exists'
+            'Force installation of TYPO3, even if `LocalConfiguration.php` file already exists.'
         );
         $this->addOption(
             'skip-integrity-check',
             null,
             InputOption::VALUE_NONE,
-            'Skip the checking for clean state before executing setup. This allows a pre-defined `LocalConfiguration.php` to be present. Handle with care. It might lead to unexpected or broken installation results'
+            'Skip the checking for clean state before executing setup. This allows a pre-defined `LocalConfiguration.php` to be present. Handle with care. It might lead to unexpected or broken installation results.'
         );
         $this->addOption(
             'skip-extension-setup',
             null,
             InputOption::VALUE_NONE,
-            'Skip setting up extensions after TYPO3 is set up. Defaults to false in composer setups and to true in non composer setups'
+            'Skip setting up extensions after TYPO3 is set up. Defaults to false in composer setups and to true in non composer setups.'
         );
         $this->addOption(
             'install-steps-config',
@@ -125,7 +127,7 @@ EOH
             'use-existing-database',
             null,
             InputOption::VALUE_NONE,
-            'If set an empty database with the specified name will be used. Otherwise a database with the specified name is created'
+            'If set an empty database with the specified name will be used. Otherwise a database with the specified name is created.'
         );
         $this->addOption(
             'admin-user-name',
@@ -164,7 +166,7 @@ EOH
             'non-interactive',
             null,
             InputOption::VALUE_NONE,
-            'Deprecated. Use `--no-interaction` instead'
+            'Deprecated. Use `--no-interaction` instead.'
         );
     }
 
@@ -187,9 +189,11 @@ EOH
         $output->writeln('<i>Welcome to the TYPO3 Console installer!</i>');
         $output->writeln('');
 
-        $installActionDispatcher = new InstallActionDispatcher($this->output);
+        // @deprecated ConsoleOutput should be removed in 6.0
+        $consoleOutput = new ConsoleOutput($output, $input);
+        $installActionDispatcher = new InstallActionDispatcher($consoleOutput);
         $installationSucceeded = $installActionDispatcher->dispatch(
-            $input->getArguments(),
+            $this->getNormalizedInstallStepArguments($input),
             [
                 'integrityCheck' => !$skipIntegrityCheck,
                 'forceInstall' => $force,
@@ -205,5 +209,24 @@ EOH
 
         $output->writeln('');
         $output->writeln('<i>Successfully installed TYPO3 CMS!</i>');
+
+        return 0;
+    }
+
+    private function getNormalizedInstallStepArguments(InputInterface $input): array
+    {
+        $normalizedArguments = [];
+        foreach ($input->getOptions() as $optionName => $value) {
+            if ($value !== null && $input instanceof ArgvInput && $input->hasGivenOption($optionName)) {
+                $normalizedArguments[$this->dashedToLowerCamelCase($optionName)] = $value;
+            }
+        }
+
+        return $normalizedArguments;
+    }
+
+    private function dashedToLowerCamelCase(string $string): string
+    {
+        return lcfirst(str_replace(' ', '', ucwords(str_replace('-', ' ', strtolower($string)))));
     }
 }

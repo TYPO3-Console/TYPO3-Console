@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Command\Install;
  *
  */
 
+use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -75,7 +76,7 @@ EOH
         if (empty($fixedStatusObjects)) {
             $output->writeln('<info>No action performed!</info>');
         } else {
-            $this->outputLine('<info>The following directory structure has been fixed:</info>');
+            $output->writeln('<info>The following directory structure has been fixed:</info>');
             foreach ($fixedStatusObjects as $fixedStatusObject) {
                 $output->writeln($fixedStatusObject->getTitle());
             }

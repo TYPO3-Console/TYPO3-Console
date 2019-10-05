@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\TYPO3v87\Install;
 
 use Helhum\Typo3Console\Install\InstallStepResponse;
 use Helhum\Typo3Console\Install\Upgrade\SilentConfigurationUpgrade;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Install\Controller\Action\ActionInterface;
 use TYPO3\CMS\Install\Controller\Action\Step\StepInterface;
@@ -42,10 +43,10 @@ class InstallStepActionExecutor
      * @param ObjectManager $objectManager
      * @param SilentConfigurationUpgrade $silentConfigurationUpgrade
      */
-    public function __construct(ObjectManager $objectManager, SilentConfigurationUpgrade $silentConfigurationUpgrade)
+    public function __construct(SilentConfigurationUpgrade $silentConfigurationUpgrade, ObjectManager $objectManager = null)
     {
-        $this->objectManager = $objectManager;
         $this->silentConfigurationUpgrade = $silentConfigurationUpgrade;
+        $this->objectManager = $objectManager ?? GeneralUtility::makeInstance(ObjectManager::class);
     }
 
     /**

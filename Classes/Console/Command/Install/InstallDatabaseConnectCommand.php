@@ -14,35 +14,18 @@ namespace Helhum\Typo3Console\Command\Install;
  *
  */
 
+use Helhum\Typo3Console\Install\InstallStepActionExecutor;
+use Helhum\Typo3Console\Install\Upgrade\SilentConfigurationUpgrade;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Core\Package\PackageManager;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 class InstallDatabaseConnectCommand extends Command
 {
-    use ExecuteActionWithArgumentsTrait;
-
-    /**
-     * @var PackageManager
-     */
-    protected $packageManager;
-
-    public function __construct(
-        string $name = null,
-        PackageManager $packageManager = null
-    ) {
-        parent::__construct($name);
-
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->packageManager = $packageManager ?? $objectManager->get(PackageManager::class);
-    }
-
     protected function configure()
     {
+        $this->setHidden(true);
         $this->setDescription('Connect to database');
         $this->setHelp('Database connection details');
         $this->addOption(
@@ -98,13 +81,25 @@ class InstallDatabaseConnectCommand extends Command
         $databaseSocket = $input->getOption('database-socket');
         $databaseDriver = $input->getOption('database-driver');
 
-        $this->executeActionWithArguments('databaseConnect', [
-            'host' => $databaseHostName,
-            'port' => $databasePort,
-            'username' => $databaseUserName,
-            'password' => $databaseUserPassword,
-            'socket' => $databaseSocket,
-            'driver' => $databaseDriver,
-        ]);
+        $installStepActionExecutor = new InstallStepActionExecutor(
+            new SilentConfigurationUpgrade()
+        );
+        $output->write(
+            serialize(
+                $installStepActionExecutor->executeActionWithArguments(
+                    'databaseConnect',
+                    [
+                        'host' => $databaseHostName,
+                        'port' => $databasePort,
+                        'username' => $databaseUserName,
+                        'password' => $databaseUserPassword,
+                        'socket' => $databaseSocket,
+                        'driver' => $databaseDriver,
+                    ]
+                )
+            ),
+            false,
+            OutputInterface::OUTPUT_RAW
+        );
     }
 }

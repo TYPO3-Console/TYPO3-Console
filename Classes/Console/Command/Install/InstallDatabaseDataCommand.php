@@ -14,35 +14,18 @@ namespace Helhum\Typo3Console\Command\Install;
  *
  */
 
+use Helhum\Typo3Console\Install\InstallStepActionExecutor;
+use Helhum\Typo3Console\Install\Upgrade\SilentConfigurationUpgrade;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Core\Package\PackageManager;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 class InstallDatabaseDataCommand extends Command
 {
-    use ExecuteActionWithArgumentsTrait;
-
-    /**
-     * @var PackageManager
-     */
-    protected $packageManager;
-
-    public function __construct(
-        string $name = null,
-        PackageManager $packageManager = null
-    ) {
-        parent::__construct($name);
-
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->packageManager = $packageManager ?? $objectManager->get(PackageManager::class);
-    }
-
     protected function configure()
     {
+        $this->setHidden(true);
         $this->setDescription('Add database data');
         $this->setHelp('Adds admin user and site name in database');
         $this->addOption(
@@ -72,10 +55,22 @@ class InstallDatabaseDataCommand extends Command
         $adminPassword = $input->getOption('admin-password');
         $siteName = $input->getOption('site-name');
 
-        $this->executeActionWithArguments('DatabaseData', [
-            'username' => $adminUserName,
-            'password' => $adminPassword,
-            'sitename' => $siteName,
-        ]);
+        $installStepActionExecutor = new InstallStepActionExecutor(
+            new SilentConfigurationUpgrade()
+        );
+        $output->write(
+            serialize(
+                $installStepActionExecutor->executeActionWithArguments(
+                    'databaseData',
+                    [
+                        'username' => $adminUserName,
+                        'password' => $adminPassword,
+                        'sitename' => $siteName,
+                    ]
+                )
+            ),
+            false,
+            OutputInterface::OUTPUT_RAW
+        );
     }
 }

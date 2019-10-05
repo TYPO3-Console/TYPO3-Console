@@ -22,6 +22,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
@@ -69,21 +70,21 @@ EOH
             'framework-extensions',
             null,
             InputOption::VALUE_REQUIRED,
-            'TYPO3 system extensions that should be marked as active. Extension keys separated by comma',
+            'TYPO3 system extensions that should be marked as active. Extension keys separated by comma.',
             []
         );
         $this->addOption(
             'excluded-extensions',
             null,
             InputOption::VALUE_REQUIRED,
-            'Extensions which should stay inactive. This does not affect provided framework extensions or framework extensions that are required or part as minimal usable system',
+            'Extensions which should stay inactive. This does not affect provided framework extensions or framework extensions that are required or part as minimal usable system.',
             []
         );
         $this->addOption(
             'activate-default',
             null,
             InputOption::VALUE_NONE,
-            '(DEPRECATED) If true, `typo3/cms` extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions'
+            '(DEPRECATED) If true, `typo3/cms` extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.'
         );
     }
 

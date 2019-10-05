@@ -15,42 +15,16 @@ namespace Helhum\Typo3Console\Command\Install;
  */
 
 use Helhum\Typo3Console\Install\InstallStepActionExecutor;
+use Helhum\Typo3Console\Install\Upgrade\SilentConfigurationUpgrade;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Core\Package\PackageManager;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 class InstallEnvironmentAndFoldersCommand extends Command
 {
-    use ExecuteActionWithArgumentsTrait;
-
-    /**
-     * @var PackageManager
-     */
-    protected $packageManager;
-
-    /**
-     * @var InstallStepActionExecutor
-     */
-    protected $installStepActionExecutor;
-
-    public function __construct(
-        string $name = null,
-        PackageManager $packageManager = null,
-        InstallStepActionExecutor $installStepActionExecutor = null
-    ) {
-        parent::__construct($name);
-
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->packageManager = $packageManager ?? $objectManager->get(PackageManager::class);
-        $this->installStepActionExecutor = $installStepActionExecutor
-            ?? $objectManager->get(InstallStepActionExecutor::class);
-    }
-
     protected function configure()
     {
+        $this->setHidden(true);
         $this->setDescription('Check environment / create folders');
         $this->setHelp(
             <<<'EOH'
@@ -61,6 +35,15 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->executeActionWithArguments('environmentAndFolders');
+        $installStepActionExecutor = new InstallStepActionExecutor(
+            new SilentConfigurationUpgrade()
+        );
+        $output->write(
+            serialize(
+                $installStepActionExecutor->executeActionWithArguments('environmentAndFolders')
+            ),
+            false,
+            OutputInterface::OUTPUT_RAW
+        );
     }
 }
