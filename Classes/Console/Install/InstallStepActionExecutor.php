@@ -17,6 +17,7 @@ namespace Helhum\Typo3Console\Install;
 use Helhum\Typo3Console\Install\Upgrade\SilentConfigurationUpgrade;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Controller\InstallerController;
 
 /**
@@ -42,10 +43,10 @@ class InstallStepActionExecutor
     /**
      * @param SilentConfigurationUpgrade $silentConfigurationUpgrade
      */
-    public function __construct(SilentConfigurationUpgrade $silentConfigurationUpgrade, InstallerController $installerController, callable $requestFactory = null)
+    public function __construct(SilentConfigurationUpgrade $silentConfigurationUpgrade, InstallerController $installerController = null, callable $requestFactory = null)
     {
         $this->silentConfigurationUpgrade = $silentConfigurationUpgrade;
-        $this->installerController = $installerController;
+        $this->installerController = $installerController ?? GeneralUtility::makeInstance(InstallerController::class);
         $this->requestFactory = $requestFactory ?: function (array $arguments) {
             return (new ServerRequest())->withParsedBody(
                 [

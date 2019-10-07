@@ -1014,13 +1014,15 @@ but also works for subsequent deployments.
 
 
 
-
-
 Related commands
 ~~~~~~~~~~~~~~~~
 
 `extension:setupactive`
   Set up all active extensions
+
+
+
+
 
 
 
@@ -1040,13 +1042,15 @@ required folders for all active extensions.
 
 
 
-
-
 Related commands
 ~~~~~~~~~~~~~~~~
 
 `install:generatepackagestates`
   Generate PackageStates.php file
+
+
+
+
 
 
 
@@ -1141,7 +1145,7 @@ The following environment variables are evaluated:
 Options
 ~~~~~~~
 
-`--force`
+`--force|-f`
    Force installation of TYPO3, even if `LocalConfiguration.php` file already exists.
 
 - Accept value: no
