@@ -14,8 +14,8 @@ namespace Helhum\Typo3Console\Command\Upgrade;
  *
  */
 
+use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeHandling;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,22 +26,41 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @internal
  */
-class UpgradeSubProcessCommand extends Command
+class UpgradeSubProcessCommand extends AbstractConvertedCommand
 {
     protected function configure()
     {
         $this->setHidden(true);
         $this->setDescription('This is where the hard work happens in a fully bootstrapped TYPO3');
         $this->setHelp('It will be called as sub process');
-        $this->addArgument(
-            'upgradeCommand',
-            InputArgument::REQUIRED
-        );
-        $this->addArgument(
-            'arguments',
-            InputArgument::REQUIRED,
-            'Serialized arguments'
-        );
+        /** @deprecated Will be removed with 6.0 */
+        $this->setDefinition($this->createCompleteInputDefinition());
+    }
+
+    /**
+     * @deprecated Will be removed with 6.0
+     */
+    protected function createNativeDefinition(): array
+    {
+        return [
+            new InputArgument(
+                'upgradeCommand',
+                InputArgument::REQUIRED
+            ),
+            new InputArgument(
+                'arguments',
+                InputArgument::REQUIRED,
+                'Serialized arguments'
+            ),
+        ];
+    }
+
+    /**
+     * @deprecated will be removed with 6.0
+     */
+    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

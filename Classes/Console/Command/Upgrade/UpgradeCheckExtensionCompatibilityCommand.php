@@ -14,14 +14,14 @@ namespace Helhum\Typo3Console\Command\Upgrade;
  *
  */
 
+use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeHandling;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UpgradeCheckExtensionCompatibilityCommand extends Command
+class UpgradeCheckExtensionCompatibilityCommand extends AbstractConvertedCommand
 {
     protected function configure()
     {
@@ -32,17 +32,36 @@ This command in meant to be executed as sub process as it is is subject to cause
 when extensions have broken (incompatible) code
 EOH
         );
-        $this->addArgument(
-            'extensionKeys',
-            InputArgument::REQUIRED,
-            'Extension key for extension to check'
-        );
-        $this->addOption(
-            'configOnly',
-            'c',
-            InputOption::VALUE_NONE,
-            ''
-        );
+        /** @deprecated Will be removed with 6.0 */
+        $this->setDefinition($this->createCompleteInputDefinition());
+    }
+
+    /**
+     * @deprecated Will be removed with 6.0
+     */
+    protected function createNativeDefinition(): array
+    {
+        return [
+            new InputArgument(
+                'extensionKeys',
+                InputArgument::REQUIRED,
+                'Extension key for extension to check'
+            ),
+            new InputOption(
+                'configOnly',
+                'c',
+                InputOption::VALUE_NONE,
+                ''
+            ),
+        ];
+    }
+
+    /**
+     * @deprecated will be removed with 6.0
+     */
+    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

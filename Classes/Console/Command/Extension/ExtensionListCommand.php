@@ -14,7 +14,7 @@ namespace Helhum\Typo3Console\Command\Extension;
  *
  */
 
-use Symfony\Component\Console\Command\Command;
+use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,29 +22,48 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class ExtensionListCommand extends Command
+class ExtensionListCommand extends AbstractConvertedCommand
 {
     protected function configure()
     {
         $this->setDescription('List extensions that are available in the system');
-        $this->addOption(
-            'active',
-            'a',
-            InputOption::VALUE_NONE,
-            'Only show active extensions'
-        );
-        $this->addOption(
-            'inactive',
-            'i',
-            InputOption::VALUE_NONE,
-            'Only show inactive extensions'
-        );
-        $this->addOption(
-            'raw',
-            'r',
-            InputOption::VALUE_NONE,
-            'Enable machine readable output (just extension keys separated by line feed)'
-        );
+        /** @deprecated Will be removed with 6.0 */
+        $this->setDefinition($this->createCompleteInputDefinition());
+    }
+
+    /**
+     * @deprecated Will be removed with 6.0
+     */
+    protected function createNativeDefinition(): array
+    {
+        return [
+            new InputOption(
+                'active',
+                'a',
+                InputOption::VALUE_NONE,
+                'Only show active extensions'
+            ),
+            new InputOption(
+                'inactive',
+                'i',
+                InputOption::VALUE_NONE,
+                'Only show inactive extensions'
+            ),
+            new InputOption(
+                'raw',
+                'r',
+                InputOption::VALUE_NONE,
+                'Enable machine readable output (just extension keys separated by line feed)'
+            ),
+        ];
+    }
+
+    /**
+     * @deprecated will be removed with 6.0
+     */
+    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

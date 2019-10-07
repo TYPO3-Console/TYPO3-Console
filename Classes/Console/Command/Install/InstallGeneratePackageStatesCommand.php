@@ -14,11 +14,11 @@ namespace Helhum\Typo3Console\Command\Install;
  *
  */
 
+use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Core\Booting\CompatibilityScripts;
 use Helhum\Typo3Console\Install\PackageStatesGenerator;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,7 +26,7 @@ use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class InstallGeneratePackageStatesCommand extends Command
+class InstallGeneratePackageStatesCommand extends AbstractConvertedCommand
 {
     protected function configure()
     {
@@ -52,26 +52,45 @@ This updates your composer.json and composer.lock without any other changes.
 <b>Example:</b> <code>%command.full_name%</code>
 EOH
         );
-        $this->addOption(
-            'framework-extensions',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'TYPO3 system extensions that should be marked as active. Extension keys separated by comma.',
-            []
-        );
-        $this->addOption(
-            'excluded-extensions',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Extensions which should stay inactive. This does not affect provided framework extensions or framework extensions that are required or part as minimal usable system.',
-            []
-        );
-        $this->addOption(
-            'activate-default',
-            null,
-            InputOption::VALUE_NONE,
-            '(DEPRECATED) If true, `typo3/cms` extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.'
-        );
+        /** @deprecated Will be removed with 6.0 */
+        $this->setDefinition($this->createCompleteInputDefinition());
+    }
+
+    /**
+     * @deprecated Will be removed with 6.0
+     */
+    protected function createNativeDefinition(): array
+    {
+        return [
+            new InputOption(
+                'framework-extensions',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'TYPO3 system extensions that should be marked as active. Extension keys separated by comma.',
+                []
+            ),
+            new InputOption(
+                'excluded-extensions',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Extensions which should stay inactive. This does not affect provided framework extensions or framework extensions that are required or part as minimal usable system.',
+                []
+            ),
+            new InputOption(
+                'activate-default',
+                null,
+                InputOption::VALUE_NONE,
+                '(DEPRECATED) If true, `typo3/cms` extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.'
+            ),
+        ];
+    }
+
+    /**
+     * @deprecated will be removed with 6.0
+     */
+    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

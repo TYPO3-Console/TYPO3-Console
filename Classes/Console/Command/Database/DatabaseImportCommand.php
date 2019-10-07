@@ -14,14 +14,14 @@ namespace Helhum\Typo3Console\Command\Database;
  *
  */
 
+use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
 use Helhum\Typo3Console\Database\Process\MysqlCommand;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DatabaseImportCommand extends Command
+class DatabaseImportCommand extends AbstractConvertedCommand
 {
     protected function configure()
     {
@@ -38,19 +38,38 @@ This obviously only works when MySQL is used as DBMS.
 <b>Example (interactive):</b> <code>%command.full_name% --interactive</code>
 EOH
         );
-        $this->addOption(
-            'interactive',
-            null,
-            InputOption::VALUE_NONE,
-            'Open an interactive mysql shell using the TYPO3 connection settings.'
-        );
-        $this->addOption(
-            'connection',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'TYPO3 database connection name',
-            'Default'
-        );
+        /** @deprecated Will be removed with 6.0 */
+        $this->setDefinition($this->createCompleteInputDefinition());
+    }
+
+    /**
+     * @deprecated Will be removed with 6.0
+     */
+    protected function createNativeDefinition(): array
+    {
+        return [
+            new InputOption(
+                'interactive',
+                '',
+                InputOption::VALUE_NONE,
+                'Open an interactive mysql shell using the TYPO3 connection settings.'
+            ),
+            new InputOption(
+                'connection',
+                '',
+                InputOption::VALUE_REQUIRED,
+                'TYPO3 database connection name',
+                'Default'
+            ),
+        ];
+    }
+
+    /**
+     * @deprecated will be removed with 6.0
+     */
+    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

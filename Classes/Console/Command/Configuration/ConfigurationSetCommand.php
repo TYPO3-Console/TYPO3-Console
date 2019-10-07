@@ -14,14 +14,14 @@ namespace Helhum\Typo3Console\Command\Configuration;
  *
  */
 
+use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ConfigurationSetCommand extends Command
+class ConfigurationSetCommand extends AbstractConvertedCommand
 {
     protected function configure()
     {
@@ -36,22 +36,41 @@ Set system configuration option value by path.
 <code>%command.full_name% EXTCONF/lang/availableLanguages '["de", "fr"]' --json</code>
 EOH
         );
-        $this->addArgument(
-            'path',
-            InputArgument::REQUIRED,
-            'Path to system configuration'
-        );
-        $this->addArgument(
-            'value',
-            InputArgument::REQUIRED,
-            'Value for system configuration'
-        );
-        $this->addOption(
-            'json',
-            null,
-            InputOption::VALUE_NONE,
-            'Treat value as JSON (also makes it possible to force datatypes for value)'
-        );
+        /** @deprecated Will be removed with 6.0 */
+        $this->setDefinition($this->createCompleteInputDefinition());
+    }
+
+    /**
+     * @deprecated Will be removed with 6.0
+     */
+    protected function createNativeDefinition(): array
+    {
+        return [
+            new InputArgument(
+                'path',
+                InputArgument::REQUIRED,
+                'Path to system configuration'
+            ),
+            new InputArgument(
+                'value',
+                InputArgument::REQUIRED,
+                'Value for system configuration'
+            ),
+            new InputOption(
+                'json',
+                '',
+                InputOption::VALUE_NONE,
+                'Treat value as JSON (also makes it possible to force datatypes for value)'
+            ),
+        ];
+    }
+
+    /**
+     * @deprecated will be removed with 6.0
+     */
+    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

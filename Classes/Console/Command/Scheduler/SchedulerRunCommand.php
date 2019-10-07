@@ -13,14 +13,15 @@ namespace Helhum\Typo3Console\Command\Scheduler;
  * LICENSE file that was distributed with this source code.
  *
  */
-use Symfony\Component\Console\Command\Command;
+
+use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Scheduler\Scheduler;
 
-class SchedulerRunCommand extends Command
+class SchedulerRunCommand extends AbstractConvertedCommand
 {
     /**
      * @var Scheduler
@@ -33,24 +34,43 @@ class SchedulerRunCommand extends Command
         $this->setHelp('Executes tasks that are registered in the scheduler module.
 
 <b>Example:</b> <code>%command.full_name% 42 --force</code>');
-        $this->addOption(
-            'task',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Uid of the task that should be executed (instead of all scheduled tasks)'
-        );
-        $this->addOption(
-            'force',
-            null,
-            InputOption::VALUE_NONE,
-            'The execution can be forced with this flag. The task will then be executed even if it is not scheduled for execution yet. Only works, when a task is specified.'
-        );
-        $this->addOption(
-            'task-id',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Deprecated option (same as --task)'
-        );
+        /** @deprecated Will be removed with 6.0 */
+        $this->setDefinition($this->createCompleteInputDefinition());
+    }
+
+    /**
+     * @deprecated Will be removed with 6.0
+     */
+    protected function createNativeDefinition(): array
+    {
+        return [
+            new InputOption(
+                'task',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Uid of the task that should be executed (instead of all scheduled tasks)'
+            ),
+            new InputOption(
+                'force',
+                null,
+                InputOption::VALUE_NONE,
+                'The execution can be forced with this flag. The task will then be executed even if it is not scheduled for execution yet. Only works, when a task is specified.'
+            ),
+            new InputOption(
+                'task-id',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Deprecated option (same as --task)'
+            ),
+        ];
+    }
+
+    /**
+     * @deprecated will be removed with 6.0
+     */
+    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

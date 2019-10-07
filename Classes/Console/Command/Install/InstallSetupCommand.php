@@ -13,17 +13,17 @@ namespace Helhum\Typo3Console\Command\Install;
  * LICENSE file that was distributed with this source code.
  *
  */
+
+use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Core\Booting\CompatibilityScripts;
 use Helhum\Typo3Console\Install\Action\InstallActionDispatcher;
-
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Input\ArgvInput;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class InstallSetupCommand extends Command
+class InstallSetupCommand extends AbstractConvertedCommand
 {
     protected function configure()
     {
@@ -51,123 +51,142 @@ The following environment variables are evaluated:
 - TYPO3_INSTALL_WEB_SERVER_CONFIG
 EOH
         );
-        $this->addOption(
-            'force',
-            'f',
-            InputOption::VALUE_NONE,
-            'Force installation of TYPO3, even if `LocalConfiguration.php` file already exists.'
-        );
-        $this->addOption(
-            'skip-integrity-check',
-            null,
-            InputOption::VALUE_NONE,
-            'Skip the checking for clean state before executing setup. This allows a pre-defined `LocalConfiguration.php` to be present. Handle with care. It might lead to unexpected or broken installation results.'
-        );
-        $this->addOption(
-            'skip-extension-setup',
-            null,
-            InputOption::VALUE_NONE,
-            'Skip setting up extensions after TYPO3 is set up. Defaults to false in composer setups and to true in non composer setups.'
-        );
-        $this->addOption(
-            'install-steps-config',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Override install steps with the ones given in this file'
-        );
-        $this->addOption(
-            'database-driver',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Database connection type (one of mysqli, pdo_sqlite, pdo_mysql, pdo_pgsql, mssql) Note: pdo_sqlite is only supported with TYPO3 9.5 or higher',
-            'mysqli'
-        );
-        $this->addOption(
-            'database-user-name',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'User name for database server',
-            ''
-        );
-        $this->addOption(
-            'database-user-password',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'User password for database server',
-            ''
-        );
-        $this->addOption(
-            'database-host-name',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Host name of database server',
-            '127.0.0.1'
-        );
-        $this->addOption(
-            'database-port',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'TCP Port of database server',
-            '3306'
-        );
-        $this->addOption(
-            'database-socket',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Unix Socket to connect to (if localhost is given as hostname and this is kept empty, a socket connection will be established)',
-            ''
-        );
-        $this->addOption(
-            'database-name',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Name of the database'
-        );
-        $this->addOption(
-            'use-existing-database',
-            null,
-            InputOption::VALUE_NONE,
-            'If set an empty database with the specified name will be used. Otherwise a database with the specified name is created.'
-        );
-        $this->addOption(
-            'admin-user-name',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'User name of the administrative backend user account to be created'
-        );
-        $this->addOption(
-            'admin-password',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Password of the administrative backend user account to be created'
-        );
-        $this->addOption(
-            'site-name',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Site Name',
-            'New TYPO3 Console site'
-        );
-        $this->addOption(
-            'web-server-config',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Web server config file to install in document root (`none`, `apache`, `iis`)',
-            'none'
-        );
-        $this->addOption(
-            'site-setup-type',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Can be either `no` (which unsurprisingly does nothing at all) or `site` (which creates an empty root page and setup)',
-            'no'
-        );
-        $this->addOption(
-            'non-interactive',
-            null,
-            InputOption::VALUE_NONE,
-            'Deprecated. Use `--no-interaction` instead.'
-        );
+        /** @deprecated Will be removed with 6.0 */
+        $this->setDefinition($this->createCompleteInputDefinition());
+    }
+
+    /**
+     * @deprecated Will be removed with 6.0
+     */
+    protected function createNativeDefinition(): array
+    {
+        return [
+            new InputOption(
+                'force',
+                'f',
+                InputOption::VALUE_NONE,
+                'Force installation of TYPO3, even if `LocalConfiguration.php` file already exists.'
+            ),
+            new InputOption(
+                'skip-integrity-check',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip the checking for clean state before executing setup. This allows a pre-defined `LocalConfiguration.php` to be present. Handle with care. It might lead to unexpected or broken installation results.'
+            ),
+            new InputOption(
+                'skip-extension-setup',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip setting up extensions after TYPO3 is set up. Defaults to false in composer setups and to true in non composer setups.'
+            ),
+            new InputOption(
+                'install-steps-config',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Override install steps with the ones given in this file'
+            ),
+            new InputOption(
+                'database-driver',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Database connection type (one of mysqli, pdo_sqlite, pdo_mysql, pdo_pgsql, mssql) Note: pdo_sqlite is only supported with TYPO3 9.5 or higher',
+                'mysqli'
+            ),
+            new InputOption(
+                'database-user-name',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'User name for database server',
+                ''
+            ),
+            new InputOption(
+                'database-user-password',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'User password for database server',
+                ''
+            ),
+            new InputOption(
+                'database-host-name',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Host name of database server',
+                '127.0.0.1'
+            ),
+            new InputOption(
+                'database-port',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'TCP Port of database server',
+                '3306'
+            ),
+            new InputOption(
+                'database-socket',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Unix Socket to connect to (if localhost is given as hostname and this is kept empty, a socket connection will be established)',
+                ''
+            ),
+            new InputOption(
+                'database-name',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Name of the database'
+            ),
+            new InputOption(
+                'use-existing-database',
+                null,
+                InputOption::VALUE_NONE,
+                'If set an empty database with the specified name will be used. Otherwise a database with the specified name is created.'
+            ),
+            new InputOption(
+                'admin-user-name',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'User name of the administrative backend user account to be created'
+            ),
+            new InputOption(
+                'admin-password',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Password of the administrative backend user account to be created'
+            ),
+            new InputOption(
+                'site-name',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Site Name',
+                'New TYPO3 Console site'
+            ),
+            new InputOption(
+                'web-server-config',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Web server config file to install in document root (`none`, `apache`, `iis`)',
+                'none'
+            ),
+            new InputOption(
+                'site-setup-type',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Can be either `no` (which unsurprisingly does nothing at all) or `site` (which creates an empty root page and setup)',
+                'no'
+            ),
+            new InputOption(
+                'non-interactive',
+                null,
+                InputOption::VALUE_NONE,
+                'Deprecated. Use `--no-interaction` instead.'
+            ),
+        ];
+    }
+
+    /**
+     * @deprecated will be removed with 6.0
+     */
+    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

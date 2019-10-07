@@ -14,25 +14,44 @@ namespace Helhum\Typo3Console\Command\Upgrade;
  *
  */
 
+use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeHandling;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardListRenderer;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UpgradeListCommand extends Command
+class UpgradeListCommand extends AbstractConvertedCommand
 {
     protected function configure()
     {
         $this->setDescription('List upgrade wizards');
-        $this->addOption(
-            'all',
-            'a',
-            InputOption::VALUE_NONE,
-            'If set, all wizards will be listed, even the once marked as ready or done'
-        );
+        /** @deprecated Will be removed with 6.0 */
+        $this->setDefinition($this->createCompleteInputDefinition());
+    }
+
+    /**
+     * @deprecated Will be removed with 6.0
+     */
+    protected function createNativeDefinition(): array
+    {
+        return [
+            new InputOption(
+                'all',
+                'a',
+                InputOption::VALUE_NONE,
+                'If set, all wizards will be listed, even the once marked as ready or done'
+            ),
+        ];
+    }
+
+    /**
+     * @deprecated will be removed with 6.0
+     */
+    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

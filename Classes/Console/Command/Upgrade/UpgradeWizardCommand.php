@@ -14,38 +14,57 @@ namespace Helhum\Typo3Console\Command\Upgrade;
  *
  */
 
+use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeHandling;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardResultRenderer;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UpgradeWizardCommand extends Command
+class UpgradeWizardCommand extends AbstractConvertedCommand
 {
     protected function configure()
     {
         $this->setDescription('Execute a single upgrade wizard');
-        $this->addArgument(
-            'identifier',
-            InputArgument::REQUIRED,
-            'Identifier of the wizard that should be executed'
-        );
-        $this->addOption(
-            'arguments',
-            'a',
-            InputOption::VALUE_REQUIRED,
-            'Arguments for the wizard prefixed with the identifier, e.g. <code>compatibility7Extension[install]=0</code>',
-            []
-        );
-        $this->addOption(
-            'force',
-            'f',
-            InputOption::VALUE_NONE,
-            'Force execution, even if the wizard has been marked as done'
-        );
+        /** @deprecated Will be removed with 6.0 */
+        $this->setDefinition($this->createCompleteInputDefinition());
+    }
+
+    /**
+     * @deprecated Will be removed with 6.0
+     */
+    protected function createNativeDefinition(): array
+    {
+        return [
+            new InputArgument(
+                'identifier',
+                InputArgument::REQUIRED,
+                'Identifier of the wizard that should be executed'
+            ),
+            new InputOption(
+                'arguments',
+                'a',
+                InputOption::VALUE_REQUIRED,
+                'Arguments for the wizard prefixed with the identifier, e.g. <code>compatibility7Extension[install]=0</code>',
+                []
+            ),
+            new InputOption(
+                'force',
+                'f',
+                InputOption::VALUE_NONE,
+                'Force execution, even if the wizard has been marked as done'
+            ),
+        ];
+    }
+
+    /**
+     * @deprecated will be removed with 6.0
+     */
+    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

@@ -14,12 +14,12 @@ namespace Helhum\Typo3Console\Command\Extension;
  *
  */
 
+use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Command\RelatableCommandInterface;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ExtensionSetupActiveCommand extends Command implements RelatableCommandInterface
+class ExtensionSetupActiveCommand extends AbstractConvertedCommand implements RelatableCommandInterface
 {
     public function getRelatedCommandNames(): array
     {
@@ -44,6 +44,24 @@ As an additional benefit no caches are flushed, which significantly improves per
 and avoids unnecessary cache clearing.
 EOH
         );
+        /** @deprecated Will be removed with 6.0 */
+        $this->setDefinition($this->createCompleteInputDefinition());
+    }
+
+    /**
+     * @deprecated Will be removed with 6.0
+     */
+    protected function createNativeDefinition(): array
+    {
+        return [];
+    }
+
+    /**
+     * @deprecated will be removed with 6.0
+     */
+    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

@@ -14,11 +14,11 @@ namespace Helhum\Typo3Console\Command\Cleanup;
  *
  */
 
+use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Log\Writer\ConsoleWriter;
 use Helhum\Typo3Console\Service\Persistence\PersistenceContext;
 use Helhum\Typo3Console\Service\Persistence\PersistenceIntegrityService;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -29,7 +29,7 @@ use TYPO3\CMS\Core\Log\LogLevel;
 use TYPO3\CMS\Core\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class UpdateReferenceIndexCommand extends Command
+class UpdateReferenceIndexCommand extends AbstractConvertedCommand
 {
     /**
      * @var SymfonyStyle
@@ -46,18 +46,37 @@ Updates reference index to ensure data integrity
 <b>Example:</b> <code>%command.full_name% --dry-run --verbose</code>
 EOH
         );
-        $this->addOption(
-            'dry-run',
-            null,
-            InputOption::VALUE_NONE,
-            'If set, index is only checked without performing any action'
-        );
-        $this->addOption(
-            'show-progress',
-            null,
-            InputOption::VALUE_NONE,
-            'Whether or not to output a progress bar'
-        );
+        /** @deprecated Will be removed with 6.0 */
+        $this->setDefinition($this->createCompleteInputDefinition());
+    }
+
+    /**
+     * @deprecated Will be removed with 6.0
+     */
+    protected function createNativeDefinition(): array
+    {
+        return [
+            new InputOption(
+                'dry-run',
+                null,
+                InputOption::VALUE_NONE,
+                'If set, index is only checked without performing any action'
+            ),
+            new InputOption(
+                'show-progress',
+                null,
+                InputOption::VALUE_NONE,
+                'Whether or not to output a progress bar'
+            ),
+        ];
+    }
+
+    /**
+     * @deprecated will be removed with 6.0
+     */
+    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

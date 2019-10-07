@@ -35,10 +35,13 @@ class CacheFlushCommand extends AbstractConvertedCommand
 Flushes TYPO3 core caches first and after that, flushes caches from extensions.
 EOH
         );
-
+        /** @deprecated Will be removed with 6.0 */
         $this->setDefinition($this->createCompleteInputDefinition());
     }
 
+    /**
+     * @deprecated Will be removed with 6.0
+     */
     protected function createNativeDefinition(): array
     {
         return [
