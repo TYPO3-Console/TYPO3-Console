@@ -21,7 +21,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
@@ -30,23 +29,6 @@ use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 
 class GenerateXsdCommand extends AbstractConvertedCommand
 {
-    /**
-     * @var XsdGenerator
-     */
-    protected $xsdGenerator;
-
-    public function __construct(string $name = null, XsdGenerator $xsdGenerator = null)
-    {
-        parent::__construct($name);
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->xsdGenerator = $xsdGenerator ?? new XsdGenerator(
-            GeneralUtility::makeInstance(PackageManager::class),
-            $objectManager,
-            $objectManager->get(DocCommentParser::class),
-            $objectManager->get(ReflectionService::class)
-        );
-    }
-
     protected function configure()
     {
         $this->setDescription('Generate Fluid ViewHelper XSD Schema');
@@ -102,7 +84,14 @@ EOH
             $xsdNamespace = sprintf('http://typo3.org/ns/%s', str_replace($search, $replace, $phpNamespace));
         }
         try {
-            $xsdSchema = $this->xsdGenerator->generateXsd($phpNamespace, $xsdNamespace);
+            $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+            $xsdGenerator = new XsdGenerator(
+                GeneralUtility::makeInstance(PackageManager::class),
+                $objectManager,
+                GeneralUtility::makeInstance(DocCommentParser::class),
+                GeneralUtility::makeInstance(ReflectionService::class)
+            );
+            $xsdSchema = $xsdGenerator->generateXsd($phpNamespace, $xsdNamespace);
         } catch (Service\Exception $exception) {
             $output->writeln('An error occurred while trying to generate the XSD schema:');
             $output->writeln($exception->getMessage());
