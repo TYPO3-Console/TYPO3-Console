@@ -233,6 +233,12 @@ Options
 
 
 
+Related commands
+~~~~~~~~~~~~~~~~
+
+`backend:unlock`
+  Unlock backend
+
 
 
 .. _`Command Reference: typo3_console backend:lockforeditors`:
@@ -249,6 +255,12 @@ Admins will still be able to log in and work with the backend.
 
 
 
+Related commands
+~~~~~~~~~~~~~~~~
+
+`backend:unlockforeditors`
+  Unlock backend for editors
+
 
 
 .. _`Command Reference: typo3_console backend:unlock`:
@@ -264,6 +276,12 @@ Allow backend access again (e.g. after having been locked with backend:lock comm
 
 
 
+Related commands
+~~~~~~~~~~~~~~~~
+
+`backend:lock`
+  Lock backend
+
 
 
 .. _`Command Reference: typo3_console backend:unlockforeditors`:
@@ -278,6 +296,12 @@ Allow backend access for editors again (e.g. after having been locked with backe
 
 
 
+
+Related commands
+~~~~~~~~~~~~~~~~
+
+`backend:lockforeditors`
+  Lock backend for editors
 
 
 
@@ -575,16 +599,6 @@ Note that this value could be overridden. Use `typo3cms configuration:show <path
 
 **Example:** `typo3cms configuration:showlocal DB`
 
-
-
-Related commands
-~~~~~~~~~~~~~~~~
-
-`configuration:show`
-  Show configuration value
-
-
-
 Arguments
 ~~~~~~~~~
 
@@ -606,6 +620,12 @@ Options
 
 
 
+
+Related commands
+~~~~~~~~~~~~~~~~
+
+`configuration:show`
+  Show configuration value
 
 
 
@@ -630,7 +650,7 @@ Options
 ~~~~~~~
 
 `--exclude|-e`
-   Full table name or wildcard expression to exclude from the export
+   Full table name or wildcard expression to exclude from the export.
 
 - Accept value: yes
 - Is value required: yes
@@ -672,7 +692,7 @@ Options
 ~~~~~~~
 
 `--interactive`
-   Open an interactive mysql shell using the TYPO3 connection settings
+   Open an interactive mysql shell using the TYPO3 connection settings.
 
 - Accept value: no
 - Is value required: no
@@ -810,7 +830,7 @@ Arguments
 ~~~~~~~~~
 
 `extensionKeys`
-   Extension keys to activate. Separate multiple extension keys with comma
+   Extension keys to activate. Separate multiple extension keys with comma.
 
 
 
@@ -834,7 +854,7 @@ Arguments
 ~~~~~~~~~
 
 `extensionKeys`
-   Extension keys to deactivate. Separate multiple extension keys with comma
+   Extension keys to deactivate. Separate multiple extension keys with comma.
 
 
 
@@ -935,7 +955,7 @@ Arguments
 ~~~~~~~~~
 
 `extensionKeys`
-   Extension keys to set up. Separate multiple extension keys with comma
+   Extension keys to set up. Separate multiple extension keys with comma.
 
 
 
@@ -960,6 +980,8 @@ and avoids unnecessary cache clearing.
 
 
 
+
+
 Related commands
 ~~~~~~~~~~~~~~~~
 
@@ -969,10 +991,6 @@ Related commands
   Generate PackageStates.php file
 `cache:flush`
   Flush all caches
-
-
-
-
 
 
 
@@ -1014,15 +1032,13 @@ but also works for subsequent deployments.
 
 
 
+
+
 Related commands
 ~~~~~~~~~~~~~~~~
 
 `extension:setupactive`
   Set up all active extensions
-
-
-
-
 
 
 
@@ -1042,15 +1058,13 @@ required folders for all active extensions.
 
 
 
+
+
 Related commands
 ~~~~~~~~~~~~~~~~
 
 `install:generatepackagestates`
   Generate PackageStates.php file
-
-
-
-
 
 
 

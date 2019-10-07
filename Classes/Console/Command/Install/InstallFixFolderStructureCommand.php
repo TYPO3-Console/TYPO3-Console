@@ -14,27 +14,21 @@ namespace Helhum\Typo3Console\Command\Install;
  *
  */
 
+use Helhum\Typo3Console\Command\RelatableCommandInterface;
 use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
-class InstallFixFolderStructureCommand extends Command
+class InstallFixFolderStructureCommand extends Command implements RelatableCommandInterface
 {
-    /**
-     * @var PackageManager
-     */
-    protected $packageManager;
-
-    public function __construct(string $name = null, PackageManager $packageManager = null)
+    public function getRelatedCommandNames(): array
     {
-        parent::__construct($name);
-
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->packageManager = $packageManager ?? $objectManager->get(PackageManager::class);
+        return [
+            'typo3_console:install:generatepackagestates',
+        ];
     }
 
     protected function configure()
@@ -48,14 +42,6 @@ This command creates the required folder structure needed for TYPO3 including ex
 It is recommended to be executed <b>after</b> executing
 <code>typo3cms install:generatepackagestates</code>, to ensure proper generation of
 required folders for all active extensions.
-
-
-
-Related commands
-~~~~~~~~~~~~~~~~
-
-`install:generatepackagestates`
-  Generate PackageStates.php file
 EOH
         );
     }
@@ -68,7 +54,7 @@ EOH
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $folderStructureFactory = new ExtensionFactory($this->packageManager);
+        $folderStructureFactory = new ExtensionFactory(GeneralUtility::makeInstance(PackageManager::class));
         $fixedStatusObjects = $folderStructureFactory
             ->getStructure()
             ->fix();

@@ -14,12 +14,20 @@ namespace Helhum\Typo3Console\Command\Backend;
  *
  */
 
+use Helhum\Typo3Console\Command\RelatableCommandInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UnlockBackendCommand extends Command
+class UnlockBackendCommand extends Command implements RelatableCommandInterface
 {
+    public function getRelatedCommandNames(): array
+    {
+        return [
+            'typo3_console:backend:lock',
+        ];
+    }
+
     protected function configure()
     {
         $this->setDescription('Unlock backend');

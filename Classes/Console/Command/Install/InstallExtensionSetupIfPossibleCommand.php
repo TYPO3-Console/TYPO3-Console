@@ -14,28 +14,20 @@ namespace Helhum\Typo3Console\Command\Install;
  *
  */
 
+use Helhum\Typo3Console\Command\RelatableCommandInterface;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Core\Package\PackageManager;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
-class InstallExtensionSetupIfPossibleCommand extends Command
+class InstallExtensionSetupIfPossibleCommand extends Command implements RelatableCommandInterface
 {
-    /**
-     * @var PackageManager
-     */
-    protected $packageManager;
-
-    public function __construct(string $name = null, PackageManager $packageManager = null)
+    public function getRelatedCommandNames(): array
     {
-        parent::__construct($name);
-
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->packageManager = $packageManager ?? $objectManager->get(PackageManager::class);
+        return [
+            'typo3_console:extension:setupactive',
+        ];
     }
 
     protected function configure()
@@ -50,14 +42,6 @@ but does not fail on packaging for deployment where no database connection is av
 
 Besides that, it can be used for a first deploy of a TYPO3 instance in a new environment,
 but also works for subsequent deployments.
-
-
-
-Related commands
-~~~~~~~~~~~~~~~~
-
-`extension:setupactive`
-  Set up all active extensions
 EOH
         );
     }

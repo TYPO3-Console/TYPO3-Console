@@ -37,7 +37,7 @@ EOH
         $this->addArgument(
             'extensionKeys',
             InputArgument::REQUIRED,
-            'Extension keys to deactivate. Separate multiple extension keys with comma'
+            'Extension keys to deactivate. Separate multiple extension keys with comma.'
         );
     }
 

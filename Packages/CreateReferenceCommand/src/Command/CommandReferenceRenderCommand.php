@@ -24,6 +24,7 @@ namespace Typo3Console\CreateReferenceCommand\Command;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use Helhum\Typo3Console\Command\RelatableCommandInterface;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Descriptor\ApplicationDescription;
 use Symfony\Component\Console\Input\InputArgument;
@@ -124,7 +125,7 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
             }
 
             $relatedCommands = [];
-            if (is_callable([$command, 'getRelatedCommandNames'])) {
+            if ($command instanceof RelatableCommandInterface) {
                 $relatedCommandIdentifiers = $command->getRelatedCommandNames();
                 foreach ($relatedCommandIdentifiers as $relatedCommandIdentifier) {
                     $commandParts = explode(':', $relatedCommandIdentifier);

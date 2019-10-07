@@ -27,6 +27,7 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony\Command;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Helhum\Typo3Console\Command\RelatableCommandInterface;
 use Helhum\Typo3Console\Mvc\Cli\Command as CommandDefinition;
 use Helhum\Typo3Console\Mvc\Cli\RequestHandler;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
@@ -41,7 +42,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Wrapper to turn a command controller commands into a Symfony Command
  */
-class CommandControllerCommand extends Command
+class CommandControllerCommand extends Command implements RelatableCommandInterface
 {
     /**
      * @var CommandDefinition
@@ -81,7 +82,7 @@ class CommandControllerCommand extends Command
         return $commandInputDefinition;
     }
 
-    public function getRelatedCommandNames()
+    public function getRelatedCommandNames(): array
     {
         return $this->commandDefinition->getRelatedCommandIdentifiers();
     }
