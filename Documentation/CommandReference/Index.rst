@@ -1367,7 +1367,7 @@ Options
 Options
 ~~~~~~~
 
-`--arguments`
+`--arguments|-a`
    Arguments for the wizard prefixed with the identifier, e.g. `compatibility7Extension[install]=0`; multiple arguments separated with comma
 
 - Accept value: yes
@@ -1395,7 +1395,7 @@ Arguments
 ~~~~~~~~~
 
 `extensionKeys`
-   Extension keys to check. Separate multiple extension keys with comma.
+   Extension keys to check. Separate multiple extension keys with comma
 
 
 
@@ -1403,7 +1403,7 @@ Options
 ~~~~~~~
 
 `--typo3-version`
-   TYPO3 version to check against. Defaults to current TYPO3 version.
+   TYPO3 version to check against. Defaults to current TYPO3 version
 
 - Accept value: yes
 - Is value required: yes
@@ -1429,7 +1429,7 @@ Options
 Options
 ~~~~~~~
 
-`--all`
+`--all|-a`
    If set, all wizards will be listed, even the once marked as ready or done
 
 - Accept value: no
@@ -1462,7 +1462,7 @@ Arguments
 Options
 ~~~~~~~
 
-`--arguments`
+`--arguments|-a`
    Arguments for the wizard prefixed with the identifier, e.g. `compatibility7Extension[install]=0`
 
 - Accept value: yes
@@ -1470,7 +1470,7 @@ Options
 - Is multiple: no
 - Default: array ()
 
-`--force`
+`--force|-f`
    Force execution, even if the wizard has been marked as done
 
 - Accept value: no
