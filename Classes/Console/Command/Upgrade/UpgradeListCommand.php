@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Command\Upgrade;
  */
 
 use Helhum\Typo3Console\Install\Upgrade\UpgradeHandling;
+use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardListRenderer;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,37 +24,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UpgradeListCommand extends Command
 {
-    use EnsureExtensionCompatibilityTrait;
-
-    const OPT_ALL = 'all';
-
-    /**
-     * @var UpgradeHandling
-     */
-    private $upgradeHandling;
-
-    /**
-     * @var OutputInterface
-     */
-    private $output;
-
-    /**
-     * @param UpgradeHandling|null $upgradeHandling
-     */
-    public function __construct(
-        string $name = null,
-        UpgradeHandling $upgradeHandling = null
-    ) {
-        parent::__construct($name);
-
-        $this->upgradeHandling = $upgradeHandling ?? new UpgradeHandling();
-    }
-
     protected function configure()
     {
         $this->setDescription('List upgrade wizards');
         $this->addOption(
-            self::OPT_ALL,
+            'all',
             'a',
             InputOption::VALUE_NONE,
             'If set, all wizards will be listed, even the once marked as ready or done'
@@ -62,26 +37,42 @@ class UpgradeListCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->output = $output;
-
-        if (!$this->ensureExtensionCompatibility()) {
+        $upgradeHandling = new UpgradeHandling();
+        if (!$this->ensureExtensionCompatibility($upgradeHandling, $output)) {
             return 1;
         }
 
-        $all = $input->getOption(self::OPT_ALL);
-        $verbose = $output->isVerbose();
-
-        $wizards = $this->upgradeHandling->executeInSubProcess('listWizards', []);
+        $all = $input->getOption('all');
+        $wizards = $upgradeHandling->executeInSubProcess('listWizards');
 
         $listRenderer = new UpgradeWizardListRenderer();
+        // @deprecated usage of ConsoleOutput will be removed with 6.0
         $consoleOutput = new ConsoleOutput($output, $input);
 
         $output->writeln('<comment>Wizards scheduled for execution:</comment>');
-        $listRenderer->render($wizards['scheduled'], $consoleOutput, $verbose);
+        $listRenderer->render($wizards['scheduled'], $consoleOutput, $output->isVerbose());
 
         if ($all) {
             $output->writeln(PHP_EOL . '<comment>Wizards marked as done:</comment>');
-            $listRenderer->render($wizards['done'], $consoleOutput, $verbose);
+            $listRenderer->render($wizards['done'], $consoleOutput, $output->isVerbose());
         }
+
+        return 0;
+    }
+
+    private function ensureExtensionCompatibility(UpgradeHandling $upgradeHandling, OutputInterface $output): bool
+    {
+        $messages = $upgradeHandling->ensureExtensionCompatibility();
+        if (!empty($messages)) {
+            $output->writeln('<error>Incompatible extensions found, aborting.</error>');
+
+            foreach ($messages as $message) {
+                $output->writeln($message);
+            }
+
+            return false;
+        }
+
+        return true;
     }
 }

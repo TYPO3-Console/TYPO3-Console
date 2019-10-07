@@ -25,51 +25,23 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UpgradeWizardCommand extends Command
 {
-    use EnsureExtensionCompatibilityTrait;
-
-    const ARG_IDENTIFIER = 'identifier';
-    const OPT_ARGUMENTS = 'arguments';
-    const OPT_FORCE = 'force';
-
-    /**
-     * @var UpgradeHandling
-     */
-    private $upgradeHandling;
-
-    /**
-     * @var OutputInterface
-     */
-    private $output;
-
-    /**
-     * @param UpgradeHandling|null $upgradeHandling
-     */
-    public function __construct(
-        string $name = null,
-        UpgradeHandling $upgradeHandling = null
-    ) {
-        parent::__construct($name);
-
-        $this->upgradeHandling = $upgradeHandling ?? new UpgradeHandling();
-    }
-
     protected function configure()
     {
         $this->setDescription('Execute a single upgrade wizard');
         $this->addArgument(
-            self::ARG_IDENTIFIER,
+            'identifier',
             InputArgument::REQUIRED,
             'Identifier of the wizard that should be executed'
         );
         $this->addOption(
-            self::OPT_ARGUMENTS,
+            'arguments',
             'a',
             InputOption::VALUE_REQUIRED,
             'Arguments for the wizard prefixed with the identifier, e.g. <code>compatibility7Extension[install]=0</code>',
             []
         );
         $this->addOption(
-            self::OPT_FORCE,
+            'force',
             'f',
             InputOption::VALUE_NONE,
             'Force execution, even if the wizard has been marked as done'
@@ -78,21 +50,39 @@ class UpgradeWizardCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->output = $output;
-
-        if (!$this->ensureExtensionCompatibility()) {
+        $upgradeHandling = new UpgradeHandling();
+        if (!$this->ensureExtensionCompatibility($upgradeHandling, $output)) {
             return 1;
         }
 
-        $identifier = $input->getArgument(self::ARG_IDENTIFIER);
-        $arguments = $input->getOption(self::OPT_ARGUMENTS);
-        $force = $input->getOption(self::OPT_FORCE);
+        $identifier = $input->getArgument('identifier');
+        $arguments = $input->getOption('arguments');
+        $force = $input->getOption('force');
 
-        $result = $this->upgradeHandling->executeInSubProcess(
+        $result = $upgradeHandling->executeInSubProcess(
             'executeWizard',
             [$identifier, $arguments, $force]
         );
 
+        // @deprecated usage of ConsoleOutput will be removed with 6.0
         (new UpgradeWizardResultRenderer())->render([$identifier => $result], new ConsoleOutput($output, $input));
+
+        return 0;
+    }
+
+    private function ensureExtensionCompatibility(UpgradeHandling $upgradeHandling, OutputInterface $output): bool
+    {
+        $messages = $upgradeHandling->ensureExtensionCompatibility();
+        if (!empty($messages)) {
+            $output->writeln('<error>Incompatible extensions found, aborting.</error>');
+
+            foreach ($messages as $message) {
+                $output->writeln($message);
+            }
+
+            return false;
+        }
+
+        return true;
     }
 }

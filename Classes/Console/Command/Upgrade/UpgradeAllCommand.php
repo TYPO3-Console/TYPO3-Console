@@ -24,37 +24,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UpgradeAllCommand extends Command
 {
-    use EnsureExtensionCompatibilityTrait;
-
-    const OPT_ARGUMENTS = 'arguments';
-
-    /**
-     * @var UpgradeHandling
-     */
-    private $upgradeHandling;
-
-    /**
-     * @var OutputInterface
-     */
-    private $output;
-
-    /**
-     * @param UpgradeHandling|null $upgradeHandling
-     */
-    public function __construct(
-        string $name = null,
-        UpgradeHandling $upgradeHandling = null
-    ) {
-        parent::__construct($name);
-
-        $this->upgradeHandling = $upgradeHandling ?? new UpgradeHandling();
-    }
-
     protected function configure()
     {
         $this->setDescription('Execute all upgrade wizards that are scheduled for execution');
         $this->addOption(
-            self::OPT_ARGUMENTS,
+            'arguments',
             'a',
             InputOption::VALUE_REQUIRED,
             'Arguments for the wizard prefixed with the identifier, e.g. <code>compatibility7Extension[install]=0</code>; multiple arguments separated with comma',
@@ -64,31 +38,50 @@ class UpgradeAllCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->output = $output;
-
-        if (!$this->ensureExtensionCompatibility()) {
+        $upgradeHandling = new UpgradeHandling();
+        // @deprecated, should be changed to StyleInterface
+        $consoleOutput = new ConsoleOutput($output, $input);
+        if (!$this->ensureExtensionCompatibility($upgradeHandling, $output)) {
             return 1;
         }
 
-        $arguments = $input->getArgument(self::ARG_ARGUMENTS);
+        $arguments = $input->getOption('arguments');
         $verbose = $output->isVerbose();
 
         $output->writeln(PHP_EOL . '<i>Initiating TYPO3 upgrade</i>' . PHP_EOL);
 
         $messages = [];
-        $results = $this->upgradeHandling->executeAll($arguments, $this->output, $messages);
+        $results = $upgradeHandling->executeAll($arguments, $consoleOutput, $messages);
 
-        $output->outputLine(PHP_EOL . PHP_EOL . '<i>Successfully upgraded TYPO3 to version %s</i>', [TYPO3_version]);
+        $output->writeln(sprintf(PHP_EOL . PHP_EOL . '<i>Successfully upgraded TYPO3 to version %s</i>', TYPO3_version));
 
         if ($verbose) {
             $output->writeln('');
             $output->writeln('<comment>Upgrade report:</comment>');
-            (new UpgradeWizardResultRenderer())->render($results, new ConsoleOutput($output, $input));
+            (new UpgradeWizardResultRenderer())->render($results, $consoleOutput);
         }
 
         $output->writeln('');
         foreach ($messages as $message) {
             $output->writeln($message);
         }
+
+        return 0;
+    }
+
+    private function ensureExtensionCompatibility(UpgradeHandling $upgradeHandling, OutputInterface $output): bool
+    {
+        $messages = $upgradeHandling->ensureExtensionCompatibility();
+        if (!empty($messages)) {
+            $output->writeln('<error>Incompatible extensions found, aborting.</error>');
+
+            foreach ($messages as $message) {
+                $output->writeln($message);
+            }
+
+            return false;
+        }
+
+        return true;
     }
 }

@@ -24,26 +24,6 @@ use TYPO3\CMS\Core\Package\Exception\UnknownPackageException;
 
 class UpgradeCheckExtensionConstraintsCommand extends Command
 {
-    const ARG_EXTENSION_KEYS = 'extensionKeys';
-    const OPT_TYPO3_VERSION = 'typo3-version';
-
-    /**
-     * @var UpgradeHandling
-     */
-    private $upgradeHandling;
-
-    /**
-     * @param UpgradeHandling|null $upgradeHandling
-     */
-    public function __construct(
-        string $name = null,
-        UpgradeHandling $upgradeHandling = null
-    ) {
-        parent::__construct($name);
-
-        $this->upgradeHandling = $upgradeHandling ?? new UpgradeHandling();
-    }
-
     protected function configure()
     {
         $this->setDescription('Check TYPO3 version constraints of extensions');
@@ -55,13 +35,13 @@ It therefore relies on the constraints to be correct.
 EOH
         );
         $this->addArgument(
-            self::ARG_EXTENSION_KEYS,
+            'extensionKeys',
             InputArgument::OPTIONAL,
             'Extension keys to check. Separate multiple extension keys with comma',
             ''
         );
         $this->addOption(
-            self::OPT_TYPO3_VERSION,
+            'typo3-version',
             null,
             InputOption::VALUE_REQUIRED,
             'TYPO3 version to check against. Defaults to current TYPO3 version',
@@ -71,16 +51,16 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $extensionKeys = explode(',', $input->getArgument(self::ARG_EXTENSION_KEYS));
-        $typo3Version = $input->getOption(self::OPT_TYPO3_VERSION);
-
+        $extensionKeys = explode(',', $input->getArgument('extensionKeys'));
+        $typo3Version = $input->getOption('typo3-version');
+        $upgradeHandling = new UpgradeHandling();
         if (empty($extensionKeys)) {
-            $failedPackageMessages = $this->upgradeHandling->matchAllExtensionConstraints($typo3Version);
+            $failedPackageMessages = $upgradeHandling->matchAllExtensionConstraints($typo3Version);
         } else {
             $failedPackageMessages = [];
             foreach ($extensionKeys as $extensionKey) {
                 try {
-                    if (!empty($result = $this->upgradeHandling->matchExtensionConstraints($extensionKey, $typo3Version))) {
+                    if (!empty($result = $upgradeHandling->matchExtensionConstraints($extensionKey, $typo3Version))) {
                         $failedPackageMessages[$extensionKey] = $result;
                     }
                 } catch (UnknownPackageException $e) {
@@ -99,8 +79,10 @@ EOH
                 '<info>All third party extensions claim to be compatible with TYPO3 version %s</info>',
                 $typo3Version
             ));
-        } else {
-            return 1;
+
+            return 0;
         }
+
+        return 1;
     }
 }

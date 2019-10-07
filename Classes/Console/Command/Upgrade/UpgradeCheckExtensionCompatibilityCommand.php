@@ -23,26 +23,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UpgradeCheckExtensionCompatibilityCommand extends Command
 {
-    const ARG_EXTENSION_KEY = 'extensionKeys';
-    const OPT_CONFIG_ONLY = 'configOnly';
-
-    /**
-     * @var UpgradeHandling
-     */
-    private $upgradeHandling;
-
-    /**
-     * @param UpgradeHandling|null $upgradeHandling
-     */
-    public function __construct(
-        string $name = null,
-        UpgradeHandling $upgradeHandling = null
-    ) {
-        parent::__construct($name);
-
-        $this->upgradeHandling = $upgradeHandling ?? new UpgradeHandling();
-    }
-
     protected function configure()
     {
         $this->setDescription('Checks for broken extensions');
@@ -53,12 +33,12 @@ when extensions have broken (incompatible) code
 EOH
         );
         $this->addArgument(
-            self::ARG_EXTENSION_KEY,
+            'extensionKeys',
             InputArgument::REQUIRED,
             'Extension key for extension to check'
         );
         $this->addOption(
-            self::OPT_CONFIG_ONLY,
+            'configOnly',
             'c',
             InputOption::VALUE_NONE,
             ''
@@ -67,9 +47,9 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $extensionKey = $input->getArgument(self::ARG_EXTENSION_KEY);
-        $configOnly = $input->getOption(self::OPT_CONFIG_ONLY);
+        $extensionKey = $input->getArgument('extensionKeys');
+        $configOnly = $input->getOption('configOnly');
 
-        $output->writeln(\json_encode($this->upgradeHandling->isCompatible($extensionKey, $configOnly)));
+        $output->writeln(\json_encode((new UpgradeHandling())->isCompatible($extensionKey, $configOnly)));
     }
 }

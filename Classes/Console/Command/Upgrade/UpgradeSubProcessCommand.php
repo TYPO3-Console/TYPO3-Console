@@ -28,36 +28,17 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class UpgradeSubProcessCommand extends Command
 {
-    const ARG_UPGRADE_COMMAND = 'upgradeCommand';
-    const ARG_ARGUMENTS = 'arguments';
-
-    /**
-     * @var UpgradeHandling
-     */
-    private $upgradeHandling;
-
-    /**
-     * @param UpgradeHandling|null $upgradeHandling
-     */
-    public function __construct(
-        string $name = null,
-        UpgradeHandling $upgradeHandling = null
-    ) {
-        parent::__construct($name);
-
-        $this->upgradeHandling = $upgradeHandling ?? new UpgradeHandling();
-    }
-
     protected function configure()
     {
+        $this->setHidden(true);
         $this->setDescription('This is where the hard work happens in a fully bootstrapped TYPO3');
         $this->setHelp('It will be called as sub process');
         $this->addArgument(
-            self::ARG_UPGRADE_COMMAND,
+            'upgradeCommand',
             InputArgument::REQUIRED
         );
         $this->addArgument(
-            self::ARG_ARGUMENTS,
+            'arguments',
             InputArgument::REQUIRED,
             'Serialized arguments'
         );
@@ -65,11 +46,11 @@ class UpgradeSubProcessCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $upgradeCommand = $input->getArgument(self::ARG_UPGRADE_COMMAND);
-        $arguments = $input->getArgument(self::ARG_ARGUMENTS);
+        $upgradeCommand = $input->getArgument('upgradeCommand');
+        $arguments = $input->getArgument('arguments');
 
         $arguments = unserialize($arguments, ['allowed_classes' => false]);
-        $result = $this->upgradeHandling->$upgradeCommand(...$arguments);
-        $output->writeln(serialize($result));
+        $result = (new UpgradeHandling())->$upgradeCommand(...$arguments);
+        $output->write(serialize($result), false, OutputInterface::OUTPUT_RAW);
     }
 }
