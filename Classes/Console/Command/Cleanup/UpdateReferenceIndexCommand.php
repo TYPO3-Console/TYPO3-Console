@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Command\Cleanup;
  */
 
 use Helhum\Typo3Console\Log\Writer\ConsoleWriter;
+use Helhum\Typo3Console\Service\Persistence\PersistenceContext;
 use Helhum\Typo3Console\Service\Persistence\PersistenceIntegrityService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -22,11 +23,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Log\Logger;
 use TYPO3\CMS\Core\Log\LogLevel;
 use TYPO3\CMS\Core\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 class UpdateReferenceIndexCommand extends Command
 {
@@ -61,8 +62,12 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $persistenceIntegrityService = $objectManager->get(PersistenceIntegrityService::class);
+        $persistenceIntegrityService = new PersistenceIntegrityService(
+            new PersistenceContext(
+                GeneralUtility::makeInstance(ConnectionPool::class),
+                $GLOBALS['TCA']
+            )
+        );
         $this->io = new SymfonyStyle($input, $output);
 
         $dryRun = $input->getOption('dry-run');

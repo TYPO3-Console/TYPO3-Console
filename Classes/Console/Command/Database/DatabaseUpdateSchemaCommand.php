@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Command\Database;
  *
  */
 
+use Helhum\Typo3Console\Database\Schema\SchemaUpdate;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateResultRenderer;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
@@ -25,7 +26,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 class DatabaseUpdateSchemaCommand extends Command
 {
@@ -77,8 +78,10 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $schemaService = $objectManager->get(SchemaService::class);
+        $schemaService = new SchemaService(
+            new SchemaUpdate(),
+            GeneralUtility::makeInstance(Dispatcher::class)
+        );
         $schemaUpdateResultRenderer = new SchemaUpdateResultRenderer();
 
         $schemaUpdateTypes = (array)$input->getArgument('schemaUpdateTypes');

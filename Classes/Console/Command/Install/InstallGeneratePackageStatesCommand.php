@@ -25,23 +25,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 class InstallGeneratePackageStatesCommand extends Command
 {
-    /**
-     * @var PackageManager
-     */
-    protected $packageManager;
-
-    public function __construct(string $name = null, PackageManager $packageManager = null)
-    {
-        parent::__construct($name);
-
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->packageManager = $packageManager ?? $objectManager->get(PackageManager::class);
-    }
-
     protected function configure()
     {
         $this->setDescription('Generate PackageStates.php file');
@@ -107,7 +93,8 @@ EOH
             ',',
             (string)getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS')
         );
-        $packageStatesGenerator = new PackageStatesGenerator($this->packageManager);
+        $packageManager = GeneralUtility::makeInstance(PackageManager::class);
+        $packageStatesGenerator = new PackageStatesGenerator($packageManager);
         $activatedExtensions = $packageStatesGenerator->generate(
             $frameworkExtensions,
             $excludedExtensions,
