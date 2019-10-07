@@ -14,12 +14,22 @@ namespace Helhum\Typo3Console\Command\Extension;
  *
  */
 
+use Helhum\Typo3Console\Command\RelatableCommandInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ExtensionSetupActiveCommand extends Command
+class ExtensionSetupActiveCommand extends Command implements RelatableCommandInterface
 {
+    public function getRelatedCommandNames(): array
+    {
+        return [
+            'typo3_console:extension:setup',
+            'typo3_console:install:generatepackagestates',
+            'typo3_console:cache:flush',
+        ];
+    }
+
     protected function configure()
     {
         $this->setDescription('Set up all active extensions');
@@ -32,18 +42,6 @@ are already marked as active, but have not been set up yet or might have changed
 setup step for the (changed) extensions is performed.
 As an additional benefit no caches are flushed, which significantly improves performance of this command
 and avoids unnecessary cache clearing.
-
-
-
-Related commands
-~~~~~~~~~~~~~~~~
-
-`extension:setup`
-  Set up extension(s)
-`install:generatepackagestates`
-  Generate PackageStates.php file
-`cache:flush`
-  Flush all caches
 EOH
         );
     }

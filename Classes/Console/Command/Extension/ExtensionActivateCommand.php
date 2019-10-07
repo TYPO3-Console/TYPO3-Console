@@ -37,7 +37,7 @@ EOH
         $this->addArgument(
             'extensionKeys',
             InputArgument::REQUIRED,
-            'Extension keys to activate. Separate multiple extension keys with comma'
+            'Extension keys to activate. Separate multiple extension keys with comma.'
         );
     }
 

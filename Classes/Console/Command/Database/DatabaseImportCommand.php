@@ -42,7 +42,7 @@ EOH
             'interactive',
             null,
             InputOption::VALUE_NONE,
-            'Open an interactive mysql shell using the TYPO3 connection settings'
+            'Open an interactive mysql shell using the TYPO3 connection settings.'
         );
         $this->addOption(
             'connection',
