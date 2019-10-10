@@ -41,9 +41,13 @@ in your Fluid template by adding the xmlns:* attribute(s):
 <code><html xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers" ...></code>
 EOH
         );
+        /** @deprecated Will be removed with 6.0 */
         $this->setDefinition($this->createCompleteInputDefinition());
     }
 
+    /**
+     * @deprecated Will be removed with 6.0
+     */
     protected function createNativeDefinition(): array
     {
         return [

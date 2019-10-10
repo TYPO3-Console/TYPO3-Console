@@ -14,24 +14,19 @@ namespace Helhum\Typo3Console\Command\Cache;
  *
  */
 
+use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Service\CacheService;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class CacheFlushGroupsCommand extends Command
+class CacheFlushGroupsCommand extends AbstractConvertedCommand
 {
     protected function configure()
     {
         $this->setDescription('Flush all caches in specified groups');
-        $this->addArgument(
-            'groups',
-            InputArgument::REQUIRED,
-            'An array of names (specified as comma separated values) of cache groups to flush'
-        );
         $this->setHelp(
             <<<'EOH'
 Flushes all caches in specified groups.
@@ -44,6 +39,30 @@ Valid group names are by default:
 <b>Example:</b> <code>%command.full_name% pages,all</code>
 EOH
         );
+        /** @deprecated Will be removed with 6.0 */
+        $this->setDefinition($this->createCompleteInputDefinition());
+    }
+
+    /**
+     * @deprecated Will be removed with 6.0
+     */
+    protected function createNativeDefinition(): array
+    {
+        return [
+            new InputArgument(
+                'groups',
+                InputArgument::REQUIRED,
+                'An array of names (specified as comma separated values) of cache groups to flush'
+            ),
+        ];
+    }
+
+    /**
+     * @deprecated will be removed with 6.0
+     */
+    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

@@ -14,15 +14,15 @@ namespace Helhum\Typo3Console\Command\Install;
  *
  */
 
+use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Command\RelatableCommandInterface;
 use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class InstallFixFolderStructureCommand extends Command implements RelatableCommandInterface
+class InstallFixFolderStructureCommand extends AbstractConvertedCommand implements RelatableCommandInterface
 {
     public function getRelatedCommandNames(): array
     {
@@ -44,6 +44,24 @@ It is recommended to be executed <b>after</b> executing
 required folders for all active extensions.
 EOH
         );
+        /** @deprecated Will be removed with 6.0 */
+        $this->setDefinition($this->createCompleteInputDefinition());
+    }
+
+    /**
+     * @deprecated Will be removed with 6.0
+     */
+    protected function createNativeDefinition(): array
+    {
+        return [];
+    }
+
+    /**
+     * @deprecated will be removed with 6.0
+     */
+    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to do here
     }
 
     /**

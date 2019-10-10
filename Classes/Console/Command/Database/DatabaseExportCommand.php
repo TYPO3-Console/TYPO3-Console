@@ -53,10 +53,13 @@ Tables to be excluded from the export can be specified fully qualified or with w
 <b>Example:</b> <code>%command.full_name% -c Default -e 'cf_*' -e 'cache_*' -e '[bf]e_sessions' -e sys_log</code>
 EOH
         );
-
+        /** @deprecated Will be removed with 6.0 */
         $this->setDefinition($this->createCompleteInputDefinition());
     }
 
+    /**
+     * @deprecated Will be removed with 6.0
+     */
     protected function createNativeDefinition(): array
     {
         return [

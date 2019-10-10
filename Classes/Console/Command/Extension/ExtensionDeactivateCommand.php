@@ -14,14 +14,14 @@ namespace Helhum\Typo3Console\Command\Extension;
  *
  */
 
+use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Core\Booting\CompatibilityScripts;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ExtensionDeactivateCommand extends Command
+class ExtensionDeactivateCommand extends AbstractConvertedCommand
 {
     protected function configure()
     {
@@ -34,11 +34,30 @@ Marks extensions as inactive in the system and clears caches for every deactivat
 This command is deprecated (and hidden) in Composer mode.
 EOH
         );
-        $this->addArgument(
-            'extensionKeys',
-            InputArgument::REQUIRED,
-            'Extension keys to deactivate. Separate multiple extension keys with comma.'
-        );
+        /** @deprecated Will be removed with 6.0 */
+        $this->setDefinition($this->createCompleteInputDefinition());
+    }
+
+    /**
+     * @deprecated Will be removed with 6.0
+     */
+    protected function createNativeDefinition(): array
+    {
+        return [
+            new InputArgument(
+                'extensionKeys',
+                InputArgument::REQUIRED,
+                'Extension keys to deactivate. Separate multiple extension keys with comma.'
+            ),
+        ];
+    }
+
+    /**
+     * @deprecated will be removed with 6.0
+     */
+    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

@@ -14,8 +14,8 @@ namespace Helhum\Typo3Console\Command\Cache;
  *
  */
 
+use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Service\CacheService;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,23 +23,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class CacheFlushTagsCommand extends Command
+class CacheFlushTagsCommand extends AbstractConvertedCommand
 {
     protected function configure()
     {
         $this->setDescription('Flush cache by tags');
-        $this->addArgument(
-            'tags',
-            InputArgument::REQUIRED,
-            'Array of tags (specified as comma separated values) to flush.'
-        );
-        $this->addOption(
-            'groups',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Optional array of groups (specified as comma separated values) for which to flush tags. If no group is specified, caches of all groups are flushed.',
-            null
-        );
         $this->setHelp(
             <<<'EOH'
 Flushes caches by tags, optionally only caches in specified groups.
@@ -47,6 +35,36 @@ Flushes caches by tags, optionally only caches in specified groups.
 <b>Example:</b> <code>%command.full_name% news_123 --groups pages,all</code>
 EOH
         );
+        /** @deprecated Will be removed with 6.0 */
+        $this->setDefinition($this->createCompleteInputDefinition());
+    }
+
+    /**
+     * @deprecated Will be removed with 6.0
+     */
+    protected function createNativeDefinition(): array
+    {
+        return [
+            new InputArgument(
+                'tags',
+                InputArgument::REQUIRED,
+                'Array of tags (specified as comma separated values) to flush.'
+            ),
+            new InputOption(
+                'groups',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Optional array of groups (specified as comma separated values) for which to flush tags. If no group is specified, caches of all groups are flushed.'
+            ),
+        ];
+    }
+
+    /**
+     * @deprecated will be removed with 6.0
+     */
+    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

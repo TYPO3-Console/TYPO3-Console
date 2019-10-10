@@ -14,12 +14,12 @@ namespace Helhum\Typo3Console\Command\Extension;
  *
  */
 
-use Symfony\Component\Console\Command\Command;
+use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ExtensionSetupCommand extends Command
+class ExtensionSetupCommand extends AbstractConvertedCommand
 {
     protected function configure()
     {
@@ -34,11 +34,30 @@ Set up means:
 - Writing default extension configuration
 EOH
         );
-        $this->addArgument(
-            'extensionKeys',
-            InputArgument::REQUIRED,
-            'Extension keys to set up. Separate multiple extension keys with comma.'
-        );
+        /** @deprecated Will be removed with 6.0 */
+        $this->setDefinition($this->createCompleteInputDefinition());
+    }
+
+    /**
+     * @deprecated Will be removed with 6.0
+     */
+    protected function createNativeDefinition(): array
+    {
+        return [
+            new InputArgument(
+                'extensionKeys',
+                InputArgument::REQUIRED,
+                'Extension keys to set up. Separate multiple extension keys with comma.'
+            ),
+        ];
+    }
+
+    /**
+     * @deprecated will be removed with 6.0
+     */
+    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
