@@ -14,13 +14,13 @@ namespace Helhum\Typo3Console\Command\Extension;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Core\ClassLoadingInformation;
 
-class DumpAutoloadCommand extends AbstractConvertedCommand
+class DumpAutoloadCommand extends Command
 {
     protected function configure()
     {
@@ -35,24 +35,6 @@ creating or updating this info properly during extension (de-)activation.
 This command is not available in Composer mode.
 EOH
         );
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        // nothing to do here
     }
 
     public function isEnabled(): bool

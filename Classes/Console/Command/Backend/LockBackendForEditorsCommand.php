@@ -14,13 +14,13 @@ namespace Helhum\Typo3Console\Command\Backend;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Command\RelatableCommandInterface;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class LockBackendForEditorsCommand extends AbstractConvertedCommand implements RelatableCommandInterface
+class LockBackendForEditorsCommand extends Command implements RelatableCommandInterface
 {
     private static $LOCK_TYPE_UNLOCKED = 0;
     private static $LOCK_TYPE_ADMIN = 2;
@@ -37,24 +37,6 @@ class LockBackendForEditorsCommand extends AbstractConvertedCommand implements R
         $this->setDescription('Lock backend for editors');
         $this->setHelp('Deny backend access, but only for editors.
 Admins will still be able to log in and work with the backend.');
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

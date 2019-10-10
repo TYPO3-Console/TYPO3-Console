@@ -14,14 +14,14 @@ namespace Helhum\Typo3Console\Command\Install;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Command\RelatableCommandInterface;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class InstallExtensionSetupIfPossibleCommand extends AbstractConvertedCommand implements RelatableCommandInterface
+class InstallExtensionSetupIfPossibleCommand extends Command implements RelatableCommandInterface
 {
     public function getRelatedCommandNames(): array
     {
@@ -44,24 +44,6 @@ Besides that, it can be used for a first deploy of a TYPO3 instance in a new env
 but also works for subsequent deployments.
 EOH
         );
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

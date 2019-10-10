@@ -14,8 +14,8 @@ namespace Helhum\Typo3Console\Command\Extension;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,7 +23,7 @@ use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 
-class ExtensionRemoveInactiveCommand extends AbstractConvertedCommand
+class ExtensionRemoveInactiveCommand extends Command
 {
     protected function configure()
     {
@@ -38,31 +38,12 @@ This command is deprecated.
 Instead of adding extensions and then removing them, just don't add them in the first place.
 EOH
         );
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [
-            new InputOption(
-                'force',
-                'f',
-                InputOption::VALUE_NONE,
-                'The option has to be specified, otherwise nothing happens'
-            ),
-        ];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        // nothing to do here
+        $this->addOption(
+            'force',
+            'f',
+            InputOption::VALUE_NONE,
+            'The option has to be specified, otherwise nothing happens'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

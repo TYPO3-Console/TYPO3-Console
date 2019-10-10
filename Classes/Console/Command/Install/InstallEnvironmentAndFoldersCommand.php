@@ -14,13 +14,13 @@ namespace Helhum\Typo3Console\Command\Install;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Install\InstallStepActionExecutor;
 use Helhum\Typo3Console\Install\Upgrade\SilentConfigurationUpgrade;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class InstallEnvironmentAndFoldersCommand extends AbstractConvertedCommand
+class InstallEnvironmentAndFoldersCommand extends Command
 {
     protected function configure()
     {
@@ -31,24 +31,6 @@ class InstallEnvironmentAndFoldersCommand extends AbstractConvertedCommand
 Check environment and create folder structure
 EOH
         );
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

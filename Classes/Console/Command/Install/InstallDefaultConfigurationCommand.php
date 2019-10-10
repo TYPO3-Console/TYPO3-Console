@@ -14,14 +14,14 @@ namespace Helhum\Typo3Console\Command\Install;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Install\InstallStepActionExecutor;
 use Helhum\Typo3Console\Install\Upgrade\SilentConfigurationUpgrade;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class InstallDefaultConfigurationCommand extends AbstractConvertedCommand
+class InstallDefaultConfigurationCommand extends Command
 {
     protected function configure()
     {
@@ -39,32 +39,13 @@ In non composer mode the following option is also available:
 - dist (which loads a list of distributions you can install)
 EOH
         );
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [
-            new InputOption(
-                'site-setup-type',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Specify the setup type: Create empty root page (site), Do nothing (no)',
-                'no'
-            ),
-        ];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        // nothing to do here
+        $this->addOption(
+            'site-setup-type',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Specify the setup type: Create empty root page (site), Do nothing (no)',
+            'no'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

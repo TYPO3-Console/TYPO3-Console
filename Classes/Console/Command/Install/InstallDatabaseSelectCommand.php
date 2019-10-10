@@ -14,51 +14,32 @@ namespace Helhum\Typo3Console\Command\Install;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Install\InstallStepActionExecutor;
 use Helhum\Typo3Console\Install\Upgrade\SilentConfigurationUpgrade;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class InstallDatabaseSelectCommand extends AbstractConvertedCommand
+class InstallDatabaseSelectCommand extends Command
 {
     protected function configure()
     {
         $this->setHidden(true);
         $this->setDescription('Select database');
         $this->setHelp('Select a database by name');
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [
-            new InputOption(
-                'database-name',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Name of the database'
-            ),
-            new InputOption(
-                'use-existing-database',
-                null,
-                InputOption::VALUE_NONE,
-                'Use already existing database?'
-            ),
-        ];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        // nothing to do here
+        $this->addOption(
+            'database-name',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Name of the database'
+        );
+        $this->addOption(
+            'use-existing-database',
+            null,
+            InputOption::VALUE_NONE,
+            'Use already existing database?'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

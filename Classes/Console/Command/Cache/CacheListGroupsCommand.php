@@ -14,35 +14,17 @@ namespace Helhum\Typo3Console\Command\Cache;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Service\CacheService;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CacheListGroupsCommand extends AbstractConvertedCommand
+class CacheListGroupsCommand extends Command
 {
     protected function configure()
     {
         $this->setDescription('List cache groups');
         $this->setHelp('Lists all registered cache groups.');
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

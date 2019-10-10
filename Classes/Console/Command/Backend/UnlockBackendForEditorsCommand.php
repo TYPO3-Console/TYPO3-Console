@@ -14,13 +14,13 @@ namespace Helhum\Typo3Console\Command\Backend;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Command\RelatableCommandInterface;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UnlockBackendForEditorsCommand extends AbstractConvertedCommand implements RelatableCommandInterface
+class UnlockBackendForEditorsCommand extends Command implements RelatableCommandInterface
 {
     private static $LOCK_TYPE_UNLOCKED = 0;
 
@@ -35,24 +35,6 @@ class UnlockBackendForEditorsCommand extends AbstractConvertedCommand implements
     {
         $this->setDescription('Unlock backend for editors');
         $this->setHelp('Allow backend access for editors again (e.g. after having been locked with backend:lockforeditors command).');
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        // nothing to do here
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

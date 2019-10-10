@@ -14,58 +14,39 @@ namespace Helhum\Typo3Console\Command\Install;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Install\InstallStepActionExecutor;
 use Helhum\Typo3Console\Install\Upgrade\SilentConfigurationUpgrade;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class InstallDatabaseDataCommand extends AbstractConvertedCommand
+class InstallDatabaseDataCommand extends Command
 {
     protected function configure()
     {
         $this->setHidden(true);
         $this->setDescription('Add database data');
         $this->setHelp('Adds admin user and site name in database');
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [
-            new InputOption(
-                'admin-user-name',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Username of to be created administrative user account'
-            ),
-            new InputOption(
-                'admin-password',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Password of to be created administrative user account'
-            ),
-            new InputOption(
-                'site-name',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Site name',
-                'New TYPO3 Console site'
-            ),
-        ];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        // nothing to do here
+        $this->addOption(
+            'admin-user-name',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Username of to be created administrative user account'
+        );
+        $this->addOption(
+            'admin-password',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Password of to be created administrative user account'
+        );
+        $this->addOption(
+            'site-name',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Site name',
+            'New TYPO3 Console site'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
