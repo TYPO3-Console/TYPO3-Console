@@ -31,6 +31,11 @@ return [
         'class' => \Helhum\Typo3Console\Command\Backend\LockBackendForEditorsCommand::class,
         'schedulable' => false,
     ],
+    'backend:systemmaintainer' => [
+        'vendor' => 'typo3_console',
+        'class' => \Helhum\Typo3Console\Command\Backend\SystemmaintainerCommand::class,
+        'schedulable' => false,
+    ],
     'backend:unlock' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Backend\UnlockBackendCommand::class,
