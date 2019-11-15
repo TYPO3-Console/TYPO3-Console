@@ -12,3 +12,18 @@
 /appveyor.yml export-ignore
 /phpunit.xml.dist export-ignore
 /sonar-project.properties export-ignore
+
+# Enforce checkout with linux lf consistent over all plattforms
+*.cfg text eol=lf
+*.dist text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.php text eol=lf
+*.properties text eol=lf
+*.rst text eol=lf
+*.sql text eol=lf
+*.tpl text eol=lf
+*.txt text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+typo3cms text eol=lf
