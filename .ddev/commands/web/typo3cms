@@ -1,0 +1,7 @@
+#!/bin/bash
+
+## Description: Execute TYPO3 Console Command (CLI)
+## Usage: typo3cms
+## Example: "ddev typo3cms list" or "ddev typo3cms help" or "ddev typo3cms --help"
+
+./typo3cms $@

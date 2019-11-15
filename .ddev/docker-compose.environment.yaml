@@ -1,0 +1,15 @@
+version: '3.6'
+
+services:
+    web:
+        environment:
+            - TYPO3_CONTEXT=Development
+            - TYPO3_INSTALL_DB_HOST=db
+            - TYPO3_INSTALL_DB_PORT=3306
+            - TYPO3_INSTALL_DB_USER=db
+            - TYPO3_INSTALL_DB_PASSWORD=db
+            - TYPO3_INSTALL_DB_DBNAME=db
+            - TYPO3_INSTALL_ADMIN_USER=admin
+            - TYPO3_INSTALL_ADMIN_PASSWORD=password
+            - TYPO3_INSTALL_SITE_NAME=TYPO3-Console
+            - TYPO3_INSTALL_SITE_SETUP_TYPE=site
