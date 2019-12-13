@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\Package;
 
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
+use TYPO3\CMS\Core\Service\DependencyOrderingService;
 
 class UncachedPackageManager extends PackageManager
 {
@@ -28,6 +29,14 @@ class UncachedPackageManager extends PackageManager
      * @var bool
      */
     protected $packageStatesFileExists = false;
+
+    /**
+     * @param DependencyOrderingService $dependencyOrderingService
+     */
+    public function injectDependencyOrderingService(DependencyOrderingService $dependencyOrderingService)
+    {
+        $this->dependencyOrderingService = $dependencyOrderingService;
+    }
 
     public function init()
     {
