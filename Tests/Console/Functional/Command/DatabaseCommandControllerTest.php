@@ -31,6 +31,16 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
+    public function multipleUpdateTypesCanBeSpecified()
+    {
+        $output = $this->executeConsoleCommand('database:updateschema', ['field.add,table.add', '--verbose']);
+        $this->assertContains('No schema updates were performed for update types:', $output);
+        $this->assertContains('"field.add", "table.add"', $output);
+    }
+
+    /**
+     * @test
+     */
     public function allUpdatesCanBePerformedWhenSpecified()
     {
         $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
