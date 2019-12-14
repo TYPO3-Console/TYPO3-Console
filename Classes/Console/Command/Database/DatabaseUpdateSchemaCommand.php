@@ -76,7 +76,7 @@ EOH
                 'schemaUpdateTypes',
                 InputArgument::OPTIONAL,
                 'List of schema update types (default: "safe")',
-                ['safe']
+                'safe'
             ),
             new InputOption(
                 'dry-run',
@@ -103,7 +103,7 @@ EOH
         );
         $schemaUpdateResultRenderer = new SchemaUpdateResultRenderer();
 
-        $schemaUpdateTypes = (array)$input->getArgument('schemaUpdateTypes');
+        $schemaUpdateTypes = explode(',', $input->getArgument('schemaUpdateTypes'));
         $dryRun = $input->getOption('dry-run');
         $verbose = $output->isVerbose();
 
