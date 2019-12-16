@@ -48,7 +48,7 @@ EOH
                 'Extension key for extension to check'
             ),
             new InputOption(
-                'configOnly',
+                'config-only',
                 'c',
                 InputOption::VALUE_NONE,
                 ''
@@ -67,7 +67,7 @@ EOH
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $extensionKey = $input->getArgument('extensionKeys');
-        $configOnly = $input->getOption('configOnly');
+        $configOnly = $input->getOption('config-only');
 
         $output->writeln(\json_encode((new UpgradeHandling())->isCompatible($extensionKey, $configOnly)));
     }
