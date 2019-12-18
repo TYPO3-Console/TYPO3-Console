@@ -70,4 +70,5 @@ finder:
   not-name:
     - "ext_emconf.php"
     - "ext_localconf.php"
+    - "ext_tables.php"
     - "ComposerPackagesCommands.php"

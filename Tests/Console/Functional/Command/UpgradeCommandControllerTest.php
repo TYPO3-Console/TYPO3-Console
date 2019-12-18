@@ -66,6 +66,36 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
+    public function checkExtensionCompatibilityReportsBrokenCodeInExtTables()
+    {
+        $this->installFixtureExtensionCode('ext_broken_ext_tables');
+        $this->executeConsoleCommand('install:generatepackagestates');
+
+        $output = $this->commandDispatcher->executeCommand('upgrade:checkextensioncompatibility', ['ext_broken_ext_tables']);
+        $this->assertSame('false', $output);
+
+        $this->removeFixtureExtensionCode('ext_broken_ext_tables');
+        $this->executeConsoleCommand('install:generatepackagestates');
+    }
+
+    /**
+     * @test
+     */
+    public function checkExtensionCompatibilityDoeNotReportBrokenCodeInExtTablesWithConfigOnlyCheck()
+    {
+        $this->installFixtureExtensionCode('ext_broken_ext_tables');
+        $this->executeConsoleCommand('install:generatepackagestates');
+
+        $output = $this->commandDispatcher->executeCommand('upgrade:checkextensioncompatibility', ['ext_broken_ext_tables', '--config-only']);
+        $this->assertSame('true', $output);
+
+        $this->removeFixtureExtensionCode('ext_broken_ext_tables');
+        $this->executeConsoleCommand('install:generatepackagestates');
+    }
+
+    /**
+     * @test
+     */
     public function checkExtensionConstraintsIssuesWarningForInvalidExtensionKeys()
     {
         $output = $this->executeConsoleCommand('upgrade:checkextensionconstraints', ['foo,bar']);
