@@ -200,7 +200,7 @@ EOH
 
         if ($nonInteractive) {
             // @deprecated in 5.0 will be removed with 6.0
-            $this->writeln('<warning>Option --non-interactive is deprecated. Please use --no-interaction instead.</warning>');
+            $output->writeln('<warning>Option --non-interactive is deprecated. Please use --no-interaction instead.</warning>');
             $isInteractive = false;
         }
 
