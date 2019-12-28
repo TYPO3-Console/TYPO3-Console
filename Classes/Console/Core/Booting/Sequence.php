@@ -80,6 +80,23 @@ class Sequence
         }
     }
 
+
+    public function replaceStep($stepIdentifier, Step $newStep)
+    {
+        $removedOccurrences = 0;
+        foreach ($this->steps as $previousStepIdentifier => $steps) {
+            foreach ($steps as $index => $step) {
+                if ($step->getIdentifier() === $stepIdentifier) {
+                    $this->steps[$previousStepIdentifier][$index] = $newStep;
+                    $removedOccurrences++;
+                }
+            }
+        }
+        if ($removedOccurrences === 0) {
+            throw new Exception(sprintf('Cannot replace sequence step with identifier "%s" because no such step exists in the given sequence.', $stepIdentifier), 1577557048);
+        }
+    }
+
     /**
      * Executes all steps of this sequence
      *
