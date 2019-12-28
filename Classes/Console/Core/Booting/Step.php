@@ -14,12 +14,8 @@ namespace Helhum\Typo3Console\Core\Booting;
  *
  */
 
-use TYPO3\CMS\Core\Core\Bootstrap;
-
 /**
  * A Step within a Sequence
- *
- * @api
  */
 class Step
 {
@@ -46,12 +42,11 @@ class Step
     /**
      * Invokes / executes this step
      *
-     * @param Bootstrap $bootstrap
      * @return void
      */
-    public function __invoke(Bootstrap $bootstrap)
+    public function __invoke()
     {
-        ($this->callback)($bootstrap);
+        ($this->callback)();
     }
 
     /**

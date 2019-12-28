@@ -24,6 +24,7 @@ use Helhum\Typo3Console\Exception;
 use Helhum\Typo3Console\Mvc\Cli\CommandCollection;
 use Helhum\Typo3Console\Mvc\Cli\CommandConfiguration;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 use TYPO3\CMS\Core\Core\Bootstrap;
@@ -50,14 +51,21 @@ class Kernel
      */
     private $initialized = false;
 
+    /**
+     * @var CompatibilityClassLoader
+     */
+    private $classLoader;
+
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
     public function __construct(CompatibilityClassLoader $classLoader)
     {
         $this->ensureRequiredEnvironment();
-        $this->bootstrap = Bootstrap::getInstance();
-        $this->bootstrap->initializeClassLoader($classLoader->getTypo3ClassLoader());
-        // Initialize basic annotation loader until TYPO3 does so as well
-        AnnotationRegistry::registerLoader('class_exists');
-        $this->runLevel = new RunLevel($this->bootstrap);
+        $this->classLoader = $classLoader;
+        $this->runLevel = new RunLevel();
     }
 
     /**
@@ -100,11 +108,27 @@ class Kernel
     public function initialize(string $runLevel = null)
     {
         if (!$this->initialized) {
-            Scripts::baseSetup($this->bootstrap);
+            // Initialize basic annotation loader until TYPO3 does so as well
+            AnnotationRegistry::registerLoader('class_exists');
+            Scripts::baseSetup();
             $this->initialized = true;
         }
         if ($runLevel !== null) {
             $this->runLevel->runSequence($runLevel);
+        }
+
+        $container = Bootstrap::init(
+            $this->classLoader->getTypo3ClassLoader(),
+            true
+        );
+        // Init symfony DI in TYPO3 v10
+        if (class_exists(\TYPO3\CMS\Install\Service\LateBootService::class)) {
+            // TODO: this won't work out when SF container config is broken by extensions
+            $lateBootService = $container->get(\TYPO3\CMS\Install\Service\LateBootService::class);
+            $this->container = $lateBootService->getContainer();
+            $lateBootService->makeCurrent($this->container);
+        } else {
+            $this->container = $container;
         }
     }
 
@@ -129,20 +153,9 @@ class Kernel
         $application->setCommandLoader($commandCollection);
 
         // Try to resolve short command names and aliases
-        $givenCommandName = $input->getFirstArgument() ?: 'list';
-        $commandNameCandidate = $commandCollection->find($givenCommandName);
-        if ($this->runLevel->isCommandAvailable($commandNameCandidate)) {
-            $this->runLevel->runSequenceForCommand($commandNameCandidate);
-            // @deprecated will be removed once command controller support is removed
-            if ($this->runLevel->getRunLevelForCommand($commandNameCandidate) !== RunLevel::LEVEL_ESSENTIAL) {
-                $commandCollection->addCommandControllerCommands($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'] ?? []);
-                $commandName = $commandCollection->find($givenCommandName);
-                if ($commandNameCandidate !== $commandName) {
-                    // Mitigate #779 and #778 at least when command controller commands conflict with non low level
-                    // previously registered commands
-                    $this->runLevel->runSequenceForCommand($commandName);
-                }
-            }
+        $commandName = $commandCollection->find($input->getFirstArgument() ?: 'list');
+        if ($this->runLevel->isCommandAvailable($commandName)) {
+            $this->runLevel->runSequenceForCommand($commandName);
         }
 
         return $application->run($input);

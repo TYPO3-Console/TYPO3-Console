@@ -37,10 +37,6 @@ class InstallCommandControllerTest extends AbstractCommandTest
         if (!extension_loaded('pdo_sqlite')) {
             $this->markTestSkipped('Cannot execute SQLite test, when SQLite module is disabled');
         }
-        if (!class_exists(Environment::class)) {
-            // @deprecated
-            $this->markTestSkipped('Cannot execute SQLite test, with TYPO3 8.7');
-        }
         @unlink(getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php');
         @unlink(getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php');
         $output = $this->executeConsoleCommand(

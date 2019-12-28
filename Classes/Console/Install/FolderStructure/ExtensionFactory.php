@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Install\FolderStructure;
  */
 
 use Helhum\Typo3Console\Package\UncachedPackageManager;
+use TYPO3\CMS\Core\Package\FailsafePackageManager;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
@@ -37,9 +38,9 @@ class ExtensionFactory extends DefaultFactory
     /**
      * ExtensionFactory constructor.
      *
-     * @param UncachedPackageManager $packageManager
+     * @param FailsafePackageManager $packageManager
      */
-    public function __construct(UncachedPackageManager $packageManager)
+    public function __construct($packageManager)
     {
         $this->packageManager = $packageManager;
     }
@@ -87,7 +88,9 @@ class ExtensionFactory extends DefaultFactory
     {
         $structureBase = [];
         foreach ($packages as $package) {
-            $extensionConfiguration = $this->packageManager->getExtensionConfiguration($package);
+            $extensionConfiguration = \Closure::bind(function() use ($package) {
+                return $this->getExtensionEmConf($package->getPackagePath());
+            }, $this->packageManager, get_class($this->packageManager))();
 
             if (isset($extensionConfiguration['uploadfolder']) && (bool)$extensionConfiguration['uploadfolder']) {
                 $structureBase[] = $this->getExtensionUploadDirectory($package->getPackageKey());
