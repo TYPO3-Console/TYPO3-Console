@@ -112,26 +112,28 @@ class Kernel
             // Initialize basic annotation loader until TYPO3 does so as well
             AnnotationRegistry::registerLoader('class_exists');
             Scripts::baseSetup();
+
+            $container = Bootstrap::init(
+                $this->classLoader->getTypo3ClassLoader(),
+                true
+            );
+
+            // Init symfony DI in TYPO3 v10
+            if (class_exists(\TYPO3\CMS\Install\Service\LateBootService::class)) {
+                // TODO: this won't work out when SF container config is broken by extensions
+                $lateBootService = $container->get(\TYPO3\CMS\Install\Service\LateBootService::class);
+                $this->container = $lateBootService->getContainer();
+                $lateBootService->makeCurrent($this->container);
+                ExtensionManagementUtility::setEventDispatcher($this->container->get(EventDispatcherInterface::class));
+            } else {
+                $this->container = $container;
+            }
+
+            $this->runLevel = new RunLevel($this->container);
+
             $this->initialized = true;
         }
 
-        $container = Bootstrap::init(
-            $this->classLoader->getTypo3ClassLoader(),
-            true
-        );
-
-        // Init symfony DI in TYPO3 v10
-        if (class_exists(\TYPO3\CMS\Install\Service\LateBootService::class)) {
-            // TODO: this won't work out when SF container config is broken by extensions
-            $lateBootService = $container->get(\TYPO3\CMS\Install\Service\LateBootService::class);
-            $this->container = $lateBootService->getContainer();
-            $lateBootService->makeCurrent($this->container);
-            ExtensionManagementUtility::setEventDispatcher($this->container->get(EventDispatcherInterface::class));
-        } else {
-            $this->container = $container;
-        }
-
-        $this->runLevel = new RunLevel($this->container);
         if ($runLevel !== null) {
             $this->runLevel->runSequence($runLevel);
         }
