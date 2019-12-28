@@ -47,8 +47,7 @@ EOH
             new InputArgument(
                 'extensionKeys',
                 InputArgument::OPTIONAL,
-                'Extension keys to check. Separate multiple extension keys with comma',
-                ''
+                'Extension keys to check. Separate multiple extension keys with comma'
             ),
             new InputOption(
                 'typo3-version',
@@ -70,14 +69,14 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $extensionKeys = ($extensionKeys = $input->getArgument('extensionKeys')) ? explode(',', $extensionKeys) : [];
+        $extensionKeys = $input->getArgument('extensionKeys');
         $typo3Version = $input->getOption('typo3-version');
         $upgradeHandling = new UpgradeHandling();
-        if (empty($extensionKeys)) {
+        if ($extensionKeys === null) {
             $failedPackageMessages = $upgradeHandling->matchAllExtensionConstraints($typo3Version);
         } else {
             $failedPackageMessages = [];
-            foreach ($extensionKeys as $extensionKey) {
+            foreach (explode(',', $extensionKeys) as $extensionKey) {
                 try {
                     if (!empty($result = $upgradeHandling->matchExtensionConstraints($extensionKey, $typo3Version))) {
                         $failedPackageMessages[$extensionKey] = $result;
