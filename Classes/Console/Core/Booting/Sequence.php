@@ -83,15 +83,14 @@ class Sequence
     /**
      * Executes all steps of this sequence
      *
-     * @param Bootstrap $bootstrap
      * @throws StepFailedException
      * @return void
      */
-    public function invoke(Bootstrap $bootstrap)
+    public function invoke()
     {
         if (isset($this->steps['start'])) {
             foreach ($this->steps['start'] as $step) {
-                $this->invokeStep($step, $bootstrap);
+                $this->invokeStep($step);
             }
         }
     }
@@ -101,21 +100,20 @@ class Sequence
      * to be executed after the given step.
      *
      * @param Step $step The step to invoke
-     * @param Bootstrap $bootstrap
      * @throws StepFailedException
      * @return void
      */
-    protected function invokeStep(Step $step, Bootstrap $bootstrap)
+    protected function invokeStep(Step $step)
     {
         $identifier = $step->getIdentifier();
         try {
-            $step($bootstrap);
+            $step();
         } catch (\Throwable $e) {
             throw new StepFailedException($step, $e);
         }
         if (isset($this->steps[$identifier])) {
             foreach ($this->steps[$identifier] as $followingStep) {
-                $this->invokeStep($followingStep, $bootstrap);
+                $this->invokeStep($followingStep);
             }
         }
     }

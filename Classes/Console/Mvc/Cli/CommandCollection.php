@@ -136,11 +136,6 @@ class CommandCollection implements CommandLoaderInterface
         return array_keys($this->commands);
     }
 
-    public function addCommandControllerCommands(array $commandControllers)
-    {
-        $this->populateCommands($this->commandConfiguration->addCommandControllerCommands($commandControllers));
-    }
-
     private function populateCommands(array $definitions = null)
     {
         $definitions = $definitions ?? $this->commandConfiguration->getCommandDefinitions();

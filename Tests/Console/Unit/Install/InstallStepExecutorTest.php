@@ -23,14 +23,6 @@ use TYPO3\CMS\Install\Controller\InstallerController;
 
 class InstallStepExecutorTest extends UnitTestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists(InstallerController::class)) {
-            // @deprecated We can remove the skip once TYPO3 8 compatibility is removed
-            $this->markTestSkipped();
-        }
-    }
-
     /**
      * @test
      */
