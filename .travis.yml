@@ -65,15 +65,6 @@ jobs:
   include:
     - stage: test
       php: 7.4
-      env: TYPO3_VERSION="~9.5.8"
-    - stage: test
-      php: 7.3
-      env: TYPO3_VERSION="~9.5.8"
-    - stage: test
-      php: 7.2
-      env: TYPO3_VERSION="~9.5.8"
-    - stage: test
-      php: 7.4
       env: TYPO3_VERSION="~10.2.0"
     - stage: test
       php: 7.3
@@ -81,9 +72,6 @@ jobs:
     - stage: test
       php: 7.2
       env: TYPO3_VERSION="~10.2.0"
-    - stage: test
-      php: 7.2
-      env: TYPO3_VERSION="~9.5.8" PREFER_LOWEST="--prefer-lowest"
     - stage: test
       php: 7.2
       env: TYPO3_VERSION="dev-master"
@@ -103,69 +91,69 @@ jobs:
         - composer extension-verify-composer-json
         - composer extension-release
 
-    - stage: sonar code scanner
-      if: type = push AND branch IN (master, develop)
-      php: 7.2
-      before_install: skip
-      install: skip
-      before_script:
-        - mkdir -p .Build/external
-        - git clone https://github.com/helhum/TYPO3-testing-framework.git .Build/external/nimut-testing-framework -b allow-php73
-        - composer config repositories.testing-framework vcs .Build/external/nimut-testing-framework
-      script:
-        - git fetch --unshallow
-        - export COMPOSER_ROOT_VERSION=5.8.3
-        - composer install
-        - .Build/bin/phpunit --whitelist Classes --coverage-clover .Build/clover.xml --log-junit .Build/junit.xml
-        - >
-          if [ -n "$SONAR_TOKEN" ]; then
-            sonar-scanner
-          fi
-
-    - stage: update extension repo
-      if: type = push
-      php: 7.2
-      before_install: skip
-      install: skip
-      before_script:
-        - mkdir -p ~/.ssh
-        - openssl aes-256-cbc -K $encrypted_85bf36ae99bb_key -iv $encrypted_85bf36ae99bb_iv -in Resources/Private/deploy_rsa.enc -out ~/.ssh/id_rsa -d
-        - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-        - chmod 600 ~/.ssh/id_rsa
-        - git clone git@github.com:TYPO3-Console/Extension.git ../extension -b template
-        - cd ../extension && git checkout origin/$TRAVIS_BRANCH || true && cd -
-        - composer extension-release
-        - cd ../extension
-        - git checkout README.md
-        - git add .
-      script:
-        - |
-          if [ -n "$TRAVIS_TAG" ]; then
-              git commit -m "Release extension version $TRAVIS_TAG" --author "Helmut Hummel <typo3@helhum.io>"
-              git tag $TRAVIS_TAG
-              git push --tags
-            else
-              git commit -m "Update extension based on commit $TRAVIS_COMMIT" --author "Helmut Hummel <typo3@helhum.io>"
-              git push origin HEAD:$TRAVIS_BRANCH
-          fi;
-
-    - stage: 🚢 to TER
-      if: tag IS present
-      php: 7.0
-      install: skip
-      before_script: skip
-      script:
-        - |
-          if [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
-            echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n";
-            # Install ter client
-            composer global require helhum/ter-client
-
-            # Build extension files
-            composer extension-release
-
-            # Upload
-            TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
-            echo "Uploading release ${TRAVIS_TAG} to TER"
-            $HOME/.composer/vendor/bin/ter-client upload typo3_console ../extension -u "$TYPO3_ORG_USERNAME" -p "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
-          fi;
+#    - stage: sonar code scanner
+#      if: type = push AND branch IN (master, develop)
+#      php: 7.2
+#      before_install: skip
+#      install: skip
+#      before_script:
+#        - mkdir -p .Build/external
+#        - git clone https://github.com/helhum/TYPO3-testing-framework.git .Build/external/nimut-testing-framework -b allow-php73
+#        - composer config repositories.testing-framework vcs .Build/external/nimut-testing-framework
+#      script:
+#        - git fetch --unshallow
+#        - export COMPOSER_ROOT_VERSION=5.8.3
+#        - composer install
+#        - .Build/bin/phpunit --whitelist Classes --coverage-clover .Build/clover.xml --log-junit .Build/junit.xml
+#        - >
+#          if [ -n "$SONAR_TOKEN" ]; then
+#            sonar-scanner
+#          fi
+#
+#    - stage: update extension repo
+#      if: type = push
+#      php: 7.2
+#      before_install: skip
+#      install: skip
+#      before_script:
+#        - mkdir -p ~/.ssh
+#        - openssl aes-256-cbc -K $encrypted_85bf36ae99bb_key -iv $encrypted_85bf36ae99bb_iv -in Resources/Private/deploy_rsa.enc -out ~/.ssh/id_rsa -d
+#        - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+#        - chmod 600 ~/.ssh/id_rsa
+#        - git clone git@github.com:TYPO3-Console/Extension.git ../extension -b template
+#        - cd ../extension && git checkout origin/$TRAVIS_BRANCH || true && cd -
+#        - composer extension-release
+#        - cd ../extension
+#        - git checkout README.md
+#        - git add .
+#      script:
+#        - |
+#          if [ -n "$TRAVIS_TAG" ]; then
+#              git commit -m "Release extension version $TRAVIS_TAG" --author "Helmut Hummel <typo3@helhum.io>"
+#              git tag $TRAVIS_TAG
+#              git push --tags
+#            else
+#              git commit -m "Update extension based on commit $TRAVIS_COMMIT" --author "Helmut Hummel <typo3@helhum.io>"
+#              git push origin HEAD:$TRAVIS_BRANCH
+#          fi;
+#
+#    - stage: 🚢 to TER
+#      if: tag IS present
+#      php: 7.0
+#      install: skip
+#      before_script: skip
+#      script:
+#        - |
+#          if [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
+#            echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n";
+#            # Install ter client
+#            composer global require helhum/ter-client
+#
+#            # Build extension files
+#            composer extension-release
+#
+#            # Upload
+#            TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[0-9.]*[ ]*//g'`
+#            echo "Uploading release ${TRAVIS_TAG} to TER"
+#            $HOME/.composer/vendor/bin/ter-client upload typo3_console ../extension -u "$TYPO3_ORG_USERNAME" -p "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
+#          fi;
