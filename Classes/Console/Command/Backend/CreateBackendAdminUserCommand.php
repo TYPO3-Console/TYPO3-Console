@@ -14,54 +14,39 @@ namespace Helhum\Typo3Console\Command\Backend;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Saltedpasswords\Salt\SaltFactory;
 
-class CreateBackendAdminUserCommand extends AbstractConvertedCommand
+class CreateBackendAdminUserCommand extends Command
 {
     protected function configure()
     {
         $this->setDescription('Create admin backend user');
         $this->setHelp('Create a new user with administrative access.');
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
+        $this->setDefinition(
+            [
+                new InputArgument(
+                    'username',
+                    InputArgument::REQUIRED,
+                    'Username of the user'
+                ),
+                new InputArgument(
+                    'password',
+                    InputArgument::REQUIRED,
+                    'Password of the user'
+                ),
+            ]
+        );
     }
 
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        return [
-            new InputArgument(
-                'username',
-                InputArgument::REQUIRED,
-                'Username of the user'
-            ),
-            new InputArgument(
-                'password',
-                InputArgument::REQUIRED,
-                'Password of the user'
-            ),
-        ];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        // nothing to do here
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $passwordHasher = SaltFactory::getSaltingInstance(null, 'BE');
+        $passwordHasher = GeneralUtility::makeInstance(PasswordHashFactory::class)->getDefaultHashInstance('BE');
         $username = $input->getArgument('username');
         $password = $input->getArgument('password');
         $givenUsername = $username;
