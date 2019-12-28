@@ -55,7 +55,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         $this->executeConsoleCommand('extension:activate', ['ext_test']);
         try {
             $this->commandDispatcher->executeCommand('upgrade:checkextensionconstraints', ['--typo3-version' => '3.6.0']);
-            $this->fail('Extension compatibility check was expected to fail, but did pass.');
+            $this->fail('upgrade:checkextensionconstraints should have failed');
         } catch (FailedSubProcessCommandException $e) {
             $this->assertSame(1, $e->getExitCode());
             $this->assertContains('"ext_test" requires TYPO3 versions 4.5.0', $e->getOutputMessage());
