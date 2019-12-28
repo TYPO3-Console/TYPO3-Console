@@ -59,9 +59,10 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         } catch (FailedSubProcessCommandException $e) {
             $this->assertSame(1, $e->getExitCode());
             $this->assertContains('"ext_test" requires TYPO3 versions 4.5.0', $e->getOutputMessage());
+        } finally {
+            $this->executeConsoleCommand('extension:deactivate', ['ext_test']);
+            $this->removeFixtureExtensionCode('ext_test');
         }
-        $this->executeConsoleCommand('extension:deactivate', ['ext_test']);
-        $this->removeFixtureExtensionCode('ext_test');
     }
 
     /**

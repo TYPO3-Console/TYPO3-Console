@@ -52,9 +52,4 @@ class CompatibilityScripts
     {
         // noop for TYPO3 9
     }
-
-    public static function initializeExtensionConfiguration()
-    {
-        // noop for TYPO3 9
-    }
 }

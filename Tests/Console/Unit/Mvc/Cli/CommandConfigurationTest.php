@@ -15,7 +15,6 @@ namespace Helhum\Typo3Console\Tests\Unit\Mvc\Cli;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\CommandConfiguration;
-use Helhum\Typo3Console\Tests\Unit\Fixtures\Command\TestCommandController;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Exception\RuntimeException;
 
@@ -158,31 +157,6 @@ class CommandConfigurationTest extends TestCase
                 'runLevels' => $runLevels,
             ],
             'baz'
-        );
-
-        $this->assertSame($expected, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function commandControllerCommandsAreResolved()
-    {
-        $expected = [
-            [
-                'vendor' => 'typo3_console',
-                'name' => 'test:hello',
-                'nameSpacedName' => 'typo3_console:test:hello',
-                'controller' => TestCommandController::class,
-                'controllerCommandName' => 'hello',
-                'lateCommand' => false,
-            ],
-        ];
-        $actual = CommandConfiguration::unifyCommandConfiguration(
-            [
-                'controllers' => [TestCommandController::class],
-            ],
-            ''
         );
 
         $this->assertSame($expected, $actual);

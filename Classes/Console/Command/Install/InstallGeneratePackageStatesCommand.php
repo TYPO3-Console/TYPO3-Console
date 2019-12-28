@@ -115,10 +115,6 @@ EOH
             (string)getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS')
         );
         $packageManager = GeneralUtility::makeInstance(PackageManager::class);
-        if (!$packageManager instanceof UncachedPackageManager) {
-            throw new \RuntimeException('Expected UncachedPackageManager', 1576244721);
-        }
-        $packageManager->injectDependencyOrderingService(GeneralUtility::makeInstance(DependencyOrderingService::class));
         $packageStatesGenerator = new PackageStatesGenerator($packageManager);
         $activatedExtensions = $packageStatesGenerator->generate(
             $frameworkExtensions,
