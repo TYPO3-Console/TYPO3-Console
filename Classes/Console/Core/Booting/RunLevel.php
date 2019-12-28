@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Core\Booting;
  *
  */
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 class RunLevel
@@ -37,6 +38,16 @@ class RunLevel
      * @var StepFailedException
      */
     private $error;
+
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     /**
      * @param string $commandIdentifier
