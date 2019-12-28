@@ -15,7 +15,6 @@ namespace Helhum\Typo3Console\Tests\Unit\Mvc\Cli;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\CommandConfiguration;
-use Helhum\Typo3Console\Tests\Unit\Fixtures\Command\TestCommandController;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Exception\RuntimeException;
 
@@ -27,26 +26,6 @@ class CommandConfigurationTest extends TestCase
             'commands not an array' => [
                 [
                     'commands' => '',
-                ],
-            ],
-            'controllers not an array' => [
-                [
-                    'controllers' => '',
-                ],
-            ],
-            'runLevels not an array' => [
-                [
-                    'runLevels' => '',
-                ],
-            ],
-            'bootingSteps not an array' => [
-                [
-                    'bootingSteps' => '',
-                ],
-            ],
-            'replace not an array' => [
-                [
-                    'replace' => '',
                 ],
             ],
         ];
@@ -61,130 +40,5 @@ class CommandConfigurationTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
         CommandConfiguration::ensureValidCommandRegistration($configuration, 'foo');
-    }
-
-    /**
-     * @test
-     */
-    public function unifyCommandConfigurationMovesGlobalOptionsToCommandConfiguration()
-    {
-        $expected = [
-            [
-                'class' => 'bla',
-                'vendor' => 'foobar',
-                'name' => 'bar:baz',
-                'nameSpacedName' => 'foobar:bar:baz',
-                'runLevel' => 'normal',
-                'bootingSteps' => ['one'],
-                'replace' => ['replaced:command'],
-            ],
-        ];
-        $actual = CommandConfiguration::unifyCommandConfiguration(
-            [
-                'commands' => [
-                    'bar:baz' => [
-                        'class' => 'bla',
-                        'vendor' => 'foobar',
-                    ],
-                ],
-                'runLevels' => [
-                    'bar:baz' => 'normal',
-                ],
-                'bootingSteps' => [
-                    'bar:baz' => ['one'],
-                ],
-                'replace' => [
-                    'replaced:command',
-                ],
-            ],
-            'foo'
-        );
-
-        $this->assertSame($expected, $actual);
-    }
-
-    public function unifyCommandConfigurationMovesGlobalRunLevelOptionsToCommandConfigurationDataProvider()
-    {
-        return [
-            'command matches' => [
-                'foo:bar',
-                ['foo:bar' => 'normal'],
-            ],
-            'name spaced name in run level' => [
-                'foo:bar',
-                ['baz:foo:bar' => 'normal'],
-            ],
-            'name spaced collection in run level, command name not matching' => [
-                'foo:bar',
-                ['baz:foo:bla' => 'wrong', 'baz:foo:*' => 'normal'],
-            ],
-            'name spaced collection first in run level, command name not matching' => [
-                'foo:bar',
-                ['baz:foo:*' => 'normal', 'baz:foo:bla' => 'wrong'],
-            ],
-            'name spaced collection in run level, command name matching' => [
-                'foo:bla',
-                ['baz:foo:bla' => 'normal', 'baz:foo:*' => 'wrong'],
-            ],
-            'name spaced collection first in run level, command name matching' => [
-                'foo:bla',
-                ['baz:foo:*' => 'wrong', 'baz:foo:bla' => 'normal'],
-            ],
-        ];
-    }
-
-    /**
-     * @param string $commandName
-     * @param array $runLevels
-     * @test
-     * @dataProvider unifyCommandConfigurationMovesGlobalRunLevelOptionsToCommandConfigurationDataProvider
-     */
-    public function unifyCommandConfigurationMovesGlobalRunLevelOptionsToCommandConfiguration(string $commandName, array $runLevels)
-    {
-        $expected = [
-            [
-                'vendor' => 'baz',
-                'name' => $commandName,
-                'nameSpacedName' => 'baz:' . $commandName,
-                'runLevel' => 'normal',
-            ],
-        ];
-        $actual = CommandConfiguration::unifyCommandConfiguration(
-            [
-                'commands' => [
-                    $commandName => [
-                    ],
-                ],
-                'runLevels' => $runLevels,
-            ],
-            'baz'
-        );
-
-        $this->assertSame($expected, $actual);
-    }
-
-    /**
-     * @test
-     */
-    public function commandControllerCommandsAreResolved()
-    {
-        $expected = [
-            [
-                'vendor' => 'typo3_console',
-                'name' => 'test:hello',
-                'nameSpacedName' => 'typo3_console:test:hello',
-                'controller' => TestCommandController::class,
-                'controllerCommandName' => 'hello',
-                'lateCommand' => false,
-            ],
-        ];
-        $actual = CommandConfiguration::unifyCommandConfiguration(
-            [
-                'controllers' => [TestCommandController::class],
-            ],
-            ''
-        );
-
-        $this->assertSame($expected, $actual);
     }
 }

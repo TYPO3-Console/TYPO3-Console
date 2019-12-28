@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Extension;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
+use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 
 class ExtensionCompatibilityCheck
@@ -94,7 +95,7 @@ class ExtensionCompatibilityCheck
     {
         $activePackages = $this->packageManager->getActivePackages();
         foreach ($activePackages as $package) {
-            $this->loadExtLocalconfForExtension($package->getPackageKey());
+            $this->loadExtLocalconfForExtension($package);
             if ($package->getPackageKey() === $extensionKey) {
                 break;
             }
@@ -114,10 +115,10 @@ class ExtensionCompatibilityCheck
         $activePackages = $this->packageManager->getActivePackages();
         foreach ($activePackages as $package) {
             // Load all ext_localconf files first
-            $this->loadExtLocalconfForExtension($package->getPackageKey());
+            $this->loadExtLocalconfForExtension($package);
         }
         foreach ($activePackages as $package) {
-            $this->loadExtTablesForExtension($package->getPackageKey());
+            $this->loadExtTablesForExtension($package);
             if ($package->getPackageKey() === $extensionKey) {
                 break;
             }
@@ -130,22 +131,13 @@ class ExtensionCompatibilityCheck
      * Loads ext_localconf.php for a single extension. Method is a modified copy of
      * the original bootstrap method.
      *
-     * @param string $extensionKey
+     * @param PackageInterface $package
      */
-    private function loadExtLocalconfForExtension($extensionKey)
+    private function loadExtLocalconfForExtension(PackageInterface $package)
     {
-        $extensionInfo = $GLOBALS['TYPO3_LOADED_EXT'][$extensionKey];
-        // This is the main array meant to be manipulated in the ext_localconf.php files
-        // In general it is recommended to not rely on it to be globally defined in that
-        // scope but to use $GLOBALS['TYPO3_CONF_VARS'] instead.
-        // Nevertheless we define it here as global for backwards compatibility.
-        global $TYPO3_CONF_VARS;
-        $_EXTKEY = $extensionKey;
-        if (isset($extensionInfo['ext_localconf.php']) && $extensionInfo['ext_localconf.php']) {
-            // $_EXTKEY and $_EXTCONF are available in ext_localconf.php
-            // and are explicitly set in cached file as well
-            $_EXTCONF = $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$_EXTKEY];
-            require $extensionInfo['ext_localconf.php'];
+        $extLocalconfPath = $package->getPackagePath() . 'ext_localconf.php';
+        if (@file_exists($extLocalconfPath)) {
+            require $extLocalconfPath;
         }
     }
 
@@ -153,24 +145,13 @@ class ExtensionCompatibilityCheck
      * Loads ext_tables.php for a single extension. Method is a modified copy of
      * the original bootstrap method.
      *
-     * @param string $extensionKey
+     * @param PackageInterface $package
      */
-    private function loadExtTablesForExtension($extensionKey)
+    private function loadExtTablesForExtension(PackageInterface $package)
     {
-        $extensionInfo = $GLOBALS['TYPO3_LOADED_EXT'][$extensionKey];
-        // In general it is recommended to not rely on it to be globally defined in that
-        // scope, but we can not prohibit this without breaking backwards compatibility
-        global $T3_SERVICES, $T3_VAR, $TYPO3_CONF_VARS;
-        global $TBE_MODULES, $TBE_MODULES_EXT, $TCA;
-        global $PAGES_TYPES, $TBE_STYLES;
-        global $_EXTKEY;
-        // Load each ext_tables.php file of loaded extensions
-        $_EXTKEY = $extensionKey;
-        if (isset($extensionInfo['ext_tables.php']) && $extensionInfo['ext_tables.php']) {
-            // $_EXTKEY and $_EXTCONF are available in ext_tables.php
-            // and are explicitly set in cached file as well
-            $_EXTCONF = $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$_EXTKEY];
-            require $extensionInfo['ext_tables.php'];
+        $extTablesPath = $package->getPackagePath() . 'ext_tables.php';
+        if (@file_exists($extTablesPath)) {
+            require $extTablesPath;
         }
     }
 }

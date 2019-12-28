@@ -16,7 +16,7 @@ namespace Helhum\Typo3Console\Tests\Unit\Core\Booting;
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use PHPUnit\Framework\TestCase;
-use TYPO3\CMS\Core\Core\Bootstrap;
+use Psr\Container\ContainerInterface;
 
 class RunLevelTest extends TestCase
 {
@@ -105,8 +105,8 @@ class RunLevelTest extends TestCase
      */
     public function runLevelIsCorrectlyDeterminedForCommands(array $definitions, string $requestedCommand, string $expectedRunlevel)
     {
-        $bootstrapMock = $this->getMockBuilder(Bootstrap::class)->disableOriginalConstructor()->getMock();
-        $subject = new RunLevel($bootstrapMock);
+        $containerMock = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $subject = new RunLevel($containerMock, null);
         foreach ($definitions as $definition => $runLevel) {
             $subject->setRunLevelForCommand($definition, $runLevel);
         }

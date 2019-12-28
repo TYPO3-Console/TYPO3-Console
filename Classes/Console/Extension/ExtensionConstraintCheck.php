@@ -17,7 +17,6 @@ namespace Helhum\Typo3Console\Extension;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
-use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extensionmanager\Utility\EmConfUtility;
 
@@ -48,9 +47,9 @@ class ExtensionConstraintCheck
         $message = '';
         $extension = [
             'key' => $package->getPackageKey(),
-            'siteRelPath' => PathUtility::stripPathSitePrefix($package->getPackagePath()),
+            'packagePath' => $package->getPackagePath(),
         ];
-        $extConf = $this->emConfUtility->includeEmConf($extension);
+        $extConf = $this->emConfUtility->includeEmConf($package->getPackageKey(), $extension);
         if (!empty($extConf['constraints']['depends']['typo3'])) {
             $versions = VersionNumberUtility::convertVersionsStringToVersionNumbers($extConf['constraints']['depends']['typo3']);
             $t3version = preg_replace('/-?(dev|alpha|beta|RC).*$/', '', $typo3Version);

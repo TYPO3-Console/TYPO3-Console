@@ -70,7 +70,7 @@ EOH
         if ($filesOnly) {
             $io->writeln('Flushed all file caches.');
             // No need to proceed, as files only flush is requested
-            return;
+            return 0;
         }
 
         $lowLevelCleaner->forceFlushDatabaseCacheTables();
@@ -81,6 +81,8 @@ EOH
         $cacheService->flushCachesWithDataHandler();
 
         $io->writeln('Flushed all caches.');
+
+        return 0;
     }
 
     /**

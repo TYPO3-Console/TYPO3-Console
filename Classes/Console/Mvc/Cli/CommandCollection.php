@@ -15,7 +15,6 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
-use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\CommandControllerCommand;
 use Symfony\Component\Console\Command\Command as BaseCommand;
 use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
@@ -31,11 +30,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class CommandCollection implements CommandLoaderInterface
 {
     /**
-     * @var RunLevel
-     */
-    private $runLevel;
-
-    /**
      * @var CommandConfiguration
      */
     private $commandConfiguration;
@@ -50,46 +44,10 @@ class CommandCollection implements CommandLoaderInterface
      */
     private $replaces = [];
 
-    public function __construct(RunLevel $runLevel, CommandConfiguration $commandConfiguration)
+    public function __construct(CommandConfiguration $commandConfiguration)
     {
-        $this->runLevel = $runLevel;
         $this->commandConfiguration = $commandConfiguration;
         $this->populateCommands();
-        $this->initializeRunLevel();
-    }
-
-    /**
-     * Try resolving short command names and aliases
-     * If that fails, we return the command name as is and let the application throw an exception.
-     *
-     * Inspired by \Symfony\Component\Console\Application::find()
-     *
-     * @param string $possibleName
-     * @return string
-     */
-    public function find(string $possibleName): string
-    {
-        $allCommands = $this->getNames();
-        $expr = preg_replace_callback('{([^:]+|)}', function ($matches) {
-            return preg_quote($matches[1], '/') . '[^:]*';
-        }, $possibleName);
-        $commands = preg_grep('{^' . $expr . '}', $allCommands);
-
-        if (empty($commands)) {
-            $commands = preg_grep('{^' . $expr . '}i', $allCommands);
-        }
-
-        // filter out aliases for commands which are already on the list
-        if (count($commands) > 1) {
-            $commandList = $this->commands;
-            $commands = array_unique(array_filter($commands, function ($nameOrAlias) use ($commandList, $commands) {
-                $commandName = $commandList[$nameOrAlias]['name'];
-
-                return $commandName === $nameOrAlias || !in_array($commandName, $commands, true);
-            }));
-        }
-
-        return !empty($commands) && count($commands) === 1 ? $this->commands[reset($commands)]['name'] : $possibleName;
     }
 
     /**
@@ -103,9 +61,7 @@ class CommandCollection implements CommandLoaderInterface
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name), [], 1518812618);
         }
         $commandConfig = $this->commands[$name];
-        if (isset($commandConfig['controller'])) {
-            $command = GeneralUtility::makeInstance(CommandControllerCommand::class, $commandConfig['name'], new Command($commandConfig['controller'], $commandConfig['controllerCommandName']), $commandConfig['lateCommand'] ?? false);
-        } elseif (isset($commandConfig['class'])) {
+        if (isset($commandConfig['class'])) {
             /** @var BaseCommand $command */
             $command = GeneralUtility::makeInstance($commandConfig['class'], $commandConfig['name']);
         } else {
@@ -136,51 +92,37 @@ class CommandCollection implements CommandLoaderInterface
         return array_keys($this->commands);
     }
 
-    public function addCommandControllerCommands(array $commandControllers)
-    {
-        $this->populateCommands($this->commandConfiguration->addCommandControllerCommands($commandControllers));
-    }
-
-    private function populateCommands(array $definitions = null)
+    private function populateCommands(array $definitions = null): void
     {
         $definitions = $definitions ?? $this->commandConfiguration->getCommandDefinitions();
-        $this->extractReplaces($definitions);
+        $this->replaces = $this->commandConfiguration->getReplaces();
         foreach ($definitions as $commandConfig) {
             $this->add($commandConfig);
         }
     }
 
-    private function extractReplaces(array $definitions)
-    {
-        $replaces = [];
-        foreach ($definitions as $commandConfiguration) {
-            if (isset($commandConfiguration['replace'])) {
-                $replaces[] = $commandConfiguration['replace'];
-            }
-        }
-        $this->replaces = array_merge($this->replaces, ...$replaces);
-    }
-
-    private function initializeRunLevel()
+    /**
+     * @param RunLevel $runLevel
+     * @internal
+     */
+    public function initializeRunLevel(Runlevel $runLevel): void
     {
         foreach ($this->commands as $name => $commandConfig) {
             if (isset($commandConfig['runLevel'])) {
-                $this->runLevel->setRunLevelForCommand($name, $commandConfig['runLevel']);
+                $runLevel->setRunLevelForCommand($name, $commandConfig['runLevel']);
             }
             if (isset($commandConfig['bootingSteps'])) {
                 foreach ($commandConfig['bootingSteps'] as $bootingStep) {
-                    $this->runLevel->addBootingStepForCommand($name, $bootingStep);
+                    $runLevel->addBootingStepForCommand($name, $bootingStep);
                 }
             }
         }
     }
 
-    private function add(array $commandConfig)
+    private function add(array $commandConfig): void
     {
         $finalCommandName = $commandConfig['name'];
-        if (in_array($commandConfig['name'], $this->replaces, true)
-            || in_array($commandConfig['nameSpacedName'], $this->replaces, true)
-        ) {
+        if (in_array($commandConfig['nameSpacedName'], $this->replaces, true)) {
             return;
         }
         if (isset($this->commands[$finalCommandName])) {

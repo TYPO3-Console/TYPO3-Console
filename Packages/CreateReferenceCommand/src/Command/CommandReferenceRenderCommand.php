@@ -25,6 +25,8 @@ namespace Typo3Console\CreateReferenceCommand\Command;
  *                                                                        */
 
 use Helhum\Typo3Console\Command\RelatableCommandInterface;
+use Helhum\Typo3Console\Mvc\Cli\CommandCollection;
+use Helhum\Typo3Console\Mvc\Cli\CommandConfiguration;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Descriptor\ApplicationDescription;
 use Symfony\Component\Console\Input\InputArgument;
@@ -97,8 +99,16 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
         $applicationDescription = new ApplicationDescription($application, null, true);
         $commands = $applicationDescription->getCommands();
         $allCommands = [];
+        $commandCollection = new CommandCollection(new CommandConfiguration());
         foreach ($commands as $command) {
-            if (in_array($command->getName(), $this->skipCommands, true)) {
+            if (in_array($command->getName(), $this->skipCommands, true)
+                || (
+                    !in_array($command->getName(), ['help', 'list'])
+                    && !$commandCollection->has(
+                        $command->getName()
+                    )
+                )
+            ) {
                 continue;
             }
 

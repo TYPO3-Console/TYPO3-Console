@@ -410,43 +410,6 @@ Lists all registered cache groups.
 
 
 
-.. _`Command Reference: typo3_console cleanup:updatereferenceindex`:
-
-`cleanup:updatereferenceindex`
-------------------------------
-
-**Update reference index**
-
-Updates reference index to ensure data integrity
-
-**Example:** `typo3cms cleanup:updatereferenceindex --dry-run --verbose`
-
-
-
-Options
-~~~~~~~
-
-`--dry-run`
-   If set, index is only checked without performing any action
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Default: false
-
-`--show-progress`
-   Whether or not to output a progress bar
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Default: false
-
-
-
-
-
-
 .. _`Command Reference: typo3_console configuration:remove`:
 
 `configuration:remove`
@@ -769,51 +732,6 @@ Options
 
 
 
-.. _`Command Reference: typo3_console documentation:generatexsd`:
-
-`documentation:generatexsd`
----------------------------
-
-**Generate Fluid ViewHelper XSD Schema**
-
-Generates Schema documentation (XSD) for your ViewHelpers, preparing the
-file to be placed online and used by any XSD-aware editor.
-After creating the XSD file, reference it in your IDE and import the namespace
-in your Fluid template by adding the xmlns:* attribute(s):
-`<html xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers" ...>`
-
-Arguments
-~~~~~~~~~
-
-`phpNamespace`
-   Namespace of the Fluid ViewHelpers without leading backslash (for example "TYPO3\Fluid\ViewHelpers" or "Tx_News_ViewHelpers"). NOTE: Quote and/or escape this argument as needed to avoid backslashes from being interpreted!
-
-
-
-Options
-~~~~~~~
-
-`--xsd-namespace|-x`
-   Unique target namespace used in the XSD schema (for example "http://yourdomain.org/ns/viewhelpers"). Defaults to "http://typo3.org/ns/<php namespace>".
-
-- Accept value: yes
-- Is value required: yes
-- Is multiple: no
-
-
-`--target-file|-t`
-   File path and name of the generated XSD schema. If not specified the schema will be output to standard output.
-
-- Accept value: yes
-- Is value required: yes
-- Is multiple: no
-
-
-
-
-
-
-
 .. _`Command Reference: typo3_console extension:activate`:
 
 `extension:activate`
@@ -894,38 +812,6 @@ Options
 
 `--raw|-r`
    Enable machine readable output (just extension keys separated by line feed)
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Default: false
-
-
-
-
-
-
-.. _`Command Reference: typo3_console extension:removeinactive`:
-
-`extension:removeinactive`
---------------------------
-
-**Removes all extensions that are not marked as active**
-
-Directories of inactive extension are **removed** from `typo3/sysext` and `typo3conf/ext`.
-This is a one way command with no way back. Don't blame anybody if this command destroys your data.
-**Handle with care!**
-
-This command is deprecated.
-Instead of adding extensions and then removing them, just don't add them in the first place.
-
-
-
-Options
-~~~~~~~
-
-`--force|-f`
-   The option has to be specified, otherwise nothing happens
 
 - Accept value: no
 - Is value required: no
@@ -1302,51 +1188,6 @@ Options
 - Is value required: no
 - Is multiple: no
 - Default: false
-
-
-
-
-
-
-.. _`Command Reference: typo3_console scheduler:run`:
-
-`scheduler:run`
----------------
-
-**Run scheduler**
-
-Executes tasks that are registered in the scheduler module.
-
-**Example:** `typo3cms scheduler:run --task 42 --force`
-
-
-
-Options
-~~~~~~~
-
-`--task`
-   Uid of the task that should be executed (instead of all scheduled tasks)
-
-- Accept value: yes
-- Is value required: yes
-- Is multiple: no
-
-
-`--force`
-   The execution can be forced with this flag. The task will then be executed even if it is not scheduled for execution yet. Only works, when a task is specified.
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Default: false
-
-`--task-id`
-   Deprecated option (same as --task)
-
-- Accept value: yes
-- Is value required: yes
-- Is multiple: no
-
 
 
 
