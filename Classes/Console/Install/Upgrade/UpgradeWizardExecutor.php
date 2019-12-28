@@ -79,16 +79,13 @@ class UpgradeWizardExecutor
             return new UpgradeWizardResult(false, $dbQueries, $messages);
         }
 
-        // OMG really?
-        @GeneralUtility::_GETset(
-            [
-                'values' => [
-                    $identifier => $this->processRawArguments($identifier, $rawArguments),
-                    'TYPO3\\CMS\\Install\\Updates\\' . $identifier => $this->processRawArguments($identifier, $rawArguments),
-                ],
+        // TODO: Most likely not needed any more
+        $_GET['install'] = [
+            'values' => [
+                $identifier => $this->processRawArguments($identifier, $rawArguments),
+                'TYPO3\\CMS\\Install\\Updates\\' . $identifier => $this->processRawArguments($identifier, $rawArguments),
             ],
-            'install'
-        );
+        ];
 
         if ($wizardImplementsInterface) {
             $hasPerformed = $upgradeWizard->executeUpdate();

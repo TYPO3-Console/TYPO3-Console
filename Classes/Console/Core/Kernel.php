@@ -25,10 +25,12 @@ use Helhum\Typo3Console\Mvc\Cli\CommandCollection;
 use Helhum\Typo3Console\Mvc\Cli\CommandConfiguration;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageManager;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -36,11 +38,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class Kernel
 {
-    /**
-     * @var Bootstrap
-     */
-    private $bootstrap;
-
     /**
      * @var RunLevel
      */
@@ -65,7 +62,6 @@ class Kernel
     {
         $this->ensureRequiredEnvironment();
         $this->classLoader = $classLoader;
-        $this->runLevel = new RunLevel();
     }
 
     /**
@@ -111,24 +107,30 @@ class Kernel
             // Initialize basic annotation loader until TYPO3 does so as well
             AnnotationRegistry::registerLoader('class_exists');
             Scripts::baseSetup();
+
+            $container = Bootstrap::init(
+                $this->classLoader->getTypo3ClassLoader(),
+                true
+            );
+
+            // Init symfony DI in TYPO3 v10
+            if (class_exists(\TYPO3\CMS\Install\Service\LateBootService::class)) {
+                // TODO: this won't work out when SF container config is broken by extensions
+                $lateBootService = $container->get(\TYPO3\CMS\Install\Service\LateBootService::class);
+                $this->container = $lateBootService->getContainer();
+                $lateBootService->makeCurrent($this->container);
+                ExtensionManagementUtility::setEventDispatcher($this->container->get(EventDispatcherInterface::class));
+            } else {
+                $this->container = $container;
+            }
+
+            $this->runLevel = new RunLevel($this->container);
+
             $this->initialized = true;
         }
+
         if ($runLevel !== null) {
             $this->runLevel->runSequence($runLevel);
-        }
-
-        $container = Bootstrap::init(
-            $this->classLoader->getTypo3ClassLoader(),
-            true
-        );
-        // Init symfony DI in TYPO3 v10
-        if (class_exists(\TYPO3\CMS\Install\Service\LateBootService::class)) {
-            // TODO: this won't work out when SF container config is broken by extensions
-            $lateBootService = $container->get(\TYPO3\CMS\Install\Service\LateBootService::class);
-            $this->container = $lateBootService->getContainer();
-            $lateBootService->makeCurrent($this->container);
-        } else {
-            $this->container = $container;
         }
     }
 

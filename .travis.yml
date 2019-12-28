@@ -61,20 +61,20 @@ script:
 # Configure build stages (with build matrix above, test stage is implicitly defined)
 jobs:
   allow_failures:
-    - env: TYPO3_VERSION="dev-master"
+    - env: TYPO3_VERSION="dev-master" TYPO3_UPGRADE_FROM_VERSION="~10.3.0"
   include:
     - stage: test
+      php: 7.4
+      env: TYPO3_VERSION="~10.3.0" TYPO3_UPGRADE_FROM_VERSION="~10.3.0"
+    - stage: test
       php: 7.3
-      env: TYPO3_VERSION="~9.5.8"
+      env: TYPO3_VERSION="~10.3.0" TYPO3_UPGRADE_FROM_VERSION="~10.3.0"
     - stage: test
       php: 7.2
-      env: TYPO3_VERSION="~9.5.8"
+      env: TYPO3_VERSION="~10.2.0" TYPO3_UPGRADE_FROM_VERSION="~10.2.0"
     - stage: test
       php: 7.2
-      env: TYPO3_VERSION="~9.5.8" PREFER_LOWEST="--prefer-lowest"
-    - stage: test
-      php: 7.2
-      env: TYPO3_VERSION="dev-master"
+      env: TYPO3_VERSION="dev-master" TYPO3_UPGRADE_FROM_VERSION="~10.2.0"
 
     - stage: test
       php: 7.2
@@ -96,13 +96,9 @@ jobs:
       php: 7.2
       before_install: skip
       install: skip
-      before_script:
-        - mkdir -p .Build/external
-        - git clone https://github.com/helhum/TYPO3-testing-framework.git .Build/external/nimut-testing-framework -b allow-php73
-        - composer config repositories.testing-framework vcs .Build/external/nimut-testing-framework
       script:
         - git fetch --unshallow
-        - export COMPOSER_ROOT_VERSION=5.8.3
+        - export COMPOSER_ROOT_VERSION=6.0.0
         - composer install
         - .Build/bin/phpunit --whitelist Classes --coverage-clover .Build/clover.xml --log-junit .Build/junit.xml
         - >
@@ -139,12 +135,12 @@ jobs:
 
     - stage: 🚢 to TER
       if: tag IS present
-      php: 7.0
+      php: 7.2
       install: skip
       before_script: skip
       script:
         - |
-          if [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
+          if [[ "$TRAVIS_TAG" != *"alpha"* ]] && [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
             echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n";
             # Install ter client
             composer global require helhum/ter-client

@@ -16,20 +16,12 @@ namespace Helhum\Typo3Console\Core\Booting;
 
 use Helhum\Typo3Console\Error\ErrorHandler;
 use Helhum\Typo3Console\Error\ExceptionHandler;
-use Helhum\Typo3Console\Property\TypeConverter\ArrayConverter;
-use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
 use TYPO3\CMS\Core\Imaging\IconRegistry;
-use TYPO3\CMS\Core\Package\PackageManager;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Property\TypeConverter\BooleanConverter;
-use TYPO3\CMS\Extbase\Property\TypeConverter\FloatConverter;
-use TYPO3\CMS\Extbase\Property\TypeConverter\IntegerConverter;
-use TYPO3\CMS\Extbase\Property\TypeConverter\StringConverter;
 
 class Scripts
 {
@@ -64,21 +56,20 @@ class Scripts
         set_error_handler([$errorHandler, 'handleError']);
     }
 
-    public static function initializeDisabledCaching(Bootstrap $bootstrap)
+    public static function initializeDisabledCaching()
     {
-        self::initializeCachingFramework($bootstrap, true);
+        self::initializeCachingFramework(true);
     }
 
-    public static function initializeCaching(Bootstrap $bootstrap)
+    public static function initializeCaching()
     {
-        self::initializeCachingFramework($bootstrap);
+        self::initializeCachingFramework();
     }
 
-    private static function initializeCachingFramework(Bootstrap $bootstrap, bool $disableCaching = false)
+    private static function initializeCachingFramework(bool $disableCaching = false)
     {
         $cacheManager = CompatibilityScripts::createCacheManager($disableCaching);
         \TYPO3\CMS\Core\Utility\GeneralUtility::setSingletonInstance(CacheManager::class, $cacheManager);
-        $bootstrap->setEarlyInstance(CacheManager::class, $cacheManager);
     }
 
     public static function initializeExtensionConfiguration()
@@ -101,7 +92,7 @@ class Scripts
         $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
         $coreCache = $cacheManager->getCache('cache_core');
         Bootstrap::loadBaseTca(true, $coreCache);
-        \Closure::bind(function() {
+        \Closure::bind(function () {
             Bootstrap::checkEncryptionKey();
         }, null, Bootstrap::class)();
     }

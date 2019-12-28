@@ -15,7 +15,6 @@ namespace Helhum\Typo3Console\Core\Booting;
  */
 
 use Helhum\Typo3Console\Exception;
-use TYPO3\CMS\Core\Core\Bootstrap;
 
 /**
  * A boot sequence, consisting of individual steps, each of them initializing a
@@ -77,6 +76,22 @@ class Sequence
         }
         if ($removedOccurrences === 0) {
             throw new Exception(sprintf('Cannot remove sequence step with identifier "%s" because no such step exists in the given sequence.', $stepIdentifier), 1322591669);
+        }
+    }
+
+    public function replaceStep($stepIdentifier, Step $newStep)
+    {
+        $removedOccurrences = 0;
+        foreach ($this->steps as $previousStepIdentifier => $steps) {
+            foreach ($steps as $index => $step) {
+                if ($step->getIdentifier() === $stepIdentifier) {
+                    $this->steps[$previousStepIdentifier][$index] = $newStep;
+                    $removedOccurrences++;
+                }
+            }
+        }
+        if ($removedOccurrences === 0) {
+            throw new Exception(sprintf('Cannot replace sequence step with identifier "%s" because no such step exists in the given sequence.', $stepIdentifier), 1577557048);
         }
     }
 

@@ -14,7 +14,10 @@ namespace Helhum\Typo3Console\Core\Booting;
  *
  */
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Container;
+use TYPO3\CMS\Core\Core\Bootstrap;
 
 class RunLevel
 {
@@ -37,6 +40,16 @@ class RunLevel
      * @var StepFailedException
      */
     private $error;
+
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     /**
      * @param string $commandIdentifier
@@ -281,9 +294,27 @@ class RunLevel
             // Part of full runtime
             case 'helhum.typo3console:caching':
                 $this->executedSteps[$stepIdentifier] = self::LEVEL_FULL;
-                $sequence->addStep(new Step($stepIdentifier, function () {
-                    // Don't do anything again, step has been executed already
-                }));
+                unset($this->executedSteps['helhum.typo3console:disabledcaching']);
+                $sequence->replaceStep(
+                    'helhum.typo3console:disabledcaching',
+                    new Step(
+                        $stepIdentifier,
+                        function () {
+                            $this->container->get('boot.state')->cacheDisabled = false;
+                            $coreCache = Bootstrap::createCache('core');
+                            $assetsCache = Bootstrap::createCache('assets');
+                            if ($this->container instanceof Container) {
+                                $this->container->set('cache.core', $coreCache);
+                                $this->container->set('cache.assets', $assetsCache);
+                            } else {
+                                \Closure::bind(function () use ($coreCache, $assetsCache) {
+                                    $this->entries['cache.core'] = $coreCache;
+                                    $this->entries['cache.assets'] = $assetsCache;
+                                }, $this->container, get_class($this->container))();
+                            }
+                        }
+                    )
+                );
                 break;
             case 'helhum.typo3console:persistence':
                 $this->executedSteps[$stepIdentifier] = self::LEVEL_FULL;
