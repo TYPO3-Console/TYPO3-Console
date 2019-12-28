@@ -41,9 +41,9 @@ class CacheServiceTest extends UnitTestCase
     {
         $this->createCacheServiceWithConfiguration(
             [
-                'cache_foo' => ['groups' => ['first', 'second']],
-                'cache_bar' => ['groups' => ['third', 'second']],
-                'cache_baz' => ['groups' => ['first', 'third']],
+                'foo' => ['groups' => ['first', 'second']],
+                'bar' => ['groups' => ['third', 'second']],
+                'baz' => ['groups' => ['first', 'third']],
             ]
         );
 
@@ -64,9 +64,9 @@ class CacheServiceTest extends UnitTestCase
     {
         $this->createCacheServiceWithConfiguration(
             [
-                'cache_foo' => ['groups' => ['first', 'second']],
-                'cache_bar' => ['groups' => ['third', 'second']],
-                'cache_baz' => ['groups' => ['first', 'third']],
+                'foo' => ['groups' => ['first', 'second']],
+                'bar' => ['groups' => ['third', 'second']],
+                'baz' => ['groups' => ['first', 'third']],
             ]
         );
 

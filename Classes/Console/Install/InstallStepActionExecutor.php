@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Install;
  */
 
 use Helhum\Typo3Console\Install\Upgrade\SilentConfigurationUpgrade;
+use TYPO3\CMS\Core\Http\NormalizedParams;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -54,6 +55,16 @@ class InstallStepActionExecutor
                         'values' => $arguments,
                     ],
                 ]
+            // The TYPO3 code used to install is nor prepared to run on cli, so we provide a fake web request here
+            )->withAttribute(
+                'normalizedParams',
+                NormalizedParams::createFromServerParams(
+                    [
+                        'REMOTE_ADDR' => '127.0.0.1',
+                        'SCRIPT_NAME' => 'typo3/sysext/core/bin/typo3',
+                        'HTTP_HOST' => 'localhost',
+                    ]
+                )
             );
         };
     }
