@@ -64,21 +64,20 @@ class Scripts
         set_error_handler([$errorHandler, 'handleError']);
     }
 
-    public static function initializeDisabledCaching(Bootstrap $bootstrap)
+    public static function initializeDisabledCaching()
     {
-        self::initializeCachingFramework($bootstrap, true);
+        self::initializeCachingFramework(true);
     }
 
-    public static function initializeCaching(Bootstrap $bootstrap)
+    public static function initializeCaching()
     {
-        self::initializeCachingFramework($bootstrap);
+        self::initializeCachingFramework();
     }
 
-    private static function initializeCachingFramework(Bootstrap $bootstrap, bool $disableCaching = false)
+    private static function initializeCachingFramework(bool $disableCaching = false)
     {
         $cacheManager = CompatibilityScripts::createCacheManager($disableCaching);
         \TYPO3\CMS\Core\Utility\GeneralUtility::setSingletonInstance(CacheManager::class, $cacheManager);
-        $bootstrap->setEarlyInstance(CacheManager::class, $cacheManager);
     }
 
     public static function initializeExtensionConfiguration()

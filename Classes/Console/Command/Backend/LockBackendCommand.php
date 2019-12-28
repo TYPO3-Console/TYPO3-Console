@@ -19,6 +19,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class LockBackendCommand extends Command implements RelatableCommandInterface
@@ -49,7 +50,7 @@ class LockBackendCommand extends Command implements RelatableCommandInterface
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $redirectUrl = $input->getOption('redirect-url');
-        $fileName = PATH_typo3conf . 'LOCK_BACKEND';
+        $fileName = Environment::getLegacyConfigPath() . '/LOCK_BACKEND';
         if (@is_file($fileName)) {
             $output->writeln('<info>Backend is already locked.</info>');
 
