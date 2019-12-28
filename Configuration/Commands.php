@@ -123,7 +123,6 @@ return [
         'schedulable' => false,
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
         'bootingSteps' => [
-            'helhum.typo3console:database',
             'helhum.typo3console:persistence',
         ],
     ],
@@ -248,7 +247,6 @@ return [
         'schedulable' => false,
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
         'bootingSteps' => [
-            'helhum.typo3console:database',
             'helhum.typo3console:persistence',
         ],
     ],
@@ -258,7 +256,6 @@ return [
         'schedulable' => false,
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
         'bootingSteps' => [
-            'helhum.typo3console:database',
             'helhum.typo3console:persistence',
         ],
     ],

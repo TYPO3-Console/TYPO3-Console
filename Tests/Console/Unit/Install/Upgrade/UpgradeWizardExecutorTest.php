@@ -28,10 +28,6 @@ class UpgradeWizardExecutorTest extends UnitTestCase
 {
     protected function setUp()
     {
-        if (!interface_exists(ChattyInterface::class)) {
-            // @deprecated will be removed with 6.0
-            $this->markTestSkipped('Skipping new upgrade tests on TYPO3 8.7');
-        }
         $this->singletonInstances = GeneralUtility::getSingletonInstances();
     }
 

@@ -76,10 +76,7 @@ class CompatibilityClassLoader
 
     private function handleTypo3Compatibility()
     {
-        if (!method_exists(Bootstrap::class, 'setCacheHashOptions')) {
-            return;
-        }
-        $this->compatibilityNamespace = 'Helhum\\Typo3Console\\TYPO3v87\\';
-        spl_autoload_register([$this, 'loadClass'], true, true);
+        // Currently no compat necessary
+        return;
     }
 }
