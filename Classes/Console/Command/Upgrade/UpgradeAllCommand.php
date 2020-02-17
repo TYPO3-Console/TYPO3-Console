@@ -65,6 +65,7 @@ class UpgradeAllCommand extends AbstractConvertedCommand
         }
 
         $arguments = $input->getOption('arguments');
+        $arguments = is_array($arguments) ? $arguments : explode(',', $arguments);
         $verbose = $output->isVerbose();
 
         $output->writeln(PHP_EOL . '<i>Initiating TYPO3 upgrade</i>' . PHP_EOL);

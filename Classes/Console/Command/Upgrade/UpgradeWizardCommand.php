@@ -76,6 +76,7 @@ class UpgradeWizardCommand extends AbstractConvertedCommand
 
         $identifier = $input->getArgument('identifier');
         $arguments = $input->getOption('arguments');
+        $arguments = is_array($arguments) ? $arguments : explode(',', $arguments);
         $force = $input->getOption('force');
 
         $result = $upgradeHandling->executeInSubProcess(
