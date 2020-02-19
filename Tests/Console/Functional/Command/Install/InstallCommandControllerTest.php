@@ -15,7 +15,6 @@ namespace Helhum\Typo3Console\Tests\Functional\Command\Install;
  */
 
 use Helhum\Typo3Console\Tests\Functional\Command\AbstractCommandTest;
-use TYPO3\CMS\Core\Core\Environment;
 
 class InstallCommandControllerTest extends AbstractCommandTest
 {

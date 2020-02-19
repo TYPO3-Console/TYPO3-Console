@@ -307,7 +307,7 @@ class RunLevel
                                 $this->container->set('cache.core', $coreCache);
                                 $this->container->set('cache.assets', $assetsCache);
                             } else {
-                                \Closure::bind(function() use ($coreCache, $assetsCache) {
+                                \Closure::bind(function () use ($coreCache, $assetsCache) {
                                     $this->entries['cache.core'] = $coreCache;
                                     $this->entries['cache.assets'] = $assetsCache;
                                 }, $this->container, get_class($this->container))();

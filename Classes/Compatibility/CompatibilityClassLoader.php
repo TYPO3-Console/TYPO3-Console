@@ -77,6 +77,5 @@ class CompatibilityClassLoader
     private function handleTypo3Compatibility()
     {
         // Currently no compat necessary
-        return;
     }
 }

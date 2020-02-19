@@ -88,7 +88,7 @@ class ExtensionFactory extends DefaultFactory
     {
         $structureBase = [];
         foreach ($packages as $package) {
-            $extensionConfiguration = \Closure::bind(function() use ($package) {
+            $extensionConfiguration = \Closure::bind(function () use ($package) {
                 return $this->getExtensionEmConf($package->getPackagePath());
             }, $this->packageManager, get_class($this->packageManager))();
 
