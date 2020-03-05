@@ -224,7 +224,6 @@ class CommandDispatcher
             );
         } else {
             $process = new Process($commandLine, null, $envVars, $input, 0);
-            $process->inheritEnvironmentVariables();
         }
 
         return $process;
