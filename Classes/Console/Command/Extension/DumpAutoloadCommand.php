@@ -51,5 +51,6 @@ EOH
     {
         ClassLoadingInformation::dumpClassLoadingInformation();
         $output->writeln('<info>Class Loading information has been updated.</info>');
+        return 0;
     }
 }

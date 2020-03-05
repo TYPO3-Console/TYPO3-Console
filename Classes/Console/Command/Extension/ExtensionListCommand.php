@@ -103,5 +103,6 @@ class ExtensionListCommand extends AbstractConvertedCommand
                 $extensionInformation
             );
         }
+        return 0;
     }
 }
