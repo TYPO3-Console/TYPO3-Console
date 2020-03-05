@@ -143,5 +143,7 @@ EOH
                 implode(', ', $excludedExtensions)
             ));
         }
+
+        return 0;
     }
 }

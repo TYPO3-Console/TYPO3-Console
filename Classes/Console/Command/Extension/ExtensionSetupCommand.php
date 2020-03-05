@@ -65,5 +65,6 @@ EOH
         $extensionKeys = explode(',', $input->getArgument('extensionKeys'));
 
         (new ExtensionStateCommandsHelper($output))->setupExtensions($extensionKeys);
+        return 0;
     }
 }
