@@ -56,5 +56,6 @@ EOH
         } catch (FailedSubProcessCommandException $e) {
             $output->writeln('<warning>Extension setup skipped.</warning>');
         }
+        return 0;
     }
 }

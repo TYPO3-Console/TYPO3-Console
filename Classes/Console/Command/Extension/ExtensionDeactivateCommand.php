@@ -66,6 +66,7 @@ EOH
 
         $this->showDeprecationMessageIfApplicable($output);
         (new ExtensionStateCommandsHelper($output))->deactivateExtensions($extensionKeys);
+        return 0;
     }
 
     private function showDeprecationMessageIfApplicable(OutputInterface $output)

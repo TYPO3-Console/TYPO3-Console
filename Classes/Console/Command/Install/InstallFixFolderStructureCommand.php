@@ -85,5 +85,6 @@ EOH
                 $output->writeln($fixedStatusObject->getTitle());
             }
         }
+        return 0;
     }
 }
