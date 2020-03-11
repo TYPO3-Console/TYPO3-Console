@@ -24,11 +24,13 @@ namespace Typo3Console\CreateReferenceCommand\ViewHelpers\Format;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
+
 /**
  * Returns the string as reStructuredText headline
  * using $lineCharacter and optionally $withOverline
  */
-class HeadlineViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
+class HeadlineViewHelper extends AbstractViewHelper
 {
     public function initializeArguments()
     {
