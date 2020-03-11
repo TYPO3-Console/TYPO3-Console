@@ -48,9 +48,9 @@ class ExtensionConstraintCheck
         $message = '';
         $extension = [
             'key' => $package->getPackageKey(),
-            'siteRelPath' => PathUtility::stripPathSitePrefix($package->getPackagePath()),
+            'packagePath' => $package->getPackagePath(),
         ];
-        $extConf = $this->emConfUtility->includeEmConf($extension);
+        $extConf = $this->emConfUtility->includeEmConf($package->getPackageKey(), $extension);
         if (!empty($extConf['constraints']['depends']['typo3'])) {
             $versions = VersionNumberUtility::convertVersionsStringToVersionNumbers($extConf['constraints']['depends']['typo3']);
             $t3version = preg_replace('/-?(dev|alpha|beta|RC).*$/', '', $typo3Version);
