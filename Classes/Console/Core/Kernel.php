@@ -20,14 +20,19 @@ use Helhum\Typo3Console\CompatibilityClassLoader;
 use Helhum\Typo3Console\Core\Booting\CompatibilityScripts;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\Booting\Scripts;
+use Helhum\Typo3Console\Core\Booting\Step;
+use Helhum\Typo3Console\Core\Booting\StepFailedException;
 use Helhum\Typo3Console\Exception;
 use Helhum\Typo3Console\Mvc\Cli\CommandCollection;
 use Helhum\Typo3Console\Mvc\Cli\CommandConfiguration;
+use Helhum\Typo3Console\Mvc\Cli\CommandLoaderCollection;
+use Helhum\Typo3Console\Mvc\Cli\FilteredCommandLoaderCollection;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
+use TYPO3\CMS\Core\Console\CommandRegistry;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
@@ -117,20 +122,18 @@ class Kernel
                 $this->classLoader->getTypo3ClassLoader(),
                 true
             );
-
-            // Init symfony DI in TYPO3 v10
-            if (class_exists(\TYPO3\CMS\Install\Service\LateBootService::class)) {
-                // TODO: this won't work out when SF container config is broken by extensions
+            $error = null;
+            try {
                 $lateBootService = $container->get(\TYPO3\CMS\Install\Service\LateBootService::class);
                 $this->container = $lateBootService->getContainer();
                 $lateBootService->makeCurrent($this->container);
                 ExtensionManagementUtility::setEventDispatcher($this->container->get(EventDispatcherInterface::class));
-            } else {
+            } catch (\Throwable $e) {
                 $this->container = $container;
+                $error = new StepFailedException(new Step('build-container', function () {
+                }), $e);
             }
-
-            $this->runLevel = new RunLevel($this->container);
-
+            $this->runLevel = new RunLevel($this->container, $error);
             $this->initialized = true;
         }
 
@@ -151,19 +154,20 @@ class Kernel
     {
         $this->initialize();
 
-        $commandCollection = new CommandCollection(
-            $this->runLevel,
-            new CommandConfiguration(GeneralUtility::makeInstance(PackageManager::class))
+        $commandConfiguration = new CommandConfiguration();
+        $commandCollection = new CommandLoaderCollection(
+            new CommandCollection(
+                $this->runLevel,
+                $commandConfiguration
+            ),
+            new FilteredCommandLoaderCollection(
+                $this->container->get(CommandRegistry::class),
+                $commandConfiguration->getReplaces()
+            )
         );
 
         $application = new Application($this->runLevel, CompatibilityScripts::isComposerMode());
         $application->setCommandLoader($commandCollection);
-
-        // Try to resolve short command names and aliases
-        $commandName = $commandCollection->find($input->getFirstArgument() ?: 'list');
-        if ($this->runLevel->isCommandAvailable($commandName)) {
-            $this->runLevel->runSequenceForCommand($commandName);
-        }
 
         return $application->run($input);
     }

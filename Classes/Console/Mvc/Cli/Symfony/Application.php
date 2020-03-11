@@ -195,6 +195,10 @@ class Application extends BaseApplication
 
     private function ensureCommandAvailable(Command $command)
     {
+        $commandName = $command->getName();
+        if ($this->runLevel->isCommandAvailable($commandName)) {
+            $this->runLevel->runSequenceForCommand($commandName);
+        }
         if (!$this->runLevel->getError() && !$this->isCommandAvailable($command)) {
             throw new CommandNotAvailableException($command->getName());
         }
