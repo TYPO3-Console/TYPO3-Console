@@ -41,7 +41,7 @@
         },
         "classmap-authoritative": true,
         "platform": {
-            "php": "7.0.8"
+            "php": "7.2.5"
         }
     },
     "autoload": {
@@ -53,7 +53,7 @@
     },
     "require": {
         "helhum/typo3-console": "@dev",
-        "typo3/cms-core": "~8.7.22 || ~9.5.8"
+        "typo3/cms-core": "~9.5.8 || ^10.2"
     },
     "replace": {
         "helhum/typo3-console-plugin": "*",
