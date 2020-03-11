@@ -52,5 +52,7 @@ class UpgradeSubProcessCommand extends Command
         $arguments = unserialize($arguments, ['allowed_classes' => false]);
         $result = (new UpgradeHandling())->$upgradeCommand(...$arguments);
         $output->write(serialize($result), false, OutputInterface::OUTPUT_RAW);
+
+        return 0;
     }
 }
