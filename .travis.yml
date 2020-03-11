@@ -56,6 +56,8 @@ script:
   # This fails when command reference is not up to date
   - ./typo3cms commandreference:render > /dev/null 2>&1 && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
   - git diff
+  - ./typo3cms
+  - cat Configuration/ComposerPackagesCommands.php
   - .Build/bin/phpunit;
 
 # Configure build stages (with build matrix above, test stage is implicitly defined)
