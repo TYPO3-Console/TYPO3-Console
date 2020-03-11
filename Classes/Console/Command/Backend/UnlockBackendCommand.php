@@ -49,7 +49,7 @@ class UnlockBackendCommand extends Command implements RelatableCommandInterface
 
             return 2;
         }
-        $output->writeln('<info>Backend lock is removed. User can now access the backend again.</info>');
+        $output->writeln('<info>Backend lock is removed. Users can now access the backend again.</info>');
 
         return 0;
     }
