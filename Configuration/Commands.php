@@ -2,42 +2,15 @@
 declare(strict_types=1);
 
 return [
-    '_dummy' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Mvc\Cli\Symfony\Command\DummyCommand::class,
-        'schedulable' => false,
-        'replace' => [
-            'extbase:_core_command',
-            'extbase:_extbase_help',
-            'extbase:help:error',
-            'typo3_console:_dummy',
-        ],
-    ],
     'backend:createadmin' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Backend\CreateBackendAdminUserCommand::class,
         'schedulable' => false,
     ],
-    'backend:lock' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Backend\LockBackendCommand::class,
-        'schedulable' => false,
-        'replace' => [
-            'backend:backend:lock',
-        ],
-    ],
     'backend:lockforeditors' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Backend\LockBackendForEditorsCommand::class,
         'schedulable' => false,
-    ],
-    'backend:unlock' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Backend\UnlockBackendCommand::class,
-        'schedulable' => false,
-        'replace' => [
-            'backend:backend:unlock',
-        ],
     ],
     'backend:unlockforeditors' => [
         'vendor' => 'typo3_console',
@@ -64,18 +37,6 @@ return [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Cache\CacheListGroupsCommand::class,
         'schedulable' => false,
-    ],
-    'cleanup:updatereferenceindex' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Cleanup\UpdateReferenceIndexCommand::class,
-        'schedulable' => false,
-        'replace' => [
-            'backend:referenceindex:update',
-        ],
-        'aliases' => [
-            'backend:referenceindex:update',
-            'referenceindex:update',
-        ],
     ],
     'configuration:remove' => [
         'vendor' => 'typo3_console',
@@ -126,22 +87,12 @@ return [
             'helhum.typo3console:persistence',
         ],
     ],
-    'documentation:generatexsd' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Documentation\GenerateXsdCommand::class,
-    ],
     'dumpautoload' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Extension\DumpAutoloadCommand::class,
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
         'replace' => [
             'core:dumpautoload',
-            'extensionmanager:extension:dumpclassloadinginformation',
-        ],
-        'aliases' => [
-            'extension:dumpautoload',
-            'extension:dumpclassloadinginformation',
-            'extensionmanager:extension:dumpclassloadinginformation',
         ],
     ],
     'extension:activate' => [
@@ -149,13 +100,10 @@ return [
         'class' => \Helhum\Typo3Console\Command\Extension\ExtensionActivateCommand::class,
         'schedulable' => false,
         'replace' => [
-            'extensionmanager:extension:install',
             'extensionmanager:extension:activate',
         ],
         'aliases' => [
             'extension:install',
-            'extensionmanager:extension:install',
-            'extensionmanager:extension:activate',
         ],
     ],
     'extension:deactivate' => [
@@ -163,27 +111,11 @@ return [
         'class' => \Helhum\Typo3Console\Command\Extension\ExtensionDeactivateCommand::class,
         'schedulable' => false,
         'replace' => [
-            'extensionmanager:extension:uninstall',
             'extensionmanager:extension:deactivate',
         ],
         'aliases' => [
             'extension:uninstall',
-            'extensionmanager:extension:uninstall',
-            'extensionmanager:extension:deactivate',
         ],
-    ],
-    'extension:list' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Extension\ExtensionListCommand::class,
-        'schedulable' => false,
-        'replace' => [
-            'core:extension:list',
-        ],
-    ],
-    'extension:removeinactive' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Extension\ExtensionRemoveInactiveCommand::class,
-        'schedulable' => false,
     ],
     'extension:setup' => [
         'vendor' => 'typo3_console',
@@ -264,14 +196,6 @@ return [
         'class' => \Helhum\Typo3Console\Command\Install\InstallActionNeedsExecutionCommand::class,
         'schedulable' => false,
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-    ],
-    'scheduler:run' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Scheduler\SchedulerRunCommand::class,
-        'schedulable' => false,
-        'replace' => [
-            'scheduler:scheduler:run',
-        ],
     ],
     'upgrade:all' => [
         'vendor' => 'typo3_console',

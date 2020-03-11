@@ -77,7 +77,8 @@ class ExtensionConstraintCheckTest extends UnitTestCase
             [
                 'key' => 'dummy',
                 'packagePath' => PATH_site . 'typo3conf/ext/dummy/',
-            ])->willReturn(
+            ]
+        )->willReturn(
             [
                 'constraints' => [
                     'depends' => [
@@ -113,7 +114,8 @@ class ExtensionConstraintCheckTest extends UnitTestCase
             [
                 'key' => 'dummy',
                 'siteRelPath' => 'typo3conf/ext/dummy/',
-            ])->willReturn(
+            ]
+        )->willReturn(
             [
                 'constraints' => [
                     'depends' => [
