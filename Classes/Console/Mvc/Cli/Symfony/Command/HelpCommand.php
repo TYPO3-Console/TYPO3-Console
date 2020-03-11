@@ -78,10 +78,6 @@ class HelpCommand extends \Symfony\Component\Console\Command\HelpCommand
             $this->command = $this->getApplication()->find($input->getArgument('command_name'));
         }
 
-        if ($this->command instanceof CommandControllerCommand && $this->command->isLateCommand()) {
-            $output->writeln('<warning>Registering commands via $GLOBALS[\'TYPO3_CONF_VARS\'][\'SC_OPTIONS\'][\'extbase\'][\'commandControllers\'] is deprecated and will be removed with 6.0. Register Symfony commands in Configuration/Commands.php instead.</warning>');
-        }
-
         $helper = new DescriptorHelper();
         // Add our own descriptor
         $helper->register('txt', new TextDescriptor());
