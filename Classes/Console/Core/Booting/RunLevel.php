@@ -46,9 +46,10 @@ class RunLevel
      */
     private $container;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, ?StepFailedException $lowLevelError)
     {
         $this->container = $container;
+        $this->error = $lowLevelError;
     }
 
     /**

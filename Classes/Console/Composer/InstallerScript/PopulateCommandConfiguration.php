@@ -88,10 +88,6 @@ class PopulateCommandConfiguration implements InstallerScript
     private function getConfigFromPackage(string $installPath, string $packageName): array
     {
         $commandConfiguration = [];
-        if (file_exists($commandConfigurationFile = $installPath . '/Configuration/Console/Commands.php')) {
-            trigger_error($packageName . ': Configuration/Console/Commands.php for registering commands is deprecated and will be removed with 6.0. Register Symfony commands in Configuration/Commands.php instead.', E_USER_DEPRECATED);
-            $commandConfiguration = require $commandConfigurationFile;
-        }
         if (file_exists($commandConfigurationFile = $installPath . '/Configuration/Commands.php')) {
             $commandConfiguration['commands'] = require $commandConfigurationFile;
         }
