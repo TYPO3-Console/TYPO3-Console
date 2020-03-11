@@ -63,6 +63,7 @@ class InstallStepActionExecutor
                         'REMOTE_ADDR' => '127.0.0.1',
                         'SCRIPT_NAME' => 'typo3/sysext/core/bin/typo3',
                         'HTTP_HOST' => 'localhost',
+                        'HTTPS' => 'On',
                     ]
                 )
             );
