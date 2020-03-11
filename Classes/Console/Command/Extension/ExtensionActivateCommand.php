@@ -66,6 +66,7 @@ EOH
 
         $this->showDeprecationMessageIfApplicable($output);
         (new ExtensionStateCommandsHelper($output))->activateExtensions($extensionKeys);
+
         return 0;
     }
 

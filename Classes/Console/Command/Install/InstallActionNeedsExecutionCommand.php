@@ -40,6 +40,7 @@ class InstallActionNeedsExecutionCommand extends Command
             new SilentConfigurationUpgrade()
         );
         $output->write(serialize($installStepActionExecutor->executeActionWithArguments($actionName, [], true)), false, OutputInterface::OUTPUT_RAW);
+
         return 0;
     }
 }
