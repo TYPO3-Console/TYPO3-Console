@@ -24,11 +24,13 @@ namespace Typo3Console\CreateReferenceCommand\ViewHelpers\Format;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
+
 /**
  * Renders it's children and replaces every newline by a combination of
  * newline and $indent.
  */
-class IndentViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
+class IndentViewHelper extends AbstractViewHelper
 {
     public function initializeArguments()
     {
