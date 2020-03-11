@@ -95,7 +95,7 @@ class ExtensionCompatibilityCheck
     {
         $activePackages = $this->packageManager->getActivePackages();
         foreach ($activePackages as $package) {
-            $this->loadExtLocalconfForExtension($package->getPackageKey());
+            $this->loadExtLocalconfForExtension($package);
             if ($package->getPackageKey() === $extensionKey) {
                 break;
             }
@@ -118,7 +118,7 @@ class ExtensionCompatibilityCheck
             $this->loadExtLocalconfForExtension($package);
         }
         foreach ($activePackages as $package) {
-            $this->loadExtTablesForExtension($package->getPackageKey());
+            $this->loadExtTablesForExtension($package);
             if ($package->getPackageKey() === $extensionKey) {
                 break;
             }
