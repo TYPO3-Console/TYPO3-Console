@@ -15,12 +15,12 @@ cache:
     - $HOME/.composer/cache
     - $HOME/.sonar/cache
 
-# Do not build feature branches or alpha/beta releases
+# Do not build feature branches
 branches:
   only:
     - master
     - develop
-    - /^v?([0-9]+\.){1,2}(x|[0-9]+)$/
+    - /^v?([0-9]+\.){1,2}(x|[0-9]+)-?[a-z]*[1-9]*$/
 
 # Inform me about failures
 notifications:
@@ -35,7 +35,7 @@ before_install:
   - composer config repositories.testing-framework vcs .Build/external/nimut-testing-framework
 
 install:
-  - export COMPOSER_ROOT_VERSION=5.8.3
+  - export COMPOSER_ROOT_VERSION=6.0.0
   - |
     composer require \
       typo3/cms-backend="$TYPO3_VERSION" \
@@ -84,7 +84,7 @@ jobs:
       before_script: skip
       script:
         - >
-          if [ -n "$TRAVIS_TAG" ]; then
+          if [ -n "$TRAVIS_TAG" ] && [[ "$TRAVIS_TAG" != *"alpha"* ]]; then
             composer set-version $(echo $TRAVIS_TAG | sed s/^v//g)
             test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
           fi
