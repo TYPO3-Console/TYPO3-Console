@@ -82,7 +82,7 @@ class ListCommand extends \Symfony\Component\Console\Command\ListCommand
             $outputHelper->getErrorStyle()->writeln($messages);
         }
 
-        return null;
+        return 0;
     }
 
     private function amendDefinition(InputDefinition $definition): InputDefinition

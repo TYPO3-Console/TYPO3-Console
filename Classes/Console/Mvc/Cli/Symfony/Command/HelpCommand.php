@@ -87,5 +87,7 @@ class HelpCommand extends \Symfony\Component\Console\Command\HelpCommand
             'screen_width' => (new Terminal())->getWidth() - 4,
         ]);
         $this->command = null;
+
+        return 0;
     }
 }
