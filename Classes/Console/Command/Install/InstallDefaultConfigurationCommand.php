@@ -75,6 +75,7 @@ EOH
             false,
             OutputInterface::OUTPUT_RAW
         );
+
         return 0;
     }
 }
