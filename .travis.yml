@@ -61,23 +61,23 @@ script:
 # Configure build stages (with build matrix above, test stage is implicitly defined)
 jobs:
   allow_failures:
-    - env: TYPO3_VERSION="dev-master" TYPO3_UPGRADE_FROM_VERSION="~10.3.0"
+    - env: TYPO3_VERSION="dev-master"
   include:
     - stage: test
       php: 7.4
-      env: TYPO3_VERSION="~10.3.0" TYPO3_UPGRADE_FROM_VERSION="~10.3.0"
+      env: TYPO3_VERSION="~10.3.0"
     - stage: test
       php: 7.3
-      env: TYPO3_VERSION="~10.3.0" TYPO3_UPGRADE_FROM_VERSION="~10.3.0"
+      env: TYPO3_VERSION="~10.3.0"
     - stage: test
       php: 7.2
-      env: TYPO3_VERSION="~10.3.0" TYPO3_UPGRADE_FROM_VERSION="~10.3.0"
+      env: TYPO3_VERSION="~10.3.0"
     - stage: test
       php: 7.2
-      env: TYPO3_VERSION="~10.3.0" TYPO3_UPGRADE_FROM_VERSION="~10.3.0" PREFER_LOWEST="--prefer-lowest"
+      env: TYPO3_VERSION="~10.3.0" PREFER_LOWEST="--prefer-lowest"
     - stage: test
       php: 7.2
-      env: TYPO3_VERSION="dev-master" TYPO3_UPGRADE_FROM_VERSION="~10.3.0"
+      env: TYPO3_VERSION="dev-master"
 
     - stage: test
       php: 7.2
