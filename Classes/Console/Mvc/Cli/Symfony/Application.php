@@ -128,7 +128,7 @@ class Application extends BaseApplication
         return $this->runLevel->isCommandAvailable($command->getName());
     }
 
-    public function renderException(\Exception $exception, OutputInterface $output)
+    public function renderException($exception, OutputInterface $output)
     {
         if ($exception instanceof CommandNotAvailableException) {
             $helper = new SymfonyStyle(new ArgvInput(), $output);
@@ -152,6 +152,11 @@ class Application extends BaseApplication
         }
 
         (new ExceptionRenderer())->render($exception, $output, $this);
+    }
+
+    public function renderThrowable(\Throwable $e, OutputInterface $output): void
+    {
+        $this->renderException($e, $output);
     }
 
     /**

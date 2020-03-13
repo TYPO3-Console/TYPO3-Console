@@ -46,7 +46,7 @@ class FilteredCommandLoaderCollection implements CommandLoaderInterface
         $this->ignoredCommandNames = $ignoredCommandNames;
     }
 
-    public function get(string $name)
+    public function get($name)
     {
         if (!$this->has($name)) {
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name), [], 1584103064);
@@ -55,7 +55,7 @@ class FilteredCommandLoaderCollection implements CommandLoaderInterface
         return $this->commandLoader->get($name);
     }
 
-    public function has(string $name): bool
+    public function has($name): bool
     {
         return in_array($name, $this->getNames(), true);
     }
