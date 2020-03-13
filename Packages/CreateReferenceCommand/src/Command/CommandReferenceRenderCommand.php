@@ -104,7 +104,8 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
             if (in_array($command->getName(), $this->skipCommands, true)
                 || (
                     !in_array($command->getName(), ['help', 'list'])
-                    && !$commandCollection->has($command->getName()
+                    && !$commandCollection->has(
+                        $command->getName()
                     )
                 )
             ) {
