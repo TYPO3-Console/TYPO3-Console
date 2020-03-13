@@ -6,9 +6,17 @@ return [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Backend\CreateBackendAdminUserCommand::class,
     ],
+    'backend:lock' => [
+        'vendor' => 'typo3_console',
+        'class' => \Helhum\Typo3Console\Command\Backend\LockBackendCommand::class,
+    ],
     'backend:lockforeditors' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Backend\LockBackendForEditorsCommand::class,
+    ],
+    'backend:unlock' => [
+        'vendor' => 'typo3_console',
+        'class' => \Helhum\Typo3Console\Command\Backend\UnlockBackendCommand::class,
     ],
     'backend:unlockforeditors' => [
         'vendor' => 'typo3_console',
@@ -90,6 +98,11 @@ return [
         'aliases' => [
             'extension:uninstall',
         ],
+    ],
+    'extension:list' => [
+        'vendor' => 'typo3_console',
+        'class' => \Helhum\Typo3Console\Command\Extension\ExtensionListCommand::class,
+        'schedulable' => false,
     ],
     'extension:setup' => [
         'vendor' => 'typo3_console',
