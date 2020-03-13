@@ -97,10 +97,6 @@ Available Commands
 
    DatabaseUpdateschema
 
-   ExtensionActivate
-
-   ExtensionDeactivate
-
    ExtensionList
 
    ExtensionSetup
