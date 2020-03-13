@@ -81,8 +81,6 @@ Available Commands
 
    CacheListgroups
 
-   CleanupUpdatereferenceindex
-
    ConfigurationRemove
 
    ConfigurationSet
@@ -99,15 +97,11 @@ Available Commands
 
    DatabaseUpdateschema
 
-   DocumentationGeneratexsd
-
    ExtensionActivate
 
    ExtensionDeactivate
 
    ExtensionList
-
-   ExtensionRemoveinactive
 
    ExtensionSetup
 
@@ -122,8 +116,6 @@ Available Commands
    InstallGeneratepackagestates
 
    InstallSetup
-
-   SchedulerRun
 
    UpgradeAll
 
