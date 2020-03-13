@@ -85,20 +85,6 @@ return [
         'class' => \Helhum\Typo3Console\Command\Extension\DumpAutoloadCommand::class,
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
     ],
-    'extension:activate' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Extension\ExtensionActivateCommand::class,
-        'aliases' => [
-            'extension:install',
-        ],
-    ],
-    'extension:deactivate' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Extension\ExtensionDeactivateCommand::class,
-        'aliases' => [
-            'extension:uninstall',
-        ],
-    ],
     'extension:list' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Extension\ExtensionListCommand::class,
