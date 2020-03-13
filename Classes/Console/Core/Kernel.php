@@ -155,11 +155,11 @@ class Kernel
         $this->initialize();
 
         $commandConfiguration = new CommandConfiguration();
+        $consoleCommandCollection = new CommandCollection($commandConfiguration);
+        $consoleCommandCollection->initializeRunLevel($this->runLevel);
+
         $commandCollection = new CommandLoaderCollection(
-            new CommandCollection(
-                $this->runLevel,
-                $commandConfiguration
-            ),
+            $consoleCommandCollection,
             new FilteredCommandLoaderCollection(
                 $this->container->get(CommandRegistry::class),
                 $commandConfiguration->getReplaces()

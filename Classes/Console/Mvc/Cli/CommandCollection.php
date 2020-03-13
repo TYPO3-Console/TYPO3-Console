@@ -30,11 +30,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class CommandCollection implements CommandLoaderInterface
 {
     /**
-     * @var RunLevel
-     */
-    private $runLevel;
-
-    /**
      * @var CommandConfiguration
      */
     private $commandConfiguration;
@@ -49,12 +44,10 @@ class CommandCollection implements CommandLoaderInterface
      */
     private $replaces = [];
 
-    public function __construct(RunLevel $runLevel, CommandConfiguration $commandConfiguration)
+    public function __construct(CommandConfiguration $commandConfiguration)
     {
-        $this->runLevel = $runLevel;
         $this->commandConfiguration = $commandConfiguration;
         $this->populateCommands();
-        $this->initializeRunLevel();
     }
 
     /**
@@ -108,15 +101,19 @@ class CommandCollection implements CommandLoaderInterface
         }
     }
 
-    private function initializeRunLevel(): void
+    /**
+     * @param RunLevel $runLevel
+     * @internal
+     */
+    public function initializeRunLevel(Runlevel $runLevel): void
     {
         foreach ($this->commands as $name => $commandConfig) {
             if (isset($commandConfig['runLevel'])) {
-                $this->runLevel->setRunLevelForCommand($name, $commandConfig['runLevel']);
+                $runLevel->setRunLevelForCommand($name, $commandConfig['runLevel']);
             }
             if (isset($commandConfig['bootingSteps'])) {
                 foreach ($commandConfig['bootingSteps'] as $bootingStep) {
-                    $this->runLevel->addBootingStepForCommand($name, $bootingStep);
+                    $runLevel->addBootingStepForCommand($name, $bootingStep);
                 }
             }
         }
