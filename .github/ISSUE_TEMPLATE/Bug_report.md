@@ -26,6 +26,7 @@ command output including stacktrace in case an exception occurred
 **Environment**
 - TYPO3 Console version(s): [e.g. 4.9.3, 5.2.0]
 - TYPO3 version(s): [e.g. 8.7.12, 9.2.0]
+- PHP version(s): [e.g. 7.2.13, 7.4.1]
 - Is your TYPO3 installation set up with Composer (Composer Mode): [yes, no]
 - OS: [e.g. OSX 10.13.4, Windows 10]
 
