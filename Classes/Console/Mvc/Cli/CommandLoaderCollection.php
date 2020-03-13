@@ -35,7 +35,7 @@ class CommandLoaderCollection implements CommandLoaderInterface
         $this->commandLoaderInterfaces = $commandLoaderInterfaces;
     }
 
-    public function get(string $name)
+    public function get($name)
     {
         foreach ($this->commandLoaderInterfaces as $commandLoaderInterface) {
             if ($commandLoaderInterface->has($name)) {
@@ -45,7 +45,7 @@ class CommandLoaderCollection implements CommandLoaderInterface
         throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name), [], 1583938998);
     }
 
-    public function has(string $name)
+    public function has($name)
     {
         foreach ($this->commandLoaderInterfaces as $commandLoaderInterface) {
             if ($commandLoaderInterface->has($name)) {

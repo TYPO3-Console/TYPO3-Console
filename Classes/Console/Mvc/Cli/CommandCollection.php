@@ -55,7 +55,7 @@ class CommandCollection implements CommandLoaderInterface
      * @throws \Symfony\Component\Console\Exception\CommandNotFoundException
      * @return BaseCommand
      */
-    public function get(string $name): BaseCommand
+    public function get($name): BaseCommand
     {
         if (!isset($this->commands[$name])) {
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name), [], 1518812618);
@@ -79,7 +79,7 @@ class CommandCollection implements CommandLoaderInterface
      * @param string $name
      * @return bool
      */
-    public function has(string $name): bool
+    public function has($name): bool
     {
         return isset($this->commands[$name]);
     }
