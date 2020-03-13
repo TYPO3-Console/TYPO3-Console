@@ -21,6 +21,48 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
+    public function extensionListShowsActiveAndInactiveExtensions()
+    {
+        $output = $this->executeConsoleCommand('extension:list');
+        $this->assertContains('Extension key', $output);
+        $this->assertContains('extbase', $output);
+        $this->assertContains('filemetadata', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function extensionListRawShowsActiveAndInactiveExtensionsButNoHeader()
+    {
+        $output = $this->executeConsoleCommand('extension:list', ['--raw']);
+        $this->assertNotContains('Extension key', $output);
+        $this->assertContains('extbase', $output);
+        $this->assertContains('filemetadata', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function extensionListCanShowOnlyActiveExtensions()
+    {
+        $output = $this->executeConsoleCommand('extension:list', ['--active', '--raw']);
+        $this->assertContains('extbase', $output);
+        $this->assertNotContains('filemetadata', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function extensionListCanShowOnlyInActiveExtensions()
+    {
+        $output = $this->executeConsoleCommand('extension:list', ['--inactive', '--raw']);
+        $this->assertNotContains('extbase', $output);
+        $this->assertContains('filemetadata', $output);
+    }
+
+    /**
+     * @test
+     */
     public function extensionActivateCallsSchemaUpdate()
     {
         $this->backupDatabase();
