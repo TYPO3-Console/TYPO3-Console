@@ -15,8 +15,6 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 use Symfony\Component\Console\Exception\RuntimeException;
-use TYPO3\CMS\Core\Package\PackageInterface;
-use TYPO3\CMS\Core\Package\PackageManager;
 
 /**
  * Represents command configuration provided by composer packages
