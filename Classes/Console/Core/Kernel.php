@@ -17,7 +17,6 @@ namespace Helhum\Typo3Console\Core;
 use Composer\Autoload\ClassLoader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Helhum\Typo3Console\CompatibilityClassLoader;
-use Helhum\Typo3Console\Core\Booting\CompatibilityScripts;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\Booting\Scripts;
 use Helhum\Typo3Console\Core\Booting\Step;
@@ -34,6 +33,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 use TYPO3\CMS\Core\Console\CommandRegistry;
 use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
@@ -164,7 +164,7 @@ class Kernel
             )
         );
 
-        $application = new Application($this->runLevel, CompatibilityScripts::isComposerMode());
+        $application = new Application($this->runLevel, Environment::isComposerMode());
         $application->setCommandLoader($commandCollection);
 
         return $application->run($input);

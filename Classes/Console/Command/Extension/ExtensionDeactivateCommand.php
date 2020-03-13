@@ -15,11 +15,11 @@ namespace Helhum\Typo3Console\Command\Extension;
  */
 
 use Helhum\Typo3Console\Command\AbstractConvertedCommand;
-use Helhum\Typo3Console\Core\Booting\CompatibilityScripts;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\CMS\Core\Core\Environment;
 
 class ExtensionDeactivateCommand extends AbstractConvertedCommand
 {
@@ -72,7 +72,7 @@ EOH
 
     private function showDeprecationMessageIfApplicable(OutputInterface $output)
     {
-        if (CompatibilityScripts::isComposerMode()) {
+        if (Environment::isComposerMode()) {
             $output->writeln('<warning>This command is deprecated when TYPO3 is composer managed.</warning>');
             $output->writeln('<warning>It might lead to unexpected results.</warning>');
             $output->writeln('<warning>The PackageStates.php file that tracks which extension should be active,</warning>');
