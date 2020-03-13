@@ -732,54 +732,6 @@ Options
 
 
 
-.. _`Command Reference: typo3_console extension:activate`:
-
-`extension:activate`
---------------------
-
-**Activate extension(s)**
-
-Activates one or more extensions by key.
-Marks extensions as active, sets them up and clears caches for every activated extension.
-
-This command is deprecated (and hidden) in Composer mode.
-
-Arguments
-~~~~~~~~~
-
-`extensionKeys`
-   Extension keys to activate. Separate multiple extension keys with comma.
-
-
-
-
-
-
-
-.. _`Command Reference: typo3_console extension:deactivate`:
-
-`extension:deactivate`
-----------------------
-
-**Deactivate extension(s)**
-
-Deactivates one or more extensions by key.
-Marks extensions as inactive in the system and clears caches for every deactivated extension.
-
-This command is deprecated (and hidden) in Composer mode.
-
-Arguments
-~~~~~~~~~
-
-`extensionKeys`
-   Extension keys to deactivate. Separate multiple extension keys with comma.
-
-
-
-
-
-
-
 .. _`Command Reference: typo3_console extension:list`:
 
 `extension:list`

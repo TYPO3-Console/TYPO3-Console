@@ -63,73 +63,6 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
-    public function extensionActivateCallsSchemaUpdate()
-    {
-        $this->backupDatabase();
-        $this->installFixtureExtensionCode('ext_test');
-
-        $output = $this->executeConsoleCommand('extension:activate', ['ext_test']);
-        $this->assertContains('Extension "ext_test" is now active.', $output);
-        $this->assertContains('Extension "ext_test" is now set up.', $output);
-
-        $output = $this->executeConsoleCommand('database:updateschema');
-        $this->assertContains('No schema updates were performed for update types:', $output);
-
-        $output = $this->executeConsoleCommand('extension:deactivate', ['ext_test']);
-        $this->assertContains('Extension "ext_test" is now inactive.', $output);
-
-        $this->removeFixtureExtensionCode('ext_test');
-        $this->restoreDatabase();
-    }
-
-    /**
-     * @test
-     */
-    public function extensionActivateOnAlreadyInstalledExtensionDoesNotDestroyCurrentSchema()
-    {
-        $this->backupDatabase();
-        $this->installFixtureExtensionCode('ext_test');
-
-        $output = $this->executeConsoleCommand('extension:activate', ['ext_test']);
-        $this->assertContains('Extension "ext_test" is now active.', $output);
-        $this->assertContains('Extension "ext_test" is now set up.', $output);
-
-        $output = $this->executeConsoleCommand('extension:activate', ['core']);
-        $this->assertNotContains('is now active.', $output);
-        $this->assertContains('Extension "core" is now set up.', $output);
-
-        $output = $this->executeConsoleCommand('database:updateschema');
-        $this->assertContains('No schema updates were performed for update types:', $output);
-
-        $output = $this->executeConsoleCommand('extension:deactivate', ['ext_test']);
-        $this->assertContains('Extension "ext_test" is now inactive.', $output);
-
-        $this->removeFixtureExtensionCode('ext_test');
-        $this->restoreDatabase();
-    }
-
-    /**
-     * @test
-     */
-    public function extensionActivateWorksWhenExtensionChecksConfigInExtLocalConf()
-    {
-        $this->installFixtureExtensionCode('ext_config');
-        try {
-            $output = $this->executeConsoleCommand('extension:activate', ['ext_config']);
-            $this->assertContains('Extension "ext_config" is now active.', $output);
-            $this->assertContains('Extension "ext_config" is now set up.', $output);
-            $config = @\json_decode(trim($this->executeConsoleCommand('configuration:showlocal', ['EXTENSIONS', '--json'])), true);
-            $this->assertArrayHasKey('ext_config', $config);
-        } finally {
-            $this->executeConsoleCommand('extension:deactivate', ['ext_config']);
-            $this->executeConsoleCommand('configuration:remove', ['EXTENSIONS/ext_config', '--force']);
-            $this->removeFixtureExtensionCode('ext_config');
-        }
-    }
-
-    /**
-     * @test
-     */
     public function extensionSetupActiveWorksWhenExtensionChecksConfigInExtLocalConf()
     {
         $this->installFixtureExtensionCode('ext_config');
@@ -163,10 +96,8 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
         $output = $this->executeConsoleCommand('database:updateschema');
         $this->assertContains('No schema updates were performed for update types:', $output);
 
-        $output = $this->executeConsoleCommand('extension:deactivate', ['ext_test']);
-        $this->assertContains('Extension "ext_test" is now inactive.', $output);
-
         $this->removeFixtureExtensionCode('ext_test');
+        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
         $this->restoreDatabase();
     }
 
