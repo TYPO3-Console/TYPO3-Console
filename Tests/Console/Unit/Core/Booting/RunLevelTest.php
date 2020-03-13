@@ -106,7 +106,7 @@ class RunLevelTest extends TestCase
     public function runLevelIsCorrectlyDeterminedForCommands(array $definitions, string $requestedCommand, string $expectedRunlevel)
     {
         $containerMock = $this->getMockBuilder(ContainerInterface::class)->getMock();
-        $subject = new RunLevel($containerMock);
+        $subject = new RunLevel($containerMock, null);
         foreach ($definitions as $definition => $runLevel) {
             $subject->setRunLevelForCommand($definition, $runLevel);
         }

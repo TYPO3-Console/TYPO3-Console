@@ -184,18 +184,4 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
         $filesystem->chmod(getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php', 0664);
         $this->restoreDatabase();
     }
-
-    /**
-     * @test
-     */
-    public function canRemoveInactiveExtensions()
-    {
-        $this->copyDirectory(getenv('TYPO3_PATH_ROOT') . '/typo3/sysext', getenv('TYPO3_PATH_ROOT') . '/typo3temp/sysext');
-
-        $output = $this->executeConsoleCommand('extension:removeinactive', ['--force']);
-        $this->assertContains('filemetadata', $output);
-
-        $this->copyDirectory(getenv('TYPO3_PATH_ROOT') . '/typo3temp/sysext', getenv('TYPO3_PATH_ROOT') . '/typo3/sysext');
-        $this->removeDirectory(getenv('TYPO3_PATH_ROOT') . '/typo3temp/sysext');
-    }
 }
