@@ -268,6 +268,24 @@ class InstallCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
+    public function packageStatesFileIsCreatedWithoutDependentExtensions()
+    {
+        $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
+        $this->installFixtureExtensionCode('ext_no_dep');
+        $this->installFixtureExtensionCode('ext_with_dep');
+        @unlink($packageStatesFile);
+        $this->executeConsoleCommand('install:generatepackagestates');
+        $this->assertTrue(file_exists($packageStatesFile));
+        $packageConfig = require $packageStatesFile;
+        $this->assertArrayNotHasKey('reports', $packageConfig['packages']);
+        $this->removeFixtureExtensionCode('ext_no_dep');
+        $this->removeFixtureExtensionCode('ext_with_dep');
+        $this->executeConsoleCommand('install:generatepackagestates');
+    }
+
+    /**
+     * @test
+     */
     public function packageStatesFileIsCreatedWithoutDefaultPackages()
     {
         $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
@@ -275,11 +293,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
         $this->executeConsoleCommand('install:generatepackagestates');
         $this->assertTrue(file_exists($packageStatesFile));
         $packageConfig = require $packageStatesFile;
-        if ($packageConfig['version'] === 5) {
-            $this->assertArrayNotHasKey('reports', $packageConfig['packages']);
-        } else {
-            $this->assertSame('inactive', $packageConfig['packages']['reports']['state']);
-        }
+        $this->assertArrayNotHasKey('reports', $packageConfig['packages']);
     }
 
     /**
