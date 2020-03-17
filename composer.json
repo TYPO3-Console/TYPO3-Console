@@ -107,9 +107,9 @@
         ],
         "extension-release": [
             "@extension-build",
-            "sed -i -e 's/\"typo3-console\\/extension\"/\"helhum\\/typo3-console\"/g' ../extension/composer.json",
-            "rm -rf ../extension/composer.lock",
-            "rm -rf ../extension/composer.json.bak",
+            "sed -i.bak -e 's/\"typo3-console\\/extension\"/\"helhum\\/typo3-console\"/g' ../extension/composer.json",
+            "rm ../extension/composer.lock",
+            "rm ../extension/composer.json.bak",
             "rm -rf ../extension/Libraries/bin/",
             "rm -rf ../extension/Libraries/helhum/typo3-console/Packages/",
             "rm -rf ../extension/Libraries/helhum/typo3-console/Resources/Private/ExtensionArtifacts/",
