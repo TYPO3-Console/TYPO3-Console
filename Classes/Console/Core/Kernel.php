@@ -15,10 +15,8 @@ namespace Helhum\Typo3Console\Core;
  */
 
 use Composer\Autoload\ClassLoader;
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use Helhum\Typo3Console\CompatibilityClassLoader;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
-use Helhum\Typo3Console\Core\Booting\Scripts;
 use Helhum\Typo3Console\Core\Booting\Step;
 use Helhum\Typo3Console\Core\Booting\StepFailedException;
 use Helhum\Typo3Console\Exception;
@@ -34,6 +32,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use TYPO3\CMS\Core\Console\CommandRegistry;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
@@ -107,10 +106,7 @@ class Kernel
     public function initialize(string $runLevel = null)
     {
         if (!$this->initialized) {
-            // Initialize basic annotation loader until TYPO3 does so as well
-            AnnotationRegistry::registerLoader('class_exists');
-            Scripts::baseSetup();
-
+            SystemEnvironmentBuilder::run(0, SystemEnvironmentBuilder::REQUESTTYPE_CLI);
             $container = Bootstrap::init(
                 $this->classLoader->getTypo3ClassLoader(),
                 true

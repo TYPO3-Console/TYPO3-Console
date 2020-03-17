@@ -248,9 +248,6 @@ class ExceptionRenderer
         if (getenv('TYPO3_PATH_ROOT')) {
             $pathPrefixes[] = getenv('TYPO3_PATH_ROOT') . '/';
         }
-        if (defined('PATH_site')) {
-            $pathPrefixes[] = PATH_site;
-        }
         $fileName = str_replace($pathPrefixes, '', $fileName);
         $pathPosition = strpos($fileName, 'typo3conf/ext/');
         $pathAndFilename = ($pathPosition !== false) ? substr($fileName, $pathPosition) : $fileName;
