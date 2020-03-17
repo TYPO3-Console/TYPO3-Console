@@ -18,6 +18,7 @@ use Helhum\Typo3Console\Database\Schema\SchemaUpdateResultRenderer;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Helhum\Typo3Console\Service\Database\SchemaService;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 use TYPO3\CMS\Extensionmanager\Utility\InstallUtility;
@@ -110,7 +111,7 @@ class ExtensionSetupResultRenderer
         }
         foreach ($this->results['renderImportedStaticDataResult'] as $pathToStaticSqlFile) {
             // Output content of $pathToStaticSqlFile at cli context
-            $absolutePath = PATH_site . $pathToStaticSqlFile;
+            $absolutePath = Environment::getPublicPath() . '/' . $pathToStaticSqlFile;
             if (file_exists($absolutePath)) {
                 $output->outputFormatted('<info>Import content of file "%s" into database.</info>', [$pathToStaticSqlFile]);
                 $output->outputFormatted(file_get_contents($absolutePath), [], 2);

@@ -18,6 +18,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Container;
 use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Core\Environment;
 
 class RunLevel
 {
@@ -152,7 +153,7 @@ class RunLevel
      */
     public function getMaximumAvailableRunLevel(): string
     {
-        if (!file_exists(PATH_site . 'typo3conf/PackageStates.php') || !file_exists(PATH_site . 'typo3conf/LocalConfiguration.php')) {
+        if (!file_exists(Environment::getPublicPath() . '/typo3conf/PackageStates.php') || !file_exists(Environment::getPublicPath() . '/typo3conf/LocalConfiguration.php')) {
             return self::LEVEL_COMPILE;
         }
 

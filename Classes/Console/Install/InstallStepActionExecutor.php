@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Install;
  */
 
 use Helhum\Typo3Console\Install\Upgrade\SilentConfigurationUpgrade;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Http\NormalizedParams;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
@@ -83,7 +84,7 @@ class InstallStepActionExecutor
         $actionMethod = 'execute' . ucfirst($actionName) . 'Action';
         $checkMethod = 'check' . ucfirst($actionName) . 'Action';
         $messages = [];
-        $needsExecution = file_exists(PATH_site . 'FIRST_INSTALL');
+        $needsExecution = file_exists(Environment::getPublicPath() . '/FIRST_INSTALL');
         if (is_callable([$this->installerController, $checkMethod])) {
             $needsExecution = !\json_decode((string)$this->installerController->$checkMethod()->getBody(), true)['success'];
         }
