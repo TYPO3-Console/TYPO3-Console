@@ -49,7 +49,7 @@ class PrepareInstallAction implements InstallActionInterface
     {
         $this->ensureInstallationIsPossible($options);
 
-        $typo3RootPath = rtrim(defined('PATH_site') ? PATH_site : getenv('TYPO3_PATH_ROOT'), '/');
+        $typo3RootPath = Environment::getPublicPath() ? Environment::getPublicPath() : getenv('TYPO3_PATH_ROOT');
         $firstInstallPath = $typo3RootPath . '/FIRST_INSTALL';
         touch($firstInstallPath);
 

@@ -21,6 +21,7 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -243,7 +244,7 @@ class ExceptionRenderer
         if (getenv('TYPO3_PATH_COMPOSER_ROOT')) {
             $pathPrefixes = [getenv('TYPO3_PATH_COMPOSER_ROOT') . '/'];
         }
-        $pathPrefixes[] = PATH_site;
+        $pathPrefixes[] = Environment::getPublicPath() . '/';
         $fileName = str_replace($pathPrefixes, '', $fileName);
         $pathPosition = strpos($fileName, 'typo3conf/ext/');
         $pathAndFilename = ($pathPosition !== false) ? substr($fileName, $pathPosition) : $fileName;
