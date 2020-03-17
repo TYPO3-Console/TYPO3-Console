@@ -14,68 +14,14 @@ namespace Helhum\Typo3Console\Package;
  *
  */
 
-use TYPO3\CMS\Core\Package\PackageInterface;
-use TYPO3\CMS\Core\Package\PackageManager;
-use TYPO3\CMS\Core\Service\DependencyOrderingService;
+use TYPO3\CMS\Core\Package\FailsafePackageManager;
 
-class UncachedPackageManager extends PackageManager
+class UncachedPackageManager extends FailsafePackageManager
 {
     /**
      * @var bool
      */
-    protected $forceSavePackageStates = false;
-
-    /**
-     * @var bool
-     */
-    protected $packageStatesFileExists = false;
-
-    /**
-     * @param DependencyOrderingService $dependencyOrderingService
-     */
-    public function injectDependencyOrderingService(DependencyOrderingService $dependencyOrderingService)
-    {
-        $this->dependencyOrderingService = $dependencyOrderingService;
-    }
-
-    public function init()
-    {
-        $this->packageStatesFileExists = @file_exists($this->packageStatesPathAndFilename);
-        $this->loadPackageStates();
-        $this->initializePackageObjects();
-        $this->initializeCompatibilityLoadedExtArray();
-    }
-
-    protected function loadPackageStates()
-    {
-        if ($this->packageStatesFileExists) {
-            parent::loadPackageStates();
-        } else {
-            $this->scanAvailablePackages();
-        }
-    }
-
-    /**
-     * Get the extension configuration as array from the config file
-     *
-     * @param PackageInterface $package
-     * @return array
-     */
-    public function getExtensionConfiguration(PackageInterface $package)
-    {
-        return parent::getExtensionEmConf($package->getPackagePath());
-    }
-
-    /**
-     * Only save a new PackageSates file if there is only one,
-     * to prevent saving one before TYPO3 is properly installed
-     */
-    protected function sortAndSavePackageStates()
-    {
-        if ($this->packageStatesFileExists) {
-            parent::sortAndSavePackageStates();
-        }
-    }
+    private $forceSavePackageStates = false;
 
     /**
      * Overload original method because the stupid TYPO3 core
