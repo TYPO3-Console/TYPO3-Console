@@ -319,6 +319,7 @@ class RunLevel
                 );
                 break;
             case 'helhum.typo3console:persistence':
+                $this->executedSteps[$stepIdentifier] = self::LEVEL_FULL;
                 $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'initializePersistence']), 'helhum.typo3console:extensionconfiguration');
                 break;
             case 'helhum.typo3console:authentication':

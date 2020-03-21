@@ -41,11 +41,6 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 class Kernel
 {
     /**
-     * @var Bootstrap
-     */
-    private $bootstrap;
-
-    /**
      * @var RunLevel
      */
     private $runLevel;
