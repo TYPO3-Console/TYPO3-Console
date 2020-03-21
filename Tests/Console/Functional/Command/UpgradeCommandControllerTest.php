@@ -238,7 +238,6 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         $commandLine[] = $this->upgradeInstancePath;
 
         $process = new Process($commandLine, null, $environmentVariables, null, 0);
-        $process->inheritEnvironmentVariables();
         if ($dryRun) {
             return $process->getCommandLine();
         }
