@@ -61,7 +61,6 @@ class MysqlCommand
         array_unshift($commandLine, 'mysql');
         $commandLine = array_merge($commandLine, $this->buildConnectionArguments(), $additionalArguments);
         $process = new Process($commandLine, null, null, $inputStream, 0.0);
-        $process->inheritEnvironmentVariables();
         if ($interactive) {
             // I did not figure out how to change pipes with symfony/process
             $interactiveProcess = new InteractiveProcess();
@@ -84,7 +83,6 @@ class MysqlCommand
         array_unshift($commandLine, 'mysqldump');
         $commandLine = array_merge($commandLine, $this->buildConnectionArguments(), $additionalArguments);
         $process = new Process($commandLine, null, null, null, 0.0);
-        $process->inheritEnvironmentVariables();
 
         echo  chr(10) . sprintf('-- Dump of TYPO3 Connection "%s"', $connectionName) . chr(10);
 

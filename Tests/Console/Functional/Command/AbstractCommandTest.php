@@ -60,7 +60,6 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
             $commandLine[] = getenv('TYPO3_INSTALL_DB_DBNAME');
         }
         $mysqlProcess = new Process($commandLine, null, null, $sql, 0);
-        $mysqlProcess->inheritEnvironmentVariables();
         $mysqlProcess->run();
         if (!$mysqlProcess->isSuccessful()) {
             throw new \RuntimeException(sprintf('Executing query "%s" failed. Did you set TYPO3_INSTALL_DB_* correctly? Is your database server running? Output: "%s", Error Output: "%s"', $sql, $mysqlProcess->getOutput(), $mysqlProcess->getErrorOutput()), 1493634196);
@@ -82,7 +81,6 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
         ];
 
         $mysqlProcess = new Process($commandLine, null, null, null, 0);
-        $mysqlProcess->inheritEnvironmentVariables();
         $mysqlProcess->run();
         if (!$mysqlProcess->isSuccessful()) {
             throw new \RuntimeException('Backing up database failed', 1493634217);
@@ -104,7 +102,6 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
         ];
         $sql = file_get_contents(getenv('TYPO3_PATH_ROOT') . '/typo3temp/' . getenv('TYPO3_INSTALL_DB_DBNAME') . '.sql');
         $mysqlProcess = new Process($commandLine, null, null, $sql, 0);
-        $mysqlProcess->inheritEnvironmentVariables();
         $mysqlProcess->run();
         if (!$mysqlProcess->isSuccessful()) {
             throw new \RuntimeException('Restoring database failed', 1493634218);
