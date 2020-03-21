@@ -50,7 +50,7 @@
         "typo3/cms-filemetadata": "~10.3.0 || dev-master",
         "typo3-console/create-reference-command": "@dev",
         "typo3-console/php-server-command": "^0.2",
-        "symfony/filesystem": "^3.2",
+        "symfony/filesystem": "^4.4 || ^5.0",
         "nimut/testing-framework": "5.x-dev",
         "cweagans/composer-patches": "^1.6",
         "jakub-onderka/php-parallel-lint": "^1.0",
