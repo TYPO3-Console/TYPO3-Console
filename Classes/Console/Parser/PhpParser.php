@@ -96,7 +96,7 @@ class PhpParser implements PhpParserInterface
      */
     protected function parseClassNameRaw($classContent): string
     {
-        preg_match('/^\\s*(abstract)*\\s*(class|interface) ([a-zA-Z_\x7f-\xff][a-zA-Z0-9\\\\_\x7f-\xff]*)/ims', $classContent, $matches);
+        preg_match('/^\\s*(abstract|final)*\\s*(class|interface) ([a-zA-Z_\x7f-\xff][a-zA-Z0-9\\\\_\x7f-\xff]*)/ims', $classContent, $matches);
         if (!isset($matches[2])) {
             throw new ParsingException('Class file does not contain a class or interface definition', 1399285302);
         }
