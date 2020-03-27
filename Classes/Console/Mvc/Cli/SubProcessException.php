@@ -27,6 +27,11 @@ class SubProcessException extends \Exception
     /**
      * @var string|null
      */
+    private $previousExceptionMessage;
+
+    /**
+     * @var string|null
+     */
     private $previousExceptionTrace;
 
     /**
@@ -67,14 +72,23 @@ class SubProcessException extends \Exception
         $previousExceptionErrorMessage = null
     ) {
         $previousException = $previousExceptionData ? self::createFromArray($previousExceptionData) : null;
-        parent::__construct($previousExceptionMessage, $previousExceptionCode, $previousException);
+        $fullMessage = sprintf('[%s] %s', $previousExceptionClass, $previousExceptionMessage);
+        parent::__construct($fullMessage, $previousExceptionCode, $previousException);
         $this->previousExceptionClass = $previousExceptionClass;
+        $this->previousExceptionMessage = $previousExceptionMessage;
         $this->previousExceptionTrace = $previousExceptionTrace;
         $this->previousExceptionLine = $previousExceptionLine;
         $this->previousExceptionFile = $previousExceptionFile;
         $this->previousExceptionCommandLine = $previousExceptionCommandLine;
         $this->previousExceptionOutputMessage = $previousExceptionOutputMessage;
         $this->previousExceptionErrorMessage = $previousExceptionErrorMessage;
+
+        $this->line = $previousExceptionLine;
+        $this->file = $previousExceptionFile;
+        array_shift($previousExceptionTrace);
+        $traceReflection = new \ReflectionProperty(\Exception::class, 'trace');
+        $traceReflection->setAccessible(true);
+        $traceReflection->setValue($this, $previousExceptionTrace);
     }
 
     public static function createFromArray($previousExceptionData)
@@ -99,6 +113,14 @@ class SubProcessException extends \Exception
     public function getPreviousExceptionClass()
     {
         return $this->previousExceptionClass;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPreviousExceptionMessage()
+    {
+        return $this->previousExceptionMessage;
     }
 
     /**
