@@ -118,6 +118,7 @@ class PhpParserTest extends UnitTestCase
         return [
             'normal class' => ['class Tx_Ext_Bar {', ['className' => 'Bar', 'namespace' => 'Tx_Ext', 'separator' => '_', 'full' => 'Tx_Ext_Bar']],
             'abstract class' => ['abstract class Tx_Ext_BarAbstract {', ['className' => 'BarAbstract', 'namespace' => 'Tx_Ext', 'separator' => '_', 'full' => 'Tx_Ext_BarAbstract']],
+            'final class' => ['final class Tx_Ext_BarFinal {', ['className' => 'BarFinal', 'namespace' => 'Tx_Ext', 'separator' => '_', 'full' => 'Tx_Ext_BarFinal']],
             'without namespace' => ['class TxExtBar {', ['className' => 'TxExtBar', 'namespace' => '', 'separator' => '', 'full' => 'TxExtBar']],
         ];
     }
