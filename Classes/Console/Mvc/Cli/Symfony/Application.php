@@ -37,7 +37,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class Application extends BaseApplication
 {
-    const TYPO3_CONSOLE_VERSION = '5.8.2';
+    const TYPO3_CONSOLE_VERSION = 'v5.8.3';
     const COMMAND_NAME = 'typo3cms';
 
     /**

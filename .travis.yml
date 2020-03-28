@@ -35,7 +35,7 @@ before_install:
   - composer config repositories.testing-framework vcs .Build/external/nimut-testing-framework
 
 install:
-  - export COMPOSER_ROOT_VERSION=5.8.2
+  - export COMPOSER_ROOT_VERSION=v5.8.3
   - |
     composer require \
       typo3/cms-backend="$TYPO3_VERSION" \
@@ -111,7 +111,7 @@ jobs:
         - composer config repositories.testing-framework vcs .Build/external/nimut-testing-framework
       script:
         - git fetch --unshallow
-        - export COMPOSER_ROOT_VERSION=5.8.2
+        - export COMPOSER_ROOT_VERSION=v5.8.3
         - composer install
         - .Build/bin/phpunit --whitelist Classes --coverage-clover .Build/clover.xml --log-junit .Build/junit.xml
         - >
