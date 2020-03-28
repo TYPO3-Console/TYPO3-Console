@@ -87,8 +87,10 @@ class ExceptionRenderer
     private function outputException(\Throwable $exception, OutputInterface $output)
     {
         $exceptionClass = get_class($exception);
+        $exceptionMessage = $exception->getMessage();
         if ($exception instanceof SubProcessException) {
             $exceptionClass = $exception->getPreviousExceptionClass();
+            $exceptionMessage = $exception->getPreviousExceptionMessage();
         }
 
         $title = sprintf('[ %s ]', $exceptionClass);
@@ -97,7 +99,7 @@ class ExceptionRenderer
         $maxWidth = $this->terminal->getWidth() ? $this->terminal->getWidth() - 1 : PHP_INT_MAX;
 
         $lines = [];
-        foreach (preg_split('/\r?\n/', trim($exception->getMessage())) as $line) {
+        foreach (preg_split('/\r?\n/', trim($exceptionMessage)) as $line) {
             foreach ($this->splitStringByWidth($line, $maxWidth - 4) as $splitLine) {
                 $lines[] = $splitLine;
                 $messageLength = max(Helper::strlen($splitLine), $messageLength);
@@ -243,7 +245,12 @@ class ExceptionRenderer
         if (getenv('TYPO3_PATH_COMPOSER_ROOT')) {
             $pathPrefixes = [getenv('TYPO3_PATH_COMPOSER_ROOT') . '/'];
         }
-        $pathPrefixes[] = PATH_site;
+        if (getenv('TYPO3_PATH_ROOT')) {
+            $pathPrefixes[] = getenv('TYPO3_PATH_ROOT') . '/';
+        }
+        if (defined('PATH_site')) {
+            $pathPrefixes[] = PATH_site;
+        }
         $fileName = str_replace($pathPrefixes, '', $fileName);
         $pathPosition = strpos($fileName, 'typo3conf/ext/');
         $pathAndFilename = ($pathPosition !== false) ? substr($fileName, $pathPosition) : $fileName;
@@ -261,10 +268,12 @@ class ExceptionRenderer
         $serializedException = null;
         if ($exception) {
             $exceptionClass = get_class($exception);
+            $exceptionMessage = $exception->getMessage();
             $line = $exception->getLine();
             $file = $exception->getFile();
             if ($exception instanceof SubProcessException) {
                 $exceptionClass = $exception->getPreviousExceptionClass();
+                $exceptionMessage = $exception->getPreviousExceptionMessage();
                 $line = $exception->getPreviousExceptionLine();
                 $file = $exception->getPreviousExceptionFile();
             } elseif ($exception instanceof FailedSubProcessCommandException) {
@@ -279,7 +288,7 @@ class ExceptionRenderer
                 'class' => $exceptionClass,
                 'line' => $line,
                 'file' => $file,
-                'message' => $exception->getMessage(),
+                'message' => $exceptionMessage,
                 'code' => $exception->getCode(),
                 'trace' => $this->getTrace($exception),
                 'previous' => $this->serializeException($exception->getPrevious()),

@@ -70,7 +70,7 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $extensionKeys = explode(',', $input->getArgument('extensionKeys'));
+        $extensionKeys = ($extensionKeys = $input->getArgument('extensionKeys')) ? explode(',', $extensionKeys) : [];
         $typo3Version = $input->getOption('typo3-version');
         $upgradeHandling = new UpgradeHandling();
         if (empty($extensionKeys)) {
