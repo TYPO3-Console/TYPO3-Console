@@ -1,0 +1,43 @@
+{namespace d=Typo3Console\CreateReferenceCommand\ViewHelpers}
+.. include:: ../Includes.txt
+
+
+
+.. _typo3_console-command-reference-{command.docIdentifier}:
+
+The following reference was automatically generated from code.
+
+
+{command.identifier -> d:format.headline(lineCharacter: '=', withOverline: 1)}
+
+
+**{command.shortDescription}**
+
+{command.description -> f:format.raw()}
+
+<f:if condition="{command.arguments}"><d:format.headline lineCharacter="~">Arguments</d:format.headline>
+
+<f:for each="{command.arguments}" key="name" as="description">`{name}`
+   {description -> f:format.raw()}
+</f:for>
+</f:if>
+
+<f:if condition="{command.options}"><d:format.headline lineCharacter="~">Options</d:format.headline>
+
+<f:for each="{command.options}" key="name" as="description">`{name}`
+   {description.description -> f:format.raw()}
+
+- Accept value: {description.acceptValue}
+- Is value required: {description.isValueRequired}
+- Is multiple: {description.isMultiple}
+<f:if condition="{description.default} != 'NULL'">- Default: {description.default -> f:format.raw()}</f:if>
+
+</f:for>
+</f:if>
+
+<f:if condition="{command.relatedCommands}"><d:format.headline lineCharacter="~">Related commands</d:format.headline>
+
+<f:for each="{command.relatedCommands}" key="relatedCommandIdentifier" as="relatedCommandDescription">`{relatedCommandIdentifier}`
+  {relatedCommandDescription -> f:format.raw()}
+</f:for>
+</f:if>

@@ -121,6 +121,9 @@
         ],
         "extension-clean": [
             "rm -rf ../extension/*"
+        ],
+        "docs:render": [
+            "docker-compose -f render-documentation.yml up"
         ]
     },
     "extra": {
