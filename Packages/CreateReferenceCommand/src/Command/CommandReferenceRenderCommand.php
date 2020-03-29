@@ -152,7 +152,17 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
                 'options' => $optionDescriptions,
                 'arguments' => $argumentDescriptions,
                 'relatedCommands' => $relatedCommands,
+                'docIdentifier' => str_replace(':', '-', $command->getName()),
+                'docDirectory' => str_replace(':', '', ucwords($command->getName(), ':')),
             ];
+
+            $standaloneView = new StandaloneView();
+            $templatePathAndFilename = __DIR__ . '/../../Resources/Templates/CommandTemplate.txt';
+            $standaloneView->setTemplatePathAndFilename($templatePathAndFilename);
+            $standaloneView->assignMultiple(['command' => $allCommands[$command->getName()]]);
+    
+            $renderedOutputFile = getenv('TYPO3_PATH_COMPOSER_ROOT') . '/Documentation/CommandReference/' . $allCommands[$command->getName()]['docDirectory'] . '.rst';
+            file_put_contents($renderedOutputFile, $standaloneView->render());
         }
 
         $applicationOptions = [];
