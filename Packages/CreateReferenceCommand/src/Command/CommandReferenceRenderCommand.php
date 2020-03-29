@@ -160,7 +160,7 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
             $templatePathAndFilename = __DIR__ . '/../../Resources/Templates/CommandTemplate.txt';
             $standaloneView->setTemplatePathAndFilename($templatePathAndFilename);
             $standaloneView->assignMultiple(['command' => $allCommands[$command->getName()]]);
-    
+
             $renderedOutputFile = getenv('TYPO3_PATH_COMPOSER_ROOT') . '/Documentation/CommandReference/' . $allCommands[$command->getName()]['docDirectory'] . '.rst';
             file_put_contents($renderedOutputFile, $standaloneView->render());
         }
