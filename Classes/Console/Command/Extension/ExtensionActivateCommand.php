@@ -31,7 +31,7 @@ class ExtensionActivateCommand extends AbstractConvertedCommand
 Activates one or more extensions by key.
 Marks extensions as active, sets them up and clears caches for every activated extension.
 
-This command is deprecated (and hidden) in Composer mode.
+<warning>This command is deprecated (and hidden) in Composer mode.</warning>
 EOH
         );
         /** @deprecated Will be removed with 6.0 */

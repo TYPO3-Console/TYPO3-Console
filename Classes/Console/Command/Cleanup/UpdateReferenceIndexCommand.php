@@ -43,7 +43,9 @@ class UpdateReferenceIndexCommand extends AbstractConvertedCommand
             <<<'EOH'
 Updates reference index to ensure data integrity
 
-<b>Example:</b> <code>%command.full_name% --dry-run --verbose</code>
+<b>Example:</b>
+
+  <code>%command.full_name% --dry-run --verbose</code>
 EOH
         );
         /** @deprecated Will be removed with 6.0 */

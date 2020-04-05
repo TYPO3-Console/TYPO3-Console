@@ -21,7 +21,9 @@ This obviously only works when MySQL is used as DBMS.
 
 Tables to be excluded from the export can be specified fully qualified or with wildcards:
 
-**Example:** `typo3cms database:export -c Default -e 'cf_*' -e 'cache_*' -e '[bf]e_sessions' -e sys_log`
+**Example:**
+
+  `typo3cms database:export -c Default -e 'cf_*' -e 'cache_*' -e '[bf]e_sessions' -e sys_log`
 
 
 

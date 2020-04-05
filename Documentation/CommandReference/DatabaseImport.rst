@@ -20,9 +20,17 @@ it but works as well to pass SELECT statements to it.
 The mysql binary must be available in the path for this command to work.
 This obviously only works when MySQL is used as DBMS.
 
-**Example (import):** `ssh remote.server '/path/to/typo3cms database:export' | typo3cms database:import`
-**Example (select):** `echo 'SELECT username from be_users WHERE admin=1;' | typo3cms database:import`
-**Example (interactive):** `typo3cms database:import --interactive`
+**Example (import):**
+
+  `ssh remote.server '/path/to/typo3cms database:export' | typo3cms database:import`
+
+**Example (select):**
+
+  `echo 'SELECT username from be_users WHERE admin=1;' | typo3cms database:import`
+
+**Example (interactive):**
+
+  `typo3cms database:import --interactive`
 
 
 
