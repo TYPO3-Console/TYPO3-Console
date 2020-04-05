@@ -19,7 +19,9 @@ Shows system configuration value by path.
 If the currently active configuration differs from the value in LocalConfiguration.php
 the difference between these values is shown.
 
-**Example:** `typo3cms configuration:show DB`
+**Example:**
+
+  `typo3cms configuration:show DB`
 
 Arguments
 ~~~~~~~~~

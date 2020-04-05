@@ -39,7 +39,9 @@ The list of schema update types supports wildcards to specify multiple types, e.
 
 To avoid shell matching all types with wildcards should be quoted.
 
-**Example:** `typo3cms database:updateschema "*.add,*.change"`
+**Example:**
+
+  `typo3cms database:updateschema "*.add,*.change"`
 
 Arguments
 ~~~~~~~~~

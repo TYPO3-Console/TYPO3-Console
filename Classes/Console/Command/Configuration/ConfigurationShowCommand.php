@@ -32,7 +32,9 @@ Shows system configuration value by path.
 If the currently active configuration differs from the value in LocalConfiguration.php
 the difference between these values is shown.
 
-<b>Example:</b> <code>%command.full_name% DB</code>
+<b>Example:</b>
+
+  <code>%command.full_name% DB</code>
 EOH
         );
         /** @deprecated Will be removed with 6.0 */

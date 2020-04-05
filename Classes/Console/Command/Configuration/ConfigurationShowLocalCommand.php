@@ -41,7 +41,9 @@ Shows local configuration option value by path.
 Shows the value which is stored in LocalConfiguration.php.
 Note that this value could be overridden. Use <code>typo3cms configuration:show <path></code> to see if this is the case.
 
-<b>Example:</b> <code>%command.full_name% DB</code>
+<b>Example:</b>
+
+  <code>%command.full_name% DB</code>
 EOH
         );
         /** @deprecated Will be removed with 6.0 */

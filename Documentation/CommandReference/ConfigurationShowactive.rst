@@ -18,7 +18,9 @@ configuration:showactive
 Shows active system configuration by path.
 Shows the configuration value that is currently effective, no matter where and how it is set.
 
-**Example:** `typo3cms configuration:showactive DB --json`
+**Example:**
+
+  `typo3cms configuration:showactive DB --json`
 
 Arguments
 ~~~~~~~~~

@@ -50,7 +50,9 @@ This obviously only works when MySQL is used as DBMS.
 
 Tables to be excluded from the export can be specified fully qualified or with wildcards:
 
-<b>Example:</b> <code>%command.full_name% -c Default -e 'cf_*' -e 'cache_*' -e '[bf]e_sessions' -e sys_log</code>
+<b>Example:</b>
+
+  <code>%command.full_name% -c Default -e 'cf_*' -e 'cache_*' -e '[bf]e_sessions' -e sys_log</code>
 EOH
         );
         /** @deprecated Will be removed with 6.0 */
