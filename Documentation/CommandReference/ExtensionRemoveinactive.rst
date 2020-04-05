@@ -19,8 +19,9 @@ Directories of inactive extension are **removed** from `typo3/sysext` and `typo3
 This is a one way command with no way back. Don't blame anybody if this command destroys your data.
 **Handle with care!**
 
-This command is deprecated.
-Instead of adding extensions and then removing them, just don't add them in the first place.
+**This command is deprecated.**
+
+  Instead of adding extensions and then removing them, just don't add them in the first place.
 
 
 

@@ -34,8 +34,9 @@ Directories of inactive extension are <comment>removed</comment> from <code>typo
 This is a one way command with no way back. Don't blame anybody if this command destroys your data.
 <comment>Handle with care!</comment>
 
-This command is deprecated.
-Instead of adding extensions and then removing them, just don't add them in the first place.
+<warning>This command is deprecated.</warning>
+
+  Instead of adding extensions and then removing them, just don't add them in the first place.
 EOH
         );
         $this->addOption(

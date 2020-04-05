@@ -22,7 +22,9 @@ Valid group names are by default:
 - pages
 - system
 
-**Example:** `typo3cms cache:flushgroups pages,all`
+**Example:**
+
+  `typo3cms cache:flushgroups pages,all`
 
 Arguments
 ~~~~~~~~~

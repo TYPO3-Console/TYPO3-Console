@@ -17,7 +17,9 @@ scheduler:run
 
 Executes tasks that are registered in the scheduler module.
 
-**Example:** `typo3cms scheduler:run --task 42 --force`
+**Example:**
+
+  `typo3cms scheduler:run --task 42 --force`
 
 
 

@@ -51,7 +51,9 @@ To require TYPO3 core extensions use the following command:
 
 This updates your composer.json and composer.lock without any other changes.
 
-<b>Example:</b> <code>%command.full_name%</code>
+<b>Example:</b>
+
+  <code>%command.full_name%</code>
 EOH
         );
         /** @deprecated Will be removed with 6.0 */

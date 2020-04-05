@@ -59,7 +59,9 @@ The list of schema update types supports wildcards to specify multiple types, e.
 
 To avoid shell matching all types with wildcards should be quoted.
 
-<b>Example:</b> <code>%command.full_name% "*.add,*.change"</code>
+<b>Example:</b>
+
+  <code>%command.full_name% "*.add,*.change"</code>
 EOH
         );
         /** @deprecated Will be removed with 6.0 */

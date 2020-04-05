@@ -31,9 +31,14 @@ class ConfigurationSetCommand extends AbstractConvertedCommand
 Set system configuration option value by path.
 
 <b>Examples:</b>
-<code>%command.full_name% SYS/fileCreateMask 0664</code>
-<code>%command.full_name% EXTCONF/processor_enabled true --json</code>
-<code>%command.full_name% EXTCONF/lang/availableLanguages '["de", "fr"]' --json</code>
+
+  <code>%command.full_name% SYS/fileCreateMask 0664</code>
+
+  <code>%command.full_name% EXTCONF/processor_enabled true --json</code>
+
+  <code>%command.full_name% EXTCONF/lang/availableLanguages '["de", "fr"]' --json</code>
+
+  <code>%command.full_name% configuration:set BE/adminOnly -- -1</code>
 EOH
         );
         /** @deprecated Will be removed with 6.0 */
