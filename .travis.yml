@@ -30,9 +30,6 @@ notifications:
 # This is executed for all stages
 before_install:
   - if php -i | grep -v TRAVIS_CMD | grep -q xdebug; then phpenv config-rm xdebug.ini; fi
-  - mkdir -p .Build/external
-  - git clone https://github.com/helhum/TYPO3-testing-framework.git .Build/external/nimut-testing-framework -b allow-php73
-  - composer config repositories.testing-framework vcs .Build/external/nimut-testing-framework
 
 install:
   - export COMPOSER_ROOT_VERSION=6.0.0
@@ -87,7 +84,7 @@ jobs:
       before_script: skip
       script:
         - >
-          if [ -n "$TRAVIS_TAG" ] && [[ "$TRAVIS_TAG" != *"alpha"* ]]; then
+          if [ -n "$TRAVIS_TAG" ] && [[ "$TRAVIS_TAG" =~ ^v?([0-9]+\.)([0-9]+\.)([0-9]+)$ ]]; then
             composer set-version $(echo $TRAVIS_TAG | sed s/^v//g)
             test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
           fi
@@ -136,14 +133,14 @@ jobs:
               git push origin HEAD:$TRAVIS_BRANCH
           fi;
 
-    - stage: 🚢 to TER
+    - stage: ship to TER
       if: tag IS present
       php: 7.2
       install: skip
       before_script: skip
       script:
         - |
-          if [[ "$TRAVIS_TAG" != *"alpha"* ]] && [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
+          if [[ "$TRAVIS_TAG" =~ ^v?([0-9]+\.)([0-9]+\.)([0-9]+)$ ]] && [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
             echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n";
             # Install ter client
             composer global require helhum/ter-client
