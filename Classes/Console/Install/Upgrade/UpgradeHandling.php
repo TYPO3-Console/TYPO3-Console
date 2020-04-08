@@ -24,7 +24,6 @@ use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Updates\AbstractDownloadExtensionUpdate;
-use TYPO3\CMS\Install\Updates\DatabaseCharsetUpdate;
 
 /**
  * Executes a single upgrade wizard
@@ -154,7 +153,7 @@ class UpgradeHandling
                                 '%s[%s]=%s',
                                     $shortIdentifier,
                                     $argumentName,
-                                    (string)(int)$consoleOutput->askConfirmation('<comment>Install (y/N)</comment> ', $argumentDefault)
+                                    (string)(int)$consoleOutput->askConfirmation('<comment>Install (y/N)</comment> ', (bool)$argumentDefault)
                             );
                         }
                     }
@@ -246,12 +245,9 @@ class UpgradeHandling
         $this->configurationService->setLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone', TYPO3_branch, 'string');
         $this->commandDispatcher->executeCommand('install:fixfolderstructure');
         $this->silentConfigurationUpgrade->executeSilentConfigurationUpgradesIfNeeded();
-        // TODO: Check what we can do here to get TYPO3 9 support for this feature
-        if (class_exists(DatabaseCharsetUpdate::class)) {
-            $this->commandDispatcher->executeCommand('upgrade:wizard', [DatabaseCharsetUpdate::class]);
-        }
-        $this->commandDispatcher->executeCommand('cache:flush');
+        $this->commandDispatcher->executeCommand('cache:flush', ['--files-only']);
         $this->commandDispatcher->executeCommand('database:updateschema');
+        $this->commandDispatcher->executeCommand('cache:flush');
     }
 
     private function isInitialUpgradeDone(): bool
