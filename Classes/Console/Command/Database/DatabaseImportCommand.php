@@ -33,9 +33,17 @@ it but works as well to pass SELECT statements to it.
 The mysql binary must be available in the path for this command to work.
 This obviously only works when MySQL is used as DBMS.
 
-<b>Example (import):</b> <code>ssh remote.server '/path/to/typo3cms database:export' | %command.full_name%</code>
-<b>Example (select):</b> <code>echo 'SELECT username from be_users WHERE admin=1;' | %command.full_name%</code>
-<b>Example (interactive):</b> <code>%command.full_name% --interactive</code>
+<b>Example (import):</b>
+
+  <code>ssh remote.server '/path/to/typo3cms database:export' | %command.full_name%</code>
+
+<b>Example (select):</b>
+
+  <code>echo 'SELECT username from be_users WHERE admin=1;' | %command.full_name%</code>
+
+<b>Example (interactive):</b>
+
+  <code>%command.full_name% --interactive</code>
 EOH
         );
         /** @deprecated Will be removed with 6.0 */

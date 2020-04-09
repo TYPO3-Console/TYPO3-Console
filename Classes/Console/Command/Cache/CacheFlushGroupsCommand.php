@@ -36,7 +36,9 @@ Valid group names are by default:
 - pages
 - system
 
-<b>Example:</b> <code>%command.full_name% pages,all</code>
+<b>Example:</b>
+
+  <code>%command.full_name% pages,all</code>
 EOH
         );
         /** @deprecated Will be removed with 6.0 */

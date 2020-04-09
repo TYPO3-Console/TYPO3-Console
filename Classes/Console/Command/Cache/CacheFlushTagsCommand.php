@@ -32,7 +32,9 @@ class CacheFlushTagsCommand extends AbstractConvertedCommand
             <<<'EOH'
 Flushes caches by tags, optionally only caches in specified groups.
 
-<b>Example:</b> <code>%command.full_name% news_123 --groups pages,all</code>
+<b>Example:</b>
+
+  <code>%command.full_name% news_123 --groups pages,all</code>
 EOH
         );
         /** @deprecated Will be removed with 6.0 */

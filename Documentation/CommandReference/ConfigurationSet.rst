@@ -18,9 +18,14 @@ configuration:set
 Set system configuration option value by path.
 
 **Examples:**
-`typo3cms configuration:set SYS/fileCreateMask 0664`
-`typo3cms configuration:set EXTCONF/processor_enabled true --json`
-`typo3cms configuration:set EXTCONF/lang/availableLanguages '["de", "fr"]' --json`
+
+  `typo3cms configuration:set SYS/fileCreateMask 0664`
+
+  `typo3cms configuration:set EXTCONF/processor_enabled true --json`
+
+  `typo3cms configuration:set EXTCONF/lang/availableLanguages '["de", "fr"]' --json`
+
+  `typo3cms configuration:set configuration:set BE/adminOnly -- -1`
 
 Arguments
 ~~~~~~~~~

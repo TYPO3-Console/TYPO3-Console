@@ -32,7 +32,9 @@ class ConfigurationShowActiveCommand extends AbstractConvertedCommand
 Shows active system configuration by path.
 Shows the configuration value that is currently effective, no matter where and how it is set.
 
-<b>Example:</b> <code>%command.full_name% DB --json</code>
+<b>Example:</b>
+
+  <code>%command.full_name% DB --json</code>
 EOH
         );
         /** @deprecated Will be removed with 6.0 */

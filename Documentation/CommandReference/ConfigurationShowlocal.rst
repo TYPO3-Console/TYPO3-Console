@@ -19,7 +19,9 @@ Shows local configuration option value by path.
 Shows the value which is stored in LocalConfiguration.php.
 Note that this value could be overridden. Use `typo3cms configuration:show <path>` to see if this is the case.
 
-**Example:** `typo3cms configuration:showlocal DB`
+**Example:**
+
+  `typo3cms configuration:showlocal DB`
 
 Arguments
 ~~~~~~~~~

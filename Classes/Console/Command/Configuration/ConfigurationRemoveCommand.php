@@ -35,7 +35,9 @@ Removes a system configuration option by path.
 For this command to succeed, the configuration option(s) must be in
 LocalConfiguration.php and not be overridden elsewhere.
 
-<b>Example:</b> <code>%command.full_name% DB,EXT/EXTCONF/realurl</code>
+<b>Example:</b>
+
+  <code>%command.full_name% DB,EXT/EXTCONF/realurl</code>
 EOH
         );
         /** @deprecated Will be removed with 6.0 */
