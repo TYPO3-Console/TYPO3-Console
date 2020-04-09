@@ -23,7 +23,7 @@
         <env name="TYPO3_INSTALL_SITE_NAME" value="Travis Install" />
         <env name="TYPO3_INSTALL_WEB_SERVER_SETUP_TYPE" value="none" />
         <env name="TYPO3_INSTALL_SITE_SETUP_TYPE" value="createsite" />
-        <env name="TYPO3_VERSION" value="~9.5.8" />
+        <env name="TYPO3_VERSION" value="~10.3.0" />
         <env name="TYPO3_UPGRADE_FROM_VERSION" value="~10.3.0" />
     </php>
     <testsuites>
