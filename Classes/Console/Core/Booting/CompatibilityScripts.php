@@ -16,17 +16,11 @@ namespace Helhum\Typo3Console\Core\Booting;
 
 use Helhum\Typo3Console\Package\UncachedPackageManager;
 use TYPO3\CMS\Core\Cache\CacheManager;
-use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Service\DependencyOrderingService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CompatibilityScripts
 {
-    public static function isComposerMode(): bool
-    {
-        return Environment::isComposerMode();
-    }
-
     public static function createCacheManager(bool $disableCaching): CacheManager
     {
         $cacheManager = new CacheManager($disableCaching);
@@ -49,11 +43,6 @@ class CompatibilityScripts
      * @deprecated can be removed when TYPO3 8 support is removed
      */
     public static function initializeDatabaseConnection()
-    {
-        // noop for TYPO3 9
-    }
-
-    public static function initializeExtensionConfiguration()
     {
         // noop for TYPO3 9
     }

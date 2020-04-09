@@ -88,15 +88,18 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
      */
     public function databaseSchemaCanBeUpdatedWithExtensionsAccessingDatabaseCaches()
     {
+        // @deprecated can be removed when TYPO3 9.5 compatibility is dropped
+        $prefix = 'cf_';
+        if (class_exists(\TYPO3\CMS\Install\Service\LateBootService::class)) {
+            $prefix = '';
+        }
         $this->installFixtureExtensionCode('ext_test_cache');
         $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
-        $this->executeMysqlQuery('DROP TABLE IF EXISTS `cf_cache_rootline`');
-        $this->executeMysqlQuery('DROP TABLE IF EXISTS `cf_extbase_datamapfactory_datamap`');
+        $this->executeMysqlQuery('DROP TABLE IF EXISTS `' . $prefix . 'cache_rootline`');
 
         $output = $this->executeConsoleCommand('database:updateschema', ['--verbose']);
 
-        $this->assertContains('CREATE TABLE `cf_cache_rootline`', $output);
-        $this->assertContains('CREATE TABLE `cf_extbase_datamapfactory_datamap`', $output);
+        $this->assertContains('CREATE TABLE `' . $prefix . 'cache_rootline`', $output);
 
         $this->removeFixtureExtensionCode('ext_test_cache');
         $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);

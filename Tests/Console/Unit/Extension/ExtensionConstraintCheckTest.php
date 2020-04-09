@@ -72,10 +72,13 @@ class ExtensionConstraintCheckTest extends UnitTestCase
         $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3conf/ext/dummy/');
 
         $emConfUtilityProphecy = $this->prophesize(EmConfUtility::class);
-        $emConfUtilityProphecy->includeEmConf([
-            'key' => 'dummy',
-            'siteRelPath' => 'typo3conf/ext/dummy/',
-        ])->willReturn(
+        $emConfUtilityProphecy->includeEmConf(
+            'dummy',
+            [
+                'key' => 'dummy',
+                'packagePath' => PATH_site . 'typo3conf/ext/dummy/',
+            ]
+        )->willReturn(
             [
                 'constraints' => [
                     'depends' => [
@@ -107,6 +110,7 @@ class ExtensionConstraintCheckTest extends UnitTestCase
 
         $emConfUtilityProphecy = $this->prophesize(EmConfUtility::class);
         $emConfUtilityProphecy->includeEmConf(
+            'dummy',
             [
                 'key' => 'dummy',
                 'siteRelPath' => 'typo3conf/ext/dummy/',

@@ -52,7 +52,8 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     public function checkExtensionConstraintsReturnsErrorCodeOnFailure()
     {
         $this->installFixtureExtensionCode('ext_test');
-        $this->executeConsoleCommand('extension:activate', ['ext_test']);
+        $this->executeConsoleCommand('install:generatepackagestates');
+        $this->executeConsoleCommand('extension:setup', ['ext_test']);
         try {
             $this->commandDispatcher->executeCommand('upgrade:checkextensionconstraints', ['--typo3-version' => '3.6.0']);
             $this->fail('upgrade:checkextensionconstraints should have failed');
@@ -60,8 +61,8 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $this->assertSame(1, $e->getExitCode());
             $this->assertContains('"ext_test" requires TYPO3 versions 4.5.0', $e->getOutputMessage());
         } finally {
-            $this->executeConsoleCommand('extension:deactivate', ['ext_test']);
             $this->removeFixtureExtensionCode('ext_test');
+            $this->executeConsoleCommand('install:generatepackagestates');
         }
     }
 
@@ -237,7 +238,6 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         $commandLine[] = $this->upgradeInstancePath;
 
         $process = new Process($commandLine, null, $environmentVariables, null, 0);
-        $process->inheritEnvironmentVariables();
         if ($dryRun) {
             return $process->getCommandLine();
         }

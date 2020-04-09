@@ -73,8 +73,8 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
      */
     public function activeConfigurationReflectsRealState()
     {
-        $output = $this->executeConsoleCommand('configuration:showactive', ['SYS/caching/cacheConfigurations/extbase_datamapfactory_datamap/backend', '--json']);
-        $this->assertSame('TYPO3\\CMS\\Core\\Cache\\Backend\\Typo3DatabaseBackend', \json_decode($output));
+        $output = $this->executeConsoleCommand('configuration:showactive', ['SYS/lang/format/priority', '--json']);
+        $this->assertSame('xlf,xml', \json_decode($output));
     }
 
     /**

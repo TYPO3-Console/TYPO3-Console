@@ -22,16 +22,11 @@ use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\RepeatableUpgradeWiza
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 use TYPO3\CMS\Core\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Install\Updates\ChattyInterface;
 
 class UpgradeWizardExecutorTest extends UnitTestCase
 {
     protected function setUp()
     {
-        if (!interface_exists(ChattyInterface::class)) {
-            // @deprecated will be removed with 6.0
-            $this->markTestSkipped('Skipping new upgrade tests on TYPO3 8.7');
-        }
         $this->singletonInstances = GeneralUtility::getSingletonInstances();
     }
 

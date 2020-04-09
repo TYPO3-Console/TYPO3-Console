@@ -15,12 +15,12 @@ cache:
     - $HOME/.composer/cache
     - $HOME/.sonar/cache
 
-# Do not build feature branches or alpha/beta releases
+# Do not build feature branches
 branches:
   only:
     - master
     - develop
-    - /^v?([0-9]+\.){1,2}(x|[0-9]+)$/
+    - /^v?([0-9]+\.){1,2}(x|[0-9]+)-?[a-z]*[1-9]*$/
 
 # Inform me about failures
 notifications:
@@ -30,12 +30,9 @@ notifications:
 # This is executed for all stages
 before_install:
   - if php -i | grep -v TRAVIS_CMD | grep -q xdebug; then phpenv config-rm xdebug.ini; fi
-  - mkdir -p .Build/external
-  - git clone https://github.com/helhum/TYPO3-testing-framework.git .Build/external/nimut-testing-framework -b allow-php73
-  - composer config repositories.testing-framework vcs .Build/external/nimut-testing-framework
 
 install:
-  - export COMPOSER_ROOT_VERSION=5.8.3
+  - export COMPOSER_ROOT_VERSION=6.0.0
   - |
     composer require \
       typo3/cms-backend="$TYPO3_VERSION" \
@@ -64,36 +61,30 @@ jobs:
     - env: TYPO3_VERSION="dev-master"
   include:
     - stage: test
+      php: 7.4
+      env: TYPO3_VERSION="~10.3.0"
+    - stage: test
       php: 7.3
-      env: TYPO3_VERSION="~9.5.8" TYPO3_UPGRADE_FROM_VERSION="~9.5.8"
+      env: TYPO3_VERSION="~10.3.0"
     - stage: test
       php: 7.2
-      env: TYPO3_VERSION="~9.5.8"
+      env: TYPO3_VERSION="~10.3.0"
     - stage: test
       php: 7.2
-      env: TYPO3_VERSION=^8.7.22
-    - stage: test
-      php: 7.1
-      env: TYPO3_VERSION=^8.7.22
-    - stage: test
-      php: 7.0
-      env: TYPO3_VERSION=^8.7.22
-    - stage: test
-      php: 7.0
-      env: TYPO3_VERSION=^8.7.22 PREFER_LOWEST="--prefer-lowest"
+      env: TYPO3_VERSION="~10.3.0" PREFER_LOWEST="--prefer-lowest"
     - stage: test
       php: 7.2
       env: TYPO3_VERSION="dev-master"
 
     - stage: test
-      php: 7.0
+      php: 7.2
       env: Consistency checks
       before_install: skip
       install: skip
       before_script: skip
       script:
         - >
-          if [ -n "$TRAVIS_TAG" ]; then
+          if [ -n "$TRAVIS_TAG" ] && [[ "$TRAVIS_TAG" =~ ^v?([0-9]+\.)([0-9]+\.)([0-9]+)$ ]]; then
             composer set-version $(echo $TRAVIS_TAG | sed s/^v//g)
             test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
           fi
@@ -105,13 +96,9 @@ jobs:
       php: 7.2
       before_install: skip
       install: skip
-      before_script:
-        - mkdir -p .Build/external
-        - git clone https://github.com/helhum/TYPO3-testing-framework.git .Build/external/nimut-testing-framework -b allow-php73
-        - composer config repositories.testing-framework vcs .Build/external/nimut-testing-framework
       script:
         - git fetch --unshallow
-        - export COMPOSER_ROOT_VERSION=5.8.3
+        - export COMPOSER_ROOT_VERSION=6.0.0
         - composer install
         - .Build/bin/phpunit --whitelist Classes --coverage-clover .Build/clover.xml --log-junit .Build/junit.xml
         - >
@@ -146,14 +133,14 @@ jobs:
               git push origin HEAD:$TRAVIS_BRANCH
           fi;
 
-    - stage: 🚢 to TER
+    - stage: ship to TER
       if: tag IS present
-      php: 7.0
+      php: 7.2
       install: skip
       before_script: skip
       script:
         - |
-          if [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
+          if [[ "$TRAVIS_TAG" =~ ^v?([0-9]+\.)([0-9]+\.)([0-9]+)$ ]] && [ -n "$TYPO3_ORG_USERNAME" ] && [ -n "$TYPO3_ORG_PASSWORD" ]; then
             echo -e "Preparing upload of release ${TRAVIS_TAG} to TER\n";
             # Install ter client
             composer global require helhum/ter-client

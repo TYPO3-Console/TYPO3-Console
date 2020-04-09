@@ -15,7 +15,6 @@ namespace Helhum\Typo3Console\Core\Booting;
  */
 
 use Helhum\Typo3Console\Exception;
-use TYPO3\CMS\Core\Core\Bootstrap;
 
 /**
  * A boot sequence, consisting of individual steps, each of them initializing a
@@ -80,18 +79,33 @@ class Sequence
         }
     }
 
+    public function replaceStep($stepIdentifier, Step $newStep)
+    {
+        $removedOccurrences = 0;
+        foreach ($this->steps as $previousStepIdentifier => $steps) {
+            foreach ($steps as $index => $step) {
+                if ($step->getIdentifier() === $stepIdentifier) {
+                    $this->steps[$previousStepIdentifier][$index] = $newStep;
+                    $removedOccurrences++;
+                }
+            }
+        }
+        if ($removedOccurrences === 0) {
+            throw new Exception(sprintf('Cannot replace sequence step with identifier "%s" because no such step exists in the given sequence.', $stepIdentifier), 1577557048);
+        }
+    }
+
     /**
      * Executes all steps of this sequence
      *
-     * @param Bootstrap $bootstrap
      * @throws StepFailedException
      * @return void
      */
-    public function invoke(Bootstrap $bootstrap)
+    public function invoke()
     {
         if (isset($this->steps['start'])) {
             foreach ($this->steps['start'] as $step) {
-                $this->invokeStep($step, $bootstrap);
+                $this->invokeStep($step);
             }
         }
     }
@@ -101,21 +115,20 @@ class Sequence
      * to be executed after the given step.
      *
      * @param Step $step The step to invoke
-     * @param Bootstrap $bootstrap
      * @throws StepFailedException
      * @return void
      */
-    protected function invokeStep(Step $step, Bootstrap $bootstrap)
+    protected function invokeStep(Step $step)
     {
         $identifier = $step->getIdentifier();
         try {
-            $step($bootstrap);
+            $step();
         } catch (\Throwable $e) {
             throw new StepFailedException($step, $e);
         }
         if (isset($this->steps[$identifier])) {
             foreach ($this->steps[$identifier] as $followingStep) {
-                $this->invokeStep($followingStep, $bootstrap);
+                $this->invokeStep($followingStep);
             }
         }
     }

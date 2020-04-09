@@ -15,6 +15,8 @@ namespace Helhum\Typo3Console\Install;
  */
 
 use Helhum\Typo3Console\Package\UncachedPackageManager;
+use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Package\FailsafePackageManager;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
@@ -32,9 +34,9 @@ class PackageStatesGenerator
     /**
      * PackageStatesGenerator constructor.
      *
-     * @param UncachedPackageManager $packageManager
+     * @param FailsafePackageManager $packageManager
      */
-    public function __construct(UncachedPackageManager $packageManager)
+    public function __construct($packageManager)
     {
         $this->packageManager = $packageManager;
     }
@@ -47,7 +49,7 @@ class PackageStatesGenerator
      */
     public function generate(array $frameworkExtensionsToActivate = [], array $excludedExtensions = [], $activateDefaultExtensions = false)
     {
-        $this->ensureDirectoryExists(PATH_site . 'typo3conf');
+        $this->ensureDirectoryExists(Environment::getPublicPath() . '/typo3conf');
         $this->packageManager->scanAvailablePackages();
         foreach ($this->packageManager->getAvailablePackages() as $package) {
             $extKey = $package->getPackageKey();

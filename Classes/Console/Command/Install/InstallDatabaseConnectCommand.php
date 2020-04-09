@@ -101,5 +101,7 @@ class InstallDatabaseConnectCommand extends Command
             false,
             OutputInterface::OUTPUT_RAW
         );
+
+        return 0;
     }
 }

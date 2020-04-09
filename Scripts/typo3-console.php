@@ -2,8 +2,8 @@
 declare(strict_types=1);
 (function () {
     // Exit early if php requirement is not satisfied.
-    if (version_compare(PHP_VERSION, '7.0.0', '<')) {
-        echo 'This version of TYPO3 Console requires PHP 7.0.0 or above!' . PHP_EOL;
+    if (version_compare(PHP_VERSION, '7.2.0', '<')) {
+        echo 'This version of TYPO3 Console requires PHP 7.2.0 or above!' . PHP_EOL;
         if (defined('PHP_BINARY')) {
             echo 'Your PHP binary is located at: "' . PHP_BINARY . '",' . PHP_EOL;
             echo 'but its version is only: ' . PHP_VERSION . PHP_EOL;
@@ -11,7 +11,7 @@ declare(strict_types=1);
             echo 'Your PHP version is: ' . PHP_VERSION . PHP_EOL;
         }
         echo 'Please specify a suitable PHP cli binary before the typo3cms binary like that:' . PHP_EOL;
-        echo '/path/to/php70-latest ' . $_SERVER['argv'][0] . PHP_EOL;
+        echo '/path/to/php72-latest ' . $_SERVER['argv'][0] . PHP_EOL;
         exit(1);
     }
 

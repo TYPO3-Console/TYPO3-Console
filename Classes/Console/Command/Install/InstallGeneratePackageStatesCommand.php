@@ -15,7 +15,6 @@ namespace Helhum\Typo3Console\Command\Install;
  */
 
 use Helhum\Typo3Console\Command\AbstractConvertedCommand;
-use Helhum\Typo3Console\Core\Booting\CompatibilityScripts;
 use Helhum\Typo3Console\Install\PackageStatesGenerator;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
@@ -23,8 +22,8 @@ use Helhum\Typo3Console\Package\UncachedPackageManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Package\PackageInterface;
-use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Service\DependencyOrderingService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -105,7 +104,7 @@ EOH
             ? $excludedExtensions : explode(',', $excludedExtensions);
         $activateDefault = $input->getOption('activate-default');
 
-        if ($activateDefault && CompatibilityScripts::isComposerMode()) {
+        if ($activateDefault && Environment::isComposerMode()) {
             // @deprecated for composer usage in 5.0 will be removed with 6.0
             $output->writeln('<warning>Using --activate-default is deprecated in composer managed TYPO3 installations.</warning>');
             $output->writeln('<warning>Instead of requiring typo3/cms in your project, you should consider only requiring individual packages you need.</warning>');
@@ -114,11 +113,8 @@ EOH
             ',',
             (string)getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS')
         );
-        $packageManager = GeneralUtility::makeInstance(PackageManager::class);
-        if (!$packageManager instanceof UncachedPackageManager) {
-            throw new \RuntimeException('Expected UncachedPackageManager', 1576244721);
-        }
-        $packageManager->injectDependencyOrderingService(GeneralUtility::makeInstance(DependencyOrderingService::class));
+        $dependencyOrderingService = GeneralUtility::makeInstance(DependencyOrderingService::class);
+        $packageManager = GeneralUtility::makeInstance(UncachedPackageManager::class, $dependencyOrderingService);
         $packageStatesGenerator = new PackageStatesGenerator($packageManager);
         $activatedExtensions = $packageStatesGenerator->generate(
             $frameworkExtensions,
@@ -149,5 +145,7 @@ EOH
                 implode(', ', $excludedExtensions)
             ));
         }
+
+        return 0;
     }
 }

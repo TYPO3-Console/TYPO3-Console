@@ -18,6 +18,7 @@ use Helhum\Typo3Console\Command\RelatableCommandInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\CMS\Core\Core\Environment;
 
 class UnlockBackendCommand extends Command implements RelatableCommandInterface
 {
@@ -36,7 +37,7 @@ class UnlockBackendCommand extends Command implements RelatableCommandInterface
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $fileName = PATH_typo3conf . 'LOCK_BACKEND';
+        $fileName = Environment::getLegacyConfigPath() . '/LOCK_BACKEND';
         if (!@is_file($fileName)) {
             $output->writeln('<info>Backend is already unlocked.</info>');
 
@@ -48,7 +49,7 @@ class UnlockBackendCommand extends Command implements RelatableCommandInterface
 
             return 2;
         }
-        $output->writeln('<info>Backend lock is removed. User can now access the backend again.</info>');
+        $output->writeln('<info>Backend lock is removed. Users can now access the backend again.</info>');
 
         return 0;
     }

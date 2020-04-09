@@ -19,6 +19,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpProcess;
+use TYPO3\CMS\Core\Core\Environment;
 
 class FrontendRequestCommand extends AbstractConvertedCommand
 {
@@ -63,7 +64,7 @@ EOH
         // TODO: this needs heavy cleanup!
         $template = file_get_contents(__DIR__ . '/../../../../Resources/Private/Templates/request.tpl');
         $arguments = [
-            'documentRoot' => getenv('TYPO3_PATH_WEB') ?: PATH_site,
+            'documentRoot' => getenv('TYPO3_PATH_WEB') ?: Environment::getPublicPath(),
             'requestUrl' => $this->makeAbsolute($requestUrl),
         ];
 

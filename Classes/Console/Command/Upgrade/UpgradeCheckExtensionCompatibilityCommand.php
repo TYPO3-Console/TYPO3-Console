@@ -43,7 +43,7 @@ EOH
     {
         return [
             new InputArgument(
-                'extensionKeys',
+                'extensionKey',
                 InputArgument::REQUIRED,
                 'Extension key for extension to check'
             ),
@@ -66,9 +66,11 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $extensionKey = $input->getArgument('extensionKeys');
+        $extensionKey = $input->getArgument('extensionKey');
         $configOnly = $input->getOption('config-only');
 
         $output->writeln(\json_encode((new UpgradeHandling())->isCompatible($extensionKey, $configOnly)));
+
+        return 0;
     }
 }

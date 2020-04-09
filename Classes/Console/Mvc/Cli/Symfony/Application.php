@@ -37,7 +37,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class Application extends BaseApplication
 {
-    const TYPO3_CONSOLE_VERSION = '5.8.3';
+    const TYPO3_CONSOLE_VERSION = '6.0.0';
     const COMMAND_NAME = 'typo3cms';
 
     /**
@@ -128,7 +128,7 @@ class Application extends BaseApplication
         return $this->runLevel->isCommandAvailable($command->getName());
     }
 
-    public function renderException(\Exception $exception, OutputInterface $output)
+    public function renderException($exception, OutputInterface $output)
     {
         if ($exception instanceof CommandNotAvailableException) {
             $helper = new SymfonyStyle(new ArgvInput(), $output);
@@ -152,6 +152,11 @@ class Application extends BaseApplication
         }
 
         (new ExceptionRenderer())->render($exception, $output, $this);
+    }
+
+    public function renderThrowable(\Throwable $e, OutputInterface $output): void
+    {
+        $this->renderException($e, $output);
     }
 
     /**
@@ -195,6 +200,10 @@ class Application extends BaseApplication
 
     private function ensureCommandAvailable(Command $command)
     {
+        $commandName = $command->getName();
+        if ($this->runLevel->isCommandAvailable($commandName)) {
+            $this->runLevel->runSequenceForCommand($commandName);
+        }
         if (!$this->runLevel->getError() && !$this->isCommandAvailable($command)) {
             throw new CommandNotAvailableException($command->getName());
         }

@@ -26,7 +26,7 @@ Examples for such commands are:
 * Flexible bootstrap for commands (not every command needs a fully bootstrapped framework)
 * Reliable cache flush commands
 * Many commands useful for deployment
-* Support for command controllers and Symfony commands registered within TYPO3 extensions and Composer packages
+* Support for Symfony commands registered within TYPO3 extensions and Composer packages
 
 ## Installation
 
@@ -52,7 +52,7 @@ as well as current state of development in the respective branches.
 
 ## Submit bug reports or feature requests
 
-Look at the [Issues](https://github.com/TYPO3-Console/typo3_console/issues)
+Look at the [Issues](https://github.com/TYPO3-Console/TYPO3-Console/issues)
 for what has been planned to be implemented in the (near) future.
 
 ## Credits
