@@ -17,7 +17,9 @@ cleanup:updatereferenceindex
 
 Updates reference index to ensure data integrity
 
-**Example:** `typo3cms cleanup:updatereferenceindex --dry-run --verbose`
+**Example:**
+
+  `typo3cms cleanup:updatereferenceindex --dry-run --verbose`
 
 
 

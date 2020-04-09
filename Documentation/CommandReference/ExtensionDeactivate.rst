@@ -18,7 +18,7 @@ extension:deactivate
 Deactivates one or more extensions by key.
 Marks extensions as inactive in the system and clears caches for every deactivated extension.
 
-This command is deprecated (and hidden) in Composer mode.
+**This command is deprecated (and hidden) in Composer mode.**
 
 Arguments
 ~~~~~~~~~

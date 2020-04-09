@@ -31,7 +31,9 @@ To require TYPO3 core extensions use the following command:
 
 This updates your composer.json and composer.lock without any other changes.
 
-**Example:** `typo3cms install:generatepackagestates`
+**Example:**
+
+  `typo3cms install:generatepackagestates`
 
 
 

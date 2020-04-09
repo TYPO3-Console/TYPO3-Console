@@ -31,7 +31,7 @@ class ExtensionDeactivateCommand extends AbstractConvertedCommand
 Deactivates one or more extensions by key.
 Marks extensions as inactive in the system and clears caches for every deactivated extension.
 
-This command is deprecated (and hidden) in Composer mode.
+<warning>This command is deprecated (and hidden) in Composer mode.</warning>
 EOH
         );
         /** @deprecated Will be removed with 6.0 */

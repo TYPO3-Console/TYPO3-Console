@@ -33,7 +33,9 @@ class SchedulerRunCommand extends AbstractConvertedCommand
         $this->setDescription('Run scheduler');
         $this->setHelp('Executes tasks that are registered in the scheduler module.
 
-<b>Example:</b> <code>%command.full_name% --task 42 --force</code>');
+<b>Example:</b>
+
+  <code>%command.full_name% --task 42 --force</code>');
         /** @deprecated Will be removed with 6.0 */
         $this->setDefinition($this->createCompleteInputDefinition());
     }
