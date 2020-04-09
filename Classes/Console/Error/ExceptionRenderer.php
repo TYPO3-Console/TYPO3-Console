@@ -123,8 +123,12 @@ class ExceptionRenderer
      */
     private function outputCode(\Throwable $exception, OutputInterface $output)
     {
-        if ($exception->getCode() > 0) {
-            $output->writeln(sprintf('<comment>Exception code:</comment> <info>%s</info>', $exception->getCode()));
+        $code = $exception->getCode();
+        if ($exception instanceof SubProcessException) {
+            $code = $exception->getPreviousExceptionCode();
+        }
+        if (!empty($code)) {
+            $output->writeln(sprintf('<comment>Exception code:</comment> <info>%s</info>', $code));
             $output->writeln('');
         }
     }
@@ -269,11 +273,13 @@ class ExceptionRenderer
         if ($exception) {
             $exceptionClass = get_class($exception);
             $exceptionMessage = $exception->getMessage();
+            $exceptionCode = $exception->getCode();
             $line = $exception->getLine();
             $file = $exception->getFile();
             if ($exception instanceof SubProcessException) {
                 $exceptionClass = $exception->getPreviousExceptionClass();
                 $exceptionMessage = $exception->getPreviousExceptionMessage();
+                $exceptionCode = $exception->getPreviousExceptionCode();
                 $line = $exception->getPreviousExceptionLine();
                 $file = $exception->getPreviousExceptionFile();
             } elseif ($exception instanceof FailedSubProcessCommandException) {
@@ -289,7 +295,7 @@ class ExceptionRenderer
                 'line' => $line,
                 'file' => $file,
                 'message' => $exceptionMessage,
-                'code' => $exception->getCode(),
+                'code' => $exceptionCode,
                 'trace' => $this->getTrace($exception),
                 'previous' => $this->serializeException($exception->getPrevious()),
                 'commandline' => $commandLine ?? null,
