@@ -19,11 +19,6 @@ class UpgradeWizardResult
     /**
      * @var array
      */
-    private $sqlQueries;
-
-    /**
-     * @var array
-     */
     private $messages;
 
     /**
@@ -31,34 +26,30 @@ class UpgradeWizardResult
      */
     private $hasPerformed;
 
-    public function __construct($hasPerformed, array $sqlQueries = [], array $messages = [])
+    /**
+     * @var bool
+     */
+    private $succeeded;
+
+    public function __construct(bool $hasPerformed, array $messages = [], bool $succeeded = false)
     {
-        $this->sqlQueries = $sqlQueries;
-        $this->messages = $messages;
         $this->hasPerformed = $hasPerformed;
+        $this->messages = $messages;
+        $this->succeeded = $hasPerformed && $succeeded;
     }
 
-    /**
-     * @return array
-     */
-    public function getSqlQueries()
-    {
-        return $this->sqlQueries;
-    }
-
-    /**
-     * @return array
-     */
-    public function getMessages()
+    public function getMessages(): array
     {
         return $this->messages;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasPerformed()
+    public function hasPerformed(): bool
     {
         return $this->hasPerformed;
+    }
+
+    public function hasErrored(): bool
+    {
+        return $this->hasPerformed && !$this->succeeded;
     }
 }

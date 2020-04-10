@@ -88,7 +88,7 @@ class UpgradeHandling
      *
      * @var array
      */
-    private static $extensionWizardArguments = [['name' => 'install', 'type' => 'bool', 'default' => '0']];
+    private static $extensionWizardArguments = [['name' => 'confirm', 'type' => 'bool', 'default' => '0']];
 
     public function __construct(
         UpgradeWizardFactory $factory = null,

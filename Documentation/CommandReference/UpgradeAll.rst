@@ -13,9 +13,18 @@ upgrade:all
 ===========
 
 
-**Execute all upgrade wizards that are scheduled for execution**
+**Execute all upgrade wizards**
 
+Executes all upgrade wizards that are scheduled for execution.
+Arguments can be provided for wizards that need confirmation.
 
+**Examples:**
+
+  `typo3cms upgrade:all --arguments adminpanelExtension[confirm]=0`
+
+  `typo3cms upgrade:all --arguments adminpanelExtension[confirm]=0,funcExtension[confirm]=0`
+
+  `typo3cms upgrade:all --arguments confirm=0`
 
 
 
@@ -23,7 +32,7 @@ Options
 ~~~~~~~
 
 `--arguments|-a`
-   Arguments for the wizard prefixed with the identifier, e.g. `compatibility7Extension[install]=0`; multiple arguments separated with comma
+   Arguments for the wizard prefixed with the identifier, multiple arguments separated with comma.
 
 - Accept value: yes
 - Is value required: yes

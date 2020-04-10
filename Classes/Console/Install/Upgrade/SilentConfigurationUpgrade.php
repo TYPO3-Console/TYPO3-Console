@@ -48,10 +48,6 @@ class SilentConfigurationUpgrade
         if (!file_exists($this->configurationManager->getLocalConfigurationFileLocation())) {
             return;
         }
-        // We need to write the extension configuration for all active extensions ourselves
-        // as the core does not take care doing so (yet)
-        $extensionConfigurationService = new ExtensionConfiguration();
-        $extensionConfigurationService->synchronizeExtConfTemplateWithLocalConfigurationOfAllExtensions();
 
         $upgradeService = new SilentConfigurationUpgradeService($this->configurationManager);
         $count = 0;
@@ -68,5 +64,10 @@ class SilentConfigurationUpgrade
                 }
             }
         } while ($redirect === true);
+
+        // We need to write the extension configuration for all active extensions ourselves
+        // as the core does not take care doing so (yet)
+        $extensionConfigurationService = new ExtensionConfiguration();
+        $extensionConfigurationService->synchronizeExtConfTemplateWithLocalConfigurationOfAllExtensions();
     }
 }

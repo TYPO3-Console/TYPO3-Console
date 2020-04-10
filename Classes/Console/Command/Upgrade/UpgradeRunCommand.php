@@ -14,33 +14,19 @@ namespace Helhum\Typo3Console\Command\Upgrade;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeHandling;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardResultRenderer;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UpgradeAllCommand extends AbstractConvertedCommand
+class UpgradeRunCommand extends Command
 {
     protected function configure()
     {
-        $this->setDescription('Execute all upgrade wizards');
-        $this->setHelp(
-            <<<'EOH'
-Executes all upgrade wizards that are scheduled for execution.
-Arguments can be provided for wizards that need confirmation.
-
-<b>Examples:</b>
-
-  <code>%command.full_name% --arguments adminpanelExtension[confirm]=0</code>
-
-  <code>%command.full_name% --arguments adminpanelExtension[confirm]=0,funcExtension[confirm]=0</code>
-
-  <code>%command.full_name% --arguments confirm=0</code>
-EOH
-        );
+        $this->setDescription('Execute all upgrade wizards that are scheduled for execution');
         /** @deprecated Will be removed with 6.0 */
         $this->setDefinition($this->createCompleteInputDefinition());
     }
@@ -55,7 +41,7 @@ EOH
                 'arguments',
                 'a',
                 InputOption::VALUE_REQUIRED,
-                'Arguments for the wizard prefixed with the identifier, multiple arguments separated with comma.',
+                'Arguments for the wizard prefixed with the identifier, e.g. <code>compatibility7Extension[install]=0</code>; multiple arguments separated with comma',
                 []
             ),
         ];
