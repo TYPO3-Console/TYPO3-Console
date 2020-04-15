@@ -132,7 +132,7 @@ class UpgradeWizardExecutorTest extends UnitTestCase
         $upgradeWizardServiceProphecy->markWizardAsDone(ConfirmableUpgradeWizard::class)->shouldNotBeCalled();
 
         $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $upgradeWizardServiceProphecy->reveal());
-        $result = $subject->executeWizard(ConfirmableUpgradeWizard::class, ['confirm=1']);
+        $result = $subject->executeWizard(ConfirmableUpgradeWizard::class, ['confirm' => true]);
         $this->assertTrue($result->hasPerformed());
         $this->assertTrue($result->hasErrored());
     }
@@ -235,7 +235,7 @@ class UpgradeWizardExecutorTest extends UnitTestCase
         $factoryProphecy->create(ConfirmableUpgradeWizard::class)->willReturn($upgradeWizard);
 
         $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $upgradeWizardServiceProphecy->reveal());
-        $result = $subject->executeWizard(ConfirmableUpgradeWizard::class, ['confirm=1']);
+        $result = $subject->executeWizard(ConfirmableUpgradeWizard::class, ['confirm' => true]);
         $this->assertTrue($result->hasPerformed());
     }
 
@@ -254,7 +254,7 @@ class UpgradeWizardExecutorTest extends UnitTestCase
         $factoryProphecy->create(ConfirmableUpgradeWizard::class)->willReturn($upgradeWizard);
 
         $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $upgradeWizardServiceProphecy->reveal());
-        $result = $subject->executeWizard(ConfirmableUpgradeWizard::class, ['confirm=0']);
+        $result = $subject->executeWizard(ConfirmableUpgradeWizard::class, ['confirm' => false]);
         $this->assertFalse($result->hasPerformed());
     }
 
@@ -273,7 +273,7 @@ class UpgradeWizardExecutorTest extends UnitTestCase
         $factoryProphecy->create(ConfirmableUpgradeWizard::class)->willReturn($upgradeWizard);
 
         $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $upgradeWizardServiceProphecy->reveal());
-        $result = $subject->executeWizard(ConfirmableUpgradeWizard::class, ['confirm=0']);
+        $result = $subject->executeWizard(ConfirmableUpgradeWizard::class, ['confirm' => false]);
         $this->assertFalse($result->hasPerformed());
     }
 

@@ -111,6 +111,8 @@ class Kernel
                 $this->classLoader->getTypo3ClassLoader(),
                 true
             );
+            // @TODO: Can be removed, once TYPO3 does not start buffering on CLI within Bootstrap::init()
+            ob_end_flush();
             $error = null;
             try {
                 $lateBootService = $container->get(\TYPO3\CMS\Install\Service\LateBootService::class);

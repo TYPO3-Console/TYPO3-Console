@@ -18,90 +18,127 @@ use Helhum\Typo3Console\Install\Upgrade\UpgradeHandling;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardResultRenderer;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class UpgradeRunCommand extends Command
 {
+    private const allWizardsOrConfirmations = 'all';
+
+    /**
+     * @var UpgradeHandling
+     */
+    private $upgradeHandling;
+
     protected function configure()
     {
-        $this->setDescription('Execute all upgrade wizards that are scheduled for execution');
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
+        $this->setDescription('Run a single upgrade wizard, or all wizards that are scheduled for execution');
+        $this->setHelp(
+            <<<'EOH'
+Runs upgrade wizards.
+
+If "all" is specified as wizard identifier, all wizards that are scheduled are executed.
+When no identifier is specified a select UI is presented to select a wizard out of all scheduled ones.
+
+<b>Examples:</b>
+
+  <code>%command.full_name% all</code>
+
+  <code>%command.full_name% all --no-interaction --confirm all --deny typo3DbLegacyExtension --deny funcExtension</code>
+
+  <code>%command.full_name% all --no-interaction --deny all</code>
+
+  <code>%command.full_name% argon2iPasswordHashes --confirm all</code>
+
+EOH
+        );
+        $this->addArgument(
+            'wizardIdentifier',
+            InputArgument::REQUIRED
+        );
+        $this->addOption(
+            'confirm',
+            'y',
+            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+            'Identifier of the wizard, that should be confirmed. Keyword "all" confirms all wizards.'
+        );
+        $this->addOption(
+            'deny',
+            'd',
+            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+            'Identifier of the wizard, that should be denied. Keyword "all" denies all wizards.'
+        );
+        $this->addOption(
+            'force',
+            'f',
+            InputOption::VALUE_NONE,
+            'Force a single wizard to run, despite being marked as executed before. Has no effect on "all"'
+        );
     }
 
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
+    protected function interact(InputInterface $input, OutputInterface $output)
     {
-        return [
-            new InputOption(
-                'arguments',
-                'a',
-                InputOption::VALUE_REQUIRED,
-                'Arguments for the wizard prefixed with the identifier, e.g. <code>compatibility7Extension[install]=0</code>; multiple arguments separated with comma',
-                []
-            ),
-        ];
-    }
+        $this->upgradeHandling = new UpgradeHandling();
+        if (empty($input->getArgument('wizardIdentifier'))) {
+            $scheduledWizards = $this->upgradeHandling->listWizards()['scheduled'];
+            if (empty($scheduledWizards)) {
+                $input->setArgument('wizardIdentifier', self::allWizardsOrConfirmations);
 
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        // nothing to do here
+                return;
+            }
+            $wizards = [];
+            foreach ($scheduledWizards as $identifier => $options) {
+                $wizards[$identifier] = $options['title'];
+            }
+            ksort($wizards);
+            $wizards = [self::allWizardsOrConfirmations => 'All scheduled wizards'] + $wizards;
+            $io = new SymfonyStyle($input, $output);
+            $chosenWizard = $io->choice(
+                'Select wizard(s) to run',
+                $wizards,
+                self::allWizardsOrConfirmations
+            );
+            $input->setArgument('wizardIdentifier', $chosenWizard);
+        }
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $upgradeHandling = new UpgradeHandling();
-        // @deprecated, should be changed to StyleInterface
-        $consoleOutput = new ConsoleOutput($output, $input);
-        if (!$this->ensureExtensionCompatibility($upgradeHandling, $output)) {
+        $this->upgradeHandling = $this->upgradeHandling ?? new UpgradeHandling();
+        if (!$this->upgradeHandling->isUpgradePrepared()) {
+            $output->writeln('<error>Preparation incomplete. Please run upgrade:prepare before running this command.</error>');
+
             return 1;
         }
-
-        $arguments = $input->getOption('arguments');
-        $arguments = is_array($arguments) ? $arguments : explode(',', $arguments);
-        $verbose = $output->isVerbose();
-
-        $output->writeln(PHP_EOL . '<i>Initiating TYPO3 upgrade</i>' . PHP_EOL);
-
-        $messages = [];
-        $results = $upgradeHandling->executeAll($arguments, $consoleOutput, $messages);
-
-        $output->writeln(sprintf(PHP_EOL . PHP_EOL . '<i>Successfully upgraded TYPO3 to version %s</i>', TYPO3_version));
-
-        if ($verbose) {
-            $output->writeln('');
-            $output->writeln('<comment>Upgrade report:</comment>');
-            (new UpgradeWizardResultRenderer())->render($results, $consoleOutput);
-        }
-
-        $output->writeln('');
-        foreach ($messages as $message) {
-            $output->writeln($message);
-        }
+        [$wizardsToExecute, $confirmations, $denies] = $this->unpackArguments($input, $output);
+        $io = new SymfonyStyle($input, $output);
+        $results = $this->upgradeHandling->runWizards($io, $wizardsToExecute, $confirmations, $denies);
+        (new UpgradeWizardResultRenderer())->render($results, new ConsoleOutput($output, $input));
 
         return 0;
     }
 
-    private function ensureExtensionCompatibility(UpgradeHandling $upgradeHandling, OutputInterface $output): bool
+    private function unpackArguments(InputInterface $input, OutputInterface $output): array
     {
-        $messages = $upgradeHandling->ensureExtensionCompatibility();
-        if (!empty($messages)) {
-            $output->writeln('<error>Incompatible extensions found, aborting.</error>');
-
-            foreach ($messages as $message) {
-                $output->writeln($message);
-            }
-
-            return false;
+        $identifier = $input->getArgument('wizardIdentifier');
+        $wizardsToExecute = [$identifier];
+        $confirmations = $input->getOption('confirm');
+        $denies = $input->getOption('deny');
+        if ($identifier === self::allWizardsOrConfirmations) {
+            $wizardsToExecute = array_keys($this->upgradeHandling->listWizards()['scheduled']);
         }
+        if (in_array(self::allWizardsOrConfirmations, $confirmations, true)) {
+            $confirmations = $wizardsToExecute;
+        }
+        if (in_array(self::allWizardsOrConfirmations, $denies, true)) {
+            $denies = $wizardsToExecute;
+        }
+        // Filter confirmations, that are present in denies
+        $confirmations = array_diff($confirmations, array_intersect($confirmations, $denies));
 
-        return true;
+        return [$wizardsToExecute, $confirmations, $denies];
     }
 }

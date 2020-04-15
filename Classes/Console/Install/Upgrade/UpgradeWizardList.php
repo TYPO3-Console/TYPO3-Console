@@ -16,8 +16,7 @@ namespace Helhum\Typo3Console\Install\Upgrade;
 
 use TYPO3\CMS\Core\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Install\Updates\AbstractUpdate;
-use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
+use TYPO3\CMS\Install\Service\UpgradeWizardsService;
 
 /**
  * Handle update wizards
@@ -43,22 +42,21 @@ class UpgradeWizardList
      * @var array
      */
     private $listCache = [];
-
     /**
-     * UpgradeWizardList constructor.
-     *
-     * @param UpgradeWizardFactory|null $factory
-     * @param Registry|null $registry
-     * @param array $wizardRegistry
+     * @var UpgradeWizardsService
      */
+    private $upgradeWizardsService;
+
     public function __construct(
         UpgradeWizardFactory $factory = null,
         Registry $registry = null,
-        array $wizardRegistry = []
+        array $wizardRegistry = [],
+        UpgradeWizardsService $upgradeWizardsService = null
     ) {
         $this->factory = $factory ?: new UpgradeWizardFactory();
         $this->registry = $registry ?: GeneralUtility::makeInstance(Registry::class);
         $this->wizardRegistry = $wizardRegistry ?: $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update'];
+        $this->upgradeWizardsService = $upgradeWizardsService ?? GeneralUtility::makeInstance(UpgradeWizardsService::class);
     }
 
     /**
@@ -73,25 +71,18 @@ class UpgradeWizardList
             $availableUpgradeWizards = [];
             foreach ($this->wizardRegistry as $identifier => $className) {
                 $updateObject = $this->factory->create($identifier);
-                $shortIdentifier = $this->factory->getShortIdentifier($identifier);
+                $shortIdentifier = $updateObject->getIdentifier();
                 $availableUpgradeWizards[$shortIdentifier] = [
                     'className' => $className,
                     'title' => $updateObject->getTitle(),
+                    'explanation' => $updateObject->getDescription(),
                     'done' => false,
                 ];
-                $explanation = '';
-                $wizardImplementsInterface = $updateObject instanceof UpgradeWizardInterface && !$updateObject instanceof AbstractUpdate;
-                $markedAsDone = $this->registry->get('installUpdate', $className, false);
-                if ($wizardImplementsInterface) {
-                    $explanation = $updateObject->getDescription();
-                    $wizardClaimsExecution = $updateObject->updateNecessary();
-                } else {
-                    $wizardClaimsExecution = $updateObject->checkForUpdate($explanation);
-                }
+                $markedAsDone = $this->upgradeWizardsService->isWizardDone($shortIdentifier);
+                $wizardClaimsExecution = $updateObject->updateNecessary();
                 if ($markedAsDone || !$wizardClaimsExecution) {
                     $availableUpgradeWizards[$shortIdentifier]['done'] = true;
                 }
-                $availableUpgradeWizards[$shortIdentifier]['explanation'] = html_entity_decode(strip_tags($explanation));
             }
             $this->listCache = $availableUpgradeWizards;
         }

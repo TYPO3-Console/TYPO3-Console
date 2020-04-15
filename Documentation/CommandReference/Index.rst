@@ -113,11 +113,11 @@ Available Commands
 
    InstallSetup
 
-   UpgradeAll
-
    UpgradeCheckextensionconstraints
 
    UpgradeList
 
-   UpgradeWizard
+   UpgradePrepare
+
+   UpgradeRun
 

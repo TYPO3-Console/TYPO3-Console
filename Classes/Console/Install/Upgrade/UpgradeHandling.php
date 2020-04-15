@@ -17,18 +17,12 @@ namespace Helhum\Typo3Console\Install\Upgrade;
 use Helhum\Typo3Console\Extension\ExtensionCompatibilityCheck;
 use Helhum\Typo3Console\Extension\ExtensionConstraintCheck;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
-use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
-use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
-use TYPO3\CMS\Core\Core\Environment;
+use Symfony\Component\Console\Style\StyleInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Install\Updates\AbstractDownloadExtensionUpdate;
+use TYPO3\CMS\Install\Updates\ConfirmableInterface;
 
-/**
- * Executes a single upgrade wizard
- * Holds the information on possible user interactions
- */
 class UpgradeHandling
 {
     /**
@@ -83,13 +77,6 @@ class UpgradeHandling
      */
     private $initialUpgradeDone = false;
 
-    /**
-     * Wizards that have a user interaction with resulting argument
-     *
-     * @var array
-     */
-    private static $extensionWizardArguments = [['name' => 'confirm', 'type' => 'bool', 'default' => '0']];
-
     public function __construct(
         UpgradeWizardFactory $factory = null,
         UpgradeWizardExecutor $executor = null,
@@ -112,77 +99,41 @@ class UpgradeHandling
         $this->extensionCompatibilityCheck = $extensionCompatibilityCheck ?: new ExtensionCompatibilityCheck($this->packageManager, $this->commandDispatcher);
     }
 
-    public function executeWizard(string $identifier, array $rawArguments = [], bool $force = false): UpgradeWizardResult
+    public function runWizards(StyleInterface $io, array $wizards, array $confirmations, array $denies): array
     {
-        return $this->executor->executeWizard($identifier, $rawArguments, $force);
-    }
-
-    public function executeAll(array $arguments, ConsoleOutput $consoleOutput, array &$messages = []): array
-    {
-        $consoleOutput->progressStart(rand(6, 9));
-        $consoleOutput->progressAdvance();
-
-        $wizards = $this->executeInSubProcess('listWizards', []);
-
-        $consoleOutput->progressStart(count($wizards['scheduled']) + 2);
-
         $results = [];
-        if (!empty($wizards['scheduled'])) {
-            foreach ($wizards['scheduled'] as $shortIdentifier => $wizardOptions) {
-                $consoleOutput->progressAdvance();
-                if (is_subclass_of($wizardOptions['className'], AbstractDownloadExtensionUpdate::class)) {
-                    foreach (self::$extensionWizardArguments as $argumentDefinition) {
-                        $argumentName = $argumentDefinition['name'];
-                        $argumentDefault = $argumentDefinition['default'];
-                        if ($this->wizardHasArgument($shortIdentifier, $argumentName, $arguments)) {
-                            continue;
-                        }
-                        if (Environment::isComposerMode()) {
-                            // In composer mode, skip all install extension wizards!
-                            $arguments[] = sprintf('%s[%s]=%s', $shortIdentifier, $argumentName, $argumentDefault);
-                            $messages[] = '<warning>Wizard "' . $shortIdentifier . '" was not executed but only marked as executed due to composer mode.</warning>';
-                        } elseif ($argumentDefinition['type'] === 'bool') {
-                            // We currently only handle one argument type
-                            $wizard = $this->factory->create($wizardOptions['className']);
-                            $consoleOutput->outputLine(PHP_EOL . PHP_EOL . '<info>' . $wizard->getTitle() . '</info>' . PHP_EOL);
-                            if (is_callable([$wizard, 'getUserInput'])) {
-                                $consoleOutput->outputLine(implode(PHP_EOL, array_filter(array_map('trim', explode(chr(10), html_entity_decode(strip_tags($wizard->getUserInput(''))))))));
-                            }
-                            $consoleOutput->outputLine();
-                            $arguments[] = sprintf(
-                                '%s[%s]=%s',
-                                    $shortIdentifier,
-                                    $argumentName,
-                                    (string)(int)$consoleOutput->askConfirmation('<comment>Install (y/N)</comment> ', (bool)$argumentDefault)
-                            );
-                        }
-                    }
-                }
-                $results[$shortIdentifier] = $this->executeInSubProcess('executeWizard', [$shortIdentifier, $arguments]);
-            }
+        foreach ($wizards as $identifier) {
+            $results[$identifier] = $this->runWizard($io, $identifier, $confirmations, $denies);
         }
-
-        $consoleOutput->progressAdvance();
-
-        $this->commandDispatcher->executeCommand('database:updateschema');
-
-        $consoleOutput->progressFinish();
 
         return $results;
     }
 
-    private function wizardHasArgument(string $identifier, string $argumentName, array $arguments): bool
+    public function runWizard(StyleInterface $io, string $identifier, array $confirmations, array $denies, bool $force = false): UpgradeWizardResult
     {
-        foreach ($arguments as $argument) {
-            if (strpos($argument, sprintf('%s[%s]', $identifier, $argumentName)) !== false) {
-                return true;
-            }
-            if (strpos($argument, '[') === false && strpos($argument, $argumentName) !== false) {
-                return true;
-            }
+        $wizard = $this->factory->create($identifier);
+        $identifier = $wizard->getIdentifier();
+        $isConfirmed = in_array($identifier, $confirmations, true);
+        $isDenied = in_array($identifier, $denies, true);
+        $arguments = [];
+        if ($isConfirmed || $isDenied) {
+            $arguments['confirm'] = $isConfirmed;
         }
 
-        return false;
+        $executeWizard = $this->executor->wizardNeedsExecution($identifier) || $force;
+        if ($executeWizard && $wizard instanceof ConfirmableInterface && !$isConfirmed && !$isDenied) {
+            $confirmation = $wizard->getConfirmation();
+            $question = sprintf(
+                '<info>%s</info>' . LF . '%s' . LF . '%s' . LF . '%s' . LF,
+                $confirmation->getTitle(),
+                $confirmation->getMessage(),
+                $confirmation->getConfirm(),
+                $confirmation->getDeny()
+            );
+            $arguments['confirm'] = $io->confirm($question, $confirmation->getDefaultValue());
+        }
+
+        return $this->executor->executeWizard($identifier, $arguments, $force);
     }
 
     public function listWizards(): array
@@ -213,44 +164,19 @@ class UpgradeHandling
         return $this->extensionCompatibilityCheck->findIncompatible();
     }
 
-    /**
-     * Execute the command in a sub process,
-     * but execute some automated migration steps beforehand
-     *
-     * @param string $command
-     * @param array $arguments
-     * @throws FailedSubProcessCommandException
-     * @throws \UnexpectedValueException
-     * @throws \RuntimeException
-     * @return mixed
-     */
-    public function executeInSubProcess($command, array $arguments = [])
+    public function prepareUpgrade(): array
     {
-        $this->ensureUpgradeIsPossible();
-
-        return @unserialize($this->commandDispatcher->executeCommand('upgrade:subprocess', [$command, serialize($arguments)]));
-    }
-
-    /**
-     * @throws FailedSubProcessCommandException
-     * @throws \UnexpectedValueException
-     * @throws \RuntimeException
-     */
-    private function ensureUpgradeIsPossible()
-    {
-        if ($this->isInitialUpgradeDone()) {
-            return;
-        }
-        $this->initialUpgradeDone = true;
         $this->configurationService->setLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone', TYPO3_branch, 'string');
         $this->commandDispatcher->executeCommand('install:fixfolderstructure');
         $this->silentConfigurationUpgrade->executeSilentConfigurationUpgradesIfNeeded();
         $this->commandDispatcher->executeCommand('cache:flush', ['--files-only']);
         $this->commandDispatcher->executeCommand('database:updateschema');
         $this->commandDispatcher->executeCommand('cache:flush');
+
+        return $this->checkExtensionCompatibility();
     }
 
-    private function isInitialUpgradeDone(): bool
+    public function isUpgradePrepared(): bool
     {
         return $this->initialUpgradeDone
             || (
@@ -259,11 +185,8 @@ class UpgradeHandling
             );
     }
 
-    public function ensureExtensionCompatibility(): array
+    private function checkExtensionCompatibility(): array
     {
-        if ($this->isInitialUpgradeDone()) {
-            return [];
-        }
         $messages = [];
         $failedPackageMessages = $this->matchAllExtensionConstraints(TYPO3_version);
         foreach ($failedPackageMessages as $extensionKey => $constraintMessage) {

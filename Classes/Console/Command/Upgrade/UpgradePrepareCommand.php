@@ -15,85 +15,35 @@ namespace Helhum\Typo3Console\Command\Upgrade;
  */
 
 use Helhum\Typo3Console\Install\Upgrade\UpgradeHandling;
-use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardResultRenderer;
-use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class UpgradePrepareCommand extends Command
 {
     protected function configure()
     {
-        $this->setDescription('Execute all upgrade wizards that are scheduled for execution');
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [
-            new InputOption(
-                'arguments',
-                'a',
-                InputOption::VALUE_REQUIRED,
-                'Arguments for the wizard prefixed with the identifier, e.g. <code>compatibility7Extension[install]=0</code>; multiple arguments separated with comma',
-                []
-            ),
-        ];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        // nothing to do here
+        $this->setDescription('Executes preparational upgrade steps and checks basic extension compatibility');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $upgradeHandling = new UpgradeHandling();
-        // @deprecated, should be changed to StyleInterface
-        $consoleOutput = new ConsoleOutput($output, $input);
-        if (!$this->ensureExtensionCompatibility($upgradeHandling, $output)) {
+        if ($upgradeHandling->isUpgradePrepared()) {
+            $output->writeln('<info>Preparation has been done before, repeating preparation and checking extensions.</info>');
+        }
+        if (!$this->prepareUpgrade($upgradeHandling, $output)) {
             return 1;
-        }
-
-        $arguments = $input->getOption('arguments');
-        $arguments = is_array($arguments) ? $arguments : explode(',', $arguments);
-        $verbose = $output->isVerbose();
-
-        $output->writeln(PHP_EOL . '<i>Initiating TYPO3 upgrade</i>' . PHP_EOL);
-
-        $messages = [];
-        $results = $upgradeHandling->executeAll($arguments, $consoleOutput, $messages);
-
-        $output->writeln(sprintf(PHP_EOL . PHP_EOL . '<i>Successfully upgraded TYPO3 to version %s</i>', TYPO3_version));
-
-        if ($verbose) {
-            $output->writeln('');
-            $output->writeln('<comment>Upgrade report:</comment>');
-            (new UpgradeWizardResultRenderer())->render($results, $consoleOutput);
-        }
-
-        $output->writeln('');
-        foreach ($messages as $message) {
-            $output->writeln($message);
         }
 
         return 0;
     }
 
-    private function ensureExtensionCompatibility(UpgradeHandling $upgradeHandling, OutputInterface $output): bool
+    private function prepareUpgrade(UpgradeHandling $upgradeHandling, OutputInterface $output): bool
     {
-        $messages = $upgradeHandling->ensureExtensionCompatibility();
+        $messages = $upgradeHandling->prepareUpgrade();
         if (!empty($messages)) {
-            $output->writeln('<error>Incompatible extensions found, aborting.</error>');
+            $output->writeln('<error>Incompatible extensions found! Please resolve errors before running upgrade:run.</error>');
 
             foreach ($messages as $message) {
                 $output->writeln($message);
