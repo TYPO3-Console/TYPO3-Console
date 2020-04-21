@@ -65,7 +65,6 @@
         "typo3/cms-fluid": "*",
         "typo3/cms-frontend": "*",
         "typo3/cms-install": "*",
-        "typo3/cms-scheduler": "*",
         "typo3/cms-saltedpasswords": "*",
 
         "doctrine/annotations": "*",

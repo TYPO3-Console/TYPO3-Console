@@ -20,7 +20,6 @@ $EM_CONF[$_EXTKEY] = [
       'extensionmanager' => '10.4.0-10.4.99',
       'fluid' => '10.4.0-10.4.99',
       'install' => '10.4.0-10.4.99',
-      'scheduler' => '10.4.0-10.4.99',
     ],
     'conflicts' => [
         'dbal' => '',

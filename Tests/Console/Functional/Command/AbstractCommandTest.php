@@ -35,8 +35,8 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
         ) {
             throw new \RuntimeException('TYPO3_PATH_ROOT is not properly set!', 1493574402);
         }
-        putenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS=scheduler');
-        $_ENV['TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS'] = 'scheduler';
+        putenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS=core');
+        $_ENV['TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS'] = 'core';
         $this->commandDispatcher = CommandDispatcher::createFromTestRun();
     }
 

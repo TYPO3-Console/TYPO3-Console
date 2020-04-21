@@ -38,7 +38,6 @@
         "typo3/cms-fluid": "^10.4.0",
         "typo3/cms-frontend": "^10.4.0",
         "typo3/cms-install": "^10.4.0",
-        "typo3/cms-scheduler": "^10.4.0",
 
         "doctrine/annotations": "^1.4",
         "symfony/console": "^4.4 || ^5.0",
