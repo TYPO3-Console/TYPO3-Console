@@ -65,6 +65,7 @@ class UpgradeWizardExecutorTest extends UnitTestCase
 
         $upgradeWizardServiceProphecy = $this->prophesize(UpgradeWizardsService::class);
         $upgradeWizardServiceProphecy->isWizardDone('FOO')->willReturn(true)->shouldBeCalled();
+        $upgradeWizardServiceProphecy->markWizardAsDone('FOO')->shouldNotBeCalled();
 
         $factoryProphecy->create('Foo\\Test')->willReturn($upgradeWizardProphecy->reveal());
 
@@ -152,6 +153,28 @@ class UpgradeWizardExecutorTest extends UnitTestCase
 
         $upgradeWizardServiceProphecy = $this->prophesize(UpgradeWizardsService::class);
         $upgradeWizardServiceProphecy->isWizardDone('FOO')->willReturn(true)->shouldBeCalled();
+        $upgradeWizardServiceProphecy->markWizardAsDone('FOO')->shouldNotBeCalled();
+
+        $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $upgradeWizardServiceProphecy->reveal());
+        $result = $subject->executeWizard('Foo\\Test', [], true);
+        $this->assertTrue($result->hasPerformed());
+    }
+
+    /**
+     * @test
+     */
+    public function wizardIsNotDoneCalledWithForcedAndMarkedDone()
+    {
+        $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
+        $upgradeWizardProphecy = $this->prophesize(DummyUpgradeWizard::class);
+        $upgradeWizardProphecy->getIdentifier()->willReturn('FOO')->shouldBeCalled();
+        $upgradeWizardProphecy->updateNecessary()->willReturn(true)->shouldBeCalled();
+        $upgradeWizardProphecy->executeUpdate()->willReturn(true)->shouldBeCalled();
+        $upgradeWizardProphet = $upgradeWizardProphecy->reveal();
+        $factoryProphecy->create('Foo\\Test')->willReturn($upgradeWizardProphet);
+
+        $upgradeWizardServiceProphecy = $this->prophesize(UpgradeWizardsService::class);
+        $upgradeWizardServiceProphecy->isWizardDone('FOO')->willReturn(false)->shouldBeCalled();
         $upgradeWizardServiceProphecy->markWizardAsDone('FOO')->shouldBeCalled();
 
         $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $upgradeWizardServiceProphecy->reveal());

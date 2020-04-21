@@ -80,10 +80,10 @@ class UpgradeWizardExecutor
                 $messages[] = sprintf('<info>Skipped wizard "%s" and marked as executed.</info>', $identifier);
             }
         }
-        if ($succeeded && !$upgradeWizard instanceof RepeatableInterface) {
+        if (!$isWizardDone && $succeeded && !$upgradeWizard instanceof RepeatableInterface) {
             $this->upgradeWizardsService->markWizardAsDone($identifier);
         }
-        if ($userHasDecided && !$hasPerformed && !$requiresConfirmation && !$isWizardDone) {
+        if (!$isWizardDone && $userHasDecided && !$hasPerformed && !$requiresConfirmation) {
             $this->upgradeWizardsService->markWizardAsDone($identifier);
         }
 
