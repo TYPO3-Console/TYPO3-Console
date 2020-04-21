@@ -31,14 +31,14 @@
         "php": "^7.2",
         "helhum/typo3-console-plugin": "^2.0.2",
 
-        "typo3/cms-backend": "^10.3.0",
-        "typo3/cms-core": "^10.3.0",
-        "typo3/cms-extbase": "^10.3.0",
-        "typo3/cms-extensionmanager": "^10.3.0",
-        "typo3/cms-fluid": "^10.3.0",
-        "typo3/cms-frontend": "^10.3.0",
-        "typo3/cms-install": "^10.3.0",
-        "typo3/cms-scheduler": "^10.3.0",
+        "typo3/cms-backend": "^10.4.0",
+        "typo3/cms-core": "^10.4.0",
+        "typo3/cms-extbase": "^10.4.0",
+        "typo3/cms-extensionmanager": "^10.4.0",
+        "typo3/cms-fluid": "^10.4.0",
+        "typo3/cms-frontend": "^10.4.0",
+        "typo3/cms-install": "^10.4.0",
+        "typo3/cms-scheduler": "^10.4.0",
 
         "doctrine/annotations": "^1.4",
         "symfony/console": "^4.4 || ^5.0",
@@ -46,8 +46,8 @@
         "helhum/config-loader": ">=0.9 <0.13"
     },
     "require-dev": {
-        "typo3/cms-reports": "^10.3.0 || dev-master",
-        "typo3/cms-filemetadata": "^10.3.0 || dev-master",
+        "typo3/cms-reports": "^10.4.0 || dev-master",
+        "typo3/cms-filemetadata": "^10.4.0 || dev-master",
         "typo3-console/create-reference-command": "@dev",
         "typo3-console/php-server-command": "^0.2",
         "symfony/filesystem": "^4.4 || ^5.0",

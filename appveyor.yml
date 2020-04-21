@@ -11,7 +11,7 @@ environment:
   TYPO3_INSTALL_DB_DBNAME: 'appveyor_console_test'
 
   matrix:
-    - TYPO3_VERSION: '~10.3.0'
+    - TYPO3_VERSION: '~10.4.0@dev'
       PHP_VERSION: '7.3.15-Win32-VC15'
 
 matrix:
@@ -41,12 +41,12 @@ install:
   - IF NOT EXIST php-installed.txt echo extension=php_mbstring.dll >> php.ini
   - IF NOT EXIST php-installed.txt echo extension=php_fileinfo.dll >> php.ini
   - IF NOT EXIST php-installed.txt echo extension=php_mysqli.dll >> php.ini
-  - IF NOT EXIST php-installed.txt curl -fsS -o composer.phar https://getcomposer.org/composer.phar
+  - IF NOT EXIST php-installed.txt curl -fsS -o composer.phar https://getcomposer.org/download/1.10.5/composer.phar
   - IF NOT EXIST php-installed.txt echo @php %%~dp0composer.phar %%* > composer.bat
   - IF NOT EXIST php-installed.txt type nul >> php-installed.txt
 
   - cd c:\t3c
-  - composer require "typo3/cms-backend=%TYPO3_VERSION%" "typo3/cms-core=%TYPO3_VERSION%" "typo3/cms-extbase=%TYPO3_VERSION%" "typo3/cms-extensionmanager=%TYPO3_VERSION%" "typo3/cms-fluid=%TYPO3_VERSION%" "typo3/cms-frontend=%TYPO3_VERSION%" "typo3/cms-install=%TYPO3_VERSION%" "typo3/cms-scheduler=%TYPO3_VERSION%" --prefer-dist --no-progress --ansi
+  - composer require "typo3/cms-backend=%TYPO3_VERSION%" "typo3/cms-core=%TYPO3_VERSION%" "typo3/cms-extbase=%TYPO3_VERSION%" "typo3/cms-extensionmanager=%TYPO3_VERSION%" "typo3/cms-fluid=%TYPO3_VERSION%" "typo3/cms-frontend=%TYPO3_VERSION%" "typo3/cms-install=%TYPO3_VERSION%" "typo3/cms-scheduler=%TYPO3_VERSION%" "typo3/cms-recordlist=%TYPO3_VERSION%" --prefer-dist --no-progress --ansi
   - git checkout .
 
 test_script:
