@@ -33,17 +33,9 @@ class UpgradeWizardResultRenderer
             return;
         }
         foreach ($upgradeWizardResults as $identifier => $result) {
-            $output->outputLine();
-            if (!$result->hasPerformed()) {
-                $output->outputLine('<warning>Skipped upgrade wizard "%s" because it was not scheduled for execution or marked as done.</warning>', [$identifier]);
-            } else {
-                $output->outputLine('<em>Successfully executed upgrade wizard "%s".</em>', [$identifier]);
-            }
             if (!empty($messages = array_filter($result->getMessages()))) {
-                $this->printMessages($messages, 'Messages', $output);
-            }
-            if (!empty($queries = array_filter($result->getSqlQueries()))) {
-                $this->printMessages($queries, 'SQL Queries executed', $output);
+                $output->outputLine();
+                $this->printMessages($messages, 'Wizard ' . $identifier, $output);
             }
         }
     }
@@ -52,7 +44,7 @@ class UpgradeWizardResultRenderer
     {
         $output->outputLine('<info>%s:</info>', [$title]);
         foreach ($messages as $message) {
-            $output->outputLine(html_entity_decode(strip_tags($message)));
+            $output->outputLine($message);
         }
     }
 }

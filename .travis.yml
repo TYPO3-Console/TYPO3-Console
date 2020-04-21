@@ -62,16 +62,16 @@ jobs:
   include:
     - stage: test
       php: 7.4
-      env: TYPO3_VERSION="~10.3.0"
+      env: TYPO3_VERSION="~10.4.0@dev"
     - stage: test
       php: 7.3
-      env: TYPO3_VERSION="~10.3.0"
+      env: TYPO3_VERSION="~10.4.0@dev"
     - stage: test
       php: 7.2
-      env: TYPO3_VERSION="~10.3.0"
+      env: TYPO3_VERSION="~10.4.0@dev"
     - stage: test
       php: 7.2
-      env: TYPO3_VERSION="~10.3.0" PREFER_LOWEST="--prefer-lowest"
+      env: TYPO3_VERSION="~10.4.0@dev" PREFER_LOWEST="--prefer-lowest"
     - stage: test
       php: 7.2
       env: TYPO3_VERSION="dev-master"

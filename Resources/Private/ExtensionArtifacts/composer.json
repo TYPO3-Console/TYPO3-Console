@@ -53,7 +53,7 @@
     },
     "require": {
         "helhum/typo3-console": "@dev",
-        "typo3/cms-core": "^10.3.0"
+        "typo3/cms-core": "^10.4.0"
     },
     "replace": {
         "helhum/typo3-console-plugin": "*",

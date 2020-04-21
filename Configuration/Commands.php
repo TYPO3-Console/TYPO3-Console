@@ -158,13 +158,10 @@ return [
         'class' => \Helhum\Typo3Console\Command\Install\InstallActionNeedsExecutionCommand::class,
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
     ],
-    'upgrade:all' => [
+    'upgrade:checkextensioncompatibility' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeAllCommand::class,
+        'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeCheckExtensionCompatibilityCommand::class,
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-        'replace' => [
-            'upgrade:run',
-        ],
     ],
     'upgrade:checkextensionconstraints' => [
         'vendor' => 'typo3_console',
@@ -174,20 +171,16 @@ return [
     'upgrade:list' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeListCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
     ],
-    'upgrade:wizard' => [
+    'upgrade:prepare' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeWizardCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
+        'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradePrepareCommand::class,
     ],
-    'upgrade:subprocess' => [
+    'upgrade:run' => [
         'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeSubProcessCommand::class,
-    ],
-    'upgrade:checkextensioncompatibility' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeCheckExtensionCompatibilityCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
+        'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeRunCommand::class,
+        'replace' => [
+            'upgrade:run',
+        ],
     ],
 ];
