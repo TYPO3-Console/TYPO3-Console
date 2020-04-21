@@ -62,7 +62,8 @@ class UpgradeWizardExecutor
             $upgradeWizard->setOutput($output);
         }
 
-        if ($userWantsExecution && (!$isWizardDone || $force) && $upgradeWizard->updateNecessary()) {
+        $checkForUpdateNecessary = $userWantsExecution && (!$isWizardDone || $force);
+        if ($checkForUpdateNecessary && $upgradeWizard->updateNecessary()) {
             $succeeded = $upgradeWizard->executeUpdate();
             $hasPerformed = true;
         }
@@ -80,7 +81,7 @@ class UpgradeWizardExecutor
                 $messages[] = sprintf('<info>Skipped wizard "%s" and marked as executed.</info>', $identifier);
             }
         }
-        if (!$isWizardDone && $succeeded && !$upgradeWizard instanceof RepeatableInterface) {
+        if (!$isWizardDone && ($succeeded || ($checkForUpdateNecessary && !$hasPerformed)) && !$upgradeWizard instanceof RepeatableInterface) {
             $this->upgradeWizardsService->markWizardAsDone($identifier);
         }
         if (!$isWizardDone && $userHasDecided && !$hasPerformed && !$requiresConfirmation) {

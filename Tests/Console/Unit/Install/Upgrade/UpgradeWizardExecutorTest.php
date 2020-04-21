@@ -44,6 +44,7 @@ class UpgradeWizardExecutorTest extends UnitTestCase
 
         $upgradeWizardServiceProphecy = $this->prophesize(UpgradeWizardsService::class);
         $upgradeWizardServiceProphecy->isWizardDone('FOO')->willReturn(false)->shouldBeCalled();
+        $upgradeWizardServiceProphecy->markWizardAsDone('FOO')->shouldBeCalled();
 
         $factoryProphecy->create('Foo\\Test')->willReturn($upgradeWizardProphecy->reveal());
 
@@ -230,7 +231,7 @@ class UpgradeWizardExecutorTest extends UnitTestCase
     {
         $upgradeWizardServiceProphecy = $this->prophesize(UpgradeWizardsService::class);
         $upgradeWizardServiceProphecy->isWizardDone(ChattyUpgradeWizard::class)->willReturn(false)->shouldBeCalled();
-        $upgradeWizardServiceProphecy->markWizardAsDone(ChattyUpgradeWizard::class)->shouldNotBeCalled();
+        $upgradeWizardServiceProphecy->markWizardAsDone(ChattyUpgradeWizard::class)->shouldBeCalled();
 
         $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
         $upgradeWizard = new ChattyUpgradeWizard(false);
