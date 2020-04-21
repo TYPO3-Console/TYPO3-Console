@@ -51,6 +51,7 @@ class UpgradePrepareCommand extends Command
 
             return false;
         }
+        $output->writeln('<success>Upgrade preparations successfully executed.</success>');
 
         return true;
     }

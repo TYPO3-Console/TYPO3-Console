@@ -113,22 +113,31 @@ EOH
 
             return 1;
         }
-        [$wizardsToExecute, $confirmations, $denies] = $this->unpackArguments($input, $output);
+        [$wizardsToExecute, $confirmations, $denies, $force] = $this->unpackArguments($input);
         $io = new SymfonyStyle($input, $output);
-        $results = $this->upgradeHandling->runWizards($io, $wizardsToExecute, $confirmations, $denies);
+
+        if (empty($wizardsToExecute)) {
+            $io->writeln('<success>All wizards done. Nothing to do.</success>');
+
+            return 0;
+        }
+
+        $results = $this->upgradeHandling->runWizards($io, $wizardsToExecute, $confirmations, $denies, $force);
         (new UpgradeWizardResultRenderer())->render($results, new ConsoleOutput($output, $input));
 
         return 0;
     }
 
-    private function unpackArguments(InputInterface $input, OutputInterface $output): array
+    private function unpackArguments(InputInterface $input): array
     {
         $identifier = $input->getArgument('wizardIdentifier');
         $wizardsToExecute = [$identifier];
         $confirmations = $input->getOption('confirm');
         $denies = $input->getOption('deny');
+        $force = $input->getOption('force');
         if ($identifier === self::allWizardsOrConfirmations) {
             $wizardsToExecute = array_keys($this->upgradeHandling->listWizards()['scheduled']);
+            $force = false;
         }
         if (in_array(self::allWizardsOrConfirmations, $confirmations, true)) {
             $confirmations = $wizardsToExecute;
@@ -139,6 +148,6 @@ EOH
         // Filter confirmations, that are present in denies
         $confirmations = array_diff($confirmations, array_intersect($confirmations, $denies));
 
-        return [$wizardsToExecute, $confirmations, $denies];
+        return [$wizardsToExecute, $confirmations, $denies, $force];
     }
 }
