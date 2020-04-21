@@ -42,7 +42,7 @@ class UpgradeWizardListRenderer
         }
         $tableHeader = ['Identifier', 'Title'];
         if ($verbose) {
-            $tableHeader = ['Identifier', 'Description'];
+            $tableHeader = ['Identifier', 'Description', 'Confirmation'];
         }
 
         $tableRows = [];
@@ -56,14 +56,16 @@ class UpgradeWizardListRenderer
             if ($info['className'] === DatabaseRowsUpdateWizard::class) {
                 $rowUpdaterInfo = $this->extractRowUpdatersInfo($verbose, $upgradeWizardList);
             }
+            $confirmableHint = $info['confirmable'] ? ' ✔' : '';
             $row = [
-                $identifier,
+                $identifier . $confirmableHint,
                 wordwrap($info['title'] . $rowUpdaterInfo, $this->wrapLength),
             ];
             if ($verbose) {
                 $row = [
-                    $identifier,
+                    $identifier . $confirmableHint,
                     wordwrap(trim($rowUpdaterInfo ?: $info['explanation']), $this->wrapLength),
+                    $info['confirmable'] ? wordwrap($info['confirmation']['message'], 40) : '',
                 ];
             }
             $tableRows[] = $row;
@@ -72,6 +74,9 @@ class UpgradeWizardListRenderer
         array_pop($tableRows);
 
         $output->outputTable($tableRows, $tableHeader);
+
+        $output->outputLine('Legend:');
+        $output->outputLine('✔ Wizard is confirmable');
     }
 
     private function extractRowUpdatersInfo(bool $verbose, array $upgradeWizardList): string
@@ -111,6 +116,6 @@ class UpgradeWizardListRenderer
             }
             $length = strlen($identifier) > $length ? strlen($identifier) : $length;
         }
-        $this->wrapLength = max($this->wrapLength, (new Terminal())->getWidth() - $length - 7, $rowUpdaterLength);
+        $this->wrapLength = max($this->wrapLength, (new Terminal())->getWidth() - $length - 9, $rowUpdaterLength);
     }
 }
