@@ -74,6 +74,15 @@ class UpgradeWizardExecutor
         if ($hasPerformed && !$succeeded) {
             $messages[] = sprintf('<error>Upgrade wizard "%s" had errors during execution.</error>', $identifier);
         }
+        if ($hasPerformed && $force && $isWizardDone) {
+            $messages[] = sprintf('<info>Upgrade wizard "%s" was executed (forced).</info>', $identifier);
+        }
+        if (!$hasPerformed && !$force && $isWizardDone) {
+            $messages[] = sprintf('<info>Upgrade wizard "%s" was skipped because it is marked as done.</info>', $identifier);
+        }
+        if (!$hasPerformed && $checkForUpdateNecessary) {
+            $messages[] = sprintf('<info>Upgrade wizard "%s" was skipped because no operation is needed.</info>', $identifier);
+        }
         if ($userHasDecided && !$hasPerformed) {
             if ($requiresConfirmation && !$isWizardDone) {
                 $messages[] = sprintf('<error>Skipped wizard "%s" but it needs confirmation!</error>', $identifier);

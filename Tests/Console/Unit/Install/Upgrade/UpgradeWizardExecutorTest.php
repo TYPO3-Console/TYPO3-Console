@@ -21,16 +21,10 @@ use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\ConfirmableUpgradeWiz
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\DummyUpgradeWizard;
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\RepeatableUpgradeWizard;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Service\UpgradeWizardsService;
 
 class UpgradeWizardExecutorTest extends UnitTestCase
 {
-    protected function setUp()
-    {
-        $this->singletonInstances = GeneralUtility::getSingletonInstances();
-    }
-
     /**
      * @test
      */
@@ -51,6 +45,7 @@ class UpgradeWizardExecutorTest extends UnitTestCase
         $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $upgradeWizardServiceProphecy->reveal());
         $result = $subject->executeWizard('Foo\\Test');
         $this->assertFalse($result->hasPerformed());
+        $this->assertContains('Upgrade wizard "FOO" was skipped because no operation is needed', implode(chr(10), $result->getMessages()));
     }
 
     /**
@@ -73,6 +68,7 @@ class UpgradeWizardExecutorTest extends UnitTestCase
         $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $upgradeWizardServiceProphecy->reveal());
         $result = $subject->executeWizard('Foo\\Test');
         $this->assertFalse($result->hasPerformed());
+        $this->assertContains('Upgrade wizard "FOO" was skipped because it is marked as done.', implode(chr(10), $result->getMessages()));
     }
 
     /**
@@ -159,6 +155,7 @@ class UpgradeWizardExecutorTest extends UnitTestCase
         $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $upgradeWizardServiceProphecy->reveal());
         $result = $subject->executeWizard('Foo\\Test', [], true);
         $this->assertTrue($result->hasPerformed());
+        $this->assertContains('Upgrade wizard "FOO" was executed (forced)', implode(chr(10), $result->getMessages()));
     }
 
     /**
