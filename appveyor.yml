@@ -11,7 +11,7 @@ environment:
   TYPO3_INSTALL_DB_DBNAME: 'appveyor_console_test'
 
   matrix:
-    - TYPO3_VERSION: '~10.4.0@dev'
+    - TYPO3_VERSION: '~10.4.0'
       PHP_VERSION: '7.3.15-Win32-VC15'
 
 matrix:
