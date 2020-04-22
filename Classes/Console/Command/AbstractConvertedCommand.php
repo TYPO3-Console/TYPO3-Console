@@ -115,6 +115,7 @@ abstract class AbstractConvertedCommand extends Command
                 $argumentValue = $io->ask(sprintf('Please specify the required argument "%s"', $missingArgument));
             }
             $input->setArgument($missingArgument, $argumentValue);
+            $argumentValue = null;
         }
     }
 
