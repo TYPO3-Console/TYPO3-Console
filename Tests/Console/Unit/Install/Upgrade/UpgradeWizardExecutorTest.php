@@ -21,16 +21,10 @@ use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\ConfirmableUpgradeWiz
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\DummyUpgradeWizard;
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\RepeatableUpgradeWizard;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Service\UpgradeWizardsService;
 
 class UpgradeWizardExecutorTest extends UnitTestCase
 {
-    protected function setUp()
-    {
-        $this->singletonInstances = GeneralUtility::getSingletonInstances();
-    }
-
     /**
      * @test
      */
@@ -44,12 +38,14 @@ class UpgradeWizardExecutorTest extends UnitTestCase
 
         $upgradeWizardServiceProphecy = $this->prophesize(UpgradeWizardsService::class);
         $upgradeWizardServiceProphecy->isWizardDone('FOO')->willReturn(false)->shouldBeCalled();
+        $upgradeWizardServiceProphecy->markWizardAsDone('FOO')->shouldBeCalled();
 
         $factoryProphecy->create('Foo\\Test')->willReturn($upgradeWizardProphecy->reveal());
 
         $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $upgradeWizardServiceProphecy->reveal());
         $result = $subject->executeWizard('Foo\\Test');
         $this->assertFalse($result->hasPerformed());
+        $this->assertContains('Upgrade wizard "FOO" was skipped because no operation is needed', implode(chr(10), $result->getMessages()));
     }
 
     /**
@@ -65,12 +61,14 @@ class UpgradeWizardExecutorTest extends UnitTestCase
 
         $upgradeWizardServiceProphecy = $this->prophesize(UpgradeWizardsService::class);
         $upgradeWizardServiceProphecy->isWizardDone('FOO')->willReturn(true)->shouldBeCalled();
+        $upgradeWizardServiceProphecy->markWizardAsDone('FOO')->shouldNotBeCalled();
 
         $factoryProphecy->create('Foo\\Test')->willReturn($upgradeWizardProphecy->reveal());
 
         $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $upgradeWizardServiceProphecy->reveal());
         $result = $subject->executeWizard('Foo\\Test');
         $this->assertFalse($result->hasPerformed());
+        $this->assertContains('Upgrade wizard "FOO" was skipped because it is marked as done.', implode(chr(10), $result->getMessages()));
     }
 
     /**
@@ -152,6 +150,29 @@ class UpgradeWizardExecutorTest extends UnitTestCase
 
         $upgradeWizardServiceProphecy = $this->prophesize(UpgradeWizardsService::class);
         $upgradeWizardServiceProphecy->isWizardDone('FOO')->willReturn(true)->shouldBeCalled();
+        $upgradeWizardServiceProphecy->markWizardAsDone('FOO')->shouldNotBeCalled();
+
+        $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $upgradeWizardServiceProphecy->reveal());
+        $result = $subject->executeWizard('Foo\\Test', [], true);
+        $this->assertTrue($result->hasPerformed());
+        $this->assertContains('Upgrade wizard "FOO" was executed (forced)', implode(chr(10), $result->getMessages()));
+    }
+
+    /**
+     * @test
+     */
+    public function wizardIsNotDoneCalledWithForcedAndMarkedDone()
+    {
+        $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
+        $upgradeWizardProphecy = $this->prophesize(DummyUpgradeWizard::class);
+        $upgradeWizardProphecy->getIdentifier()->willReturn('FOO')->shouldBeCalled();
+        $upgradeWizardProphecy->updateNecessary()->willReturn(true)->shouldBeCalled();
+        $upgradeWizardProphecy->executeUpdate()->willReturn(true)->shouldBeCalled();
+        $upgradeWizardProphet = $upgradeWizardProphecy->reveal();
+        $factoryProphecy->create('Foo\\Test')->willReturn($upgradeWizardProphet);
+
+        $upgradeWizardServiceProphecy = $this->prophesize(UpgradeWizardsService::class);
+        $upgradeWizardServiceProphecy->isWizardDone('FOO')->willReturn(false)->shouldBeCalled();
         $upgradeWizardServiceProphecy->markWizardAsDone('FOO')->shouldBeCalled();
 
         $subject = new UpgradeWizardExecutor($factoryProphecy->reveal(), $upgradeWizardServiceProphecy->reveal());
@@ -207,7 +228,7 @@ class UpgradeWizardExecutorTest extends UnitTestCase
     {
         $upgradeWizardServiceProphecy = $this->prophesize(UpgradeWizardsService::class);
         $upgradeWizardServiceProphecy->isWizardDone(ChattyUpgradeWizard::class)->willReturn(false)->shouldBeCalled();
-        $upgradeWizardServiceProphecy->markWizardAsDone(ChattyUpgradeWizard::class)->shouldNotBeCalled();
+        $upgradeWizardServiceProphecy->markWizardAsDone(ChattyUpgradeWizard::class)->shouldBeCalled();
 
         $factoryProphecy = $this->prophesize(UpgradeWizardFactory::class);
         $upgradeWizard = new ChattyUpgradeWizard(false);

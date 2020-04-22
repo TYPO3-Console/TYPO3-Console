@@ -99,11 +99,11 @@ class UpgradeHandling
         $this->extensionCompatibilityCheck = $extensionCompatibilityCheck ?: new ExtensionCompatibilityCheck($this->packageManager, $this->commandDispatcher);
     }
 
-    public function runWizards(StyleInterface $io, array $wizards, array $confirmations, array $denies): array
+    public function runWizards(StyleInterface $io, array $wizards, array $confirmations, array $denies, bool $force): array
     {
         $results = [];
         foreach ($wizards as $identifier) {
-            $results[$identifier] = $this->runWizard($io, $identifier, $confirmations, $denies);
+            $results[$identifier] = $this->runWizard($io, $identifier, $confirmations, $denies, $force);
         }
 
         return $results;

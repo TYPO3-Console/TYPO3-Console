@@ -38,7 +38,6 @@
         "typo3/cms-fluid": "^10.4.0",
         "typo3/cms-frontend": "^10.4.0",
         "typo3/cms-install": "^10.4.0",
-        "typo3/cms-scheduler": "^10.4.0",
 
         "doctrine/annotations": "^1.4",
         "symfony/console": "^4.4 || ^5.0",
@@ -52,7 +51,6 @@
         "typo3-console/php-server-command": "^0.2",
         "symfony/filesystem": "^4.4 || ^5.0",
         "nimut/testing-framework": "5.x-dev",
-        "cweagans/composer-patches": "^1.6",
         "jakub-onderka/php-parallel-lint": "^1.0",
         "phpunit/phpunit": "^6"
     },

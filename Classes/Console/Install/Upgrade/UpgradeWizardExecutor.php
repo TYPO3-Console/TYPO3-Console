@@ -62,7 +62,8 @@ class UpgradeWizardExecutor
             $upgradeWizard->setOutput($output);
         }
 
-        if ($userWantsExecution && (!$isWizardDone || $force) && $upgradeWizard->updateNecessary()) {
+        $checkForUpdateNecessary = $userWantsExecution && (!$isWizardDone || $force);
+        if ($checkForUpdateNecessary && $upgradeWizard->updateNecessary()) {
             $succeeded = $upgradeWizard->executeUpdate();
             $hasPerformed = true;
         }
@@ -73,6 +74,15 @@ class UpgradeWizardExecutor
         if ($hasPerformed && !$succeeded) {
             $messages[] = sprintf('<error>Upgrade wizard "%s" had errors during execution.</error>', $identifier);
         }
+        if ($hasPerformed && $force && $isWizardDone) {
+            $messages[] = sprintf('<info>Upgrade wizard "%s" was executed (forced).</info>', $identifier);
+        }
+        if (!$hasPerformed && !$force && $isWizardDone) {
+            $messages[] = sprintf('<info>Upgrade wizard "%s" was skipped because it is marked as done.</info>', $identifier);
+        }
+        if (!$hasPerformed && $checkForUpdateNecessary) {
+            $messages[] = sprintf('<info>Upgrade wizard "%s" was skipped because no operation is needed.</info>', $identifier);
+        }
         if ($userHasDecided && !$hasPerformed) {
             if ($requiresConfirmation && !$isWizardDone) {
                 $messages[] = sprintf('<error>Skipped wizard "%s" but it needs confirmation!</error>', $identifier);
@@ -80,10 +90,10 @@ class UpgradeWizardExecutor
                 $messages[] = sprintf('<info>Skipped wizard "%s" and marked as executed.</info>', $identifier);
             }
         }
-        if ($succeeded && !$upgradeWizard instanceof RepeatableInterface) {
+        if (!$isWizardDone && ($succeeded || ($checkForUpdateNecessary && !$hasPerformed)) && !$upgradeWizard instanceof RepeatableInterface) {
             $this->upgradeWizardsService->markWizardAsDone($identifier);
         }
-        if ($userHasDecided && !$hasPerformed && !$requiresConfirmation && !$isWizardDone) {
+        if (!$isWizardDone && $userHasDecided && !$hasPerformed && !$requiresConfirmation) {
             $this->upgradeWizardsService->markWizardAsDone($identifier);
         }
 
