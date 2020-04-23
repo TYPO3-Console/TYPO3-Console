@@ -16,11 +16,11 @@ namespace Helhum\Typo3Console\Core\Booting;
 
 use Helhum\Typo3Console\Error\ErrorHandler;
 use Helhum\Typo3Console\Error\ExceptionHandler;
+use Psr\Container\ContainerInterface;
 use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
-use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Imaging\IconRegistry;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Page\PageRenderer;
 
 class Scripts
 {
@@ -45,45 +45,27 @@ class Scripts
         set_error_handler([$errorHandler, 'handleError']);
     }
 
-    public static function initializeDisabledCaching()
+    public static function initializeExtensionConfiguration(ContainerInterface $container)
     {
-        self::initializeCachingFramework(true);
-    }
-
-    public static function initializeCaching()
-    {
-        self::initializeCachingFramework();
-    }
-
-    private static function initializeCachingFramework(bool $disableCaching = false)
-    {
-        $cacheManager = CompatibilityScripts::createCacheManager($disableCaching);
-        \TYPO3\CMS\Core\Utility\GeneralUtility::setSingletonInstance(CacheManager::class, $cacheManager);
-    }
-
-    public static function initializeExtensionConfiguration()
-    {
-        $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
-        $assetsCache = $cacheManager->getCache('assets');
-        $coreCache = $cacheManager->getCache('cache_core');
+        $container->get('boot.state')->done = false;
+        $assetsCache = $container->get('cache.assets');
+        $coreCache = $container->get('cache.core');
         IconRegistry::setCache($assetsCache);
-        // TODO: only in v10
-//        PageRenderer::setCache($assetsCache);
+        PageRenderer::setCache($assetsCache);
         Bootstrap::loadTypo3LoadedExtAndExtLocalconf(true, $coreCache);
-        if (is_callable([Bootstrap::class, 'setFinalCachingFrameworkCacheConfiguration'])) {
-            Bootstrap::setFinalCachingFrameworkCacheConfiguration($cacheManager);
-        }
         Bootstrap::unsetReservedGlobalVariables();
+        $container->get('boot.state')->done = true;
     }
 
-    public static function initializePersistence()
+    public static function initializePersistence(ContainerInterface $container)
     {
-        $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
-        $coreCache = $cacheManager->getCache('cache_core');
-        Bootstrap::loadBaseTca(true, $coreCache);
-        \Closure::bind(function () {
-            Bootstrap::checkEncryptionKey();
-        }, null, Bootstrap::class)();
+        Bootstrap::loadBaseTca(true, $container->get('cache.core'));
+        if (empty($GLOBALS['TYPO3_CONF_VARS']['SYS']['encryptionKey'])) {
+            throw new \RuntimeException(
+                'TYPO3 Encryption is empty. $GLOBALS[\'TYPO3_CONF_VARS\'][\'SYS\'][\'encryptionKey\'] needs to be set for TYPO3 to work securely',
+                1502987245
+            );
+        }
     }
 
     public static function initializeAuthenticatedOperations()
