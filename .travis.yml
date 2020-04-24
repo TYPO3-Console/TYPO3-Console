@@ -32,7 +32,7 @@ before_install:
   - if php -i | grep -v TRAVIS_CMD | grep -q xdebug; then phpenv config-rm xdebug.ini; fi
 
 install:
-  - export COMPOSER_ROOT_VERSION=6.0.0
+  - export COMPOSER_ROOT_VERSION=6.0.1
   - |
     composer require \
       typo3/cms-backend="$TYPO3_VERSION" \
@@ -97,7 +97,7 @@ jobs:
       install: skip
       script:
         - git fetch --unshallow
-        - export COMPOSER_ROOT_VERSION=6.0.0
+        - export COMPOSER_ROOT_VERSION=6.0.1
         - composer install
         - .Build/bin/phpunit --whitelist Classes --coverage-clover .Build/clover.xml --log-junit .Build/junit.xml
         - >
