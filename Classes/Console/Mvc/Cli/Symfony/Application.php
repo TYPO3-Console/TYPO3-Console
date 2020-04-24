@@ -29,6 +29,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -261,5 +262,16 @@ class Application extends BaseApplication
         $output->getFormatter()->setStyle('ins', new OutputFormatterStyle('green'));
         $output->getFormatter()->setStyle('del', new OutputFormatterStyle('red'));
         $output->getFormatter()->setStyle('code', new OutputFormatterStyle(null, null, ['bold']));
+
+        // Reverting https://github.com/symfony/symfony/pull/33897 until this is resolved: https://github.com/symfony/symfony/issues/36565
+        if (function_exists('posix_isatty') && getenv('SHELL_INTERACTIVE') === false && $input->isInteractive()) {
+            $inputStream = null;
+            if ($input instanceof StreamableInputInterface) {
+                $inputStream = $input->getStream();
+            }
+            if (!@posix_isatty($inputStream)) {
+                $input->setInteractive(false);
+            }
+        }
     }
 }
