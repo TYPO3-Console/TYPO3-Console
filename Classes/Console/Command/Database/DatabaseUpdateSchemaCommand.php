@@ -77,7 +77,7 @@ EOH
             new InputArgument(
                 'schemaUpdateTypes',
                 InputArgument::OPTIONAL,
-                'List of schema update types (default: "safe")',
+                'List of schema update types',
                 'safe'
             ),
             new InputOption(

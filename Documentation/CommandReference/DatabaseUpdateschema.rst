@@ -47,7 +47,7 @@ Arguments
 ~~~~~~~~~
 
 `schemaUpdateTypes`
-   List of schema update types (default: "safe")
+   List of schema update types
 
 
 
