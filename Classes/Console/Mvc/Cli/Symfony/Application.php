@@ -32,6 +32,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Information\Typo3Version;
 
 /**
  * Represents the complete console application
@@ -57,6 +59,17 @@ class Application extends BaseApplication
         $this->runLevel = $runLevel;
         $this->composerManaged = $composerManaged;
         $this->setAutoExit(false);
+    }
+
+    public function getLongVersion(): string
+    {
+        return parent::getLongVersion()
+            . chr(10)
+            . sprintf(
+                'TYPO3 CMS <info>%s</info> (<comment>Application Context:</comment> <info>%s</info>)',
+                (new Typo3Version())->getVersion(),
+                Environment::getContext()
+            );
     }
 
     /**
