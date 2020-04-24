@@ -290,7 +290,14 @@ class RunLevel
             // Part of basic runtime
             case 'helhum.typo3console:extensionconfiguration':
                 $this->executedSteps[$stepIdentifier] = self::LEVEL_MINIMAL;
-                $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'initializeExtensionConfiguration']));
+                $sequence->addStep(
+                    new Step(
+                        $stepIdentifier,
+                        function () {
+                            Scripts::initializeExtensionConfiguration($this->container);
+                        }
+                    )
+                );
                 break;
 
             // Part of full runtime
@@ -320,7 +327,14 @@ class RunLevel
                 break;
             case 'helhum.typo3console:persistence':
                 $this->executedSteps[$stepIdentifier] = self::LEVEL_FULL;
-                $sequence->addStep(new Step($stepIdentifier, [Scripts::class, 'initializePersistence']), 'helhum.typo3console:extensionconfiguration');
+                $sequence->addStep(
+                    new Step(
+                        $stepIdentifier,
+                        function () {
+                            Scripts::initializePersistence($this->container);
+                        }
+                    )
+                );
                 break;
             case 'helhum.typo3console:authentication':
                 $this->executedSteps[$stepIdentifier] = self::LEVEL_FULL;
