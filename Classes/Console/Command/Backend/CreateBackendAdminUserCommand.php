@@ -14,16 +14,23 @@ namespace Helhum\Typo3Console\Command\Backend;
  *
  */
 
+use Helhum\Typo3Console\Exception\ArgumentValidationFailedException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Query\Restriction\EndTimeRestriction;
+use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
+use TYPO3\CMS\Core\Database\Query\Restriction\StartTimeRestriction;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CreateBackendAdminUserCommand extends Command
 {
+    private $passwordAsArgument = true;
+
     protected function configure()
     {
         $this->setDescription('Create admin backend user');
@@ -44,40 +51,56 @@ class CreateBackendAdminUserCommand extends Command
         );
     }
 
+    protected function interact(InputInterface $input, OutputInterface $output)
+    {
+        $io = new SymfonyStyle($input, $output);
+        if (empty($input->getArgument('username'))) {
+            $username = $io->ask(
+                'Username',
+                null,
+                function ($username) {
+                    if ($error = $this->validateUsername($username)) {
+                        throw new ArgumentValidationFailedException($error);
+                    }
+
+                    return $username;
+                }
+            );
+            $input->setArgument('username', $username);
+        }
+        if (empty($input->getArgument('password'))) {
+            $password = $io->askHidden(
+                'Password',
+                function ($password) {
+                    if ($error = $this->validatePassword($password)) {
+                        throw new ArgumentValidationFailedException($error);
+                    }
+
+                    return $password;
+                }
+            );
+            $this->passwordAsArgument = false;
+            $input->setArgument('password', $password);
+        }
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $passwordHasher = GeneralUtility::makeInstance(PasswordHashFactory::class)->getDefaultHashInstance('BE');
         $username = $input->getArgument('username');
         $password = $input->getArgument('password');
-        $givenUsername = $username;
-        $username = strtolower(preg_replace('/\\s/i', '', $username));
-
-        if ($givenUsername !== $username) {
-            $output->writeln(sprintf('<warning>Given username "%s" contains invalid characters. Using "%s" instead.</warning>', $givenUsername, $username));
+        if ($this->passwordAsArgument) {
+            $output->writeln('<warning>Using a password on the command line interface can be insecure.</warning>');
         }
-
-        if ($username === '') {
-            $output->writeln('<error>Username must have at least 1 character.</error>');
-
+        if ($userError = $this->validateUsername($username)) {
+            $output->writeln(sprintf('<error>%s</error>', $userError));
+        }
+        if ($passwordError = $this->validatePassword($password)) {
+            $output->writeln(sprintf('<error>%s</error>', $passwordError));
+        }
+        if (isset($userError) || isset($passwordError)) {
             return 1;
         }
-        if (strlen($password) < 8) {
-            $output->writeln('<error>Password must have at least 8 characters.</error>');
-
-            return 1;
-        }
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
-        $userExists = $connectionPool->getConnectionForTable('be_users')
-            ->count(
-                'uid',
-                'be_users',
-                ['username' => $username]
-            );
-        if ($userExists) {
-            $output->writeln(sprintf('<error>A user with username "%s" already exists.</error>', $username));
-
-            return 1;
-        }
+        $passwordHasher = GeneralUtility::makeInstance(PasswordHashFactory::class)->getDefaultHashInstance('BE');
         $adminUserFields = [
             'username' => $username,
             'password' => $passwordHasher->getHashedPassword($password),
@@ -85,11 +108,51 @@ class CreateBackendAdminUserCommand extends Command
             'tstamp' => $GLOBALS['EXEC_TIME'],
             'crdate' => $GLOBALS['EXEC_TIME'],
         ];
+        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $connectionPool->getConnectionForTable('be_users')
             ->insert('be_users', $adminUserFields);
 
         $output->writeln(sprintf('<info>Created admin user with username "%s".</info>', $username));
 
         return 0;
+    }
+
+    private function validateUsername(?string $username): ?string
+    {
+        if (empty($username)) {
+            return 'Username must not be empty.';
+        }
+        $cleanedUsername = strtolower(preg_replace('/\\s/i', '', $username));
+        if ($username !== $cleanedUsername) {
+            return sprintf('No special characters are allowed in username. Use "%s" as username instead.', $cleanedUsername);
+        }
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('be_users');
+        $queryBuilder->getRestrictions()
+             ->removeByType(StartTimeRestriction::class)
+             ->removeByType(EndTimeRestriction::class)
+             ->removeByType(HiddenRestriction::class);
+        $userExists = $queryBuilder->count('uid')
+            ->from('be_users')
+            ->where(
+                $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username))
+            )->execute()->fetchColumn() > 0;
+
+        if ($userExists) {
+            return sprintf('A user with username "%s" already exists.', $username);
+        }
+
+        return null;
+    }
+
+    private function validatePassword(?string $password): ?string
+    {
+        if (empty($password)) {
+            return 'Password must not be empty.';
+        }
+        if (strlen($password) < 8) {
+            return 'Password must have at least 8 characters.';
+        }
+
+        return null;
     }
 }
