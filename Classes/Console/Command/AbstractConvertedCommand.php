@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Command;
  *
  */
 
+use Helhum\Typo3Console\Exception\ArgumentValidationFailedException;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Input\ArgvInput;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -108,14 +109,21 @@ abstract class AbstractConvertedCommand extends Command
             return !array_key_exists($argument, $givenArguments) && $definition->getArgument($argument)->isRequired();
         });
 
-        $argumentValue = null;
         $io = new SymfonyStyle($input, $output);
         foreach ($missingArguments as $missingArgument) {
-            while ($argumentValue === null) {
-                $argumentValue = $io->ask(sprintf('Please specify the required argument "%s"', $missingArgument));
-            }
+            $definition = $this->getDefinition()->getArgument($missingArgument);
+            $argumentValue = $io->ask(
+                $definition->getDescription(),
+                null,
+                function ($value) use ($missingArgument) {
+                    if ($value === null) {
+                        throw new ArgumentValidationFailedException(sprintf('%s must not be empty', $missingArgument));
+                    }
+
+                    return $value;
+                }
+            );
             $input->setArgument($missingArgument, $argumentValue);
-            $argumentValue = null;
         }
     }
 

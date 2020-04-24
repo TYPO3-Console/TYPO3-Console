@@ -74,12 +74,16 @@ class BackendCommandControllerTest extends AbstractCommandTest
      * @dataProvider createAdminUserRemovesSpacesFromUserNameDataProvider
      * @param string $username
      */
-    public function createAdminUserRemovesSpacesFromUserNameAndLowerCasesIt(string $username)
+    public function createAdminUserFailsCreatingUsersWithInvalidCharacters(string $username): void
     {
-        $output = $this->executeConsoleCommand('backend:createadmin', [$username, 'password']);
-        $message = sprintf('Given username "%s" contains invalid characters.', $username);
-        $this->assertContains($message, $output);
-        $this->executeMysqlQuery('DELETE FROM be_users WHERE username LIKE "test\_%"');
+        try {
+            $this->commandDispatcher->executeCommand('backend:createadmin', [$username, 'password']);
+            $this->fail(sprintf('Creating user %s should have failed', $username));
+        } catch (FailedSubProcessCommandException $e) {
+            $this->assertContains('No special characters are allowed in username', $e->getOutputMessage());
+        } finally {
+            $this->executeMysqlQuery('DELETE FROM be_users WHERE username LIKE "test\_%"');
+        }
     }
 
     public function createAdminUserCreatesUserWithSpecialCharactersInUserNameDataProvider(): array
@@ -102,14 +106,15 @@ class BackendCommandControllerTest extends AbstractCommandTest
      * @dataProvider createAdminUserCreatesUserWithSpecialCharactersInUserNameDataProvider
      * @param string $username
      */
-    public function createAdminUserCreatesUserWithSpecialCharactersInUserName(string $username)
+    public function createAdminUserCreatesUserWithSpecialCharactersInUserName(string $username): void
     {
-        $output = $this->executeConsoleCommand('backend:createadmin', [$username, 'password']);
-        $message = sprintf('Given username "%s" contains invalid characters.', $username);
-        $this->assertNotContains($message, $output);
-        $queryResult = $this->executeMysqlQuery('SELECT username FROM be_users WHERE username="' . $username . '"');
-        $this->assertSame($username, trim($queryResult));
-        $this->executeMysqlQuery('DELETE FROM be_users WHERE username LIKE "test\_%"');
+        try {
+            $this->executeConsoleCommand('backend:createadmin', [$username, 'password']);
+            $queryResult = $this->executeMysqlQuery('SELECT username FROM be_users WHERE username="' . $username . '"');
+            $this->assertSame($username, trim($queryResult));
+        } finally {
+            $this->executeMysqlQuery('DELETE FROM be_users WHERE username LIKE "test\_%"');
+        }
     }
 
     public function createAdminUserCreatesUserWithShortNamesDataProvider(): array
@@ -132,7 +137,7 @@ class BackendCommandControllerTest extends AbstractCommandTest
      * @dataProvider createAdminUserCreatesUserWithShortNamesDataProvider
      * @param string $username
      */
-    public function createAdminUserCreatesUserWithShortNames(string $username)
+    public function createAdminUserCreatesUserWithShortNames(string $username): void
     {
         $this->executeConsoleCommand('backend:createadmin', [$username, 'password']);
         $queryResult = $this->executeMysqlQuery(sprintf('SELECT username FROM be_users WHERE username="%s";', $username));
@@ -143,20 +148,20 @@ class BackendCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
-    public function adminUserWithTooShortUsernameWillBeRejected()
+    public function adminUserWithTooShortUsernameWillBeRejected(): void
     {
         try {
-            $this->commandDispatcher->executeCommand('backend:createadmin', ['', 'bar']);
+            $this->commandDispatcher->executeCommand('backend:createadmin', ['', 'bar', '--no-interaction']);
             $this->fail('Command did not fail as expected (user is created)');
         } catch (FailedSubProcessCommandException $e) {
-            $this->assertContains('Username must have at least 1 character', $e->getOutputMessage());
+            $this->assertContains('Username must not be empty', $e->getOutputMessage());
         }
     }
 
     /**
      * @test
      */
-    public function adminUserWithTooShortPasswordWillBeRejected()
+    public function adminUserWithTooShortPasswordWillBeRejected(): void
     {
         try {
             $this->commandDispatcher->executeCommand('backend:createadmin', ['foobar', 'baz']);
@@ -169,7 +174,7 @@ class BackendCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
-    public function adminUserWithValidCredentialsWillBeCreated()
+    public function adminUserWithValidCredentialsWillBeCreated(): void
     {
         $output = $this->executeConsoleCommand('backend:createadmin', ['administrator', 'password']);
         $this->assertContains('Created admin user with username "administrator"', $output);
@@ -180,7 +185,7 @@ class BackendCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
-    public function adminUserWithValidCredentialsWillNotBeCreatedIfUsernameAlreadyExists()
+    public function adminUserWithValidCredentialsWillNotBeCreatedIfUsernameAlreadyExists(): void
     {
         try {
             $this->commandDispatcher->executeCommand('backend:createadmin', ['administrator', 'password2']);
