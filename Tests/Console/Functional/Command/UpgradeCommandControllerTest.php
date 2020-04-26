@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Tests\Functional\Command;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
+use TYPO3\CMS\Install\Updates\RowUpdater\WorkspaceVersionRecordsMigration;
 
 class UpgradeCommandControllerTest extends AbstractCommandTest
 {
@@ -185,5 +186,21 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $this->removeFixtureExtensionCode('ext_upgrade');
             $this->executeConsoleCommand('install:generatepackagestates');
         }
+    }
+
+    /**
+     * @test
+     */
+    public function rowUpdaterCanBeForced(): void
+    {
+        $output = $this->executeConsoleCommand('upgrade:list');
+        $this->assertContains('None', $output);
+        $output = $this->executeConsoleCommand('upgrade:list', ['--all']);
+        $this->assertContains('Row Updaters:', $output);
+        $this->assertContains(WorkspaceVersionRecordsMigration::class, $output);
+        $output = $this->executeConsoleCommand('upgrade:run', ['databaseRowsUpdateWizard']);
+        $this->assertContains('Upgrade wizard "databaseRowsUpdateWizard" was skipped because no operation is needed', $output);
+        $output = $this->executeConsoleCommand('upgrade:run', ['databaseRowsUpdateWizard', '--force-row-updater', WorkspaceVersionRecordsMigration::class]);
+        $this->assertContains('Successfully executed upgrade wizard "databaseRowsUpdateWizard"', $output);
     }
 }
