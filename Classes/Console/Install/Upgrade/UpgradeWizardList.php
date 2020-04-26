@@ -17,6 +17,7 @@ namespace Helhum\Typo3Console\Install\Upgrade;
 use TYPO3\CMS\Core\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Service\UpgradeWizardsService;
+use TYPO3\CMS\Install\Updates\ConfirmableInterface;
 use TYPO3\CMS\Install\Updates\DatabaseRowsUpdateWizard;
 
 /**
@@ -79,10 +80,21 @@ class UpgradeWizardList
                     'className' => $className,
                     'title' => $updateObject->getTitle(),
                     'explanation' => $updateObject->getDescription(),
+                    'confirmable' => false,
                     'done' => false,
                 ];
                 if ($includeRowUpdaters && $updateObject instanceof DatabaseRowsUpdateWizard) {
                     $availableUpgradeWizards = $this->extractRowUpdaters($updateObject, $availableUpgradeWizards);
+                }
+                if ($updateObject instanceof ConfirmableInterface) {
+                    $confirmation = $updateObject->getConfirmation();
+                    $availableUpgradeWizards[$shortIdentifier]['confirmable'] = true;
+                    $availableUpgradeWizards[$shortIdentifier]['confirmation'] = [
+                        'title' => $confirmation->getTitle(),
+                        'message' => $confirmation->getMessage(),
+                        'default' => $confirmation->getDefaultValue() ? 'allow' : 'deny',
+                        'isRequired' => $confirmation->isRequired(),
+                    ];
                 }
                 $markedAsDone = $this->upgradeWizardsService->isWizardDone($shortIdentifier);
                 $wizardClaimsExecution = $updateObject->updateNecessary();
