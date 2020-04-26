@@ -42,7 +42,7 @@ class UpgradeWizardListRenderer
         }
         $tableHeader = ['Identifier', 'Title'];
         if ($verbose) {
-            $tableHeader = ['Identifier', 'Description', 'Confirmation'];
+            $tableHeader = ['Identifier', 'Description'];
         }
 
         $tableRows = [];
@@ -62,10 +62,14 @@ class UpgradeWizardListRenderer
                 wordwrap($info['title'] . $rowUpdaterInfo, $this->wrapLength),
             ];
             if ($verbose) {
+                $description = trim($rowUpdaterInfo ?: $info['explanation']);
+                if ($info['confirmable']) {
+                    $description .= chr(10) . chr(10) . '<info>Confirmation: </info>' . chr(10);
+                    $description .= $info['confirmation']['message'];
+                }
                 $row = [
                     $identifier . $confirmableHint,
-                    wordwrap(trim($rowUpdaterInfo ?: $info['explanation']), $this->wrapLength),
-                    $info['confirmable'] ? wordwrap($info['confirmation']['message'], 40) : '',
+                    wordwrap($description, $this->wrapLength),
                 ];
             }
             $tableRows[] = $row;
