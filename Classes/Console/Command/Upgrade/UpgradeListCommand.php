@@ -45,7 +45,7 @@ class UpgradeListCommand extends Command
         }
 
         $all = $input->getOption('all');
-        $wizards = $upgradeHandling->listWizards();
+        $wizards = $upgradeHandling->listWizards(true);
 
         $listRenderer = new UpgradeWizardListRenderer();
         // @deprecated usage of ConsoleOutput will be removed with 6.0

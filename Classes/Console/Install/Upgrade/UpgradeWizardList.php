@@ -17,6 +17,7 @@ namespace Helhum\Typo3Console\Install\Upgrade;
 use TYPO3\CMS\Core\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Service\UpgradeWizardsService;
+use TYPO3\CMS\Install\Updates\DatabaseRowsUpdateWizard;
 
 /**
  * Handle update wizards
@@ -63,9 +64,10 @@ class UpgradeWizardList
      * List available upgrade wizards
      *
      * @param bool $includeDone
+     * @param bool $includeRowUpdaters
      * @return array
      */
-    public function listWizards($includeDone = false)
+    public function listWizards($includeDone = false, bool $includeRowUpdaters = false): array
     {
         if (empty($this->listCache)) {
             $availableUpgradeWizards = [];
@@ -73,11 +75,15 @@ class UpgradeWizardList
                 $updateObject = $this->factory->create($identifier);
                 $shortIdentifier = $updateObject->getIdentifier();
                 $availableUpgradeWizards[$shortIdentifier] = [
+                    'wizard' => $updateObject,
                     'className' => $className,
                     'title' => $updateObject->getTitle(),
                     'explanation' => $updateObject->getDescription(),
                     'done' => false,
                 ];
+                if ($includeRowUpdaters && $updateObject instanceof DatabaseRowsUpdateWizard) {
+                    $availableUpgradeWizards = $this->extractRowUpdaters($updateObject, $availableUpgradeWizards);
+                }
                 $markedAsDone = $this->upgradeWizardsService->isWizardDone($shortIdentifier);
                 $wizardClaimsExecution = $updateObject->updateNecessary();
                 if ($markedAsDone || !$wizardClaimsExecution) {
@@ -93,5 +99,33 @@ class UpgradeWizardList
                 return $includeDone || !$info['done'];
             }
         );
+    }
+
+    private function extractRowUpdaters(DatabaseRowsUpdateWizard $rowsUpdateWizard, array $availableUpgradeWizards): array
+    {
+        $protectedProperty = 'rowUpdater';
+        $availableRowUpdaters = \Closure::bind(function () use ($rowsUpdateWizard, $protectedProperty) {
+            return $rowsUpdateWizard->$protectedProperty;
+        }, null, $rowsUpdateWizard)();
+        foreach ($this->upgradeWizardsService->listOfRowUpdatersDone() as $rowUpdatersDone) {
+            $availableUpgradeWizards[$rowUpdatersDone['class']] = [
+                'className' => $rowUpdatersDone['class'],
+                'title' => $rowUpdatersDone['title'],
+                'explanation' => 'rowUpdater',
+                'done' => true,
+            ];
+        }
+        $notDoneRowUpdaters = array_diff($availableRowUpdaters, array_keys($availableUpgradeWizards));
+        foreach ($notDoneRowUpdaters as $notDoneRowUpdater) {
+            $rowUpdater = GeneralUtility::makeInstance($notDoneRowUpdater);
+            $availableUpgradeWizards[$notDoneRowUpdater] = [
+                'className' => $notDoneRowUpdater,
+                'title' => $rowUpdater->getTitle(),
+                'explanation' => 'rowUpdater',
+                'done' => false,
+            ];
+        }
+
+        return $availableUpgradeWizards;
     }
 }

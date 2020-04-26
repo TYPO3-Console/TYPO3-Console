@@ -136,11 +136,11 @@ class UpgradeHandling
         return $this->executor->executeWizard($identifier, $arguments, $force);
     }
 
-    public function listWizards(): array
+    public function listWizards(bool $includeRowUpdaters = false): array
     {
         return [
-            'scheduled' => $this->upgradeWizardList->listWizards(),
-            'done' => $this->upgradeWizardList->listWizards(true),
+            'scheduled' => $this->upgradeWizardList->listWizards(false, $includeRowUpdaters),
+            'done' => $this->upgradeWizardList->listWizards(true, $includeRowUpdaters),
         ];
     }
 

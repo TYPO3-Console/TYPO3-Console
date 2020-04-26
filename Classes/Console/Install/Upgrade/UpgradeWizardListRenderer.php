@@ -16,12 +16,16 @@ namespace Helhum\Typo3Console\Install\Upgrade;
 
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Symfony\Component\Console\Helper\TableSeparator;
+use Symfony\Component\Console\Terminal;
+use TYPO3\CMS\Install\Updates\DatabaseRowsUpdateWizard;
 
 /**
  * Renders a list of upgrade wizards
  */
 class UpgradeWizardListRenderer
 {
+    private $wrapLength = 40;
+
     /**
      * Renders a table for upgrade wizards
      *
@@ -42,15 +46,24 @@ class UpgradeWizardListRenderer
         }
 
         $tableRows = [];
+        $this->calculateColumnSize($upgradeWizardList);
         foreach ($upgradeWizardList as $identifier => $info) {
+            if ($info['explanation'] === 'rowUpdater') {
+                continue;
+            }
+            $rowUpdaterInfo = '';
+            $identifier = '<code>' . $identifier . '</code>';
+            if ($info['className'] === DatabaseRowsUpdateWizard::class) {
+                $rowUpdaterInfo = $this->extractRowUpdatersInfo($verbose, $upgradeWizardList);
+            }
             $row = [
                 $identifier,
-                wordwrap($info['title'], 40),
+                wordwrap($info['title'] . $rowUpdaterInfo, $this->wrapLength),
             ];
             if ($verbose) {
                 $row = [
                     $identifier,
-                    wordwrap($info['explanation'], 40),
+                    wordwrap(trim($rowUpdaterInfo ?: $info['explanation']), $this->wrapLength),
                 ];
             }
             $tableRows[] = $row;
@@ -59,5 +72,45 @@ class UpgradeWizardListRenderer
         array_pop($tableRows);
 
         $output->outputTable($tableRows, $tableHeader);
+    }
+
+    private function extractRowUpdatersInfo(bool $verbose, array $upgradeWizardList): string
+    {
+        $rowUpdaters = array_filter(
+            $upgradeWizardList,
+            function ($wizardInfo) {
+                return $wizardInfo['explanation'] === 'rowUpdater';
+            }
+        );
+        if (empty($rowUpdaters)) {
+            return '';
+        }
+        $rowUpdaterInfo = '';
+        if (!$verbose) {
+            $rowUpdaterInfo = chr(10) . chr(10);
+        }
+        $rowUpdaterInfo .= 'Row Updaters:' . chr(10) . chr(10);
+        foreach ($rowUpdaters as $rowUpdater) {
+            $rowUpdaterInfo .= '<code>' . $rowUpdater['className'] . '</code>' . chr(10);
+            if ($verbose) {
+                $rowUpdaterInfo .= wordwrap($rowUpdater['title'], $this->wrapLength) . chr(10) . chr(10);
+            }
+        }
+
+        return $rowUpdaterInfo;
+    }
+
+    private function calculateColumnSize(array $wizards): void
+    {
+        $length = $this->wrapLength;
+        $rowUpdaterLength = 0;
+        foreach ($wizards as $identifier => $info) {
+            if ($info['explanation'] === 'rowUpdater') {
+                $rowUpdaterLength = strlen($identifier) > $rowUpdaterLength ? strlen($identifier) : $rowUpdaterLength;
+                continue;
+            }
+            $length = strlen($identifier) > $length ? strlen($identifier) : $length;
+        }
+        $this->wrapLength = max($this->wrapLength, (new Terminal())->getWidth() - $length - 7, $rowUpdaterLength);
     }
 }

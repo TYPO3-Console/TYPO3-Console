@@ -66,6 +66,14 @@ Options
 - Is multiple: no
 - Default: false
 
+`--force-row-updater`
+   Identifier of the row updater to be forced to run. Has only effect on "databaseRowsUpdateWizard"
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: yes
+- Default: array ()
+
 
 
 

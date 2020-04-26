@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Command\Upgrade;
  *
  */
 
+use Helhum\Typo3Console\Exception;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeHandling;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardResultRenderer;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
@@ -23,6 +24,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Install\Service\UpgradeWizardsService;
+use TYPO3\CMS\Install\Updates\DatabaseRowsUpdateWizard;
 
 class UpgradeRunCommand extends Command
 {
@@ -77,6 +81,12 @@ EOH
             InputOption::VALUE_NONE,
             'Force a single wizard to run, despite being marked as executed before. Has no effect on "all"'
         );
+        $this->addOption(
+            'force-row-updater',
+            '',
+            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+            'Identifier of the row updater to be forced to run. Has only effect on "databaseRowsUpdateWizard"'
+        );
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)
@@ -113,7 +123,7 @@ EOH
 
             return 1;
         }
-        [$wizardsToExecute, $confirmations, $denies, $force] = $this->unpackArguments($input);
+        [$wizardsToExecute, $confirmations, $denies, $force, $forceRowUpdaters] = $this->unpackArguments($input);
         $io = new SymfonyStyle($input, $output);
 
         if (empty($wizardsToExecute)) {
@@ -131,6 +141,26 @@ EOH
     private function unpackArguments(InputInterface $input): array
     {
         $identifier = $input->getArgument('wizardIdentifier');
+        $forceRowUpdaters = $input->getOption('force-row-updater');
+        if (!empty($forceRowUpdaters)
+            && (
+                $identifier === self::allWizardsOrConfirmations
+                || empty($this->upgradeHandling->listWizards()['done'][$identifier])
+                || !$this->upgradeHandling->listWizards()['done'][$identifier]['wizard'] instanceof DatabaseRowsUpdateWizard
+            )
+        ) {
+            $forceRowUpdaters = [];
+        }
+        if (!empty($forceRowUpdaters)) {
+            $upgradeWizardService = GeneralUtility::makeInstance(UpgradeWizardsService::class);
+            foreach ($forceRowUpdaters as $rowUpdater) {
+                try {
+                    $upgradeWizardService->markWizardUndone($rowUpdater);
+                } catch (\Throwable $e) {
+                    throw new Exception(sprintf('Invalid row updater identifier "%s" given', $rowUpdater), 1587931548);
+                }
+            }
+        }
         $wizardsToExecute = [$identifier];
         $confirmations = $input->getOption('confirm');
         $denies = $input->getOption('deny');
@@ -148,6 +178,6 @@ EOH
         // Filter confirmations, that are present in denies
         $confirmations = array_diff($confirmations, array_intersect($confirmations, $denies));
 
-        return [$wizardsToExecute, $confirmations, $denies, $force];
+        return [$wizardsToExecute, $confirmations, $denies, $force, $forceRowUpdaters];
     }
 }
