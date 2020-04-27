@@ -74,9 +74,6 @@
         "typo3-ter/typo3-console": "self.version"
     },
     "config": {
-        "platform": {
-            "php": "7.2.5"
-        },
         "preferred-install": {
             "*": "dist"
         },

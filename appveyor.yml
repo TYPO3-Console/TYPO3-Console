@@ -46,7 +46,8 @@ install:
   - IF NOT EXIST php-installed.txt type nul >> php-installed.txt
 
   - cd c:\t3c
-  - composer require "typo3/cms-backend=%TYPO3_VERSION%" "typo3/cms-core=%TYPO3_VERSION%" "typo3/cms-extbase=%TYPO3_VERSION%" "typo3/cms-extensionmanager=%TYPO3_VERSION%" "typo3/cms-fluid=%TYPO3_VERSION%" "typo3/cms-frontend=%TYPO3_VERSION%" "typo3/cms-install=%TYPO3_VERSION%" "typo3/cms-recordlist=%TYPO3_VERSION%" --prefer-dist --no-progress --ansi
+  - composer require --no-update "typo3/cms-backend=%TYPO3_VERSION%" "typo3/cms-core=%TYPO3_VERSION%" "typo3/cms-extbase=%TYPO3_VERSION%" "typo3/cms-extensionmanager=%TYPO3_VERSION%" "typo3/cms-fluid=%TYPO3_VERSION%" "typo3/cms-frontend=%TYPO3_VERSION%" "typo3/cms-install=%TYPO3_VERSION%" "typo3/cms-recordlist=%TYPO3_VERSION%" --prefer-dist --no-progress --ansi
+  - composer update
   - git checkout .
 
 test_script:
