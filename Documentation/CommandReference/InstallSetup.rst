@@ -176,6 +176,14 @@ Options
 - Is multiple: no
 - Default: 'no'
 
+`--site-base-url`
+   When `site-setup-type` is set to `site`, this base url is used for the created site configuration
+
+- Accept value: yes
+- Is value required: yes
+- Is multiple: no
+- Default: '/'
+
 `--non-interactive`
    Deprecated. Use `--no-interaction` instead.
 
