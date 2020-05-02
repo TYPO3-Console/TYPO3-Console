@@ -62,22 +62,22 @@ jobs:
   include:
     - stage: test
       php: 7.4
-      env: TYPO3_VERSION="^10.4"
+      env: TYPO3_VERSION="^10.4.1"
     - stage: test
       php: 7.3
-      env: TYPO3_VERSION="^10.4"
+      env: TYPO3_VERSION="^10.4.1"
     - stage: test
       php: 7.2
-      env: TYPO3_VERSION="^10.4"
+      env: TYPO3_VERSION="^10.4.1"
     - stage: test
       php: 7.2
-      env: TYPO3_VERSION="^10.4" PREFER_LOWEST="--prefer-lowest"
+      env: TYPO3_VERSION="^10.4.1" PREFER_LOWEST="--prefer-lowest"
     - stage: test
       php: 7.2
       env: TYPO3_VERSION="dev-master"
     - stage: test
       php: 7.4
-      env: TYPO3_VERSION="^10.4"
+      env: TYPO3_VERSION="^10.4.1"
       script:
         - composer self-update --snapshot --2
         - git clean -dffx
