@@ -32,8 +32,8 @@ class Scripts
 
         $enforcedExceptionalErrors = E_WARNING | E_USER_WARNING | E_USER_ERROR | E_RECOVERABLE_ERROR;
         $errorHandlerErrors = $GLOBALS['TYPO3_CONF_VARS']['SYS']['errorHandlerErrors'] ?? E_ALL & ~(E_STRICT | E_NOTICE | E_COMPILE_WARNING | E_COMPILE_ERROR | E_CORE_WARNING | E_CORE_ERROR | E_PARSE | E_ERROR);
-        // Ensure all exceptional errors are handled including E_USER_NOTICE
-        $errorHandlerErrors = $errorHandlerErrors | E_USER_NOTICE | $enforcedExceptionalErrors;
+        // Ensure all exceptional errors are handled including E_USER_NOTICE and E_USER_DEPRECATED
+        $errorHandlerErrors = $errorHandlerErrors | E_USER_NOTICE | E_USER_DEPRECATED | $enforcedExceptionalErrors;
         // Ensure notices are excluded to avoid overhead in the error handler
         $errorHandlerErrors &= ~E_NOTICE;
         $errorHandler = new ErrorHandler();
