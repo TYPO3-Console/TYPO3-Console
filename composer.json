@@ -51,8 +51,7 @@
         "typo3-console/php-server-command": "^0.2",
         "symfony/filesystem": "^4.4 || ^5.0",
         "nimut/testing-framework": "5.x-dev",
-        "jakub-onderka/php-parallel-lint": "^1.0",
-        "phpunit/phpunit": "^6"
+        "php-parallel-lint/php-parallel-lint": "^1.2"
     },
     "conflict": {
         "typo3-ter/dbal": "*",
@@ -75,9 +74,6 @@
         "typo3-ter/typo3-console": "self.version"
     },
     "config": {
-        "platform": {
-            "php": "7.2.5"
-        },
         "preferred-install": {
             "*": "dist"
         },
