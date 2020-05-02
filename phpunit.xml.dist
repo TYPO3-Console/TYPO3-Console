@@ -22,7 +22,7 @@
         <env name="TYPO3_INSTALL_ADMIN_PASSWORD" value="password" />
         <env name="TYPO3_INSTALL_SITE_NAME" value="Travis Install" />
         <env name="TYPO3_INSTALL_WEB_SERVER_SETUP_TYPE" value="none" />
-        <env name="TYPO3_INSTALL_SITE_SETUP_TYPE" value="createsite" />
+        <env name="TYPO3_INSTALL_SITE_SETUP_TYPE" value="site" />
     </php>
     <testsuites>
         <testsuite name="TYPO3 Console Unit Tests">

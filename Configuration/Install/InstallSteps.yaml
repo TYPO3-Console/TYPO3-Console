@@ -16,7 +16,7 @@ databaseConnect:
             type: select
             values:
                 mysqli: 'MySQL connection'
-                pdo_sqlite: 'SQLite connection (TYPO3 9.5 or higher)'
+                pdo_sqlite: 'SQLite connection'
                 pdo_pgsql: 'PostgreSQL connection'
                 mssql: 'MSSQL connection'
             value: '%env(TYPO3_INSTALL_DB_DRIVER)%'
@@ -110,6 +110,12 @@ defaultConfiguration:
                 site: 'Create root page'
             value: '%env(TYPO3_INSTALL_SITE_SETUP_TYPE)%'
             default: 'no'
+        siteUrl:
+            description: 'Specify the site base url'
+            option: '--site-base-url'
+            type: string
+            default: '/'
+            value: '%env(TYPO3_INSTALL_SITE_BASE_URL)%'
 
 writeWebserverConfiguration:
     type: Helhum\Typo3Console\Install\Action\WriteWebServerConfigAction

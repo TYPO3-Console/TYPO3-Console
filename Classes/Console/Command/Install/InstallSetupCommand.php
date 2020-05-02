@@ -173,6 +173,13 @@ EOH
                 'no'
             ),
             new InputOption(
+                'site-base-url',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'When `site-setup-type` is set to `site`, this base url is used for the created site configuration',
+                '/'
+            ),
+            new InputOption(
                 'non-interactive',
                 null,
                 InputOption::VALUE_NONE,
