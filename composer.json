@@ -49,6 +49,7 @@
         "typo3/cms-filemetadata": "^10.4.1 || dev-master",
         "typo3-console/create-reference-command": "@dev",
         "typo3-console/php-server-command": "^0.2",
+        "symfony/expression-language": "^4.4 || ^5.0",
         "symfony/filesystem": "^4.4 || ^5.0",
         "nimut/testing-framework": "5.x-dev",
         "php-parallel-lint/php-parallel-lint": "^1.2"

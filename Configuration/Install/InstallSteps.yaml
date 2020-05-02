@@ -23,6 +23,7 @@ databaseConnect:
             default: 'mysqli'
 
         databaseUserName:
+            condition: 'databaseDriver != "pdo_sqlite"'
             description: 'User name for database server'
             option: '--database-user-name'
             type: string
@@ -30,6 +31,7 @@ databaseConnect:
             default: ''
 
         databaseUserPassword:
+            condition: 'databaseDriver != "pdo_sqlite"'
             description: 'User password for database server'
             option: '--database-user-password'
             type: hidden
@@ -37,6 +39,7 @@ databaseConnect:
             default: ''
 
         databaseHostName:
+            condition: 'databaseDriver != "pdo_sqlite"'
             description: 'Host name of database server'
             option: '--database-host-name'
             type: string
@@ -44,6 +47,7 @@ databaseConnect:
             default: '127.0.0.1'
 
         databasePort:
+            condition: 'databaseDriver != "pdo_sqlite"'
             description: 'TCP Port of database server'
             option: '--database-port'
             type: int
@@ -51,6 +55,7 @@ databaseConnect:
             default: 3306
 
         databaseSocket:
+            condition: 'databaseDriver != "pdo_sqlite"'
             description: 'Unix Socket to connect to'
             option: '--database-socket'
             type: string
@@ -111,6 +116,7 @@ defaultConfiguration:
             value: '%env(TYPO3_INSTALL_SITE_SETUP_TYPE)%'
             default: 'no'
         siteUrl:
+            condition: 'siteSetupType == "site"'
             description: 'Specify the site base url'
             option: '--site-base-url'
             type: string

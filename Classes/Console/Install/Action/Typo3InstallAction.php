@@ -18,6 +18,7 @@ use Helhum\Typo3Console\Install\CliMessageRenderer;
 use Helhum\Typo3Console\Install\InstallStepResponse;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
+use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 
 class Typo3InstallAction implements InstallActionInterface
 {
@@ -62,12 +63,6 @@ class Typo3InstallAction implements InstallActionInterface
         );
         $response = $this->executeActionWithArguments($actionName, $arguments);
 
-        if ($this->executeActionWithArguments('actionNeedsExecution', [$actionName])->actionNeedsExecution()) {
-            // @deprecated Can be removed once TYPO3 8.7 support is removed. Then it will be safe to call the action only once
-            // and just assume it completed
-            $response = $this->executeActionWithArguments($actionName, $arguments);
-        }
-
         $messages = $response->getMessages();
         $messageRenderer = new CliMessageRenderer($this->output);
         $messageRenderer->render($messages);
@@ -99,21 +94,16 @@ class Typo3InstallAction implements InstallActionInterface
      * @param string $actionName Name of the install step
      * @param array $arguments Arguments for the install step
      * @param array $options Options for the install step
+     * @throws FailedSubProcessCommandException
      * @return InstallStepResponse
      */
-    private function executeActionWithArguments($actionName, array $arguments = [], array $options = [])
+    private function executeActionWithArguments($actionName, array $arguments = [], array $options = []): InstallStepResponse
     {
         $actionName = strtolower($actionName);
         // Arguments must come first then options, to avoid argument values to be passed to boolean flags
         $arguments = array_merge($arguments, $options);
         $actionResult = $this->commandDispatcher->executeCommand('install:' . $actionName, $arguments);
-        $response = @unserialize($actionResult);
-        if ($response === false && $actionName === 'defaultconfiguration') {
-            // This action terminates with exit, (trying to initiate a HTTP redirect)
-            // Therefore we gracefully create a valid response here
-            $response = new InstallStepResponse(false, []);
-        }
 
-        return $response;
+        return @unserialize($actionResult);
     }
 }
