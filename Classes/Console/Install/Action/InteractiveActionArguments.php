@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\Install\Action;
 
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class InteractiveActionArguments
 {
@@ -47,13 +48,25 @@ class InteractiveActionArguments
         $actionArguments = [];
         foreach ($argumentDefinitions as $argumentName => $argumentDefinition) {
             $argumentValue = $this->extractArgumentValueFromDefinitionOrGivenArguments($argumentName, $argumentDefinition);
-            while ($argumentValue === null) {
-                $argumentValue = $this->fetchArgumentValue($argumentDefinition);
+            if ($this->shouldExtractValue($argumentDefinition, $actionArguments)) {
+                while ($argumentValue === null) {
+                    $argumentValue = $this->fetchArgumentValue($argumentDefinition);
+                }
             }
             $actionArguments[$argumentName] = $argumentValue;
         }
 
         return $actionArguments;
+    }
+
+    private function shouldExtractValue(array $argumentDefinition, array $actionArguments): bool
+    {
+        if (!$condition = ($argumentDefinition['condition'] ?? '')) {
+            return true;
+        }
+        $expressionLanguage = new ExpressionLanguage();
+
+        return (bool)$expressionLanguage->evaluate($condition, $actionArguments);
     }
 
     private function extractArgumentValueFromDefinitionOrGivenArguments(string $argumentName, array $argumentDefinition)
