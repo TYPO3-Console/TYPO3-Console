@@ -30,7 +30,7 @@ class ParsedClass
     protected $className;
 
     /**
-     * @var
+     * @var string
      */
     protected $namespaceSeparator = '\\';
 
