@@ -14,8 +14,10 @@ namespace Helhum\Typo3Console\Service;
  *
  */
 
+use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
+use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -54,19 +56,19 @@ class CacheService implements SingletonInterface
     /**
      * Flushes caches using the data handler.
      * Although we trigger the cache flush API here, the real intention is to trigger
-     * hook subscribers, so that they can do their job (flushing "other" caches when cache is flushed.
-     * For example realurl subscribes to these hooks.
+     * hook subscribers, so that they can do their job (flushing "other" caches when cache is flushed).
      *
      * We use "all" because this method is only called from "flush" command which is indeed meant
      * to flush all caches. Besides that, "all" is really all caches starting from TYPO3 8.x
      * thus it would make sense for the hook subscribers to act on that cache clear type.
      *
      * However if you find a valid use case for us to also call "pages" here, then please create
-     * a pull request and describe this case. "system" or "temp_cached" will not be added however
-     * because these are deprecated since TYPO3 8.x
+     * a pull request and describe this case.
      */
-    public function flushCachesWithDataHandler()
+    public function flushCachesWithDataHandler(): void
     {
+        Bootstrap::initializeBackendUser(CommandLineUserAuthentication::class);
+        Bootstrap::initializeBackendAuthentication();
         $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
         $dataHandler->start([], []);
         $dataHandler->clear_cacheCmd('all');
@@ -77,8 +79,9 @@ class CacheService implements SingletonInterface
      *
      * @param array $groups
      * @throws NoSuchCacheGroupException
+     * @return void
      */
-    public function flushGroups(array $groups)
+    public function flushGroups(array $groups): void
     {
         $this->ensureCacheGroupsExist($groups);
         foreach ($groups as $group) {
@@ -91,8 +94,10 @@ class CacheService implements SingletonInterface
      *
      * @param array $tags
      * @param string $group
+     * @throws NoSuchCacheGroupException
+     * @return void
      */
-    public function flushByTags(array $tags, $group = null)
+    public function flushByTags(array $tags, $group = null): void
     {
         foreach ($tags as $tag) {
             if ($group === null) {
@@ -108,8 +113,10 @@ class CacheService implements SingletonInterface
      *
      * @param array $tags
      * @param array $groups
+     * @throws NoSuchCacheGroupException
+     * @return void
      */
-    public function flushByTagsAndGroups(array $tags, array $groups = null)
+    public function flushByTagsAndGroups(array $tags, array $groups = null): void
     {
         if ($groups === null) {
             $this->flushByTags($tags);
@@ -121,10 +128,7 @@ class CacheService implements SingletonInterface
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getValidCacheGroups()
+    public function getValidCacheGroups(): array
     {
         $validGroups = [];
         foreach ($this->cacheConfiguration as $cacheConfiguration) {
@@ -138,9 +142,9 @@ class CacheService implements SingletonInterface
 
     /**
      * @param array $groups
-     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
+     * @throws NoSuchCacheGroupException
      */
-    private function ensureCacheGroupsExist($groups)
+    private function ensureCacheGroupsExist($groups): void
     {
         $validGroups = $this->getValidCacheGroups();
         $sanitizedGroups = array_intersect($groups, $validGroups);
