@@ -73,5 +73,6 @@ class Scripts
         Bootstrap::loadExtTables();
         Bootstrap::initializeBackendUser(CommandLineUserAuthentication::class);
         Bootstrap::initializeBackendAuthentication();
+        Bootstrap::initializeLanguageObject();
     }
 }
