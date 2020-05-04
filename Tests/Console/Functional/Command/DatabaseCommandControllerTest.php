@@ -91,13 +91,13 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
         $this->installFixtureExtensionCode('ext_test_cache');
         $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
         $this->executeMysqlQuery('DROP TABLE IF EXISTS `cache_rootline`');
-
-        $output = $this->executeConsoleCommand('database:updateschema', ['--verbose']);
-
-        $this->assertContains('CREATE TABLE `cache_rootline`', $output);
-
-        $this->removeFixtureExtensionCode('ext_test_cache');
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
+        try {
+            $output = $this->executeConsoleCommand('database:updateschema', ['--verbose']);
+            $this->assertContains('CREATE TABLE `cache_rootline`', $output);
+        } finally {
+            $this->removeFixtureExtensionCode('ext_test_cache');
+            $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
+        }
     }
 
     /**

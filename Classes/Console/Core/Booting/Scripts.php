@@ -17,6 +17,7 @@ namespace Helhum\Typo3Console\Core\Booting;
 use Helhum\Typo3Console\Error\ErrorHandler;
 use Helhum\Typo3Console\Error\ExceptionHandler;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\Container;
 use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Imaging\IconRegistry;
@@ -24,7 +25,7 @@ use TYPO3\CMS\Core\Page\PageRenderer;
 
 class Scripts
 {
-    public static function initializeErrorHandling()
+    public static function initializeErrorHandling(): void
     {
         error_reporting(E_ALL & ~E_NOTICE);
         $exceptionHandler = new ExceptionHandler();
@@ -45,8 +46,11 @@ class Scripts
         set_error_handler([$errorHandler, 'handleError']);
     }
 
-    public static function initializeExtensionConfiguration(ContainerInterface $container)
+    public static function initializeExtensionConfiguration(ContainerInterface $container): void
     {
+        if ($container instanceof Container && $container->get('boot.state')->runLevel === RunLevel::LEVEL_FULL) {
+            self::enableEarlyCachesInContainer($container);
+        }
         $container->get('boot.state')->done = false;
         $assetsCache = $container->get('cache.assets');
         $coreCache = $container->get('cache.core');
@@ -57,7 +61,7 @@ class Scripts
         $container->get('boot.state')->done = true;
     }
 
-    public static function initializePersistence(ContainerInterface $container)
+    public static function initializePersistence(ContainerInterface $container): void
     {
         Bootstrap::loadBaseTca(true, $container->get('cache.core'));
         if (empty($GLOBALS['TYPO3_CONF_VARS']['SYS']['encryptionKey'])) {
@@ -68,11 +72,25 @@ class Scripts
         }
     }
 
-    public static function initializeAuthenticatedOperations()
+    public static function initializeAuthenticatedOperations(): void
     {
         Bootstrap::loadExtTables();
         Bootstrap::initializeBackendUser(CommandLineUserAuthentication::class);
         Bootstrap::initializeBackendAuthentication();
         Bootstrap::initializeLanguageObject();
+    }
+
+    /**
+     * We simulate caches in full boot mode, although we booted failsafe
+     *
+     * @param Container $container
+     * @throws \TYPO3\CMS\Core\Cache\Exception\InvalidBackendException
+     * @throws \TYPO3\CMS\Core\Cache\Exception\InvalidCacheException
+     */
+    private static function enableEarlyCachesInContainer(Container $container): void
+    {
+        $container->get('boot.state')->cacheDisabled = false;
+        $container->set('cache.core', Bootstrap::createCache('core'));
+        $container->set('cache.assets', Bootstrap::createCache('assets'));
     }
 }

@@ -43,7 +43,7 @@ class Sequence
     }
 
     /**
-     * Adds the given step to this sequence, to be executed after then step specified
+     * Adds the given step to this sequence, to be executed after the step specified
      * by $previousStepIdentifier. If no previous step is specified, the new step
      * is added to the list of steps executed right at the start of the sequence.
      *
@@ -51,9 +51,23 @@ class Sequence
      * @param string $previousStepIdentifier The preceding step
      * @return void
      */
-    public function addStep(Step $step, $previousStepIdentifier = 'start')
+    public function addStep(Step $step, $previousStepIdentifier = 'start'): void
     {
         $this->steps[$previousStepIdentifier][] = $step;
+    }
+
+    /**
+     * Prepends the given step to this sequence, to be executed before then step specified
+     * by $prependStepIdentifier. If no prepended step is specified, the new step
+     * is added to the list of steps executed right before the start of the sequence.
+     *
+     * @param \Helhum\Typo3Console\Core\Booting\Step $step The new step to add
+     * @param string $prependStepIdentifier The preceding step
+     * @return void
+     */
+    public function prependStep(Step $step, $prependStepIdentifier = 'start'): void
+    {
+        array_unshift($this->steps[$prependStepIdentifier], $step);
     }
 
     /**
@@ -63,7 +77,7 @@ class Sequence
      * @throws Exception
      * @return void
      */
-    public function removeStep($stepIdentifier)
+    public function removeStep($stepIdentifier): void
     {
         $removedOccurrences = 0;
         foreach ($this->steps as $previousStepIdentifier => $steps) {
@@ -76,22 +90,6 @@ class Sequence
         }
         if ($removedOccurrences === 0) {
             throw new Exception(sprintf('Cannot remove sequence step with identifier "%s" because no such step exists in the given sequence.', $stepIdentifier), 1322591669);
-        }
-    }
-
-    public function replaceStep($stepIdentifier, Step $newStep)
-    {
-        $removedOccurrences = 0;
-        foreach ($this->steps as $previousStepIdentifier => $steps) {
-            foreach ($steps as $index => $step) {
-                if ($step->getIdentifier() === $stepIdentifier) {
-                    $this->steps[$previousStepIdentifier][$index] = $newStep;
-                    $removedOccurrences++;
-                }
-            }
-        }
-        if ($removedOccurrences === 0) {
-            throw new Exception(sprintf('Cannot replace sequence step with identifier "%s" because no such step exists in the given sequence.', $stepIdentifier), 1577557048);
         }
     }
 

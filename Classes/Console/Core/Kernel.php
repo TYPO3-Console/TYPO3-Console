@@ -14,9 +14,9 @@ namespace Helhum\Typo3Console\Core;
  *
  */
 
-use Composer\Autoload\ClassLoader;
 use Helhum\Typo3Console\CompatibilityClassLoader;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
+use Helhum\Typo3Console\Core\Booting\Scripts;
 use Helhum\Typo3Console\Core\Booting\Step;
 use Helhum\Typo3Console\Core\Booting\StepFailedException;
 use Helhum\Typo3Console\Exception;
@@ -44,11 +44,6 @@ class Kernel
      * @var RunLevel
      */
     private $runLevel;
-
-    /**
-     * @var bool
-     */
-    private $initialized = false;
 
     /**
      * @var CompatibilityClassLoader
@@ -84,56 +79,6 @@ class Kernel
     }
 
     /**
-     * Legacy method called by old composer plugins
-     *
-     * @param ClassLoader $classLoader
-     * @internal
-     * @deprecated will be removed with 6.0
-     */
-    public static function initializeCompatibilityLayer(ClassLoader $classLoader)
-    {
-        new CompatibilityClassLoader($classLoader);
-    }
-
-    /**
-     * This is useful to bootstrap the console application
-     * without actually executing a command (e.g. during composer install)
-     *
-     * @param string $runLevel
-     * @throws Exception
-     * @throws InvalidArgumentException
-     */
-    public function initialize(string $runLevel = null)
-    {
-        if (!$this->initialized) {
-            SystemEnvironmentBuilder::run(0, SystemEnvironmentBuilder::REQUESTTYPE_CLI);
-            $container = Bootstrap::init(
-                $this->classLoader->getTypo3ClassLoader(),
-                true
-            );
-            // @TODO: Can be removed, once TYPO3 does not start buffering on CLI within Bootstrap::init()
-            ob_end_flush();
-            $error = null;
-            try {
-                $lateBootService = $container->get(\TYPO3\CMS\Install\Service\LateBootService::class);
-                $this->container = $lateBootService->getContainer();
-                $lateBootService->makeCurrent($this->container);
-                ExtensionManagementUtility::setEventDispatcher($this->container->get(EventDispatcherInterface::class));
-            } catch (\Throwable $e) {
-                $this->container = $container;
-                $error = new StepFailedException(new Step('build-container', function () {
-                }), $e);
-            }
-            $this->runLevel = new RunLevel($this->container, $error);
-            $this->initialized = true;
-        }
-
-        if ($runLevel !== null) {
-            $this->runLevel->runSequence($runLevel);
-        }
-    }
-
-    /**
      * Handle the given command input and return the exit code of the called command
      *
      * @param InputInterface $input
@@ -161,6 +106,42 @@ class Kernel
         $application->setCommandLoader($commandCollection);
 
         return $application->run($input);
+    }
+
+    /**
+     * Bootstrap the console application
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     */
+    private function initialize(): void
+    {
+        SystemEnvironmentBuilder::run(0, SystemEnvironmentBuilder::REQUESTTYPE_CLI);
+        $failsafeContainer = Bootstrap::init(
+            $this->classLoader->getTypo3ClassLoader(),
+            true
+        );
+        // @TODO: Can be removed, once TYPO3 does not start buffering on CLI within Bootstrap::init()
+        ob_end_flush();
+        Scripts::initializeErrorHandling();
+        $error = null;
+        try {
+            $lateBootService = $failsafeContainer->get(\TYPO3\CMS\Install\Service\LateBootService::class);
+            $this->container = $lateBootService->getContainer();
+            $lateBootService->makeCurrent($this->container);
+            ExtensionManagementUtility::setEventDispatcher($this->container->get(EventDispatcherInterface::class));
+        } catch (\Throwable $e) {
+            $this->container = $failsafeContainer;
+            $error = new StepFailedException(
+                new Step(
+                    'build-container',
+                    function () {
+                    }
+                ),
+                $e
+            );
+        }
+        $this->runLevel = new RunLevel($this->container, $error);
     }
 
     /**
