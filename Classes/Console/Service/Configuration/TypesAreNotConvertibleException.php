@@ -14,9 +14,11 @@ namespace Helhum\Typo3Console\Service\Configuration;
  *
  */
 
+use Helhum\Typo3Console\Service\Exception;
+
 /**
  * Variable types could not be converted
  */
-class TypesAreNotConvertibleException extends \Exception
+class TypesAreNotConvertibleException extends Exception
 {
 }
