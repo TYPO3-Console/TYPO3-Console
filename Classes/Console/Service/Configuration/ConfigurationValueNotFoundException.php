@@ -14,9 +14,11 @@ namespace Helhum\Typo3Console\Service\Configuration;
  *
  */
 
+use Helhum\Typo3Console\Service\Exception;
+
 /**
  * Configuration value was not found
  */
-class ConfigurationValueNotFoundException extends \Exception
+class ConfigurationValueNotFoundException extends Exception
 {
 }
