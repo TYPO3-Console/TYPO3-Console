@@ -33,6 +33,11 @@ class InstallActionNeedsExecutionCommand extends Command
         );
     }
 
+    public function isEnabled()
+    {
+        return getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') === false;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $actionName = $input->getArgument('actionName');

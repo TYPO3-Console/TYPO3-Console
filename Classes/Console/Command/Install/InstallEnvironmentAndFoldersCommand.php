@@ -33,6 +33,11 @@ EOH
         );
     }
 
+    public function isEnabled()
+    {
+        return getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') === false;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $installStepActionExecutor = new InstallStepActionExecutor(
