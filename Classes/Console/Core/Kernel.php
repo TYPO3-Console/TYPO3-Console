@@ -22,9 +22,8 @@ use Helhum\Typo3Console\Core\Booting\StepFailedException;
 use Helhum\Typo3Console\Exception;
 use Helhum\Typo3Console\Mvc\Cli\CommandCollection;
 use Helhum\Typo3Console\Mvc\Cli\CommandConfiguration;
-use Helhum\Typo3Console\Mvc\Cli\CommandLoaderCollection;
-use Helhum\Typo3Console\Mvc\Cli\FilteredCommandLoaderCollection;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
+use Helhum\Typo3Console\Mvc\Cli\Typo3CommandRegistry;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -91,16 +90,11 @@ class Kernel
         $this->initialize();
 
         $commandConfiguration = new CommandConfiguration();
-        $consoleCommandCollection = new CommandCollection($commandConfiguration);
-        $consoleCommandCollection->initializeRunLevel($this->runLevel);
-
-        $commandCollection = new CommandLoaderCollection(
-            $consoleCommandCollection,
-            new FilteredCommandLoaderCollection(
-                $this->container->get(CommandRegistry::class),
-                $commandConfiguration->getReplaces()
-            )
+        $commandCollection = new CommandCollection(
+            $commandConfiguration,
+            new Typo3CommandRegistry($this->container->get(CommandRegistry::class))
         );
+        $commandCollection->initializeRunLevel($this->runLevel);
 
         $application = new Application($this->runLevel, Environment::isComposerMode());
         $application->setCommandLoader($commandCollection);

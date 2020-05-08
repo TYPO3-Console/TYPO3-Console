@@ -18,6 +18,7 @@ use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Symfony\Component\Console\Command\Command as BaseCommand;
 use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Core\Console\CommandNameAlreadyInUseException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -44,9 +45,15 @@ class CommandCollection implements CommandLoaderInterface
      */
     private $replaces = [];
 
-    public function __construct(CommandConfiguration $commandConfiguration)
+    /**
+     * @var Typo3CommandRegistry
+     */
+    private $typo3CommandRegistry;
+
+    public function __construct(CommandConfiguration $commandConfiguration, Typo3CommandRegistry $typo3CommandRegistry)
     {
         $this->commandConfiguration = $commandConfiguration;
+        $this->typo3CommandRegistry = $typo3CommandRegistry;
         $this->populateCommands();
     }
 
@@ -61,6 +68,9 @@ class CommandCollection implements CommandLoaderInterface
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name), [], 1518812618);
         }
         $commandConfig = $this->commands[$name];
+        if ($commandConfig['service']) {
+            return $this->typo3CommandRegistry->get($name);
+        }
         if (isset($commandConfig['class'])) {
             /** @var BaseCommand $command */
             $command = GeneralUtility::makeInstance($commandConfig['class'], $commandConfig['name']);
@@ -92,13 +102,28 @@ class CommandCollection implements CommandLoaderInterface
         return array_keys($this->commands);
     }
 
-    private function populateCommands(array $definitions = null): void
+    private function populateCommands(): void
     {
-        $definitions = $definitions ?? $this->commandConfiguration->getCommandDefinitions();
+        $definitions = array_merge($this->getTypo3CommandDefinitions(), $this->commandConfiguration->getCommandDefinitions());
         $this->replaces = $this->commandConfiguration->getReplaces();
         foreach ($definitions as $commandConfig) {
             $this->add($commandConfig);
         }
+    }
+
+    private function getTypo3CommandDefinitions(): array
+    {
+        $definitions = [];
+        foreach ($this->typo3CommandRegistry->getCommandConfiguration() as $commandName => $commandConfig) {
+            $definitions[] = [
+                'name' => $commandName,
+                'nameSpacedName' => $commandName,
+                'class' => $commandConfig['class'],
+                'service' => true,
+            ];
+        }
+
+        return $definitions;
     }
 
     /**
@@ -121,8 +146,18 @@ class CommandCollection implements CommandLoaderInterface
 
     private function add(array $commandConfig): void
     {
+        if (isset($this->commands[$commandConfig['name']])
+            && $this->commands[$commandConfig['name']]['service']
+            && $this->commands[$commandConfig['name']]['class'] === $commandConfig['class']
+        ) {
+            if (isset($commandConfig['runLevel'])) {
+                throw new RuntimeException(sprintf('Command "%s" is registered as service. Setting runLevel via configuration is not supported in that case.', $commandConfig['name']), 1589019018);
+            }
+            // Command is also registered as service. Ignoring legacy registration
+            return;
+        }
         $finalCommandName = $commandConfig['name'];
-        if (in_array($commandConfig['nameSpacedName'], $this->replaces, true)) {
+        if (in_array($commandConfig['class'], $this->replaces, true)) {
             return;
         }
         if (isset($this->commands[$finalCommandName])) {
@@ -138,7 +173,7 @@ class CommandCollection implements CommandLoaderInterface
         }
         $commandConfig['name'] = $finalCommandName;
         $this->commands[$finalCommandName] = $commandConfig;
-        foreach ($commandConfig['aliases'] as $alias) {
+        foreach ($commandConfig['aliases'] ?? [] as $alias) {
             $this->commands[$alias] = $commandConfig;
         }
     }

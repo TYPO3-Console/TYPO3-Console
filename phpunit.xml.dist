@@ -14,6 +14,7 @@
     verbose="true"
 >
     <php>
+        <env name="TYPO3_CONSOLE_TEST_RUN" value="1" />
         <env name="TYPO3_INSTALL_DB_USER" value="root" />
         <env name="TYPO3_INSTALL_DB_HOST" value="127.0.0.1" />
         <env name="TYPO3_INSTALL_DB_PASSWORD" value="" />

@@ -1,0 +1,14 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  TYPO3Console\ExtCommand\:
+    resource: '../src/*'
+
+  TYPO3Console\ExtCommand\ExtCommand:
+    tags:
+      - { name: 'console.command', command: 'ext:command' }
+      - { name: 'console.command', command: 'ext:command-alias', alias: true }
+

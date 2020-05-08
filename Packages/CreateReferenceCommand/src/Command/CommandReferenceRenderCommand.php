@@ -89,7 +89,7 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
         $_SERVER['PHP_SELF'] = Application::COMMAND_NAME;
         $commandReferenceDir = getenv('TYPO3_PATH_COMPOSER_ROOT') . '/Documentation/CommandReference/';
         GeneralUtility::flushDirectory($commandReferenceDir, true);
-        $commandCollection = new CommandCollection(new CommandConfiguration());
+        $commandCollection = new CommandCollection(new CommandConfiguration(), new EmptyTypo3CommandRegistry());
         $application = new class($this->getApplication()) extends \Symfony\Component\Console\Application {
             /**
              * @var Application
