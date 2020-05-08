@@ -13,10 +13,17 @@ class ExtAlias extends ExtCommand
 
     public function __construct(string $name = null, CommandRegistry $registry = null)
     {
+        if (getenv('THROWS_CONSTRUCT_EXCEPTION')) {
+            throw new \Exception('Error occurred during object creation', 1589036051);
+        }
         parent::__construct($name, $registry);
         self::$instanceCount++;
         if (self::$instanceCount > 1) {
             throw new \RuntimeException('Instance created multiple times', 1589023998);
+        }
+        if (!isset($GLOBALS['TCA'])) {
+            // We check whether the command is instantiated after TYPO3 boot.
+            throw new \RuntimeException('Instance created before boot', 1589025618);
         }
     }
 }

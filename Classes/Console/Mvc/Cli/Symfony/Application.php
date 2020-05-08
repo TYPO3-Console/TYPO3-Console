@@ -18,6 +18,7 @@ use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\Booting\StepFailedException;
 use Helhum\Typo3Console\Error\ExceptionRenderer;
 use Helhum\Typo3Console\Exception\CommandNotAvailableException;
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\ErroredCommand;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\HelpCommand;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\ListCommand;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Input\ArgvInput;
@@ -52,6 +53,11 @@ class Application extends BaseApplication
      * @var bool
      */
     private $composerManaged;
+
+    /**
+     * @var ErroredCommand[]
+     */
+    private $erroredCommands = [];
 
     public function __construct(RunLevel $runLevel = null, bool $composerManaged = true)
     {
@@ -142,6 +148,14 @@ class Application extends BaseApplication
         return $this->runLevel->isCommandAvailable($command->getName());
     }
 
+    /**
+     * @return ErroredCommand[]
+     */
+    public function getErroredCommands(): array
+    {
+        return $this->erroredCommands;
+    }
+
     public function renderException($exception, OutputInterface $output)
     {
         if ($exception instanceof CommandNotAvailableException) {
@@ -171,6 +185,15 @@ class Application extends BaseApplication
     public function renderThrowable(\Throwable $e, OutputInterface $output): void
     {
         $this->renderException($e, $output);
+    }
+
+    public function add(Command $command)
+    {
+        if ($command instanceof ErroredCommand) {
+            $this->erroredCommands[$command->getName()] = $command;
+        }
+
+        return parent::add($command);
     }
 
     /**
@@ -214,10 +237,6 @@ class Application extends BaseApplication
 
     private function ensureCommandAvailable(Command $command)
     {
-        $commandName = $command->getName();
-        if ($this->runLevel->isCommandAvailable($commandName)) {
-            $this->runLevel->runSequenceForCommand($commandName);
-        }
         if (!$this->runLevel->getError() && !$this->isCommandAvailable($command)) {
             throw new CommandNotAvailableException($command->getName());
         }

@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 use Helhum\Typo3Console\Core\Booting\RunLevel;
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Command\ErroredCommand;
 use Symfony\Component\Console\Command\Command as BaseCommand;
 use Symfony\Component\Console\CommandLoader\CommandLoaderInterface;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
@@ -36,9 +37,14 @@ class CommandCollection implements CommandLoaderInterface
     private $commandConfiguration;
 
     /**
-     * @var BaseCommand[]
+     * @var array
      */
     private $commands = [];
+
+    /**
+     * @var BaseCommand[]
+     */
+    private $erroredCommands = [];
 
     /**
      * @var string[]
@@ -58,6 +64,40 @@ class CommandCollection implements CommandLoaderInterface
     }
 
     /**
+     * Try resolving short command names and aliases
+     * If that fails, we return the command name as is and let the application throw an exception.
+     *
+     * Inspired by \Symfony\Component\Console\Application::find()
+     *
+     * @param string $possibleName
+     * @return string
+     */
+    public function find(string $possibleName): string
+    {
+        $allCommands = $this->getNames();
+        $expr = preg_replace_callback('{([^:]+|)}', function ($matches) {
+            return preg_quote($matches[1], '/') . '[^:]*';
+        }, $possibleName);
+        $commands = preg_grep('{^' . $expr . '}', $allCommands);
+
+        if (empty($commands)) {
+            $commands = preg_grep('{^' . $expr . '}i', $allCommands);
+        }
+
+        // filter out aliases for commands which are already on the list
+        if (count($commands) > 1) {
+            $commandList = $this->commands;
+            $commands = array_unique(array_filter($commands, function ($nameOrAlias) use ($commandList, $commands) {
+                $commandName = $commandList[$nameOrAlias]['name'];
+
+                return $commandName === $nameOrAlias || !in_array($commandName, $commands, true);
+            }));
+        }
+
+        return !empty($commands) && count($commands) === 1 ? $this->commands[reset($commands)]['name'] : $possibleName;
+    }
+
+    /**
      * @param string $name
      * @throws \Symfony\Component\Console\Exception\CommandNotFoundException
      * @return BaseCommand
@@ -67,22 +107,34 @@ class CommandCollection implements CommandLoaderInterface
         if (!isset($this->commands[$name])) {
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name), [], 1518812618);
         }
+        if (isset($this->erroredCommands[$this->commands[$name]['name']])) {
+            return $this->erroredCommands[$this->commands[$name]['name']];
+        }
         $commandConfig = $this->commands[$name];
-        if ($commandConfig['service']) {
-            return $this->typo3CommandRegistry->get($name);
-        }
-        if (isset($commandConfig['class'])) {
-            /** @var BaseCommand $command */
-            $command = GeneralUtility::makeInstance($commandConfig['class'], $commandConfig['name']);
-        } else {
-            throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name), [], 1520205204);
-        }
+        try {
+            if ($commandConfig['service']) {
+                return $this->typo3CommandRegistry->get($name);
+            }
+            if (isset($commandConfig['class'])) {
+                /** @var BaseCommand $command */
+                $command = GeneralUtility::makeInstance($commandConfig['class'], $commandConfig['name']);
+            } else {
+                throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name), [], 1520205204);
+            }
 
-        if (!empty($this->commands[$name]['aliases'])) {
-            $command->setAliases($this->commands[$name]['aliases']);
-        }
+            if (!empty($this->commands[$name]['aliases'])) {
+                $command->setAliases($this->commands[$name]['aliases']);
+            }
 
-        return $command;
+            return $command;
+        } catch (\Throwable $e) {
+            if (isset($commandConfig['runLevel'])) {
+                // Do not hide object creation errors in lowlevel commands
+                throw $e;
+            }
+
+            return $this->erroredCommands[$commandConfig['name']] = new ErroredCommand($commandConfig['name'], $e);
+        }
     }
 
     /**
@@ -117,6 +169,7 @@ class CommandCollection implements CommandLoaderInterface
         foreach ($this->typo3CommandRegistry->getCommandConfiguration() as $commandName => $commandConfig) {
             $definitions[] = [
                 'name' => $commandName,
+                'vendor' => $commandName,
                 'nameSpacedName' => $commandName,
                 'class' => $commandConfig['class'],
                 'service' => true,

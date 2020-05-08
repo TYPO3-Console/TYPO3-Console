@@ -96,6 +96,13 @@ class Kernel
         );
         $commandCollection->initializeRunLevel($this->runLevel);
 
+        // Try to resolve short command names and aliases
+        $givenCommandName = $input->getFirstArgument() ?: 'list';
+        $commandName = $commandCollection->find($givenCommandName);
+        if ($this->runLevel->isCommandAvailable($commandName)) {
+            $this->runLevel->runSequenceForCommand($commandName);
+        }
+
         $application = new Application($this->runLevel, Environment::isComposerMode());
         $application->setCommandLoader($commandCollection);
 
