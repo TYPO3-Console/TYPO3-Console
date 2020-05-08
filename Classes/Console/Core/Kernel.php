@@ -101,6 +101,11 @@ class Kernel
         $commandName = $commandCollection->find($givenCommandName);
         if ($this->runLevel->isCommandAvailable($commandName)) {
             $this->runLevel->runSequenceForCommand($commandName);
+            if ($this->runLevel->getError()) {
+                // If a booting error occurred, we cannot boot further,
+                // thus can assume booting is "done".
+                $this->container->get('boot.state')->done = true;
+            }
         }
 
         $application = new Application($this->runLevel, Environment::isComposerMode());
