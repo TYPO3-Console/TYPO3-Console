@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Error;
  */
 
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class ExceptionHandler
 {
@@ -24,11 +25,11 @@ class ExceptionHandler
     private $exceptionRenderer;
 
     /**
-     * @var ConsoleOutput
+     * @var OutputInterface
      */
     protected $output;
 
-    public function __construct(ExceptionRenderer $exceptionRenderer = null, ConsoleOutput $output = null)
+    public function __construct(ExceptionRenderer $exceptionRenderer = null, OutputInterface $output = null)
     {
         $this->exceptionRenderer = $exceptionRenderer ?: new ExceptionRenderer();
         $this->output = $output ?? new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG);
@@ -42,7 +43,7 @@ class ExceptionHandler
      */
     public function handleException(\Throwable $exception)
     {
-        $this->exceptionRenderer->render($exception, $this->output->getErrorOutput());
+        $this->exceptionRenderer->render($exception, $this->output);
 
         echo PHP_EOL;
         exit(1);
