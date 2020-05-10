@@ -41,6 +41,6 @@ class ExtCommand extends Command
 
     public function isEnabled()
     {
-        return getenv('TYPO3_CONSOLE_TEST_RUN') !== false;
+        return !empty(getenv('TYPO3_CONSOLE_TEST_RUN'));
     }
 }

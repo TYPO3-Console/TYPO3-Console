@@ -37,14 +37,9 @@ class CommandCollection implements CommandLoaderInterface
     private $commandConfiguration;
 
     /**
-     * @var array
+     * @var array|BaseCommand[]
      */
     private $commands = [];
-
-    /**
-     * @var BaseCommand[]
-     */
-    private $erroredCommands = [];
 
     /**
      * @var string[]
@@ -108,37 +103,48 @@ class CommandCollection implements CommandLoaderInterface
         if (!isset($this->commands[$name])) {
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name), [], 1518812618);
         }
-        if (isset($this->erroredCommands[$this->commands[$name]['name']])) {
-            return $this->erroredCommands[$this->commands[$name]['name']];
+        if ($this->commands[$name] instanceof BaseCommand) {
+            return $this->commands[$name];
         }
-        $commandConfig = $this->commands[$name];
+        $command = $this->createInstance($name);
+        $this->commands[$name] = $command;
+        foreach ($command->getAliases() as $alias) {
+            $this->commands[$alias] = $command;
+        }
+
+        return $command;
+    }
+
+    private function createInstance(string $name): BaseCommand
+    {
         try {
-            if ($commandConfig['service']) {
-                return $this->typo3CommandRegistry->get($name);
+            if ($this->commands[$name]['service']) {
+                $command = $this->typo3CommandRegistry->get($name);
+
+                return $command;
             }
-            if (isset($commandConfig['class'])) {
+            if (isset($this->commands[$name]['class'])) {
                 /** @var BaseCommand $command */
-                $command = GeneralUtility::makeInstance($commandConfig['class'], $commandConfig['name']);
-            } else {
-                throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name), [], 1520205204);
+                $command = GeneralUtility::makeInstance($this->commands[$name]['class'], $this->commands[$name]['name']);
+
+                return $command;
             }
-            $command->setAliases($this->commands[$name]['aliases'] ?? []);
-            if (!$command->isEnabled()) {
-                $this->disabledCommands[$name] = $command;
-                foreach ($command->getAliases() as $alias) {
-                    $this->disabledCommands[$alias] = $command;
-                }
-            }
+        } catch (\Throwable $e) {
+            // There might be some edge cases where creating the object fails
+            // Create a dummy command, which is disabled for that case
+            // In Application we check for that and show an error accordingly,
+            // but we do not interfere with other commands
+            $command = new ErroredCommand($this->commands[$name]['name'], $e);
 
             return $command;
-        } catch (\Throwable $e) {
-            if (isset($commandConfig['runLevel'])) {
-                // Do not hide object creation errors in lowlevel commands
-                throw $e;
+        } finally {
+            if (isset($command) && !$this->commands[$name]['service']) {
+                // Aliases have been set during dependency injection container object creation already,
+                // but set them for other cases here
+                $command->setAliases($this->commands[$name]['aliases']);
             }
-
-            return $this->erroredCommands[$commandConfig['name']] = new ErroredCommand($commandConfig['name'], $e);
         }
+        throw new CommandNotFoundException(sprintf('The command "%s" does not exist. No class defined.', $name), [], 1520205204);
     }
 
     /**

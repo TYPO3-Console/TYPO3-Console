@@ -99,6 +99,18 @@ class ListCommandTest extends AbstractCommandTest
     /**
      * @test
      */
+    public function commandsClassesAreNotInstantiatedTwiceWhenDisabled(): void
+    {
+        $output = $this->executeConsoleCommand('list', [], ['TYPO3_CONSOLE_TEST_RUN' => '0']);
+        $this->assertNotContains('ext:alias', $output);
+        $this->assertNotContains('ext:command', $output);
+        $this->assertNotContains('ext_bla:extension:activate', $output);
+        $this->assertNotContains('ext_command:extension:list', $output);
+    }
+
+    /**
+     * @test
+     */
     public function serviceCommandGetsDependenciesInjected(): void
     {
         $output = $this->executeConsoleCommand('ext:command');
