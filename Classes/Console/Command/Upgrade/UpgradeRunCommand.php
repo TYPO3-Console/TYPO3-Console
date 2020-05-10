@@ -52,11 +52,15 @@ When no identifier is specified a select UI is presented to select a wizard out 
 
   <code>%command.full_name% all</code>
 
-  <code>%command.full_name% all --no-interaction --confirm all --deny typo3DbLegacyExtension --deny funcExtension</code>
-
-  <code>%command.full_name% all --no-interaction --deny all</code>
+  <code>%command.full_name% all --confirm all</code>
 
   <code>%command.full_name% argon2iPasswordHashes --confirm all</code>
+
+  <code>%command.full_name% all --confirm all --deny typo3DbLegacyExtension --deny funcExtension</code>
+
+  <code>%command.full_name% all --deny all</code>
+
+  <code>%command.full_name% all --no-interaction --deny all --confirm argon2iPasswordHashes</code>
 
 EOH
         );
@@ -76,7 +80,7 @@ EOH
             'deny',
             'd',
             InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-            'Identifier of the wizard, that should be denied. Keyword "all" denies all wizards.'
+            'Identifier of the wizard, that should be denied. Keyword "all" denies all wizards. Deny takes precedence except when "all" is specified.'
         );
         $this->addOption(
             'force',
@@ -172,14 +176,20 @@ EOH
         $confirmations = $input->getOption('confirm');
         $denies = $input->getOption('deny');
         $force = $input->getOption('force') && !$runAllWizards;
-        if (in_array(self::allWizardsOrConfirmations, $confirmations, true)) {
+        if ($allowAll = \in_array(self::allWizardsOrConfirmations, $confirmations, true)) {
             $confirmations = $wizardsToExecute;
         }
-        if (in_array(self::allWizardsOrConfirmations, $denies, true)) {
+        if ($denyAll = \in_array(self::allWizardsOrConfirmations, $denies, true)) {
             $denies = $wizardsToExecute;
         }
-        // Filter confirmations, that are present in denies
-        $confirmations = array_diff($confirmations, array_intersect($confirmations, $denies));
+
+        if ($denyAll && !$allowAll) {
+            // Filter denies, that are present in confirmations
+            $denies = array_diff($denies, array_intersect($denies, $confirmations));
+        } else {
+            // Default: Filter confirmations, that are present in denies
+            $confirmations = array_diff($confirmations, array_intersect($confirmations, $denies));
+        }
 
         return [$wizardsToExecute, $confirmations, $denies, $force];
     }

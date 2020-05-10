@@ -214,6 +214,46 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
+    public function upgradeRunCanConfirmAllAndDenySomeConfirmableWizards(): void
+    {
+        $this->installFixtureExtensionCode('ext_upgrade');
+        $this->executeConsoleCommand('install:generatepackagestates');
+        $this->executeConsoleCommand('extension:setup', ['ext_upgrade']);
+        try {
+            $this->executeMysqlQuery('DELETE FROM sys_registry WHERE entry_namespace = \'installUpdate\' AND (entry_key LIKE \'%ext_upgrade%\' OR entry_key LIKE \'%RsaauthExtractionUpdate%\')');
+            $output = $this->executeConsoleCommand('upgrade:run', ['all', '--confirm', 'all', '--deny', 'rsaauthExtension']);
+            $this->assertContains('Skipped wizard "rsaauthExtension"', $output);
+            $this->assertContains('Successfully executed upgrade wizard "confirmableWizard"', $output);
+            $this->assertContains('Successfully executed upgrade wizard "normalWizard"', $output);
+        } finally {
+            $this->removeFixtureExtensionCode('ext_upgrade');
+            $this->executeConsoleCommand('install:generatepackagestates');
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function upgradeRunCanDenyAllAndConfirmSomeConfirmableWizards(): void
+    {
+        $this->installFixtureExtensionCode('ext_upgrade');
+        $this->executeConsoleCommand('install:generatepackagestates');
+        $this->executeConsoleCommand('extension:setup', ['ext_upgrade']);
+        try {
+            $this->executeMysqlQuery('DELETE FROM sys_registry WHERE entry_namespace = \'installUpdate\' AND (entry_key LIKE \'%ext_upgrade%\' OR entry_key LIKE \'%RsaauthExtractionUpdate%\')');
+            $output = $this->executeConsoleCommand('upgrade:run', ['all', '--deny', 'all', '--confirm', 'confirmableWizard']);
+            $this->assertContains('Skipped wizard "rsaauthExtension"', $output);
+            $this->assertContains('Successfully executed upgrade wizard "confirmableWizard"', $output);
+            $this->assertContains('Successfully executed upgrade wizard "normalWizard"', $output);
+        } finally {
+            $this->removeFixtureExtensionCode('ext_upgrade');
+            $this->executeConsoleCommand('install:generatepackagestates');
+        }
+    }
+
+    /**
+     * @test
+     */
     public function rowUpdaterCanBeForced(): void
     {
         $output = $this->executeConsoleCommand('upgrade:list');
