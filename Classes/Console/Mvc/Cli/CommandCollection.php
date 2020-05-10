@@ -99,7 +99,8 @@ class CommandCollection implements CommandLoaderInterface
 
     /**
      * @param string $name
-     * @throws \Symfony\Component\Console\Exception\CommandNotFoundException
+     * @throws CommandNotFoundException
+     * @throws \Throwable
      * @return BaseCommand
      */
     public function get($name): BaseCommand
@@ -121,9 +122,12 @@ class CommandCollection implements CommandLoaderInterface
             } else {
                 throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $name), [], 1520205204);
             }
-
-            if (!empty($this->commands[$name]['aliases'])) {
-                $command->setAliases($this->commands[$name]['aliases']);
+            $command->setAliases($this->commands[$name]['aliases'] ?? []);
+            if (!$command->isEnabled()) {
+                $this->disabledCommands[$name] = $command;
+                foreach ($command->getAliases() as $alias) {
+                    $this->disabledCommands[$alias] = $command;
+                }
             }
 
             return $command;
@@ -156,17 +160,17 @@ class CommandCollection implements CommandLoaderInterface
 
     private function populateCommands(): void
     {
-        $definitions = array_merge($this->getTypo3CommandDefinitions(), $this->commandConfiguration->getCommandDefinitions());
+        $definitions = array_merge($this->commandConfiguration->getCommandDefinitions(), $this->getTypo3ServiceDefinitions(), $this->typo3CommandRegistry->getCommandConfiguration());
         $this->replaces = $this->commandConfiguration->getReplaces();
         foreach ($definitions as $commandConfig) {
             $this->add($commandConfig);
         }
     }
 
-    private function getTypo3CommandDefinitions(): array
+    private function getTypo3ServiceDefinitions(): array
     {
         $definitions = [];
-        foreach ($this->typo3CommandRegistry->getCommandConfiguration() as $commandName => $commandConfig) {
+        foreach ($this->typo3CommandRegistry->getServiceConfiguration() as $commandName => $commandConfig) {
             $definitions[] = [
                 'name' => $commandName,
                 'vendor' => $commandName,
@@ -199,17 +203,17 @@ class CommandCollection implements CommandLoaderInterface
 
     private function add(array $commandConfig): void
     {
-        if (isset($this->commands[$commandConfig['name']])
-            && $this->commands[$commandConfig['name']]['service']
-            && $this->commands[$commandConfig['name']]['class'] === $commandConfig['class']
+        $finalCommandName = $commandConfig['name'];
+        if (isset($this->commands[$finalCommandName])
+            && $this->commands[$finalCommandName]['service']
+            && $this->commands[$finalCommandName]['class'] === $commandConfig['class']
         ) {
             if (isset($commandConfig['runLevel'])) {
-                throw new RuntimeException(sprintf('Command "%s" is registered as service. Setting runLevel via configuration is not supported in that case.', $commandConfig['name']), 1589019018);
+                throw new RuntimeException(sprintf('Command "%s" is registered as service. Setting runLevel via configuration is not supported in that case.', $finalCommandName), 1589019018);
             }
             // Command is also registered as service. Ignoring legacy registration
             return;
         }
-        $finalCommandName = $commandConfig['name'];
         if (in_array($commandConfig['class'], $this->replaces, true)) {
             return;
         }
@@ -226,7 +230,7 @@ class CommandCollection implements CommandLoaderInterface
         }
         $commandConfig['name'] = $finalCommandName;
         $this->commands[$finalCommandName] = $commandConfig;
-        foreach ($commandConfig['aliases'] ?? [] as $alias) {
+        foreach ($commandConfig['aliases'] as $alias) {
             $this->commands[$alias] = $commandConfig;
         }
     }

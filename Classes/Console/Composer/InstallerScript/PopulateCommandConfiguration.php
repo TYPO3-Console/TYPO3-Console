@@ -50,8 +50,10 @@ class PopulateCommandConfiguration implements InstallerScript
         foreach ($this->extractPackageMapFromComposer($composer) as [$package, $installPath]) {
             /** @var PackageInterface $package */
             $installPath = ($installPath ?: $basePath);
-            if ($package->getType() === 'metapackage') {
-                // Meta packages can be skipped
+            if (in_array($package->getType(), ['metapackage', 'typo3-cms-extension', 'typo3-cms-framework'], true)) {
+                // Commands in TYPO3 extensions are scanned for anyway at a later point.
+                // With that we ensure not showing commands for extensions that aren't active.
+                // Since meta packages have no code, thus cannot include any commands, we ignore them as well.
                 continue;
             }
             $packageConfig = $this->getConfigFromPackage($installPath, $package);
