@@ -9,6 +9,9 @@ return [
     'backend:lock' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Backend\LockBackendCommand::class,
+        'replace' => [
+            \TYPO3\CMS\Backend\Command\LockBackendCommand::class,
+        ],
     ],
     'backend:lockforeditors' => [
         'vendor' => 'typo3_console',
@@ -17,6 +20,9 @@ return [
     'backend:unlock' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Backend\UnlockBackendCommand::class,
+        'replace' => [
+            \TYPO3\CMS\Backend\Command\UnlockBackendCommand::class,
+        ],
     ],
     'backend:unlockforeditors' => [
         'vendor' => 'typo3_console',
@@ -84,11 +90,17 @@ return [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Extension\DumpAutoloadCommand::class,
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
+        'replace' => [
+            \TYPO3\CMS\Core\Command\DumpAutoloadCommand::class,
+        ],
     ],
     'extension:list' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Extension\ExtensionListCommand::class,
         'schedulable' => false,
+        'replace' => [
+            \TYPO3\CMS\Core\Command\ExtensionListCommand::class,
+        ],
     ],
     'extension:setup' => [
         'vendor' => 'typo3_console',
@@ -171,6 +183,9 @@ return [
     'upgrade:list' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeListCommand::class,
+        'replace' => [
+            \TYPO3\CMS\Install\Command\UpgradeWizardListCommand::class,
+        ],
     ],
     'upgrade:prepare' => [
         'vendor' => 'typo3_console',
@@ -181,7 +196,7 @@ return [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeRunCommand::class,
         'replace' => [
-            'upgrade:run',
+            \TYPO3\CMS\Install\Command\UpgradeWizardRunCommand::class,
         ],
     ],
 ];

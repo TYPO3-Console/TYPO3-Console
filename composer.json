@@ -52,7 +52,8 @@
         "symfony/expression-language": "^4.4 || ^5.0",
         "symfony/filesystem": "^4.4 || ^5.0",
         "nimut/testing-framework": "5.x-dev",
-        "php-parallel-lint/php-parallel-lint": "^1.2"
+        "php-parallel-lint/php-parallel-lint": "^1.2",
+        "typo3-console/ext-command": "@dev"
     },
     "conflict": {
         "typo3-ter/dbal": "*",

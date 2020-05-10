@@ -14,8 +14,12 @@ namespace Helhum\Typo3Console\Composer\InstallerScript;
  *
  */
 
+use Composer\Composer;
+use Composer\IO\IOInterface;
+use Composer\Package\PackageInterface;
 use Composer\Script\Event as ScriptEvent;
-use Helhum\Typo3Console\Mvc\Cli\CommandConfiguration;
+use Composer\Util\PackageSorter;
+use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Composer\Plugin\Core\InstallerScript;
 
 /**
@@ -25,6 +29,11 @@ use TYPO3\CMS\Composer\Plugin\Core\InstallerScript;
 class PopulateCommandConfiguration implements InstallerScript
 {
     /**
+     * @var IOInterface
+     */
+    private $io;
+
+    /**
      * Called from Composer
      *
      * @param ScriptEvent $event
@@ -33,31 +42,35 @@ class PopulateCommandConfiguration implements InstallerScript
      */
     public function run(ScriptEvent $event): bool
     {
+        $this->io = $event->getIO();
         $composer = $event->getComposer();
         $composerConfig = $composer->getConfig();
         $basePath = realpath(substr($composerConfig->get('vendor-dir'), 0, -strlen($composerConfig->get('vendor-dir', $composerConfig::RELATIVE_PATHS))));
         $commandConfiguration = [];
-        foreach ($this->extractPackageMapFromComposer($composer) as $item) {
-            /** @var \Composer\Package\PackageInterface $package */
-            list($package, $installPath) = $item;
+        foreach ($this->extractPackageMapFromComposer($composer) as [$package, $installPath]) {
+            /** @var PackageInterface $package */
             $installPath = ($installPath ?: $basePath);
-            $packageName = $package->getName();
-            $packageType = $package->getType();
-            if ($packageType === 'metapackage') {
-                // Meta packages can be skipped
+            if (in_array($package->getType(), ['metapackage', 'typo3-cms-extension', 'typo3-cms-framework'], true)) {
+                // Commands in TYPO3 extensions are scanned for anyway at a later point.
+                // With that we ensure not showing commands for extensions that aren't active.
+                // Since meta packages have no code, thus cannot include any commands, we ignore them as well.
                 continue;
             }
-            $packageConfig = $this->getConfigFromPackage($installPath, $packageName);
+            $packageConfig = $this->getConfigFromPackage($installPath, $package);
             if ($packageConfig !== []) {
                 $commandConfiguration[] = $packageConfig;
             }
         }
+        $generatedConfigFilePath = $composerConfig->get('vendor-dir') . '/helhum/typo3-console/Configuration/ComposerPackagesCommands.php';
+        if ($composer->getPackage()->getName() === 'helhum/typo3-console') {
+            $generatedConfigFilePath = $basePath . '/Configuration/ComposerPackagesCommands.php';
+        }
 
         $success = file_put_contents(
-            __DIR__ . '/../../../../Configuration/ComposerPackagesCommands.php',
+            $generatedConfigFilePath,
             '<?php' . chr(10)
             . 'return '
-            . var_export($commandConfiguration, true)
+            . var_export(array_merge([], ...$commandConfiguration), true)
             . ';'
         );
 
@@ -65,35 +78,104 @@ class PopulateCommandConfiguration implements InstallerScript
     }
 
     /**
-     * @param \Composer\Composer $composer
+     * @param Composer $composer
      * @return array
      */
-    private function extractPackageMapFromComposer(\Composer\Composer $composer): array
+    private function extractPackageMapFromComposer(Composer $composer): array
     {
         $mainPackage = $composer->getPackage();
         $autoLoadGenerator = $composer->getAutoloadGenerator();
         $localRepo = $composer->getRepositoryManager()->getLocalRepository();
 
-        return $autoLoadGenerator->buildPackageMap($composer->getInstallationManager(), $mainPackage, $localRepo->getCanonicalPackages());
+        return $this->sortPackageMap($autoLoadGenerator->buildPackageMap($composer->getInstallationManager(), $mainPackage, $localRepo->getCanonicalPackages()));
     }
 
     /**
-     * @param string $installPath
-     * @param string $packageName
-     * @throws \Symfony\Component\Console\Exception\RuntimeException
+     * Sorts packages by dependency weight
+     *
+     * Packages of equal weight retain the original order
+     *
+     * @param  array $packageMap
      * @return array
      */
-    private function getConfigFromPackage(string $installPath, string $packageName): array
+    private function sortPackageMap(array $packageMap): array
     {
-        $commandConfiguration = [];
-        if (file_exists($commandConfigurationFile = $installPath . '/Configuration/Commands.php')) {
-            $commandConfiguration['commands'] = require $commandConfigurationFile;
+        $packages = [];
+        $paths = [];
+
+        foreach ($packageMap as [$package, $path]) {
+            /** @var PackageInterface $package */
+            $name = $package->getName();
+            $packages[$name] = $package;
+            $paths[$name] = $path;
         }
-        if (empty($commandConfiguration)) {
+
+        $sortedPackages = PackageSorter::sortPackages($packages);
+
+        $sortedPackageMap = [];
+        $sortedPackageMap[] = [$packages['helhum/typo3-console'], $paths['helhum/typo3-console']];
+
+        foreach ($sortedPackages as $package) {
+            $name = $package->getName();
+            if ($name === 'helhum/typo3-console') {
+                continue;
+            }
+            $sortedPackageMap[] = [$packages[$name], $paths[$name]];
+        }
+
+        return $sortedPackageMap;
+    }
+
+    private function getConfigFromPackage(string $installPath, PackageInterface $package): array
+    {
+        if (!file_exists($commandConfigurationFile = $installPath . '/Configuration/Commands.php')) {
             return [];
         }
-        CommandConfiguration::ensureValidCommandRegistration($commandConfiguration, $packageName);
 
-        return CommandConfiguration::unifyCommandConfiguration($commandConfiguration, $packageName);
+        if (empty($commandConfiguration = require $commandConfigurationFile)) {
+            return [];
+        }
+        $this->ensureValidCommandRegistration($commandConfiguration, $this->resolveVendorName($package));
+
+        return $this->unifyCommandConfiguration($commandConfiguration, $package);
+    }
+
+    /**
+     * @param mixed $commandConfiguration
+     * @param string $packageName
+     * @throws RuntimeException
+     */
+    private function ensureValidCommandRegistration($commandConfiguration, $packageName): void
+    {
+        if (!is_array($commandConfiguration)) {
+            throw new RuntimeException($packageName . ' defines invalid commands in Configuration/Console/Commands.php', 1461186959);
+        }
+    }
+
+    private function unifyCommandConfiguration(array $commandConfiguration, PackageInterface $package): array
+    {
+        $commandDefinitions = [];
+
+        foreach ($commandConfiguration ?? [] as $commandName => $commandConfig) {
+            $vendor = $commandConfig['vendor'] ?? $this->resolveVendorName($package);
+            $nameSpacedCommandName = $vendor . ':' . $commandName;
+            $commandConfig['vendor'] = $vendor;
+            $commandConfig['name'] = $commandName;
+            $commandConfig['nameSpacedName'] = $nameSpacedCommandName;
+            $commandConfig['service'] = false;
+            $commandDefinitions[] = $commandConfig;
+        }
+
+        return $commandDefinitions;
+    }
+
+    private function resolveVendorName(PackageInterface $package): string
+    {
+        $vendor = $package->getName();
+        if (strpos($package->getType(), 'typo3-cms-') === 0) {
+            $vendor = $package->getExtra()['typo3/cms']['extension-key'] ?? $vendor;
+        }
+
+        return $vendor;
     }
 }

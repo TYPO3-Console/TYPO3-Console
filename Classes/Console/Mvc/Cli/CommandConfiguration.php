@@ -14,8 +14,6 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  *
  */
 
-use Symfony\Component\Console\Exception\RuntimeException;
-
 /**
  * Represents command configuration provided by composer packages
  */
@@ -34,38 +32,6 @@ class CommandConfiguration
     public function __construct()
     {
         $this->initialize();
-    }
-
-    /**
-     * @param mixed $commandConfiguration
-     * @param string $packageName
-     * @throws RuntimeException
-     */
-    public static function ensureValidCommandRegistration($commandConfiguration, $packageName): void
-    {
-        if (
-            !is_array($commandConfiguration)
-            || !isset($commandConfiguration['commands'])
-            || !is_array($commandConfiguration['commands'])
-        ) {
-            throw new RuntimeException($packageName . ' defines invalid commands in Configuration/Console/Commands.php', 1461186959);
-        }
-    }
-
-    public static function unifyCommandConfiguration(array $commandConfiguration, string $packageName): array
-    {
-        $commandDefinitions = [];
-
-        foreach ($commandConfiguration['commands'] ?? [] as $commandName => $commandConfig) {
-            $vendor = $commandConfig['vendor'] ?? $packageName;
-            $nameSpacedCommandName = $vendor . ':' . $commandName;
-            $commandConfig['vendor'] = $vendor;
-            $commandConfig['name'] = $commandName;
-            $commandConfig['nameSpacedName'] = $nameSpacedCommandName;
-            $commandDefinitions[] = $commandConfig;
-        }
-
-        return $commandDefinitions;
     }
 
     /**
@@ -96,14 +62,6 @@ class CommandConfiguration
 
     private function initialize(): void
     {
-        $this->commandDefinitions = array_merge([], ...$this->getComposerPackagesCommands());
-    }
-
-    /**
-     * @return array
-     */
-    private function getComposerPackagesCommands(): array
-    {
-        return require __DIR__ . '/../../../../Configuration/ComposerPackagesCommands.php';
+        $this->commandDefinitions = require __DIR__ . '/../../../../Configuration/ComposerPackagesCommands.php';
     }
 }

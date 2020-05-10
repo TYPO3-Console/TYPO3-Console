@@ -60,8 +60,9 @@ class ListCommand extends \Symfony\Component\Console\Command\ListCommand
         if (!$application instanceof Application) {
             return 0;
         }
+        $io = new SymfonyStyle($input, $output);
+        $messages = [];
         if (!$input->getArgument('namespace') && !$application->isFullyCapable() && !$input->getOption('all')) {
-            $outputHelper = new SymfonyStyle($input, $output);
             $messages = [
                 '',
                 sprintf(
@@ -78,11 +79,30 @@ class ListCommand extends \Symfony\Component\Console\Command\ListCommand
                     $_SERVER['PHP_SELF']
                 ),
             ];
-
-            $outputHelper->getErrorStyle()->writeln($messages);
+        }
+        $exceptions = [];
+        if (($erroredCommands = $application->getErroredCommands()) && (!$application->hasErrors() || $input->getOption('all'))) {
+            $messages[] = '';
+            $messages[] = '<error>Some commands could not be configured and are missing in this list:</error>';
+            foreach ($erroredCommands as $command) {
+                $messages[] = sprintf(
+                    '<error>Command name: "%s", error: "%s"</error>',
+                    $command->getName(),
+                    $command->getException()->getMessage()
+                );
+                $exceptions[] = $command->getException();
+            }
+        }
+        if ($messages !== []) {
+            $io->getErrorStyle()->writeln($messages);
+        }
+        if ($output->isVerbose()) {
+            foreach ($exceptions as $exception) {
+                $application->renderThrowable($exception, $output);
+            }
         }
 
-        return 0;
+        return $exceptions === [] ? 0 : 1;
     }
 
     private function amendDefinition(InputDefinition $definition): InputDefinition

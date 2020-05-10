@@ -131,7 +131,7 @@ class CommandDispatcher
      */
     public static function create($typo3CommandPath, array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null): self
     {
-        $environmentVars['TYPO3_CONSOLE_SUB_PROCESS'] = true;
+        $environmentVars['TYPO3_CONSOLE_SUB_PROCESS'] = $environmentVars['TYPO3_CONSOLE_SUB_PROCESS'] ?? '1';
         $phpFinder = $phpFinder ?: new PhpExecutableFinder();
         if (!($php = $phpFinder->find(false))) {
             throw new RuntimeException('The "php" binary could not be found.', 1485128615);

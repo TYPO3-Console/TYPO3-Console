@@ -19,6 +19,7 @@ use Helhum\Typo3Console\Mvc\Cli\SubProcessException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
 use TYPO3\CMS\Core\Log\LogManager;
@@ -45,6 +46,9 @@ class ExceptionRenderer
      */
     public function render(\Throwable $exception, OutputInterface $output, Application $application = null)
     {
+        if ($output instanceof ConsoleOutput) {
+            $output = $output->getErrorOutput();
+        }
         $this->writeLog($exception);
         if (getenv('TYPO3_CONSOLE_SUB_PROCESS')) {
             $output->write(\json_encode($this->serializeException($exception)), false, OutputInterface::VERBOSITY_QUIET);
