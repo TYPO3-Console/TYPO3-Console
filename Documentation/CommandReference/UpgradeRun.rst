@@ -34,8 +34,8 @@ When no identifier is specified a select UI is presented to select a wizard out 
 Arguments
 ~~~~~~~~~
 
-`wizardIdentifier`
-   
+`wizardIdentifiers`
+   One or more wizard identifiers to run
 
 
 
