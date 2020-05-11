@@ -33,7 +33,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
      */
     public function checkExtensionConstraintsReturnsErrorCodeOnFailure(): void
     {
-        $this->installFixtureExtensionCode('ext_test');
+        self::installFixtureExtensionCode('ext_test');
         $this->executeConsoleCommand('install:generatepackagestates');
         $this->executeConsoleCommand('extension:setup', ['ext_test']);
         try {
@@ -43,7 +43,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $this->assertSame(1, $e->getExitCode());
             $this->assertContains('"ext_test" requires TYPO3 versions 4.5.0', $e->getOutputMessage());
         } finally {
-            $this->removeFixtureExtensionCode('ext_test');
+            self::removeFixtureExtensionCode('ext_test');
             $this->executeConsoleCommand('install:generatepackagestates');
         }
     }
@@ -53,13 +53,13 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
      */
     public function checkExtensionCompatibilityReportsBrokenCodeInExtTables(): void
     {
-        $this->installFixtureExtensionCode('ext_broken_ext_tables');
+        self::installFixtureExtensionCode('ext_broken_ext_tables');
         $this->executeConsoleCommand('install:generatepackagestates');
 
         $output = $this->commandDispatcher->executeCommand('upgrade:checkextensioncompatibility', ['ext_broken_ext_tables']);
         $this->assertSame('false', $output);
 
-        $this->removeFixtureExtensionCode('ext_broken_ext_tables');
+        self::removeFixtureExtensionCode('ext_broken_ext_tables');
         $this->executeConsoleCommand('install:generatepackagestates');
     }
 
@@ -68,13 +68,13 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
      */
     public function checkExtensionCompatibilityDoeNotReportBrokenCodeInExtTablesWithConfigOnlyCheck(): void
     {
-        $this->installFixtureExtensionCode('ext_broken_ext_tables');
+        self::installFixtureExtensionCode('ext_broken_ext_tables');
         $this->executeConsoleCommand('install:generatepackagestates');
 
         $output = $this->commandDispatcher->executeCommand('upgrade:checkextensioncompatibility', ['ext_broken_ext_tables', '--config-only']);
         $this->assertSame('true', $output);
 
-        $this->removeFixtureExtensionCode('ext_broken_ext_tables');
+        self::removeFixtureExtensionCode('ext_broken_ext_tables');
         $this->executeConsoleCommand('install:generatepackagestates');
     }
 
@@ -107,7 +107,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
      */
     public function upgradeListShowsActiveWizards(): void
     {
-        $this->installFixtureExtensionCode('ext_upgrade');
+        self::installFixtureExtensionCode('ext_upgrade');
         $this->executeConsoleCommand('install:generatepackagestates');
         $this->executeConsoleCommand('extension:setup', ['ext_upgrade']);
         $this->executeConsoleCommand('upgrade:prepare');
@@ -121,7 +121,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         $this->assertContains('repeatableWizard', $output);
         $this->assertContains('It is not despair', $output);
 
-        $this->removeFixtureExtensionCode('ext_upgrade');
+        self::removeFixtureExtensionCode('ext_upgrade');
         $this->executeConsoleCommand('install:generatepackagestates');
     }
 
@@ -130,7 +130,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
      */
     public function upgradeRunCanRunIndividualWizardWhichIsMarkedExecutedAndCanBeRunForced(): void
     {
-        $this->installFixtureExtensionCode('ext_upgrade');
+        self::installFixtureExtensionCode('ext_upgrade');
         $this->executeConsoleCommand('install:generatepackagestates');
         $this->executeConsoleCommand('extension:setup', ['ext_upgrade']);
         try {
@@ -156,7 +156,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $output = $this->executeConsoleCommand('upgrade:run', ['repeatableWizard']);
             $this->assertContains('Successfully executed upgrade wizard "repeatableWizard"', $output);
         } finally {
-            $this->removeFixtureExtensionCode('ext_upgrade');
+            self::removeFixtureExtensionCode('ext_upgrade');
             $this->executeConsoleCommand('install:generatepackagestates');
         }
     }
@@ -166,7 +166,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
      */
     public function upgradeRunAllRunsAllWizards(): void
     {
-        $this->installFixtureExtensionCode('ext_upgrade');
+        self::installFixtureExtensionCode('ext_upgrade');
         $this->executeConsoleCommand('install:generatepackagestates');
         $this->executeConsoleCommand('extension:setup', ['ext_upgrade']);
         try {
@@ -183,7 +183,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $output = $this->executeConsoleCommand('upgrade:run', ['all'], ['TYPO3_CONSOLE_DISABLE_REPEATABLE_WIZARD' => 1]);
             $this->assertContains('All wizards done. Nothing to do.', $output);
         } finally {
-            $this->removeFixtureExtensionCode('ext_upgrade');
+            self::removeFixtureExtensionCode('ext_upgrade');
             $this->executeConsoleCommand('install:generatepackagestates');
         }
     }
@@ -193,7 +193,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
      */
     public function upgradeRunCanRunMultipleSpecifiedWizards(): void
     {
-        $this->installFixtureExtensionCode('ext_upgrade');
+        self::installFixtureExtensionCode('ext_upgrade');
         $this->executeConsoleCommand('install:generatepackagestates');
         $this->executeConsoleCommand('extension:setup', ['ext_upgrade']);
         try {
@@ -206,7 +206,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $output = $this->executeConsoleCommand('upgrade:run', ['all'], ['TYPO3_CONSOLE_DISABLE_REPEATABLE_WIZARD' => 1]);
             $this->assertContains('All wizards done. Nothing to do.', $output);
         } finally {
-            $this->removeFixtureExtensionCode('ext_upgrade');
+            self::removeFixtureExtensionCode('ext_upgrade');
             $this->executeConsoleCommand('install:generatepackagestates');
         }
     }
@@ -216,7 +216,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
      */
     public function upgradeRunCanConfirmAllAndDenySomeConfirmableWizards(): void
     {
-        $this->installFixtureExtensionCode('ext_upgrade');
+        self::installFixtureExtensionCode('ext_upgrade');
         $this->executeConsoleCommand('install:generatepackagestates');
         $this->executeConsoleCommand('extension:setup', ['ext_upgrade']);
         try {
@@ -226,7 +226,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $this->assertContains('Successfully executed upgrade wizard "confirmableWizard"', $output);
             $this->assertContains('Successfully executed upgrade wizard "normalWizard"', $output);
         } finally {
-            $this->removeFixtureExtensionCode('ext_upgrade');
+            self::removeFixtureExtensionCode('ext_upgrade');
             $this->executeConsoleCommand('install:generatepackagestates');
         }
     }
@@ -236,7 +236,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
      */
     public function upgradeRunCanDenyAllAndConfirmSomeConfirmableWizards(): void
     {
-        $this->installFixtureExtensionCode('ext_upgrade');
+        self::installFixtureExtensionCode('ext_upgrade');
         $this->executeConsoleCommand('install:generatepackagestates');
         $this->executeConsoleCommand('extension:setup', ['ext_upgrade']);
         try {
@@ -246,7 +246,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $this->assertContains('Successfully executed upgrade wizard "confirmableWizard"', $output);
             $this->assertContains('Successfully executed upgrade wizard "normalWizard"', $output);
         } finally {
-            $this->removeFixtureExtensionCode('ext_upgrade');
+            self::removeFixtureExtensionCode('ext_upgrade');
             $this->executeConsoleCommand('install:generatepackagestates');
         }
     }

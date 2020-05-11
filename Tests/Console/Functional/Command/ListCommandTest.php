@@ -14,10 +14,23 @@ namespace Helhum\Typo3Console\Tests\Functional\Command;
  *
  */
 
+use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 
 class ListCommandTest extends AbstractCommandTest
 {
+    public static function setUpBeforeClass()
+    {
+        self::installFixtureExtensionCode('ext_command');
+        CommandDispatcher::createFromTestRun()->executeCommand('install:generatepackagestates');
+    }
+
+    public static function tearDownAfterClass()
+    {
+        self::removeFixtureExtensionCode('ext_command');
+        CommandDispatcher::createFromTestRun()->executeCommand('install:generatepackagestates');
+    }
+
     /**
      * @test
      */

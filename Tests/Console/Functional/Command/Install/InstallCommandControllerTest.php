@@ -271,15 +271,15 @@ class InstallCommandControllerTest extends AbstractCommandTest
     public function packageStatesFileIsCreatedWithoutDependentExtensions()
     {
         $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
-        $this->installFixtureExtensionCode('ext_no_dep');
-        $this->installFixtureExtensionCode('ext_with_dep');
+        self::installFixtureExtensionCode('ext_no_dep');
+        self::installFixtureExtensionCode('ext_with_dep');
         @unlink($packageStatesFile);
         $this->executeConsoleCommand('install:generatepackagestates');
         $this->assertTrue(file_exists($packageStatesFile));
         $packageConfig = require $packageStatesFile;
         $this->assertArrayNotHasKey('reports', $packageConfig['packages']);
-        $this->removeFixtureExtensionCode('ext_no_dep');
-        $this->removeFixtureExtensionCode('ext_with_dep');
+        self::removeFixtureExtensionCode('ext_no_dep');
+        self::removeFixtureExtensionCode('ext_with_dep');
         $this->executeConsoleCommand('install:generatepackagestates');
     }
 

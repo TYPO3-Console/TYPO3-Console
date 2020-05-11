@@ -112,11 +112,11 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
     /**
      * @param string $extensionKey
      */
-    protected function installFixtureExtensionCode($extensionKey)
+    protected static function installFixtureExtensionCode($extensionKey)
     {
         $sourcePath = dirname(__DIR__) . '/Fixtures/Extensions/' . $extensionKey;
         $targetPath = getenv('TYPO3_PATH_ROOT') . '/typo3conf/ext/' . $extensionKey;
-        $this->copyDirectory($sourcePath, $targetPath);
+        self::copyDirectory($sourcePath, $targetPath);
     }
 
     /**
@@ -124,7 +124,7 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
      * @param string $targetPath
      * @param array $ignoredDirectories
      */
-    protected function copyDirectory($sourcePath, $targetPath, array $ignoredDirectories = [])
+    protected static function copyDirectory($sourcePath, $targetPath, array $ignoredDirectories = [])
     {
         $ignoredDirectories = array_merge($ignoredDirectories, ['.git']);
         $fileSystem = new Filesystem();
@@ -151,15 +151,15 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
     /**
      * @param string $extensionKey
      */
-    protected function removeFixtureExtensionCode($extensionKey)
+    protected static function removeFixtureExtensionCode($extensionKey)
     {
-        $this->removeDirectory(getenv('TYPO3_PATH_ROOT') . '/typo3conf/ext/' . $extensionKey);
+        self::removeDirectory(getenv('TYPO3_PATH_ROOT') . '/typo3conf/ext/' . $extensionKey);
     }
 
     /**
      * @param string $targetPath
      */
-    protected function removeDirectory($targetPath)
+    protected static function removeDirectory($targetPath)
     {
         $fileSystem = new Filesystem();
         $iterator = new \RecursiveIteratorIterator(

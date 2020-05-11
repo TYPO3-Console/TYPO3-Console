@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace TYPO3Console\ExtCommand;
+namespace Helhum\Typo3Console\Tests\Functional\Fixtures\Extensions\ext_command\src;
 
 use TYPO3\CMS\Core\Console\CommandRegistry;
 

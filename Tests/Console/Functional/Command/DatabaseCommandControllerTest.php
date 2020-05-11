@@ -53,7 +53,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
      */
     public function addingAndRemovingFieldsAndTablesIncludingVerbositySwitchWork()
     {
-        $this->installFixtureExtensionCode('ext_test');
+        self::installFixtureExtensionCode('ext_test');
         $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
 
         $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
@@ -62,7 +62,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
         $this->assertContains('Change fields', $output);
         $this->assertContains('Add tables', $output);
 
-        $this->removeFixtureExtensionCode('ext_test');
+        self::removeFixtureExtensionCode('ext_test');
         $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
 
         $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
@@ -88,14 +88,14 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
      */
     public function databaseSchemaCanBeUpdatedWithExtensionsAccessingDatabaseCaches()
     {
-        $this->installFixtureExtensionCode('ext_test_cache');
+        self::installFixtureExtensionCode('ext_test_cache');
         $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
         $this->executeMysqlQuery('DROP TABLE IF EXISTS `cache_rootline`');
         try {
             $output = $this->executeConsoleCommand('database:updateschema', ['--verbose']);
             $this->assertContains('CREATE TABLE `cache_rootline`', $output);
         } finally {
-            $this->removeFixtureExtensionCode('ext_test_cache');
+            self::removeFixtureExtensionCode('ext_test_cache');
             $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
         }
     }
@@ -131,7 +131,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
      */
     public function schemaUpdateShowsErrorMessageIfTheyOccur()
     {
-        $this->installFixtureExtensionCode('ext_broken_sql');
+        self::installFixtureExtensionCode('ext_broken_sql');
         $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
         try {
             $output = $this->commandDispatcher->executeCommand('database:updateschema', ['*']);
@@ -147,7 +147,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
         }
         $this->assertContains('The following errors occurred:', $output);
         $this->assertContains('SQL Statement', $output);
-        $this->removeFixtureExtensionCode('ext_broken_sql');
+        self::removeFixtureExtensionCode('ext_broken_sql');
         $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
     }
 

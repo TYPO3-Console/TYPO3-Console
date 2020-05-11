@@ -8,7 +8,7 @@
     },
     "autoload": {
         "psr-4": {
-            "TYPO3Console\\ExtCommand\\": "src/"
+            "Helhum\\Typo3Console\\Tests\\Functional\\Fixtures\\Extensions\\ext_command\\": ""
         }
     }
 }
