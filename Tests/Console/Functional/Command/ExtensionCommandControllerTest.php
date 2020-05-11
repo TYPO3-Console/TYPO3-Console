@@ -65,7 +65,7 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
      */
     public function extensionSetupActiveWorksWhenExtensionChecksConfigInExtLocalConf()
     {
-        $this->installFixtureExtensionCode('ext_config');
+        self::installFixtureExtensionCode('ext_config');
         try {
             $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
             $output = $this->executeConsoleCommand('extension:setupactive');
@@ -74,7 +74,7 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
             $config = @\json_decode(trim($this->executeConsoleCommand('configuration:showlocal', ['EXTENSIONS', '--json'])), true);
             $this->assertArrayHasKey('ext_config', $config);
         } finally {
-            $this->removeFixtureExtensionCode('ext_config');
+            self::removeFixtureExtensionCode('ext_config');
             $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
             $this->executeConsoleCommand('configuration:remove', ['EXTENSIONS/ext_config', '--force']);
         }
@@ -86,7 +86,7 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
     public function extensionSetupActivePerformsSchemaUpdate()
     {
         $this->backupDatabase();
-        $this->installFixtureExtensionCode('ext_test');
+        self::installFixtureExtensionCode('ext_test');
         $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
 
         $output = $this->executeConsoleCommand('extension:setupactive');
@@ -96,7 +96,7 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
         $output = $this->executeConsoleCommand('database:updateschema');
         $this->assertContains('No schema updates were performed for update types:', $output);
 
-        $this->removeFixtureExtensionCode('ext_test');
+        self::removeFixtureExtensionCode('ext_test');
         $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
         $this->restoreDatabase();
     }
