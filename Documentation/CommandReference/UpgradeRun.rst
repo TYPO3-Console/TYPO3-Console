@@ -24,18 +24,22 @@ When no identifier is specified a select UI is presented to select a wizard out 
 
   `typo3cms upgrade:run all`
 
-  `typo3cms upgrade:run all --no-interaction --confirm all --deny typo3DbLegacyExtension --deny funcExtension`
-
-  `typo3cms upgrade:run all --no-interaction --deny all`
+  `typo3cms upgrade:run all --confirm all`
 
   `typo3cms upgrade:run argon2iPasswordHashes --confirm all`
+
+  `typo3cms upgrade:run all --confirm all --deny typo3DbLegacyExtension --deny funcExtension`
+
+  `typo3cms upgrade:run all --deny all`
+
+  `typo3cms upgrade:run all --no-interaction --deny all --confirm argon2iPasswordHashes`
 
 
 Arguments
 ~~~~~~~~~
 
-`wizardIdentifier`
-   
+`wizardIdentifiers`
+   One or more wizard identifiers to run
 
 
 
@@ -51,7 +55,7 @@ Options
 - Default: array ()
 
 `--deny|-d`
-   Identifier of the wizard, that should be denied. Keyword "all" denies all wizards.
+   Identifier of the wizard, that should be denied. Keyword "all" denies all wizards. Deny takes precedence except when "all" is specified.
 
 - Accept value: yes
 - Is value required: yes

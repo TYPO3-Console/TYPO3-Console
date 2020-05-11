@@ -23,6 +23,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Service\UpgradeWizardsService;
@@ -51,17 +52,23 @@ When no identifier is specified a select UI is presented to select a wizard out 
 
   <code>%command.full_name% all</code>
 
-  <code>%command.full_name% all --no-interaction --confirm all --deny typo3DbLegacyExtension --deny funcExtension</code>
-
-  <code>%command.full_name% all --no-interaction --deny all</code>
+  <code>%command.full_name% all --confirm all</code>
 
   <code>%command.full_name% argon2iPasswordHashes --confirm all</code>
+
+  <code>%command.full_name% all --confirm all --deny typo3DbLegacyExtension --deny funcExtension</code>
+
+  <code>%command.full_name% all --deny all</code>
+
+  <code>%command.full_name% all --no-interaction --deny all --confirm argon2iPasswordHashes</code>
 
 EOH
         );
         $this->addArgument(
-            'wizardIdentifier',
-            InputArgument::REQUIRED
+            'wizardIdentifiers',
+            InputArgument::REQUIRED | InputArgument::IS_ARRAY,
+            'One or more wizard identifiers to run',
+            []
         );
         $this->addOption(
             'confirm',
@@ -73,7 +80,7 @@ EOH
             'deny',
             'd',
             InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-            'Identifier of the wizard, that should be denied. Keyword "all" denies all wizards.'
+            'Identifier of the wizard, that should be denied. Keyword "all" denies all wizards. Deny takes precedence except when "all" is specified.'
         );
         $this->addOption(
             'force',
@@ -92,10 +99,10 @@ EOH
     protected function interact(InputInterface $input, OutputInterface $output)
     {
         $this->upgradeHandling = new UpgradeHandling();
-        if (empty($input->getArgument('wizardIdentifier'))) {
+        if (empty($input->getArgument('wizardIdentifiers'))) {
             $scheduledWizards = $this->upgradeHandling->listWizards()['scheduled'];
             if (empty($scheduledWizards)) {
-                $input->setArgument('wizardIdentifier', self::allWizardsOrConfirmations);
+                $input->setArgument('wizardIdentifiers', [self::allWizardsOrConfirmations]);
 
                 return;
             }
@@ -106,12 +113,14 @@ EOH
             ksort($wizards);
             $wizards = [self::allWizardsOrConfirmations => 'All scheduled wizards'] + $wizards;
             $io = new SymfonyStyle($input, $output);
-            $chosenWizard = $io->choice(
-                'Select wizard(s) to run',
-                $wizards,
-                self::allWizardsOrConfirmations
+            $chosenWizards = $io->askQuestion(
+                (new ChoiceQuestion(
+                    'Select wizard(s) to run',
+                    $wizards,
+                    self::allWizardsOrConfirmations
+                ))->setMultiselect(true)
             );
-            $input->setArgument('wizardIdentifier', $chosenWizard);
+            $input->setArgument('wizardIdentifiers', $chosenWizards);
         }
     }
 
@@ -123,7 +132,7 @@ EOH
 
             return 1;
         }
-        [$wizardsToExecute, $confirmations, $denies, $force, $forceRowUpdaters] = $this->unpackArguments($input);
+        [$wizardsToExecute, $confirmations, $denies, $force] = $this->unpackArguments($input);
         $io = new SymfonyStyle($input, $output);
 
         if (empty($wizardsToExecute)) {
@@ -140,15 +149,18 @@ EOH
 
     private function unpackArguments(InputInterface $input): array
     {
-        $identifier = $input->getArgument('wizardIdentifier');
+        $wizardsToExecute = $input->getArgument('wizardIdentifiers');
+        if (\in_array(self::allWizardsOrConfirmations, $wizardsToExecute, true)) {
+            $wizardsToExecute = [self::allWizardsOrConfirmations];
+        }
+        $runAllWizards = false;
+        if (count($wizardsToExecute) === 1 && $wizardsToExecute[0] === self::allWizardsOrConfirmations) {
+            $runAllWizards = true;
+            $wizardsToExecute = array_keys($this->upgradeHandling->listWizards()['scheduled']);
+        }
         $forceRowUpdaters = $input->getOption('force-row-updater');
-        if (!empty($forceRowUpdaters)
-            && (
-                $identifier === self::allWizardsOrConfirmations
-                || empty($this->upgradeHandling->listWizards()['done'][$identifier])
-                || !$this->upgradeHandling->listWizards()['done'][$identifier]['wizard'] instanceof DatabaseRowsUpdateWizard
-            )
-        ) {
+        if (!empty($forceRowUpdaters) && !$runAllWizards && !$this->hasRowUpdaterWizards($wizardsToExecute)) {
+            // Reset row updaters when DatabaseRowsUpdateWizard is not selected
             $forceRowUpdaters = [];
         }
         if (!empty($forceRowUpdaters)) {
@@ -161,23 +173,36 @@ EOH
                 }
             }
         }
-        $wizardsToExecute = [$identifier];
         $confirmations = $input->getOption('confirm');
         $denies = $input->getOption('deny');
-        $force = $input->getOption('force');
-        if ($identifier === self::allWizardsOrConfirmations) {
-            $wizardsToExecute = array_keys($this->upgradeHandling->listWizards()['scheduled']);
-            $force = false;
-        }
-        if (in_array(self::allWizardsOrConfirmations, $confirmations, true)) {
+        $force = $input->getOption('force') && !$runAllWizards;
+        if ($allowAll = \in_array(self::allWizardsOrConfirmations, $confirmations, true)) {
             $confirmations = $wizardsToExecute;
         }
-        if (in_array(self::allWizardsOrConfirmations, $denies, true)) {
+        if ($denyAll = \in_array(self::allWizardsOrConfirmations, $denies, true)) {
             $denies = $wizardsToExecute;
         }
-        // Filter confirmations, that are present in denies
-        $confirmations = array_diff($confirmations, array_intersect($confirmations, $denies));
 
-        return [$wizardsToExecute, $confirmations, $denies, $force, $forceRowUpdaters];
+        if ($denyAll && !$allowAll) {
+            // Filter denies, that are present in confirmations
+            $denies = array_diff($denies, array_intersect($denies, $confirmations));
+        } else {
+            // Default: Filter confirmations, that are present in denies
+            $confirmations = array_diff($confirmations, array_intersect($confirmations, $denies));
+        }
+
+        return [$wizardsToExecute, $confirmations, $denies, $force];
+    }
+
+    private function hasRowUpdaterWizards(array $wizardsToExecute): bool
+    {
+        $allWizards = array_merge($this->upgradeHandling->listWizards()['done'], $this->upgradeHandling->listWizards()['scheduled']);
+        foreach ($wizardsToExecute as $identifier) {
+            if (isset($allWizards[$identifier]) && $allWizards[$identifier]['wizard'] instanceof DatabaseRowsUpdateWizard) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
