@@ -16,11 +16,10 @@ namespace Helhum\Typo3Console\Command\Install;
 
 use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Command\RelatableCommandInterface;
-use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Install\FolderStructure\DefaultFactory;
 
 class InstallFixFolderStructureCommand extends AbstractConvertedCommand implements RelatableCommandInterface
 {
@@ -72,16 +71,17 @@ EOH
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $folderStructureFactory = new ExtensionFactory(GeneralUtility::makeInstance(PackageManager::class));
-        $fixedStatusObjects = $folderStructureFactory
+        $folderStructureFactory = GeneralUtility::makeInstance(DefaultFactory::class);
+        $messages = $folderStructureFactory
             ->getStructure()
-            ->fix();
+            ->fix()
+            ->getAllMessagesAndFlush();
 
-        if (empty($fixedStatusObjects)) {
+        if (empty($messages)) {
             $output->writeln('<info>No action performed!</info>');
         } else {
             $output->writeln('<info>The following directory structure has been fixed:</info>');
-            foreach ($fixedStatusObjects as $fixedStatusObject) {
+            foreach ($messages as $fixedStatusObject) {
                 $output->writeln($fixedStatusObject->getTitle());
             }
         }
