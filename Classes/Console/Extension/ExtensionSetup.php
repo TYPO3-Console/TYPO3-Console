@@ -15,11 +15,9 @@ namespace Helhum\Typo3Console\Extension;
  */
 
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
-use Helhum\Typo3Console\Install\FolderStructure\ExtensionFactory;
 use Helhum\Typo3Console\Service\CacheService;
 use Helhum\Typo3Console\Service\Database\SchemaService;
 use TYPO3\CMS\Core\Package\PackageInterface;
-use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
@@ -27,11 +25,6 @@ use TYPO3\CMS\Extensionmanager\Utility\InstallUtility;
 
 class ExtensionSetup
 {
-    /**
-     * @var ExtensionFactory
-     */
-    private $extensionFactory;
-
     /**
      * @var InstallUtility
      */
@@ -48,12 +41,10 @@ class ExtensionSetup
     private $extensionConfiguration;
 
     public function __construct(
-        ExtensionFactory $extensionFactory = null,
         InstallUtility $extensionInstaller = null,
         SchemaService $schemaService = null,
         ExtensionConfiguration $extensionConfiguration = null
     ) {
-        $this->extensionFactory = $extensionFactory ?? new ExtensionFactory(GeneralUtility::makeInstance(PackageManager::class));
         $this->extensionInstaller = $extensionInstaller ?? GeneralUtility::makeInstance(ObjectManager::class)->get(InstallUtility::class);
         $this->schemaService = $schemaService ?? GeneralUtility::makeInstance(ObjectManager::class)->get(SchemaService::class);
         $this->extensionConfiguration = $extensionConfiguration ?? new ExtensionConfiguration();
@@ -83,7 +74,6 @@ class ExtensionSetup
     public function setupExtensions(array $packages)
     {
         foreach ($packages as $package) {
-            $this->extensionFactory->getExtensionStructure($package)->fix();
             $this->callInstaller('importInitialFiles', [PathUtility::stripPathSitePrefix($package->getPackagePath()), $package->getPackageKey()]);
             $this->extensionConfiguration->saveDefaultConfiguration($package->getPackageKey());
         }
