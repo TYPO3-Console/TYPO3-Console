@@ -86,19 +86,21 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
     public function extensionSetupActivePerformsSchemaUpdate()
     {
         $this->backupDatabase();
-        self::installFixtureExtensionCode('ext_test');
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
+        try {
+            self::installFixtureExtensionCode('ext_test');
+            $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
 
-        $output = $this->executeConsoleCommand('extension:setupactive');
-        $this->assertContains('ext_test', $output);
-        $this->assertContains('are now set up.', $output);
+            $output = $this->executeConsoleCommand('extension:setupactive');
+            $this->assertContains('ext_test', $output);
+            $this->assertContains('are now set up.', $output);
 
-        $output = $this->executeConsoleCommand('database:updateschema');
-        $this->assertContains('No schema updates were performed for update types:', $output);
-
-        self::removeFixtureExtensionCode('ext_test');
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
-        $this->restoreDatabase();
+            $output = $this->executeConsoleCommand('database:updateschema');
+            $this->assertContains('No schema updates were performed for update types:', $output);
+        } finally {
+            self::removeFixtureExtensionCode('ext_test');
+            $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
+            $this->restoreDatabase();
+        }
     }
 
     /**
