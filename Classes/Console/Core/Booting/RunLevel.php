@@ -291,7 +291,8 @@ class RunLevel
                         function () {
                             Scripts::initializePersistence($this->container);
                         }
-                    )
+                    ),
+                    'helhum.typo3console:extensionconfiguration'
                 );
                 break;
             case 'helhum.typo3console:authentication':

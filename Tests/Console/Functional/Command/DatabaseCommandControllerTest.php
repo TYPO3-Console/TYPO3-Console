@@ -54,15 +54,17 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     public function addingAndRemovingFieldsAndTablesIncludingVerbositySwitchWork()
     {
         self::installFixtureExtensionCode('ext_test');
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
+        try {
+            $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
 
-        $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
+            $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
 
-        $this->assertContains('The following database schema updates were performed:', $output);
-        $this->assertContains('Change fields', $output);
-        $this->assertContains('Add tables', $output);
-
-        self::removeFixtureExtensionCode('ext_test');
+            $this->assertContains('The following database schema updates were performed:', $output);
+            $this->assertContains('Change fields', $output);
+            $this->assertContains('Add tables', $output);
+        } finally {
+            self::removeFixtureExtensionCode('ext_test');
+        }
         $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
 
         $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
