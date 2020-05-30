@@ -76,7 +76,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
     /**
      * @test
      */
-    public function frameworkExtensionsAreNotMarkedAsActiveByDefault()
+    public function frameworkExtensionsAreNotMarkedAsActiveByDefaultInNonComposerMode()
     {
         $packageProphecy = $this->prophesize(PackageInterface::class);
         $packageProphecy->getPackageKey()->willReturn('foo');
@@ -95,14 +95,41 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageManagerProphecy->deactivatePackage('foo')->shouldBeCalled();
         $packageManagerProphecy->getAvailablePackages()->willReturn($packages);
         $packageManagerProphecy->getActivePackages()->shouldBeCalled();
-        $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal());
+        $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal(), false);
         $packageStatesGenerator->generate();
     }
 
     /**
      * @test
      */
-    public function defaultFrameworkExtensionsAreNotMarkedAsActiveByDefault()
+    public function frameworkExtensionsAreMarkedAsActiveByDefaultInComposerMode()
+    {
+        $packageProphecy = $this->prophesize(PackageInterface::class);
+        $packageProphecy->getPackageKey()->willReturn('foo');
+        $packageProphecy->isProtected()->willReturn(false);
+        $packageProphecy->isPartOfMinimalUsableSystem()->willReturn(false);
+        $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3/sysext/foo');
+
+        $packages = [
+            $packageProphecy->reveal(),
+        ];
+
+        $packageManagerProphecy = $this->prophesize(UncachedPackageManager::class);
+        $packageManagerProphecy->scanAvailablePackages()->shouldBeCalled();
+        $packageManagerProphecy->forceSortAndSavePackageStates()->shouldBeCalled();
+
+        $packageManagerProphecy->deactivatePackage('foo')->shouldNotBeCalled();
+        $packageManagerProphecy->activatePackage('foo')->shouldBeCalled();
+        $packageManagerProphecy->getAvailablePackages()->willReturn($packages);
+        $packageManagerProphecy->getActivePackages()->shouldBeCalled();
+        $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal(), true);
+        $packageStatesGenerator->generate();
+    }
+
+    /**
+     * @test
+     */
+    public function defaultFrameworkExtensionsAreNotMarkedAsActiveByDefaultInNonComposerMode()
     {
         $packageProphecy = $this->prophesize(PackageInterface::class);
         $packageProphecy->getPackageKey()->willReturn('foo');
@@ -122,14 +149,14 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageManagerProphecy->deactivatePackage('foo')->shouldBeCalled();
         $packageManagerProphecy->getAvailablePackages()->willReturn($packages);
         $packageManagerProphecy->getActivePackages()->shouldBeCalled();
-        $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal());
+        $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal(), false);
         $packageStatesGenerator->generate();
     }
 
     /**
      * @test
      */
-    public function defaultFrameworkExtensionsAreMarkedAsActiveWhenSwitchProvided()
+    public function defaultFrameworkExtensionsAreMarkedAsActiveWhenSwitchProvidedInNonComposerMode()
     {
         $packageProphecy = $this->prophesize(PackageInterface::class);
         $packageProphecy->getPackageKey()->willReturn('foo');
@@ -149,14 +176,14 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageManagerProphecy->activatePackage('foo')->shouldBeCalled();
         $packageManagerProphecy->getAvailablePackages()->willReturn($packages);
         $packageManagerProphecy->getActivePackages()->shouldBeCalled();
-        $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal());
+        $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal(), false);
         $packageStatesGenerator->generate([], [], true);
     }
 
     /**
      * @test
      */
-    public function defaultFrameworkExtensionsAreNotMarkedAsActiveWhenSwitchProvidedButExcluded()
+    public function defaultFrameworkExtensionsAreNotMarkedAsActiveWhenSwitchProvidedButExcludedInNonComposerMode()
     {
         $packageProphecy = $this->prophesize(PackageInterface::class);
         $packageProphecy->getPackageKey()->willReturn('foo');
@@ -176,7 +203,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageManagerProphecy->deactivatePackage('foo')->shouldBeCalled();
         $packageManagerProphecy->getAvailablePackages()->willReturn($packages);
         $packageManagerProphecy->getActivePackages()->shouldBeCalled();
-        $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal());
+        $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal(), false);
         $packageStatesGenerator->generate([], ['foo'], true);
     }
 

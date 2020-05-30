@@ -100,6 +100,11 @@ EOH
         $activateDefault = $input->getOption('activate-default');
         if ($input->getOption('framework-extensions')) {
             $frameworkExtensions = explode(',', $input->getOption('framework-extensions'));
+        } elseif (getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS')) {
+            $frameworkExtensions = explode(
+                ',',
+                getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS')
+            );
         }
         if ($input->getOption('excluded-extensions')) {
             $excludedExtensions = explode(',', $input->getOption('excluded-extensions'));
@@ -110,15 +115,11 @@ EOH
             $output->writeln('<warning>Using --activate-default is deprecated in composer managed TYPO3 installations.</warning>');
             $output->writeln('<warning>Instead of requiring typo3/cms in your project, you should consider only requiring individual packages you need.</warning>');
         }
-        $frameworkExtensions = $frameworkExtensions ?? explode(
-            ',',
-            (string)getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS')
-        );
         $dependencyOrderingService = GeneralUtility::makeInstance(DependencyOrderingService::class);
         $packageManager = GeneralUtility::makeInstance(UncachedPackageManager::class, $dependencyOrderingService);
-        $packageStatesGenerator = new PackageStatesGenerator($packageManager);
+        $packageStatesGenerator = new PackageStatesGenerator($packageManager, Environment::isComposerMode());
         $activatedExtensions = $packageStatesGenerator->generate(
-            $frameworkExtensions,
+            $frameworkExtensions ?? [],
             $excludedExtensions ?? [],
             $activateDefault
         );
