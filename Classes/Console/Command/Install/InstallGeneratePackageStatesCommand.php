@@ -69,15 +69,13 @@ EOH
                 'framework-extensions',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'TYPO3 system extensions that should be marked as active. Extension keys separated by comma.',
-                []
+                'TYPO3 system extensions that should be marked as active. Extension keys separated by comma.'
             ),
             new InputOption(
                 'excluded-extensions',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Extensions which should stay inactive. This does not affect provided framework extensions or framework extensions that are required or part as minimal usable system.',
-                []
+                'Extensions which should stay inactive. This does not affect provided framework extensions or framework extensions that are required or part as minimal usable system.'
             ),
             new InputOption(
                 'activate-default',
@@ -98,29 +96,31 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $frameworkExtensions = $input->getOption('framework-extensions');
-        $frameworkExtensions = is_array($frameworkExtensions)
-            ? $frameworkExtensions : explode(',', $frameworkExtensions);
-        $excludedExtensions = $input->getOption('excluded-extensions');
-        $excludedExtensions = is_array($excludedExtensions)
-            ? $excludedExtensions : explode(',', $excludedExtensions);
+        $frameworkExtensions = $excludedExtensions = null;
         $activateDefault = $input->getOption('activate-default');
+        if ($input->getOption('framework-extensions')) {
+            $frameworkExtensions = explode(',', $input->getOption('framework-extensions'));
+        } elseif (getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS')) {
+            $frameworkExtensions = explode(
+                ',',
+                getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS')
+            );
+        }
+        if ($input->getOption('excluded-extensions')) {
+            $excludedExtensions = explode(',', $input->getOption('excluded-extensions'));
+        }
 
         if ($activateDefault && Environment::isComposerMode()) {
             // @deprecated for composer usage in 5.0 will be removed with 6.0
             $output->writeln('<warning>Using --activate-default is deprecated in composer managed TYPO3 installations.</warning>');
             $output->writeln('<warning>Instead of requiring typo3/cms in your project, you should consider only requiring individual packages you need.</warning>');
         }
-        $frameworkExtensions = $frameworkExtensions ?: explode(
-            ',',
-            (string)getenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS')
-        );
         $dependencyOrderingService = GeneralUtility::makeInstance(DependencyOrderingService::class);
         $packageManager = GeneralUtility::makeInstance(UncachedPackageManager::class, $dependencyOrderingService);
-        $packageStatesGenerator = new PackageStatesGenerator($packageManager);
+        $packageStatesGenerator = new PackageStatesGenerator($packageManager, Environment::isComposerMode());
         $activatedExtensions = $packageStatesGenerator->generate(
-            $frameworkExtensions,
-            $excludedExtensions,
+            $frameworkExtensions ?? [],
+            $excludedExtensions ?? [],
             $activateDefault
         );
 

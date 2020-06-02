@@ -46,7 +46,7 @@ Options
 - Accept value: yes
 - Is value required: yes
 - Is multiple: no
-- Default: array ()
+
 
 `--excluded-extensions`
    Extensions which should stay inactive. This does not affect provided framework extensions or framework extensions that are required or part as minimal usable system.
@@ -54,7 +54,7 @@ Options
 - Accept value: yes
 - Is value required: yes
 - Is multiple: no
-- Default: array ()
+
 
 `--activate-default`
    (DEPRECATED) If true, `typo3/cms` extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.

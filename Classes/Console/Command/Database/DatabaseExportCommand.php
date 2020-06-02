@@ -157,15 +157,13 @@ EOH
             new InputArgument(
                 'excludeTables',
                 null,
-                'Comma-separated list of table names to exclude from the export. Wildcards are supported.',
-                []
+                'Comma-separated list of table names to exclude from the export. Wildcards are supported.'
             ),
             new InputOption(
                 'exclude-tables',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Comma-separated list of table names to exclude from the export. Wildcards are supported.',
-                []
+                'Comma-separated list of table names to exclude from the export. Wildcards are supported.'
             ),
         ];
     }
