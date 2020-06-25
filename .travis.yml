@@ -4,7 +4,7 @@ addons:
   sonarcloud:
     organization: "helhum-github"
     branches:
-      - master
+      - latest
       - develop
 jdk:
   - oraclejdk8
@@ -18,7 +18,7 @@ cache:
 # Do not build feature branches
 branches:
   only:
-    - master
+    - latest
     - develop
     - /^v?([0-9]+\.){1,2}(x|[0-9]+)-?[a-z]*[1-9]*$/
 
@@ -99,7 +99,7 @@ jobs:
         - composer extension-release
 
     - stage: sonar code scanner
-      if: type = push AND branch IN (master, develop)
+      if: type = push AND branch IN (latest, develop)
       php: 7.2
       before_install: skip
       install: skip
