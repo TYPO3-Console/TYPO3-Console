@@ -13,9 +13,5 @@
         "psr-4": {
             "Typo3Console\\CreateReferenceCommand\\": "src/"
         }
-    },
-    "require": {
-        "php": "^7.0",
-        "helhum/typo3-console": "^5.0 || ^6.0"
     }
 }
