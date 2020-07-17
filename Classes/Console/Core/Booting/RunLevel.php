@@ -243,7 +243,7 @@ class RunLevel
      * @param string $identifier
      * @return Sequence
      */
-    private function buildExtendedRuntimeSequence(string $identifier = self::LEVEL_UNCACHED): Sequence
+    private function buildExtendedRuntimeSequence(string $identifier = self::LEVEL_FULL): Sequence
     {
         $sequence = $this->buildBasicRuntimeSequence($identifier);
 

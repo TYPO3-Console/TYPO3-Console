@@ -25,6 +25,18 @@ but also works for subsequent deployments.
 
 
 
+Options
+~~~~~~~
+
+`--fail-on-error`
+   Instead of gracefully exiting this command if something goes wrong, throw an error
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
+
 
 
 Related commands
