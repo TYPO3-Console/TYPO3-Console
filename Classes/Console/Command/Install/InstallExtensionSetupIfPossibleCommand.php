@@ -19,6 +19,7 @@ use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class InstallExtensionSetupIfPossibleCommand extends Command implements RelatableCommandInterface
@@ -32,6 +33,12 @@ class InstallExtensionSetupIfPossibleCommand extends Command implements Relatabl
 
     protected function configure()
     {
+        $this->addOption(
+            'fail-on-error',
+            null,
+            InputOption::VALUE_NONE,
+            'Instead of gracefully exiting this command if something goes wrong, throw an error'
+        );
         $this->setDescription('Setup TYPO3 with extensions if possible');
         $this->setHelp(
             <<<'EOH'
@@ -54,6 +61,9 @@ EOH
             $output->writeln($commandDispatcher->executeCommand('cache:flush'));
             $output->writeln($commandDispatcher->executeCommand('extension:setupactive'));
         } catch (FailedSubProcessCommandException $e) {
+            if ($input->getOption('fail-on-error')) {
+                throw $e;
+            }
             $output->writeln('<warning>Extension setup skipped.</warning>');
         }
 
