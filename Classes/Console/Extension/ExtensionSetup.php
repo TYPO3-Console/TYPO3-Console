@@ -85,8 +85,11 @@ class ExtensionSetup
             $extensionKey = $package->getPackageKey();
             $this->callInstaller('importStaticSqlFile', [$extensionKey, $relativeExtensionPath]);
             if (class_exists(\TYPO3\CMS\Impexp\Import::class)) {
-                $this->callInstaller('importT3DFile', [$extensionKey, $relativeExtensionPath]);
+                $import = $this->callInstaller('importT3DFile', [$extensionKey, $relativeExtensionPath]);
+            } else {
+                $import = null;
             }
+            $this->callInstaller('importSiteConfiguration', [$relativeExtensionPath, $import]);
             // TODO: call event dispatcher
 //            $this->callInstaller('emitAfterExtensionInstallSignal', [$extensionKey]);
         }
@@ -99,7 +102,7 @@ class ExtensionSetup
     private function callInstaller($method, array $arguments)
     {
         $installer = $this->extensionInstaller;
-        \Closure::bind(function () use ($installer, $method, $arguments) {
+        return \Closure::bind(function () use ($installer, $method, $arguments) {
             return $installer->$method(...$arguments);
         }, null, $installer)();
     }
