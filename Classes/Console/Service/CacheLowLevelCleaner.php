@@ -29,6 +29,9 @@ class CacheLowLevelCleaner
     {
         $cacheDirPattern = Environment::getVarPath() . '/cache/*/*';
         foreach (glob($cacheDirPattern) as $path) {
+            if (!is_dir($path)) {
+                continue;
+            }
             GeneralUtility::rmdir($path, true);
             GeneralUtility::mkdir($path);
         }
