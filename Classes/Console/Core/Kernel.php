@@ -15,10 +15,9 @@ namespace Helhum\Typo3Console\Core;
  */
 
 use Helhum\Typo3Console\CompatibilityClassLoader;
+use Helhum\Typo3Console\Core\Booting\ContainerBuildFailedException;
 use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\Booting\Scripts;
-use Helhum\Typo3Console\Core\Booting\Step;
-use Helhum\Typo3Console\Core\Booting\StepFailedException;
 use Helhum\Typo3Console\Exception;
 use Helhum\Typo3Console\Mvc\Cli\CommandCollection;
 use Helhum\Typo3Console\Mvc\Cli\CommandConfiguration;
@@ -138,14 +137,7 @@ class Kernel
             ExtensionManagementUtility::setEventDispatcher($this->container->get(EventDispatcherInterface::class));
         } catch (\Throwable $e) {
             $this->container = $failsafeContainer;
-            $error = new StepFailedException(
-                new Step(
-                    'build-container',
-                    function () {
-                    }
-                ),
-                $e
-            );
+            $error = new ContainerBuildFailedException($e);
         }
         $this->runLevel = new RunLevel($this->container, $error);
     }

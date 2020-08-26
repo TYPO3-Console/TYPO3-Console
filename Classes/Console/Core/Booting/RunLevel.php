@@ -110,10 +110,18 @@ class RunLevel
     }
 
     /**
+     * @param string|null $commandIdentifier
      * @return StepFailedException|null
      */
-    public function getError(): ?StepFailedException
+    public function getError(string $commandIdentifier = null): ?StepFailedException
     {
+        if ($commandIdentifier !== null
+            && $this->error instanceof ContainerBuildFailedException
+            && $this->isLowLevelCommand($commandIdentifier)
+        ) {
+            return null;
+        }
+
         return $this->error;
     }
 
@@ -166,7 +174,19 @@ class RunLevel
     public function isCommandAvailable($commandIdentifier): bool
     {
         return $this->getMaximumAvailableRunLevel() === self::LEVEL_FULL
-            || $this->getRunLevelForCommand($commandIdentifier) === self::LEVEL_COMPILE;
+            || $this->isLowLevelCommand($commandIdentifier);
+    }
+
+    /**
+     * @param string $commandIdentifier
+     * @return bool
+     */
+    public function isLowLevelCommand($commandIdentifier): bool
+    {
+        $options = $this->getOptionsForCommand($commandIdentifier);
+        $runLevel = $options['runLevel'] ?? self::LEVEL_FULL;
+
+        return $runLevel === self::LEVEL_COMPILE;
     }
 
     /**
