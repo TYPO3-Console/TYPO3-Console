@@ -17,11 +17,11 @@ namespace Helhum\Typo3Console\Extension;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateResultRenderer;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
-use Helhum\Typo3Console\Service\Database\SchemaService;
-use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
-use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
-use TYPO3\CMS\Extensionmanager\Utility\InstallUtility;
+use TYPO3\CMS\Extensionmanager\Event\AfterExtensionDatabaseContentHasBeenImportedEvent;
+use TYPO3\CMS\Extensionmanager\Event\AfterExtensionFilesHaveBeenImportedEvent;
+use TYPO3\CMS\Extensionmanager\Event\AfterExtensionStaticDatabaseContentHasBeenImportedEvent;
 
 /**
  * Class to collect and render results of extension setup
@@ -38,39 +38,33 @@ class ExtensionSetupResultRenderer
      *
      * @var array
      */
-    private static $signalsToRegister = [
+    private static $eventsToRegister = [
         [
-            'signalClass' => InstallUtility::class,
-            'signalName' => 'afterExtensionFileImport',
+            'eventClass' => AfterExtensionFilesHaveBeenImportedEvent::class,
             'resultName' => 'renderExtensionFileImportResult',
         ],
         [
-            'signalClass' => InstallUtility::class,
-            'signalName' => 'afterExtensionStaticSqlImport',
+            'eventClass' => AfterExtensionStaticDatabaseContentHasBeenImportedEvent::class,
             'resultName' => 'renderImportedStaticDataResult',
         ],
         [
-            'signalClass' => InstallUtility::class,
-            'signalName' => 'afterExtensionT3DImport',
+            'eventClass' => AfterExtensionDatabaseContentHasBeenImportedEvent::class,
             'resultName' => 'renderExtensionDataImportResult',
         ],
         [
-            'signalClass' => SchemaService::class,
-            'signalName' => 'afterDatabaseUpdate',
+            'eventClass' => DatabaseSchemaUpdateEvent::class,
             'resultName' => 'renderSchemaResult',
         ],
     ];
 
-    public function __construct(Dispatcher $signalSlotDispatcher)
+    public function __construct(ExtensionSetupEventDispatcher $eventDispatcher)
     {
-        $collector = $this;
-        foreach (static::$signalsToRegister as $signalConfig) {
-            $signalSlotDispatcher->connect(
-                $signalConfig['signalClass'],
-                $signalConfig['signalName'],
-                \Closure::bind(function ($result) use ($signalConfig, $collector) {
-                    $collector->results[$signalConfig['resultName']][] = $result;
-                }, null, $this)
+        foreach (static::$eventsToRegister as $signalConfig) {
+            $eventDispatcher->addListener(
+                $signalConfig['eventClass'],
+                function ($event) use ($signalConfig) {
+                    $this->results[$signalConfig['resultName']][] = $event;
+                }
             );
         }
     }
@@ -84,11 +78,12 @@ class ExtensionSetupResultRenderer
         if (!isset($this->results['renderSchemaResult'])) {
             return;
         }
-        $result = reset($this->results['renderSchemaResult']);
-        if ($result->hasPerformedUpdates()) {
+        /** @var DatabaseSchemaUpdateEvent $event */
+        $event = reset($this->results['renderSchemaResult']);
+        if ($event->result->hasPerformedUpdates()) {
             $schemaUpdateResultRenderer = $schemaUpdateResultRenderer ?: new SchemaUpdateResultRenderer();
             $output->outputLine('<info>The following database schema updates were performed:</info>');
-            $schemaUpdateResultRenderer->render($result, $output, true);
+            $schemaUpdateResultRenderer->render($event->result, $output, true);
         } else {
             $output->outputLine(
                 '<info>No schema updates were performed for update types:%s</info>',
@@ -109,11 +104,19 @@ class ExtensionSetupResultRenderer
         if (!isset($this->results['renderImportedStaticDataResult'])) {
             return;
         }
-        foreach ($this->results['renderImportedStaticDataResult'] as $pathToStaticSqlFile) {
+        /** @var AfterExtensionStaticDatabaseContentHasBeenImportedEvent $event */
+        foreach ($this->results['renderImportedStaticDataResult'] as $event) {
             // Output content of $pathToStaticSqlFile at cli context
-            $absolutePath = Environment::getPublicPath() . '/' . $pathToStaticSqlFile;
+            $pathToStaticSqlFile = $event->getSqlFileName();
+            $absolutePath = GeneralUtility::getFileAbsFileName($pathToStaticSqlFile);
             if (file_exists($absolutePath)) {
-                $output->outputFormatted('<info>Import content of file "%s" into database.</info>', [$pathToStaticSqlFile]);
+                $output->outputFormatted(
+                    '<info>Import content of file "%s" of extension "%s" into database.</info>',
+                    [
+                        $pathToStaticSqlFile,
+                        $event->getPackageKey(),
+                    ]
+                );
                 $output->outputFormatted(file_get_contents($absolutePath), [], 2);
             }
         }
@@ -129,10 +132,14 @@ class ExtensionSetupResultRenderer
         if (!isset($this->results['renderExtensionFileImportResult'])) {
             return;
         }
-        foreach ($this->results['renderExtensionFileImportResult'] as $destinationAbsolutePath) {
+        /** @var AfterExtensionFilesHaveBeenImportedEvent $event */
+        foreach ($this->results['renderExtensionFileImportResult'] as $event) {
             $output->outputFormatted(
-                '<info>Files from extension was imported to path "%s"</info>',
-                [PathUtility::stripPathSitePrefix($destinationAbsolutePath)]
+                '<info>Files from extension "%s" were imported to path "%s"</info>',
+                [
+                    $event->getPackageKey(),
+                    PathUtility::stripPathSitePrefix($event->getDestinationAbsolutePath()),
+                ]
             );
         }
     }
@@ -147,10 +154,14 @@ class ExtensionSetupResultRenderer
         if (!isset($this->results['renderExtensionDataImportResult'])) {
             return;
         }
-        foreach ($this->results['renderExtensionDataImportResult'] as $importedFile) {
+        /** @var AfterExtensionDatabaseContentHasBeenImportedEvent $event */
+        foreach ($this->results['renderExtensionDataImportResult'] as $event) {
             $output->outputFormatted(
-                '<info>Data from from file "%s" was imported</info>',
-                [$importedFile]
+                '<info>Data from from file "%s" of extension "%s" was imported</info>',
+                [
+                    $event->getImportFileName(),
+                    $event->getPackageKey(),
+                ]
             );
         }
     }

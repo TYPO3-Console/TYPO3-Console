@@ -15,13 +15,14 @@ namespace Helhum\Typo3Console\Command\Extension;
  */
 
 use Helhum\Typo3Console\Extension\ExtensionSetup;
+use Helhum\Typo3Console\Extension\ExtensionSetupEventDispatcher;
 use Helhum\Typo3Console\Extension\ExtensionSetupResultRenderer;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 /**
  * Convenience object to handle extension state switches from commands
@@ -54,11 +55,12 @@ class ExtensionStateCommandsHelper
         PackageManager $packageManager = null,
         ExtensionSetupResultRenderer $extensionSetupResultRenderer = null
     ) {
+        $eventDispatcher = new ExtensionSetupEventDispatcher(GeneralUtility::makeInstance(EventDispatcherInterface::class));
         // @deprecated. should be changed to OutputStyle instead
         $this->output = new ConsoleOutput($output);
-        $this->extensionSetup = $extensionSetup ?? new ExtensionSetup();
+        $this->extensionSetup = $extensionSetup ?? new ExtensionSetup(null, $eventDispatcher);
         $this->packageManager = $packageManager ?? GeneralUtility::makeInstance(PackageManager::class);
-        $this->extensionSetupResultRenderer = $extensionSetupResultRenderer ?? new ExtensionSetupResultRenderer(GeneralUtility::makeInstance(Dispatcher::class));
+        $this->extensionSetupResultRenderer = $extensionSetupResultRenderer ?? new ExtensionSetupResultRenderer($eventDispatcher);
     }
 
     /**
