@@ -128,24 +128,7 @@ class Application extends BaseApplication
      */
     public function isCommandAvailable(Command $command): bool
     {
-        if (!$this->isFullyCapable()
-            && in_array($command->getName(), [
-                // Although these commands are technically available
-                // they call other hidden commands in sub processes
-                // that need all capabilities. Therefore we disable these commands here.
-                // This can be removed, once they implement Symfony commands directly.
-                'upgrade:all',
-                'upgrade:list',
-                'upgrade:wizard',
-            ], true)
-        ) {
-            return false;
-        }
-        if ($command->getName() === 'cache:flushcomplete') {
-            return true;
-        }
-
-        return $this->runLevel->isCommandAvailable($command->getName());
+        return $this->runLevel->isCommandAvailable($command->getName()) || $this->runLevel->isInternalCommand($command->getName());
     }
 
     /**
@@ -205,7 +188,7 @@ class Application extends BaseApplication
 
         $exitCode = parent::doRunCommand($command, $input, $output);
 
-        if ($bootingError = $this->runLevel->getError()) {
+        if ($bootingError = $this->runLevel->getError($command->getName())) {
             $messages = [
                 sprintf(
                     'An error occurred while executing "%s".',
@@ -239,7 +222,7 @@ class Application extends BaseApplication
 
     private function ensureStableEnvironmentForCommand(Command $command, bool $environmentIsVerbose)
     {
-        $bootingError = $this->runLevel->getError();
+        $bootingError = $this->runLevel->getError($command->getName());
         if ($bootingError && ($environmentIsVerbose || !$this->runLevel->isInternalCommand($command->getName()))) {
             throw $bootingError->getPrevious();
         }
