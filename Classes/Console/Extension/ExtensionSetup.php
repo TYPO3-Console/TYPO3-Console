@@ -14,14 +14,17 @@ namespace Helhum\Typo3Console\Extension;
  *
  */
 
+use Helhum\Typo3Console\Database\Schema\SchemaUpdate;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use Helhum\Typo3Console\Service\CacheService;
 use Helhum\Typo3Console\Service\Database\SchemaService;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use TYPO3\CMS\Core\Package\Event\AfterPackageActivationEvent;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extensionmanager\Utility\InstallUtility;
+use TYPO3\CMS\Install\Service\LateBootService;
 
 class ExtensionSetup
 {
@@ -34,27 +37,31 @@ class ExtensionSetup
      * @var SchemaService
      */
     private $schemaService;
-
     /**
-     * @var ExtensionConfiguration
+     * @var ExtensionSetupEventDispatcher
      */
-    private $extensionConfiguration;
+    private $eventDispatcher;
 
     public function __construct(
         InstallUtility $extensionInstaller = null,
-        SchemaService $schemaService = null,
-        ExtensionConfiguration $extensionConfiguration = null
+        ExtensionSetupEventDispatcher $eventDispatcher = null,
+        SchemaService $schemaService = null
     ) {
         $this->extensionInstaller = $extensionInstaller ?? GeneralUtility::makeInstance(ObjectManager::class)->get(InstallUtility::class);
-        $this->schemaService = $schemaService ?? GeneralUtility::makeInstance(ObjectManager::class)->get(SchemaService::class);
-        $this->extensionConfiguration = $extensionConfiguration ?? new ExtensionConfiguration();
+        $this->eventDispatcher = $eventDispatcher ?? new ExtensionSetupEventDispatcher(GeneralUtility::makeInstance(EventDispatcherInterface::class));
+        $this->schemaService = $schemaService ?? new SchemaService(new SchemaUpdate(), $this->eventDispatcher);
     }
 
     public function updateCaches()
     {
         $cacheService = new CacheService();
         $cacheService->flush();
+        $lateBootService = GeneralUtility::makeInstance(LateBootService::class);
+        $container = $lateBootService->getContainer();
+        $backup = $lateBootService->makeCurrent($container);
+        $this->eventDispatcher->updateParentEventDispatcher($container->get(EventDispatcherInterface::class));
         $this->extensionInstaller->reloadCaches();
+        $lateBootService->makeCurrent($backup);
     }
 
     public function deactivateExtensions(array $packageKeys)
@@ -73,34 +80,13 @@ class ExtensionSetup
      */
     public function setupExtensions(array $packages)
     {
-        foreach ($packages as $package) {
-            $this->callInstaller('importInitialFiles', [PathUtility::stripPathSitePrefix($package->getPackagePath()), $package->getPackageKey()]);
-            $this->extensionConfiguration->saveDefaultConfiguration($package->getPackageKey());
-        }
+        $this->extensionInstaller->injectEventDispatcher($this->eventDispatcher);
 
         $this->schemaService->updateSchema(SchemaUpdateType::expandSchemaUpdateTypes(['safe']));
 
         foreach ($packages as $package) {
-            $relativeExtensionPath = PathUtility::stripPathSitePrefix($package->getPackagePath());
-            $extensionKey = $package->getPackageKey();
-            $this->callInstaller('importStaticSqlFile', [$extensionKey, $relativeExtensionPath]);
-            if (class_exists(\TYPO3\CMS\Impexp\Import::class)) {
-                $this->callInstaller('importT3DFile', [$extensionKey, $relativeExtensionPath]);
-            }
-            // TODO: call event dispatcher
-//            $this->callInstaller('emitAfterExtensionInstallSignal', [$extensionKey]);
+            $this->extensionInstaller->processExtensionSetup($package->getPackageKey());
+            $this->eventDispatcher->dispatch(new AfterPackageActivationEvent($package->getPackageKey(), 'typo3-cms-extension', $this->extensionInstaller));
         }
-    }
-
-    /**
-     * @param string $method
-     * @param array $arguments
-     */
-    private function callInstaller($method, array $arguments)
-    {
-        $installer = $this->extensionInstaller;
-        \Closure::bind(function () use ($installer, $method, $arguments) {
-            return $installer->$method(...$arguments);
-        }, null, $installer)();
     }
 }

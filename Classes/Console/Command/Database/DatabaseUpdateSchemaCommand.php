@@ -25,8 +25,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 class DatabaseUpdateSchemaCommand extends Command
 {
@@ -84,10 +82,7 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $schemaService = new SchemaService(
-            new SchemaUpdate(),
-            GeneralUtility::makeInstance(Dispatcher::class)
-        );
+        $schemaService = new SchemaService(new SchemaUpdate());
         $schemaUpdateResultRenderer = new SchemaUpdateResultRenderer();
 
         $schemaUpdateTypes = explode(',', $input->getArgument('schemaUpdateTypes'));
