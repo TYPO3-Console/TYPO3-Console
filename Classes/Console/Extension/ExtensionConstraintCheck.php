@@ -60,19 +60,19 @@ class ExtensionConstraintCheck
             if (!empty($versions[0]) && version_compare($t3version, $versions[0]) === -1) {
                 $message = sprintf(
                     '"%s" requires TYPO3 versions %s - %s. It is not compatible with TYPO3 version "%s"',
-                        $package->getPackageKey(),
-                        $versions[0],
-                        $versions[1],
-                        $typo3Version
+                    $package->getPackageKey(),
+                    $versions[0],
+                    $versions[1],
+                    $typo3Version
                 );
             }
             if (!empty($versions[1]) && version_compare($versions[1], $t3version) === -1) {
                 $message = sprintf(
                     '"%s" requires TYPO3 versions %s - %s. It is not compatible with TYPO3 version "%s"',
-                        $package->getPackageKey(),
-                        $versions[0],
-                        $versions[1],
-                        $typo3Version
+                    $package->getPackageKey(),
+                    $versions[0],
+                    $versions[1],
+                    $typo3Version
                 );
             }
         }
