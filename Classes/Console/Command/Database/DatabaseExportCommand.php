@@ -123,6 +123,7 @@ EOH
         $arguments = [
             '--opt',
             '--single-transaction',
+            '--no-tablespaces',
         ];
 
         if ($output->isVerbose()) {
