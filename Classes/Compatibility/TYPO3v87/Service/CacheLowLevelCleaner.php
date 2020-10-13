@@ -27,8 +27,14 @@ class CacheLowLevelCleaner
      */
     public function forceFlushCachesFiles()
     {
-        $cacheDirectory = PATH_site . 'typo3temp/var/Cache';
-        GeneralUtility::flushDirectory($cacheDirectory, true);
+        $cacheDirPattern = PATH_site . 'typo3temp/var/Cache/*/*';
+        foreach (glob($cacheDirPattern) as $path) {
+            if (!is_dir($path)) {
+                continue;
+            }
+            GeneralUtility::rmdir($path, true);
+            GeneralUtility::mkdir($path);
+        }
     }
 
     /**
