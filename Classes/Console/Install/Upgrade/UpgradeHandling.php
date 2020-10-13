@@ -152,9 +152,9 @@ class UpgradeHandling
                             $consoleOutput->outputLine();
                             $arguments[] = sprintf(
                                 '%s[%s]=%s',
-                                    $shortIdentifier,
-                                    $argumentName,
-                                    (string)(int)$consoleOutput->askConfirmation('<comment>Install (y/N)</comment> ', $argumentDefault)
+                                $shortIdentifier,
+                                $argumentName,
+                                (string)(int)$consoleOutput->askConfirmation('<comment>Install (y/N)</comment> ', $argumentDefault)
                             );
                         }
                     }

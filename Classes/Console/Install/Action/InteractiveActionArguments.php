@@ -133,8 +133,8 @@ class InteractiveActionArguments
                 $argumentValue = $this->output->askHiddenResponse(
                     sprintf(
                         '<comment>%s (%s):</comment> ',
-                            $argumentDefinition['description'],
-                            $isRequired ? 'required' : sprintf('default: "%s"', $argumentDefinition['default'])
+                        $argumentDefinition['description'],
+                        $isRequired ? 'required' : sprintf('default: "%s"', $argumentDefinition['default'])
                     )
                 );
                 if ($argumentValue === null) {

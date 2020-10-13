@@ -1,5 +1,7 @@
 preset: psr2
 
+risky: true
+
 enabled:
   - alpha_ordered_imports
   - binary_operator_spaces
