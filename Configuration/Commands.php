@@ -170,6 +170,16 @@ return [
         'class' => \Helhum\Typo3Console\Command\Install\InstallActionNeedsExecutionCommand::class,
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
     ],
+    'install:lock' => [
+        'vendor' => 'typo3_console',
+        'class' => \Helhum\Typo3Console\Command\InstallTool\LockInstallToolCommand::class,
+        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
+    ],
+    'install:unlock' => [
+        'vendor' => 'typo3_console',
+        'class' => \Helhum\Typo3Console\Command\InstallTool\UnlockInstallToolCommand::class,
+        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
+    ],
     'upgrade:checkextensioncompatibility' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeCheckExtensionCompatibilityCommand::class,
