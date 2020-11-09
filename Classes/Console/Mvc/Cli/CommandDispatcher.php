@@ -92,7 +92,7 @@ class CommandDispatcher
      */
     public static function createFromCommandRun(array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null): self
     {
-        if (!isset($_SERVER['argv'][0]) && strpos($_SERVER['argv'][0], Application::COMMAND_NAME) === false) {
+        if (!isset($_SERVER['argv'][0]) || strpos($_SERVER['argv'][0], Application::COMMAND_NAME) === false) {
             throw new RuntimeException('Tried to create typo3 command runner from wrong context', 1484945065);
         }
         $typo3CommandPath = $_SERVER['argv'][0];
@@ -111,7 +111,7 @@ class CommandDispatcher
      */
     public static function createFromTestRun($typo3CommandPath = null): self
     {
-        if (!isset($_SERVER['argv'][0]) && strpos($_SERVER['argv'][0], 'phpunit') === false) {
+        if (!isset($_SERVER['argv'][0]) || strpos($_SERVER['argv'][0], 'phpunit') === false) {
             throw new RuntimeException(sprintf('Tried to create %s command runner from wrong context', Application::COMMAND_NAME), 1493570522);
         }
         $typo3CommandPath = $typo3CommandPath ?: dirname(__DIR__, 4) . '/' . Application::COMMAND_NAME;
