@@ -106,6 +106,7 @@
             "dev-master": "4.x-dev"
         },
         "typo3/cms": {
+            "extension-key": "typo3_console",
             "cms-package-dir": "{$vendor-dir}/typo3/cms",
             "web-dir": ".Build/Web",
             "Package": {
