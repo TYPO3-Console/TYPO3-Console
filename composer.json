@@ -42,7 +42,7 @@
         "typo3/cms": "^8.7",
         "symfony/filesystem": "^3.2",
         "nimut/testing-framework": "^2.0 || ^3.0",
-        "mikey179/vfsStream": "~1.6.0"
+        "mikey179/vfsstream": "~1.6.0"
     },
     "autoload": {
         "psr-4": {
