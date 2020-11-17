@@ -15,7 +15,6 @@ namespace Helhum\Typo3Console\Composer\InstallerScript;
  */
 
 use Composer\Script\Event as ScriptEvent;
-use Composer\Semver\Constraint\EmptyConstraint;
 use TYPO3\CMS\Composer\Plugin\Config as Typo3Config;
 use TYPO3\CMS\Composer\Plugin\Core\InstallerScript;
 use TYPO3\CMS\Composer\Plugin\Util\Filesystem;
@@ -48,7 +47,7 @@ class CopyTypo3Directory implements InstallerScript
         $composer = $event->getComposer();
         $typo3Config = Typo3Config::load($composer);
         $webDir = $typo3Config->get('web-dir');
-        $typo3Package = $event->getComposer()->getRepositoryManager()->getLocalRepository()->findPackage('typo3/cms', new EmptyConstraint());
+        $typo3Package = $event->getComposer()->getRepositoryManager()->getLocalRepository()->findPackage('typo3/cms', '*');
         $typo3Dir = $event->getComposer()->getInstallationManager()->getInstallPath($typo3Package);
         if (is_link("$webDir/typo3")) {
             rmdir("$webDir/typo3");

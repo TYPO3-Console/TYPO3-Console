@@ -16,7 +16,6 @@ namespace Helhum\Typo3Console\Composer;
 
 use Composer\Script\Event;
 use Composer\Script\Event as ScriptEvent;
-use Composer\Semver\Constraint\EmptyConstraint;
 use Helhum\Typo3Console\Composer\InstallerScript\CopyTypo3Directory;
 use Helhum\Typo3Console\Composer\InstallerScript\GeneratePackageStates;
 use Helhum\Typo3Console\Composer\InstallerScript\InstallDummyExtension;
@@ -44,7 +43,7 @@ class InstallerScripts implements InstallerScriptsRegistration
         $scriptDispatcher->addInstallerScript(new PopulateCommandConfiguration(), 70);
         if (!class_exists(\TYPO3\CMS\Core\Composer\InstallerScripts::class)
             && !class_exists(\Helhum\Typo3ComposerSetup\Composer\InstallerScripts::class)
-            && $event->getComposer()->getRepositoryManager()->getLocalRepository()->findPackage('typo3/cms', new EmptyConstraint()) !== null
+            && $event->getComposer()->getRepositoryManager()->getLocalRepository()->findPackage('typo3/cms', '*') !== null
         ) {
             // @deprecated can be removed once TYPO3 8 support is removed
             $scriptDispatcher->addInstallerScript(new WebDirectory());
