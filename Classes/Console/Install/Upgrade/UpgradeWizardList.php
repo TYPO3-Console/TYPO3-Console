@@ -97,8 +97,7 @@ class UpgradeWizardList
                     ];
                 }
                 $markedAsDone = $this->upgradeWizardsService->isWizardDone($shortIdentifier);
-                $wizardClaimsExecution = $updateObject->updateNecessary();
-                if ($markedAsDone || !$wizardClaimsExecution) {
+                if ($markedAsDone || !$updateObject->updateNecessary()) {
                     $availableUpgradeWizards[$shortIdentifier]['done'] = true;
                 }
             }
