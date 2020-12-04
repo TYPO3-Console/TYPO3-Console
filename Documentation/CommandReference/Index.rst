@@ -111,11 +111,7 @@ Available Commands
 
    InstallGeneratepackagestates
 
-   InstallLock
-
    InstallSetup
-
-   InstallUnlock
 
    UpgradeCheckextensionconstraints
 
