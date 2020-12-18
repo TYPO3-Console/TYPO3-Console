@@ -18,7 +18,7 @@ use Helhum\Typo3Console\Extension\ExtensionCompatibilityCheck;
 use Helhum\Typo3Console\Extension\ExtensionConstraintCheck;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
-use Symfony\Component\Console\Style\StyleInterface;
+use Symfony\Component\Console\Style\OutputStyle;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Updates\ConfirmableInterface;
@@ -99,7 +99,7 @@ class UpgradeHandling
         $this->extensionCompatibilityCheck = $extensionCompatibilityCheck ?: new ExtensionCompatibilityCheck($this->packageManager, $this->commandDispatcher);
     }
 
-    public function runWizards(StyleInterface $io, array $wizards, array $confirmations, array $denies, bool $force): array
+    public function runWizards(OutputStyle $io, array $wizards, array $confirmations, array $denies, bool $force): array
     {
         $results = [];
         foreach ($wizards as $identifier) {
@@ -109,7 +109,7 @@ class UpgradeHandling
         return $results;
     }
 
-    public function runWizard(StyleInterface $io, string $identifier, array $confirmations, array $denies, bool $force = false): UpgradeWizardResult
+    public function runWizard(OutputStyle $io, string $identifier, array $confirmations, array $denies, bool $force = false): UpgradeWizardResult
     {
         $wizard = $this->factory->create($identifier);
         $identifier = $wizard->getIdentifier();
@@ -123,6 +123,7 @@ class UpgradeHandling
         $executeWizard = $this->executor->wizardNeedsExecution($identifier) || $force;
         if ($executeWizard && $wizard instanceof ConfirmableInterface && !$isConfirmed && !$isDenied) {
             $confirmation = $wizard->getConfirmation();
+            $io->writeln(sprintf('<comment>%s</comment>', $wizard->getTitle()));
             $question = sprintf(
                 '<info>%s</info>' . LF . '%s' . LF . '%s' . LF . '%s' . LF,
                 $confirmation->getTitle(),

@@ -73,18 +73,17 @@ jobs:
       php: 7.2
       env: TYPO3_VERSION="^10.4.1" PREFER_LOWEST="--prefer-lowest"
     - stage: test
-      php: 7.2
+      php: 7.4
       env: TYPO3_VERSION="dev-master"
     - stage: test
       php: 7.4
       env: TYPO3_VERSION="^10.4.1"
       script:
-        - composer self-update --snapshot --2
         - git clean -dffx
         - composer update
         - .Build/bin/phpunit
     - stage: test
-      php: 7.2
+      php: 7.4
       env: Consistency checks
       before_install: skip
       install: skip
@@ -100,7 +99,7 @@ jobs:
 
     - stage: sonar code scanner
       if: type = push AND branch IN (latest, develop)
-      php: 7.2
+      php: 7.4
       before_install: skip
       install: skip
       script:
@@ -115,7 +114,7 @@ jobs:
 
     - stage: update extension repo
       if: type = push
-      php: 7.2
+      php: 7.4
       before_install: skip
       install: skip
       before_script:
@@ -142,7 +141,7 @@ jobs:
 
     - stage: ship to TER
       if: tag IS present
-      php: 7.2
+      php: 7.4
       install: skip
       before_script: skip
       script:
