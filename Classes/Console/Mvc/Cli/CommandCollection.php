@@ -181,7 +181,7 @@ class CommandCollection implements CommandLoaderInterface
                 'name' => $commandName,
                 'vendor' => $commandName,
                 'nameSpacedName' => $commandName,
-                'class' => $commandConfig['class'],
+                'class' => $commandConfig['serviceName'] ?? $commandConfig['class'],
                 'service' => true,
             ];
         }

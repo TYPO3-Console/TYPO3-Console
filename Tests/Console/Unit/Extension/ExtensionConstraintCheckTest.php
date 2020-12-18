@@ -14,11 +14,10 @@ namespace Helhum\Typo3Console\Tests\Unit\Extension;
  *
  */
 
+use Helhum\Typo3Console\Compatibility\EmConfReader;
 use Helhum\Typo3Console\Extension\ExtensionConstraintCheck;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 use TYPO3\CMS\Core\Package\PackageInterface;
-use TYPO3\CMS\Core\Package\PackageManager;
-use TYPO3\CMS\Extensionmanager\Utility\EmConfUtility;
 
 class ExtensionConstraintCheckTest extends UnitTestCase
 {
@@ -71,13 +70,10 @@ class ExtensionConstraintCheckTest extends UnitTestCase
         $packageProphecy->getPackageKey()->willReturn('dummy');
         $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3conf/ext/dummy/');
 
-        $emConfUtilityProphecy = $this->prophesize(EmConfUtility::class);
+        $emConfUtilityProphecy = $this->prophesize(EmConfReader::class);
         $emConfUtilityProphecy->includeEmConf(
             'dummy',
-            [
-                'key' => 'dummy',
-                'packagePath' => PATH_site . 'typo3conf/ext/dummy/',
-            ]
+            PATH_site . 'typo3conf/ext/dummy/'
         )->willReturn(
             [
                 'constraints' => [
@@ -87,13 +83,9 @@ class ExtensionConstraintCheckTest extends UnitTestCase
                 ],
             ]
         );
-        $packageManagerProphecy = $this->prophesize(PackageManager::class);
-        $subject = new ExtensionConstraintCheck(
-            $emConfUtilityProphecy->reveal(),
-            $packageManagerProphecy->reveal()
-        );
+        $subject = new ExtensionConstraintCheck($emConfUtilityProphecy->reveal());
 
-        $this->assertSame($expectedResult, $subject->matchConstraints($packageProphecy->reveal(), $typo3Version));
+        self::assertSame($expectedResult, $subject->matchConstraints($packageProphecy->reveal(), $typo3Version));
     }
 
     /**
@@ -108,13 +100,10 @@ class ExtensionConstraintCheckTest extends UnitTestCase
         $packageProphecy->getPackageKey()->willReturn('dummy');
         $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3/sysext/dummy/');
 
-        $emConfUtilityProphecy = $this->prophesize(EmConfUtility::class);
+        $emConfUtilityProphecy = $this->prophesize(EmConfReader::class);
         $emConfUtilityProphecy->includeEmConf(
             'dummy',
-            [
-                'key' => 'dummy',
-                'siteRelPath' => 'typo3conf/ext/dummy/',
-            ]
+            'typo3conf/ext/dummy/'
         )->willReturn(
             [
                 'constraints' => [
@@ -124,12 +113,8 @@ class ExtensionConstraintCheckTest extends UnitTestCase
                 ],
             ]
         );
-        $packageManagerProphecy = $this->prophesize(PackageManager::class);
-        $subject = new ExtensionConstraintCheck(
-            $emConfUtilityProphecy->reveal(),
-            $packageManagerProphecy->reveal()
-        );
+        $subject = new ExtensionConstraintCheck($emConfUtilityProphecy->reveal());
 
-        $this->assertSame([], $subject->matchAllConstraints([$packageProphecy->reveal()], $typo3Version));
+        self::assertSame([], $subject->matchAllConstraints([$packageProphecy->reveal()], $typo3Version));
     }
 }
