@@ -17,19 +17,19 @@ list
 
 The `list` command lists all commands:
 
-  `php typo3cms list`
+  `typo3cms list`
 
 You can also display the commands for a specific namespace:
 
-  `php typo3cms list test`
+  `typo3cms list test`
 
 You can also output the information in other formats by using the **--format** option:
 
-  `php typo3cms list --format=xml`
+  `typo3cms list --format=xml`
 
 It's also possible to get raw list of commands (useful for embedding command runner):
 
-  `php typo3cms list --raw`
+  `typo3cms list --raw`
 
 Arguments
 ~~~~~~~~~
