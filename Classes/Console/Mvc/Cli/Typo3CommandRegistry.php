@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\Mvc\Cli;
 
 use TYPO3\CMS\Core\Console\CommandRegistry;
 use TYPO3\CMS\Core\Package\PackageManager;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Overrides the TYPO3 command registry to only contain the commands defined as services
@@ -36,7 +37,7 @@ class Typo3CommandRegistry extends CommandRegistry
     public function getCommandConfiguration(): array
     {
         // TODO: Fixme! This should be an empty array in 11, needs further conceptual steps
-        $packageManager = $this->container->get(PackageManager::class);
+        $packageManager = GeneralUtility::makeInstance(PackageManager::class);
         $commandConfigurations = [];
         foreach ($packageManager->getActivePackages() as $package) {
             $commandsOfExtension = $package->getPackagePath() . 'Configuration/Commands.php';

@@ -60,6 +60,10 @@ jobs:
   allow_failures:
     - env: TYPO3_VERSION="dev-master"
   include:
+# Will be activated once 11.0.0 is released
+#    - stage: test
+#      php: 7.4
+#      env: TYPO3_VERSION="~11.0.0"
     - stage: test
       php: 7.4
       env: TYPO3_VERSION="^10.4.1"
