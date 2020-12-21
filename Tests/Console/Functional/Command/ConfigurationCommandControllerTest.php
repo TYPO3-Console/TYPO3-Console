@@ -71,15 +71,6 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
-    public function activeConfigurationReflectsRealState()
-    {
-        $output = $this->executeConsoleCommand('configuration:showactive', ['SYS/lang/format/priority', '--json']);
-        $this->assertSame('xlf,xml', \json_decode($output));
-    }
-
-    /**
-     * @test
-     */
     public function configurationCanBeSet()
     {
         $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';

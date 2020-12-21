@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace Helhum\Typo3Console\Mvc\Cli;
+namespace Helhum\Typo3Console\TYPO3v104\Mvc\Cli;
 
 /*
  * This file is part of the TYPO3 Console project.
@@ -15,30 +15,34 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  */
 
 use TYPO3\CMS\Core\Console\CommandRegistry;
-use TYPO3\CMS\Core\Package\PackageManager;
 
 /**
  * Overrides the TYPO3 command registry to only contain the commands defined as services
+ * @deprecated can be removed once TYPO3 10.4 compat is removed
  */
 class Typo3CommandRegistry extends CommandRegistry
 {
     public function __construct(CommandRegistry $commandRegistry)
     {
-        parent::__construct($commandRegistry->container);
-        $this->commandConfigurations = $commandRegistry->commandConfigurations;
+        parent::__construct($commandRegistry->packageManager, $commandRegistry->container);
+        $this->lazyCommandConfigurations = $commandRegistry->lazyCommandConfigurations;
     }
 
-    public function getServiceConfiguration(): array
+    protected function populateCommandsFromPackages()
     {
-        return $this->commandConfigurations;
+        if ($this->commands) {
+            return;
+        }
+
+        foreach ($this->lazyCommandConfigurations as $commandName => $commandConfig) {
+            $this->commands[$commandName] = $commandConfig['class'];
+        }
+        $this->populateCommandsFromExtensions();
     }
 
-    public function getCommandConfiguration(): array
+    private function populateCommandsFromExtensions(): void
     {
-        // TODO: Fixme! This should be an empty array in 11, needs further conceptual steps
-        $packageManager = $this->container->get(PackageManager::class);
-        $commandConfigurations = [];
-        foreach ($packageManager->getActivePackages() as $package) {
+        foreach ($this->packageManager->getActivePackages() as $package) {
             $commandsOfExtension = $package->getPackagePath() . 'Configuration/Commands.php';
             if (!file_exists($commandsOfExtension)) {
                 continue;
@@ -48,8 +52,8 @@ class Typo3CommandRegistry extends CommandRegistry
             }
             $vendor = $package->getPackageKey();
             foreach ($commands as $commandName => $commandConfig) {
-                if (!empty($this->commandConfigurations[$commandName])
-                    && $commandConfig['class'] === $this->commandConfigurations[$commandName]['serviceName']
+                if (!empty($this->lazyCommandConfigurations[$commandName])
+                    && $commandConfig['class'] === $this->lazyCommandConfigurations[$commandName]['class']
                 ) {
                     // Lazy (DI managed) commands override classic commands from Configuration/Commands.php
                     // Skip this case to allow extensions to provide commands via DI config and to allow
@@ -62,7 +66,7 @@ class Typo3CommandRegistry extends CommandRegistry
                 $commandConfig['name'] = $commandName;
                 $commandConfig['nameSpacedName'] = $commandConfig['vendor'] . ':' . $commandName;
                 $commandConfig['service'] = false;
-                $commandConfigurations[] = $commandConfig;
+                $this->commandConfigurations[] = $commandConfig;
 
                 if (!isset($commandConfig['runLevel'])) {
                     trigger_error(
@@ -72,7 +76,19 @@ class Typo3CommandRegistry extends CommandRegistry
                 }
             }
         }
+    }
 
-        return $commandConfigurations;
+    public function getServiceConfiguration(): array
+    {
+        $this->populateCommandsFromPackages();
+
+        return $this->lazyCommandConfigurations;
+    }
+
+    public function getCommandConfiguration(): array
+    {
+        $this->populateCommandsFromPackages();
+
+        return $this->commandConfigurations;
     }
 }

@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace Helhum\Typo3Console;
 
 use Composer\Autoload\ClassLoader;
+use TYPO3\CMS\Core\Console\CommandRegistry;
 use TYPO3\CMS\Core\Core\Bootstrap;
 
 /**
@@ -76,6 +77,10 @@ class CompatibilityClassLoader
 
     private function handleTypo3Compatibility()
     {
-        // Currently no compat necessary
+        if (!method_exists(CommandRegistry::class, 'getIterator')) {
+            return;
+        }
+        $this->compatibilityNamespace = 'Helhum\\Typo3Console\\TYPO3v104\\';
+        spl_autoload_register([$this, 'loadClass'], true, true);
     }
 }
