@@ -81,14 +81,16 @@ class UpgradeWizardList
                 ];
                 $explanation = '';
                 $wizardImplementsInterface = $updateObject instanceof UpgradeWizardInterface && !$updateObject instanceof AbstractUpdate;
-                $markedAsDone = $this->registry->get('installUpdate', $className, false);
-                if ($wizardImplementsInterface) {
-                    $explanation = $updateObject->getDescription();
-                    $wizardClaimsExecution = $updateObject->updateNecessary();
-                } else {
-                    $wizardClaimsExecution = $updateObject->checkForUpdate($explanation);
+                $wizardDone = $this->registry->get('installUpdate', $className, false);
+                if (!$wizardDone) {
+                    if ($wizardImplementsInterface) {
+                        $explanation = $updateObject->getDescription();
+                        $wizardDone = !$updateObject->updateNecessary();
+                    } else {
+                        $wizardDone = !$updateObject->checkForUpdate($explanation);
+                    }
                 }
-                if ($markedAsDone || !$wizardClaimsExecution) {
+                if ($wizardDone) {
                     $availableUpgradeWizards[$shortIdentifier]['done'] = true;
                 }
                 $availableUpgradeWizards[$shortIdentifier]['explanation'] = html_entity_decode(strip_tags($explanation));
