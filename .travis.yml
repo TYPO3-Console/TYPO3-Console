@@ -12,7 +12,7 @@ services:
   - mysql
 cache:
   directories:
-    - $HOME/.composer/cache
+    - $HOME/.config/composer/cache
     - $HOME/.sonar/cache
 
 # Do not build feature branches
@@ -157,5 +157,5 @@ jobs:
             # Upload
             TAG_MESSAGE=`git tag -n10 -l $TRAVIS_TAG | sed 's/^[v]*[0-9.]*[ ]*//g'`
             echo "Uploading release ${TRAVIS_TAG} to TER"
-            $HOME/.composer/vendor/bin/ter-client upload typo3_console ../extension -u "$TYPO3_ORG_USERNAME" -p "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
+            $HOME/.config/composer/vendor/bin/ter-client upload typo3_console ../extension -u "$TYPO3_ORG_USERNAME" -p "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
           fi;
