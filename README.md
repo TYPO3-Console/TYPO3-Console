@@ -18,7 +18,7 @@ It ships many commands to execute TYPO3 actions, which otherwise would only be a
 Examples for such commands are:
 
 * `typo3cms install:setup` to completely set up TYPO3 from command line
-* `typo3cms upgrade:all` to execute upgrades from command line
+* `typo3cms upgrade:run` to execute upgrades from command line
 * `typo3cms extension:setupactive` to set up all active extensions (database schema update, data import, …)
 
 ## Features
