@@ -1,7 +1,7 @@
 # TYPO3 Console
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/helhum/19.99)
-[![Build Status](https://travis-ci.org/TYPO3-Console/TYPO3-Console.svg?branch=latest)](https://travis-ci.org/TYPO3-Console/TYPO3-Console)
+[![Build Status](https://travis-ci.com/TYPO3-Console/TYPO3-Console.svg?branch=latest)](https://travis-ci.com/TYPO3-Console/TYPO3-Console)
 [![Build Status (Windows)](https://ci.appveyor.com/api/projects/status/github/TYPO3-Console/TYPO3-Console?branch=latest&svg=true)](https://ci.appveyor.com/project/helhum/typo3-console-qpjaf/branch/latest)
 [![StyleCI](https://styleci.io/repos/19455482/shield?branch=latest)](https://styleci.io/repos/19455482)
 [![Maintainability](https://api.codeclimate.com/v1/badges/03aa352b8c4c20e06639/maintainability)](https://codeclimate.com/github/TYPO3-Console/TYPO3-Console/maintainability)
