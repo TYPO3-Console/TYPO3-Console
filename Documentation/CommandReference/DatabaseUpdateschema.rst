@@ -62,7 +62,10 @@ Options
 - Is multiple: no
 - Default: false
 
+`--raw`
+   If set the updates are only collected and written in a nice format
 
-
-
-
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
