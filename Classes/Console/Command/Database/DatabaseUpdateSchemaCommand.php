@@ -115,7 +115,7 @@ EOH
                     $output->writeln($updates . ';' . PHP_EOL);
                 }
             }
-            
+
             return 0;
         }
 
