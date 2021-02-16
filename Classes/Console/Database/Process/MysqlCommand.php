@@ -143,10 +143,10 @@ class MysqlCommand
         $userDefinition = '';
         $passwordDefinition = '';
         if (!empty($this->dbConfig['user'])) {
-            $userDefinition = sprintf('user="%s"', $this->dbConfig['user']);
+            $userDefinition = sprintf('user="%s"', addcslashes($this->dbConfig['user'], '"\\'));
         }
         if (!empty($this->dbConfig['password'])) {
-            $passwordDefinition = sprintf('password="%s"', $this->dbConfig['password']);
+            $passwordDefinition = sprintf('password="%s"', addcslashes($this->dbConfig['password'], '"\\'));
         }
         $confFileContent = <<<EOF
 [mysqldump]
