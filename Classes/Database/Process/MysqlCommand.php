@@ -103,7 +103,7 @@ class MysqlCommand
             $arguments[] = $this->dbConfig['user'];
         }
         if (!empty($this->dbConfig['password'])) {
-            $arguments[] = '-p' . $this->dbConfig['password'];
+            $arguments[] = '-p' . escapeshellarg($this->dbConfig['password']);
         }
         if (!empty($this->dbConfig['host'])) {
             $arguments[] = '-h';
