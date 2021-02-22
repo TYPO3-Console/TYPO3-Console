@@ -80,7 +80,7 @@ EOH
                     'raw',
                     '',
                     InputOption::VALUE_NONE,
-                    'If set the updates are only collected and written in a nice format'
+                    'If set, only the SQL statements, that are required to update the schema, are printed'
                 ),
             ]
         );
