@@ -18,13 +18,12 @@ jobs:
       matrix:
         typo3: [ ^10.4.1 ]
         php: [ '7.2', '7.3', '7.4' ]
+        dependency-version: [prefer-lowest, prefer-stable]
         include:
           - php: 7.4
             typo3: dev-master
-          - php: 7.2
-            typo3: ^10.4.1
-            env:
-              PREFER_LOWEST: "--prefer-lowest"
+
+    name: P${{ matrix.php }} - T${{ matrix.typo3 }} - ${{ matrix.dependency-version }}
 
     steps:
       - name: Start database server
@@ -58,8 +57,8 @@ jobs:
                 typo3/cms-frontend="${{ matrix.typo3 }}" \
                 typo3/cms-install="${{ matrix.typo3 }}" \
                 typo3/cms-recordlist="${{ matrix.typo3 }}" \
-                $PREFER_LOWEST
-          composer update
+                --no-interaction --no-update
+          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
           git checkout composer.json
         env:
           typo3DatabaseHost: 127.0.0.1
