@@ -46,7 +46,7 @@ jobs:
       - name: Run sonarqube
         env:
           # to get access to secrets.SONAR_TOKEN, provide GITHUB_TOKEN
-          GITHUB_TOKEN: ${{ secrets.CRAWLER_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CONSOLE_GITHUB_TOKEN }}
         run:  sonar-scanner
           -Dsonar.login=${{ secrets.SONAR_TOKEN }}
           -Dsonar.host.url=https://sonarcloud.io/
