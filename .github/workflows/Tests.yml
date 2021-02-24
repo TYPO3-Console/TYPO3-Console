@@ -1,0 +1,67 @@
+name: Tests
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  push:
+    branches:
+      - "main"
+
+jobs:
+  Unit:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        typo3: [ ^10.4.1 ]
+        php: [ '7.2', '7.3', '7.4' ]
+        include:
+          - php: 7.4
+            typo3: dev-master
+
+    steps:
+      - name: Start database server
+        run: sudo /etc/init.d/mysql start
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up PHP Version ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer:v2
+
+      - name: Environment Check
+        run: |
+          php --version
+          composer --version
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+
+      - name: Install
+        run: |
+          export COMPOSER_ROOT_VERSION=6.4.0
+          composer require --no-update \
+                typo3/cms-backend="$TYPO3_VERSION" \
+                typo3/cms-core="$TYPO3_VERSION" \
+                typo3/cms-extbase="$TYPO3_VERSION" \
+                typo3/cms-extensionmanager="${{ matrix.typo3 }}" \
+                typo3/cms-fluid="$TYPO3_VERSION" \
+                typo3/cms-frontend="$TYPO3_VERSION" \
+                typo3/cms-install="$TYPO3_VERSION" \
+                typo3/cms-recordlist="$TYPO3_VERSION"
+          composer update
+          git checkout composer.json
+
+      - name: Test
+        run: |
+          .Build/bin/parallel-lint --exclude .Build .
+          # This fails when command reference is not up to date
+          ./typo3cms commandreference:render > /dev/null 2>&1 && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)"
+          git diff
+          .Build/bin/phpunit
+
+        # Prefer lowest is still missing
