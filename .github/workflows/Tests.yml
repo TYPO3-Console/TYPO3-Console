@@ -57,13 +57,9 @@ jobs:
                 typo3/cms-frontend="${{ matrix.typo3 }}" \
                 typo3/cms-install="${{ matrix.typo3 }}" \
                 typo3/cms-recordlist="${{ matrix.typo3 }}"
+          rm -rf .Build composer.lock
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
           git checkout composer.json
-        env:
-          typo3DatabaseHost: 127.0.0.1
-          typo3DatabaseName: typo3
-          typo3DatabasePassword: root
-          typo3DatabaseUsername: root
 
       - name: Test
         run: |
