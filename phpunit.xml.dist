@@ -17,13 +17,17 @@
         <env name="TYPO3_CONSOLE_TEST_RUN" value="1" />
         <env name="TYPO3_INSTALL_DB_USER" value="root" />
         <env name="TYPO3_INSTALL_DB_HOST" value="127.0.0.1" />
-        <env name="TYPO3_INSTALL_DB_PASSWORD" value="" />
+        <env name="TYPO3_INSTALL_DB_PASSWORD" value="root" />
         <env name="TYPO3_INSTALL_DB_DBNAME" value="travis_console_test" />
         <env name="TYPO3_INSTALL_ADMIN_USER" value="admin" />
         <env name="TYPO3_INSTALL_ADMIN_PASSWORD" value="password" />
         <env name="TYPO3_INSTALL_SITE_NAME" value="Travis Install" />
         <env name="TYPO3_INSTALL_WEB_SERVER_SETUP_TYPE" value="none" />
         <env name="TYPO3_INSTALL_SITE_SETUP_TYPE" value="site" />
+        <env name="typo3DatabaseHost" value="127.0.0.1" />
+        <env name="typo3DatabaseName" value="typo3" />
+        <env name="typo3DatabasePassword" value="root" />
+        <env name="typo3DatabaseUsername" value="root" />
     </php>
     <testsuites>
         <testsuite name="TYPO3 Console Unit Tests">
