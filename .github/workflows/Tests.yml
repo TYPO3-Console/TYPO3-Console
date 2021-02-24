@@ -48,7 +48,7 @@ jobs:
       - name: Install
         run: |
           export COMPOSER_ROOT_VERSION=6.4.0
-          composer require --no-update \
+          composer require --no-update --no-interaction \
                 typo3/cms-backend="${{ matrix.typo3 }}" \
                 typo3/cms-core="${{ matrix.typo3 }}" \
                 typo3/cms-extbase="${{ matrix.typo3 }}" \
@@ -56,8 +56,7 @@ jobs:
                 typo3/cms-fluid="${{ matrix.typo3 }}" \
                 typo3/cms-frontend="${{ matrix.typo3 }}" \
                 typo3/cms-install="${{ matrix.typo3 }}" \
-                typo3/cms-recordlist="${{ matrix.typo3 }}" \
-                --no-interaction --no-update
+                typo3/cms-recordlist="${{ matrix.typo3 }}"
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
           git checkout composer.json
         env:
