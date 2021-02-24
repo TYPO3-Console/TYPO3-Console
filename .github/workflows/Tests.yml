@@ -48,7 +48,7 @@ jobs:
       - name: Install
         run: |
           export COMPOSER_ROOT_VERSION=6.4.0
-          composer require --no-update --no-interaction \
+          composer require --no-update \
                 typo3/cms-backend="${{ matrix.typo3 }}" \
                 typo3/cms-core="${{ matrix.typo3 }}" \
                 typo3/cms-extbase="${{ matrix.typo3 }}" \
@@ -57,7 +57,6 @@ jobs:
                 typo3/cms-frontend="${{ matrix.typo3 }}" \
                 typo3/cms-install="${{ matrix.typo3 }}" \
                 typo3/cms-recordlist="${{ matrix.typo3 }}"
-          rm -rf .Build composer.lock
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
           git checkout composer.json
 
@@ -68,5 +67,3 @@ jobs:
           ./typo3cms commandreference:render > /dev/null 2>&1 && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)"
           git diff
           .Build/bin/phpunit
-
-        # Prefer lowest is still missing
