@@ -22,7 +22,7 @@ jobs:
         include:
           - php: 7.4
             typo3: dev-master
-            dependency-version: [prefer-lowest, prefer-stable]
+            dependency-version: prefer-stable
 
     name: P${{ matrix.php }} - T${{ matrix.typo3 }} - ${{ matrix.dependency-version }}
 
