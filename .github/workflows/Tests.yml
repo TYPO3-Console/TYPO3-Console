@@ -24,7 +24,7 @@ jobs:
             typo3: dev-master
             dependency-version: prefer-stable
 
-    name: P${{ matrix.php }} - T${{ matrix.typo3 }} - ${{ matrix.dependency-version }}
+    name: PHP ${{ matrix.php }} - TYPO3 ${{ matrix.typo3 }} - ${{ matrix.dependency-version }}
 
     steps:
       - name: Start database server
