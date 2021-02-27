@@ -19,10 +19,14 @@ jobs:
         typo3: [ ^10.4.1 ]
         php: [ '7.2', '7.3', '7.4' ]
         dependency-version: [prefer-lowest, prefer-stable]
+        experimental: [false]
         include:
           - php: 7.4
             typo3: dev-master
             dependency-version: prefer-stable
+            experimental: true
+
+    continue-on-error: ${{ matrix.experimental }}
 
     name: PHP ${{ matrix.php }} - TYPO3 ${{ matrix.typo3 }} - ${{ matrix.dependency-version }}
 
