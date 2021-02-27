@@ -48,6 +48,6 @@ jobs:
               git tag ${{ steps.determine-tag.outputs.tag }}
               git push --tags
             else
-              git commit -m "Update extension based on commit $TRAVIS_COMMIT" --author "Helmut Hummel <typo3@helhum.io>"
+              git commit -m "Update extension based on commit $GITHUB_SHA" --author "Helmut Hummel <typo3@helhum.io>"
               git push origin HEAD:$BRANCH_NAME
           fi;
