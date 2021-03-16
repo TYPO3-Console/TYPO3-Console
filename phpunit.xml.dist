@@ -18,7 +18,7 @@
         <env name="TYPO3_INSTALL_DB_USER" value="root" />
         <env name="TYPO3_INSTALL_DB_HOST" value="127.0.0.1" />
         <env name="TYPO3_INSTALL_DB_PASSWORD" value="root" />
-        <env name="TYPO3_INSTALL_DB_DBNAME" value="travis_console_test" />
+        <env name="TYPO3_INSTALL_DB_DBNAME" value="typo3" />
         <env name="TYPO3_INSTALL_ADMIN_USER" value="admin" />
         <env name="TYPO3_INSTALL_ADMIN_PASSWORD" value="password" />
         <env name="TYPO3_INSTALL_SITE_NAME" value="Travis Install" />
