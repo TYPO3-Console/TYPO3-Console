@@ -60,7 +60,6 @@ jobs:
         run: |
           export COMPOSER_ROOT_VERSION=6.4.0
           composer require --no-update \
-                overtrue/phplint \
                 typo3/cms-backend="${{ matrix.typo3 }}" \
                 typo3/cms-core="${{ matrix.typo3 }}" \
                 typo3/cms-extbase="${{ matrix.typo3 }}" \
@@ -72,10 +71,14 @@ jobs:
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
           git checkout composer.json
 
-      - name: Test
+      - name: Lint
+        run: .Build/bin/parallel-lint --exclude .Build .
+
+      # This fails when command reference is not up to date
+      - name: Test Command Reference
         run: |
-          .Build/bin/parallel-lint --exclude .Build .
-          # This fails when command reference is not up to date
           ./typo3cms commandreference:render > /dev/null 2>&1 && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)"
           git diff
-          .Build/bin/phpunit
+
+      - name: Test
+        run: .Build/bin/phpunit
