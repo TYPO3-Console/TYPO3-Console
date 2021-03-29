@@ -111,7 +111,7 @@ class MysqlCommand
     private function buildConnectionArguments(): array
     {
         if ($configFile = $this->createTemporaryMysqlConfigurationFile()) {
-            $arguments[] = '--defaults-extra-file=' . $configFile;
+            $arguments[] = '--defaults-file=' . $configFile;
         }
         if (!empty($this->dbConfig['host'])) {
             $arguments[] = '-h';
