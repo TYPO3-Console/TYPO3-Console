@@ -26,7 +26,7 @@ jobs:
         id: "determine-tag"
         run: "echo \"::set-output name=tag::${GITHUB_REF#refs/tags/}\""
 
-      - name: Consitency Checks
+      - name: Consistency Checks
         run: |
           if [ -n "${{ steps.determine-tag.outputs.tag }}" ] && [[ "${{ steps.determine-tag.outputs.tag }}" =~ ^v?([0-9]+\.)([0-9]+\.)([0-9]+)$ ]]; then
             composer set-version $(echo ${{ steps.determine-tag.outputs.tag }} | sed s/^v//g)
