@@ -13,7 +13,7 @@ help
 ====
 
 
-**Displays help for a command**
+**Display help for a command**
 
 The `help` command displays help for a given command:
 

@@ -53,6 +53,7 @@ class HelpCommand extends \Symfony\Component\Console\Command\HelpCommand
     {
         parent::configure();
         $this->setAliases([]);
+        $this->setDescription('Display help for a command');
         $this->setHelp(
             <<<'EOF'
 The <info>%command.name%</info> command displays help for a given command:

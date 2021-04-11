@@ -13,7 +13,7 @@ list
 ====
 
 
-**Lists commands**
+**List commands**
 
 The `list` command lists all commands:
 

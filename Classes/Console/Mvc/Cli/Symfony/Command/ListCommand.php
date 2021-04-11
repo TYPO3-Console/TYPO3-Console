@@ -30,6 +30,7 @@ class ListCommand extends \Symfony\Component\Console\Command\ListCommand
     {
         parent::configure();
         $this->amendDefinition($this->getDefinition());
+        $this->setDescription('List commands');
         $this->setHelp(
             <<<'EOF'
 The <info>%command.name%</info> command lists all commands:
