@@ -68,7 +68,7 @@ jobs:
                 typo3/cms-frontend="${{ matrix.typo3 }}" \
                 typo3/cms-install="${{ matrix.typo3 }}" \
                 typo3/cms-recordlist="${{ matrix.typo3 }}"
-          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
+          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
           git checkout composer.json
 
       - name: Lint
