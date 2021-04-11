@@ -9,6 +9,15 @@ jobs:
         steps:
             -   name: Checkout
                 uses: actions/checkout@v2
+                with:
+                    path: ./typo3-console
+
+            -   name: Checkout
+                uses: actions/checkout@master
+                with:
+                    repository: TYPO3-Console/Extension
+                    token: ${{ secrets.EXTENSION_UPDATE_TOKEN }}
+                    path: ./extension
 
             -   name: Set up PHP Version ${{ matrix.php }}
                 uses: shivammathur/setup-php@v2
@@ -22,32 +31,33 @@ jobs:
                     php --version
                     composer --version
 
-            -   name: "Determine tag"
-                id: "determine-tag"
-                run: "echo \"::set-output name=tag::${GITHUB_REF#refs/tags/}\""
-
-            -   name: Get branch name (merge)
+            -   name: Determine tag name
                 if: github.event_name != 'pull_request'
-                shell: bash
-                run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
+                id: determine-tag
+                run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
 
-            -   name: Updaet Extension repo
+            -   name: Determine branch name
+                if: github.event_name != 'pull_request'
+                id: determine-branch
+                run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
+
+            -   name: Update Extension repo
                 run: |
-                    mkdir -p ~/.ssh
-                    openssl aes-256-cbc -K $encrypted_85bf36ae99bb_key -iv $encrypted_85bf36ae99bb_iv -in Resources/Private/deploy_rsa.enc -out ~/.ssh/id_rsa -d
-                    echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-                    chmod 600 ~/.ssh/id_rsa
-                    git clone git@github.com:TYPO3-Console/Extension.git ../extension -b template
-                    cd ../extension && git checkout origin/$BRANCH_NAME || true && cd -
+                    cd ./typo3-console
+                    if [[ $GITHUB_REF == *"refs/heads"* ]]; then
+                        cd ../extension && git fetch origin && git checkout origin/${{ steps.determine-branch.outputs.branch }} || true && cd -
+                    fi;
                     composer extension-release
                     cd ../extension
                     git checkout README.md
                     git add .
-                    if [ -n "${{ steps.determine-tag.outputs.tag }}" ]; then
-                        git commit -m "Release extension version ${{ steps.determine-tag.outputs.tag }}" --author "Helmut Hummel <typo3@helhum.io>"
+                    git config user.email "typo3@helhum.io"
+                    git config user.name "Helmut Hummel"
+                    if [[ $GITHUB_REF == *"refs/tags"* ]]; then
+                        git commit -m "Release extension version ${{ steps.determine-tag.outputs.tag }}"
                         git tag ${{ steps.determine-tag.outputs.tag }}
                         git push --tags
-                      else
-                        git commit -m "Update extension based on commit $GITHUB_SHA" --author "Helmut Hummel <typo3@helhum.io>"
-                        git push origin HEAD:$BRANCH_NAME
+                    else
+                        git commit -m "Update extension based on commit $GITHUB_SHA"
+                        git push origin HEAD:${{ steps.determine-branch.outputs.branch }}
                     fi;
