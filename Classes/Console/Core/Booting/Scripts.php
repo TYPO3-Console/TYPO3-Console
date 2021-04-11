@@ -54,7 +54,10 @@ class Scripts
         $container->get('boot.state')->done = false;
         $assetsCache = $container->get('cache.assets');
         $coreCache = $container->get('cache.core');
-        IconRegistry::setCache($assetsCache);
+        // compatibility to < v11
+        if (method_exists(IconRegistry::class, 'setCache')) {
+            IconRegistry::setCache($assetsCache);
+        }
         PageRenderer::setCache($assetsCache);
         Bootstrap::loadTypo3LoadedExtAndExtLocalconf(true, $coreCache);
         Bootstrap::unsetReservedGlobalVariables();
