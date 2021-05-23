@@ -62,6 +62,14 @@ Options
 - Is multiple: no
 - Default: false
 
+`--raw`
+   If set, only the SQL statements, that are required to update the schema, are printed
+
+- Accept value: no
+- Is value required: no
+- Is multiple: no
+- Default: false
+
 
 
 

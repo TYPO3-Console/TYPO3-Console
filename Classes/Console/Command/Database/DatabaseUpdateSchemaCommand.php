@@ -76,6 +76,12 @@ EOH
                     InputOption::VALUE_NONE,
                     'If set the updates are only collected and shown, but not executed'
                 ),
+                new InputOption(
+                    'raw',
+                    '',
+                    InputOption::VALUE_NONE,
+                    'If set, only the SQL statements, that are required to update the schema, are printed'
+                ),
             ]
         );
     }
@@ -87,6 +93,7 @@ EOH
 
         $schemaUpdateTypes = explode(',', $input->getArgument('schemaUpdateTypes'));
         $dryRun = $input->getOption('dry-run');
+        $raw = $input->getOption('raw');
         $verbose = $output->isVerbose();
 
         /** @deprecated */
@@ -101,6 +108,16 @@ EOH
         }
 
         $result = $schemaService->updateSchema($expandedSchemaUpdateTypes, $dryRun);
+
+        if ($raw) {
+            foreach ($result->getPerformedUpdates() as $updatesTypes) {
+                foreach ($updatesTypes as $updates) {
+                    $output->writeln($updates . ';' . PHP_EOL);
+                }
+            }
+
+            return 0;
+        }
 
         if ($result->hasPerformedUpdates()) {
             $output->writeln(sprintf(
