@@ -17,37 +17,22 @@ jobs:
                 run: sudo /etc/init.d/mysql start
 
             -   uses: actions/checkout@v2
-            -   id: composer-cache
-                run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-            -   uses: actions/cache@v1
                 with:
-                    path: ${{ steps.composer-cache.outputs.dir }}
-                    key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-                    restore-keys: |
-                        ${{ runner.os }}-composer-
+                    fetch-depth: 0
             -   uses: shivammathur/setup-php@v2
                 with:
                     php-version: 7.4
             -   run: |
                     if [ -n "${{ secrets.SONAR_TOKEN }}" ]; then
-                        git fetch --unshallow
                         export COMPOSER_ROOT_VERSION=6.4.0
-                        composer install
+                        composer update
                         .Build/bin/phpunit --whitelist Classes --coverage-clover .Build/clover.xml --log-junit .Build/junit.xml
                     fi
-                env:
-                    typo3DatabaseHost: 127.0.0.1
-                    typo3DatabaseName: typo3
-                    typo3DatabasePassword: root
-                    typo3DatabaseUsername: root
             -   name: Setup sonarqube
                 uses: warchant/setup-sonar-scanner@v3
-
             -   name: Run sonarqube
                 env:
-                    # to get access to secrets.SONAR_TOKEN, provide GITHUB_TOKEN
-                    GITHUB_TOKEN: ${{ secrets.CONSOLE_GITHUB_TOKEN }}
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
                 run: sonar-scanner
-                    -Dsonar.login=${{ secrets.SONAR_TOKEN }}
                     -Dsonar.host.url=https://sonarcloud.io/
-                    -Dsonar.organization="helhum-github"

@@ -24,10 +24,6 @@
         <env name="TYPO3_INSTALL_SITE_NAME" value="Travis Install" />
         <env name="TYPO3_INSTALL_WEB_SERVER_SETUP_TYPE" value="none" />
         <env name="TYPO3_INSTALL_SITE_SETUP_TYPE" value="site" />
-        <env name="typo3DatabaseHost" value="127.0.0.1" />
-        <env name="typo3DatabaseName" value="typo3" />
-        <env name="typo3DatabasePassword" value="root" />
-        <env name="typo3DatabaseUsername" value="root" />
     </php>
     <testsuites>
         <testsuite name="TYPO3 Console Unit Tests">
