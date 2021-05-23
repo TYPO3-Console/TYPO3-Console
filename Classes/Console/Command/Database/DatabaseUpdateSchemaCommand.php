@@ -60,6 +60,8 @@ To avoid shell matching all types with wildcards should be quoted.
 <b>Example:</b>
 
   <code>%command.full_name% "*.add,*.change"</code>
+  <code>%command.full_name% "*.add" --raw</code>
+  <code>%command.full_name% "*" --verbose</code>
 EOH
         );
         $this->setDefinition(
@@ -137,7 +139,7 @@ EOH
         if ($result->hasErrors()) {
             $output->writeln('');
             $output->writeln('<error>The following errors occurred:</error>');
-            $schemaUpdateResultRenderer->renderErrors($result, $consoleOutput, $verbose);
+            $schemaUpdateResultRenderer->renderErrors($result, $consoleOutput, true);
 
             return 1;
         }
