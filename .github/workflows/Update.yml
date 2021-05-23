@@ -1,9 +1,9 @@
-name: Update
+name: Update Extension Repo
 
 on: [ push ]
 
 jobs:
-    Unit:
+    Update-extension-repo:
         runs-on: ubuntu-latest
 
         steps:

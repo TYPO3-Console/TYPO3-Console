@@ -10,7 +10,7 @@ on:
             - "**"
 
 jobs:
-    Unit:
+    Tests:
         runs-on: ubuntu-18.04
 
         strategy:

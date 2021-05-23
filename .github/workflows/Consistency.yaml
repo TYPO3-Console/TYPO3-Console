@@ -3,7 +3,7 @@ name: Consistency
 on: [ push, pull_request ]
 
 jobs:
-    Unit:
+    Consistency-checks:
         runs-on: ubuntu-latest
 
         steps:
