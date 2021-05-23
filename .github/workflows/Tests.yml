@@ -78,7 +78,6 @@ jobs:
             -   name: Test Command Reference
                 run: |
                     ./typo3cms commandreference:render > /dev/null 2>&1 && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)"
-                    git diff
 
             -   name: Test
                 run: .Build/bin/phpunit

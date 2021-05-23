@@ -40,5 +40,5 @@ jobs:
                       # Upload
                       TAG_MESSAGE=`git tag -n10 -l ${{ steps.determine-tag.outputs.tag }} | sed 's/^[v]*[0-9.]*[ ]*//g'`
                       echo "Uploading release ${{ steps.determine-tag.outputs.tag }} to TER"
-                      $HOME/.composer/vendor/helhum/ter-client/ter-client upload typo3_console ../extension -u "$TYPO3_ORG_USERNAME" -p "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
+                      $HOME/.composer/vendor/helhum/ter-client/ter-client upload typo3_console ../extension -u "${{ secrets.TYPO3_ORG_USERNAME }}" -p "${{ secrets.TYPO3_ORG_PASSWORD }}" -m "$TAG_MESSAGE"
                     fi;
