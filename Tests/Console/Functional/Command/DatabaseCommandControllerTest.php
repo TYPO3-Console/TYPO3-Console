@@ -131,17 +131,10 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
-    public function schemaUpdateShowsErrorMessageIfTheyOccur()
+    public function schemaUpdateShowsErrorMessageWithStatementsIfTheyOccur()
     {
         self::installFixtureExtensionCode('ext_broken_sql');
         $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
-        try {
-            $output = $this->commandDispatcher->executeCommand('database:updateschema', ['*']);
-        } catch (FailedSubProcessCommandException $e) {
-            $output = $e->getOutputMessage();
-        }
-        $this->assertContains('The following errors occurred:', $output);
-        $this->assertNotContains('SQL Statement', $output);
         try {
             $output = $this->commandDispatcher->executeCommand('database:updateschema', ['*', '--verbose']);
         } catch (FailedSubProcessCommandException $e) {

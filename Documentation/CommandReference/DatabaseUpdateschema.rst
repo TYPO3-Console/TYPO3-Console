@@ -42,6 +42,8 @@ To avoid shell matching all types with wildcards should be quoted.
 **Example:**
 
   `typo3cms database:updateschema "*.add,*.change"`
+  `typo3cms database:updateschema "*.add" --raw`
+  `typo3cms database:updateschema "*" --verbose`
 
 Arguments
 ~~~~~~~~~
