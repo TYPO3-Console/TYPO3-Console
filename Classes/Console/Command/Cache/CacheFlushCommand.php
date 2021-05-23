@@ -29,10 +29,10 @@ class CacheFlushCommand extends Command
 {
     protected function configure()
     {
-        $this->setDescription('Flush all caches');
+        $this->setDescription('Flush all TYPO3 caches');
         $this->setHelp(
             <<<'EOH'
-Flushes TYPO3 core caches first and after that, flushes caches from extensions.
+Flushes all TYPO3 caches. Opcode cache will not be flushed.
 EOH
         );
         $this->setDefinition(
@@ -41,7 +41,7 @@ EOH
                     'files-only',
                     null,
                     InputOption::VALUE_NONE,
-                    'Only file caches are flushed'
+                    'Only file caches are flushed. Useful when TYPO3 is not set up or DB connection can not be established.'
                 ),
             ]
         );

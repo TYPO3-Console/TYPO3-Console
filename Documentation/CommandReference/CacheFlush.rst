@@ -13,9 +13,9 @@ cache:flush
 ===========
 
 
-**Flush all caches**
+**Flush all TYPO3 caches**
 
-Flushes TYPO3 core caches first and after that, flushes caches from extensions.
+Flushes all TYPO3 caches. Opcode cache will not be flushed.
 
 
 
@@ -23,7 +23,7 @@ Options
 ~~~~~~~
 
 `--files-only`
-   Only file caches are flushed
+   Only file caches are flushed. Useful when TYPO3 is not set up or DB connection can not be established.
 
 - Accept value: no
 - Is value required: no

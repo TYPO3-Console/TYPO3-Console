@@ -35,6 +35,6 @@ Related commands
 `install:generatepackagestates`
   Generate PackageStates.php file
 `cache:flush`
-  Flush all caches
+  Flush all TYPO3 caches
 
 
