@@ -16,7 +16,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                typo3: [ '^10.4.1', '^11' ]
+                typo3: [ '^10.4.1', '~11.2.0' ]
                 php: [ '7.2', '7.3', '7.4' ]
                 dependency-version: [ prefer-lowest, prefer-stable ]
                 experimental: [ false ]
@@ -26,9 +26,9 @@ jobs:
                         dependency-version: prefer-stable
                         experimental: true
                 exclude:
-                    -   typo3: '^11'
+                    -   typo3: '~11.2.0'
                         php: '7.2'
-                    -   typo3: '^11'
+                    -   typo3: '~11.2.0'
                         php: '7.3'
 
         continue-on-error: ${{ matrix.experimental }}
