@@ -30,13 +30,13 @@
     "require": {
         "php": "^7.2",
 
-        "typo3/cms-backend": "^10.4.1 || >=11.0.0 <11.2",
-        "typo3/cms-core": "^10.4.1 || >=11.0.0 <11.2",
-        "typo3/cms-extbase": "^10.4.1 || >=11.0.0 <11.2",
-        "typo3/cms-extensionmanager": "^10.4.1 || >=11.0.0 <11.2",
-        "typo3/cms-fluid": "^10.4.1 || >=11.0.0 <11.2",
-        "typo3/cms-frontend": "^10.4.1 || >=11.0.0 <11.2",
-        "typo3/cms-install": "^10.4.1 || >=11.0.0 <11.2",
+        "typo3/cms-backend": "^10.4.1 || >=11.2.0 <11.3",
+        "typo3/cms-core": "^10.4.1 || >=11.2.0 <11.3",
+        "typo3/cms-extbase": "^10.4.1 || >=11.2.0 <11.3",
+        "typo3/cms-extensionmanager": "^10.4.1 || >=11.2.0 <11.3",
+        "typo3/cms-fluid": "^10.4.1 || >=11.2.0 <11.3",
+        "typo3/cms-frontend": "^10.4.1 || >=11.2.0 <11.3",
+        "typo3/cms-install": "^10.4.1 || >=11.2.0 <11.3",
 
         "doctrine/annotations": "^1.4",
         "doctrine/dbal": "<2.13",
@@ -45,8 +45,8 @@
         "helhum/config-loader": ">=0.9 <0.13"
     },
     "require-dev": {
-        "typo3/cms-reports": "^10.4.1 || >=11.0.0 <11.2 || dev-master",
-        "typo3/cms-filemetadata": "^10.4.1 || >=11.0.0 <11.2 || dev-master",
+        "typo3/cms-reports": "^10.4.1 || >=11.2.0 <11.3 || dev-master",
+        "typo3/cms-filemetadata": "^10.4.1 || >=11.2.0 <11.3 || dev-master",
         "typo3-console/create-reference-command": "@dev",
         "typo3-console/php-server-command": "^0.2",
         "symfony/expression-language": "^4.4 || ^5.0",
