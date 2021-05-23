@@ -1,0 +1,63 @@
+name: Update
+
+on: [ push ]
+
+jobs:
+    Unit:
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+                with:
+                    path: ./typo3-console
+
+            -   name: Checkout
+                uses: actions/checkout@master
+                with:
+                    repository: TYPO3-Console/Extension
+                    token: ${{ secrets.EXTENSION_UPDATE_TOKEN }}
+                    path: ./extension
+
+            -   name: Set up PHP Version ${{ matrix.php }}
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: 7.4
+                    tools: composer:v2
+                    coverage: none
+
+            -   name: Environment Check
+                run: |
+                    php --version
+                    composer --version
+
+            -   name: Determine tag name
+                if: github.event_name != 'pull_request'
+                id: determine-tag
+                run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
+
+            -   name: Determine branch name
+                if: github.event_name != 'pull_request'
+                id: determine-branch
+                run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
+
+            -   name: Update Extension repo
+                run: |
+                    cd ./typo3-console
+                    if [[ $GITHUB_REF == *"refs/heads"* ]]; then
+                        cd ../extension && git fetch origin && git checkout origin/${{ steps.determine-branch.outputs.branch }} || true && cd -
+                    fi;
+                    composer extension-release
+                    cd ../extension
+                    git checkout README.md
+                    git add .
+                    git config user.email "typo3@helhum.io"
+                    git config user.name "Helmut Hummel"
+                    if [[ $GITHUB_REF == *"refs/tags"* ]]; then
+                        git commit -m "Release extension version ${{ steps.determine-tag.outputs.tag }}"
+                        git tag ${{ steps.determine-tag.outputs.tag }}
+                        git push --tags
+                    else
+                        git commit -m "Update extension based on commit $GITHUB_SHA"
+                        git push origin HEAD:${{ steps.determine-branch.outputs.branch }}
+                    fi;

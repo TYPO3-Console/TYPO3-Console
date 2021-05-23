@@ -1,0 +1,44 @@
+name: Deploy to TER
+
+on:
+    push:
+        tags:
+            - "v?[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+    TER:
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v2
+            -   id: composer-cache
+                run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+            -   uses: actions/cache@v1
+                with:
+                    path: ${{ steps.composer-cache.outputs.dir }}
+                    key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+                    restore-keys: |
+                        ${{ runner.os }}-composer-
+            -   uses: shivammathur/setup-php@v2
+                with:
+                    php-version: 7.4
+                    coverage: none
+
+            -   name: "Determine tag"
+                id: "determine-tag"
+                run: "echo \"::set-output name=tag::${GITHUB_REF#refs/tags/}\""
+
+            -   name: Deploy to TER
+                run: |
+                    if [ -n "${{ secrets.TYPO3_ORG_USERNAME }}" ] && [ -n "${{ secrets.TYPO3_ORG_PASSWORD }}" ]; then
+                      echo -e "Preparing upload of release ${{ steps.determine-tag.outputs.tag }} to TER\n";
+                      # Install ter client
+                      composer global require helhum/ter-client
+
+                      # Build extension files
+                      composer extension-release
+
+                      # Upload
+                      TAG_MESSAGE=`git tag -n10 -l ${{ steps.determine-tag.outputs.tag }} | sed 's/^[v]*[0-9.]*[ ]*//g'`
+                      echo "Uploading release ${{ steps.determine-tag.outputs.tag }} to TER"
+                      $HOME/.composer/vendor/helhum/ter-client/ter-client upload typo3_console ../extension -u "$TYPO3_ORG_USERNAME" -p "$TYPO3_ORG_PASSWORD" -m "$TAG_MESSAGE"
+                    fi;

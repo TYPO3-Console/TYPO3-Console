@@ -1,0 +1,38 @@
+name: Sonar Cloud
+
+on:
+    push:
+        branches:
+            - latest
+            - develop
+            - /^v?([0-9]+\.){1,2}(x|[0-9]+)-?[a-z]*[1-9]*$/
+
+jobs:
+    Sonar-cloud:
+        name: Sonar Cloud
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Start database server
+                run: sudo /etc/init.d/mysql start
+
+            -   uses: actions/checkout@v2
+                with:
+                    fetch-depth: 0
+            -   uses: shivammathur/setup-php@v2
+                with:
+                    php-version: 7.4
+            -   run: |
+                    if [ -n "${{ secrets.SONAR_TOKEN }}" ]; then
+                        export COMPOSER_ROOT_VERSION=6.4.0
+                        composer update
+                        .Build/bin/phpunit --whitelist Classes --coverage-clover .Build/clover.xml --log-junit .Build/junit.xml
+                    fi
+            -   name: Setup sonarqube
+                uses: warchant/setup-sonar-scanner@v3
+            -   name: Run sonarqube
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+                run: sonar-scanner
+                    -Dsonar.host.url=https://sonarcloud.io/
