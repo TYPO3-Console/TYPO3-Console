@@ -42,7 +42,7 @@ install:
   - IF NOT EXIST php-installed.txt echo extension=php_mbstring.dll >> php.ini
   - IF NOT EXIST php-installed.txt echo extension=php_fileinfo.dll >> php.ini
   - IF NOT EXIST php-installed.txt echo extension=php_mysqli.dll >> php.ini
-  - IF NOT EXIST php-installed.txt curl -fsS -o composer.phar https://getcomposer.org/download/1.10.5/composer.phar
+  - IF NOT EXIST php-installed.txt curl -fsS -o composer.phar https://getcomposer.org/composer.phar
   - IF NOT EXIST php-installed.txt echo @php %%~dp0composer.phar %%* > composer.bat
   - IF NOT EXIST php-installed.txt type nul >> php-installed.txt
 
