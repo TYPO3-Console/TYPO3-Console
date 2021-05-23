@@ -29,7 +29,7 @@
     "license": "GPL-2.0-or-later",
     "require": {
         "php": "^7",
-        "helhum/typo3-console-plugin": "^2.0.2",
+        "helhum/typo3-console-plugin": "^2.0.7",
 
         "typo3/cms-backend": "~8.7.22 || ~9.5.8",
         "typo3/cms-core": "~8.7.22 || ~9.5.8",

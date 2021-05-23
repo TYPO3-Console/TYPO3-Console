@@ -1,0 +1,36 @@
+name: Consistency
+
+on: [ push, pull_request ]
+
+jobs:
+    Consistency-checks:
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+
+            -   name: Set up PHP Version ${{ matrix.php }}
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: 7.4
+                    tools: composer:v2
+                    coverage: none
+
+            -   name: Environment Check
+                run: |
+                    php --version
+                    composer --version
+
+            -   name: "Determine tag"
+                id: "determine-tag"
+                run: "echo \"::set-output name=tag::${GITHUB_REF#refs/tags/}\""
+
+            -   name: Consistency Checks
+                run: |
+                    if [ -n "${{ steps.determine-tag.outputs.tag }}" ] && [[ "${{ steps.determine-tag.outputs.tag }}" =~ ^v?([0-9]+\.)([0-9]+\.)([0-9]+)$ ]]; then
+                      composer set-version $(echo ${{ steps.determine-tag.outputs.tag }} | sed s/^v//g)
+                      test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
+                    fi
+                    composer extension-verify-composer-json
+                    composer extension-release

@@ -1,0 +1,84 @@
+name: Tests
+
+on:
+    pull_request:
+        branches:
+            - "**"
+    push:
+        branches:
+            - "latest"
+            - "**"
+
+jobs:
+    Tests:
+        runs-on: ubuntu-18.04
+
+        strategy:
+            fail-fast: false
+            matrix:
+                typo3: [ '~9.5.8', '^8.7.22' ]
+                php: [ '7.0', '7.1', '7.2' ]
+                dependency-version: [ prefer-lowest, prefer-stable ]
+                experimental: [ false ]
+                include:
+                    -   php: 7.4
+                        typo3: dev-master
+                        dependency-version: prefer-stable
+                        experimental: true
+                exclude:
+                    -   typo3: '~9.5.8'
+                        php: '7.0'
+                    -   typo3: '~9.5.8'
+                        php: '7.1'
+
+        continue-on-error: ${{ matrix.experimental }}
+
+        name: PHP ${{ matrix.php }} - TYPO3 ${{ matrix.typo3 }} - ${{ matrix.dependency-version }}
+
+        steps:
+            -   name: Start database server
+                run: sudo /etc/init.d/mysql start
+
+            -   name: Checkout
+                uses: actions/checkout@v2
+
+            -   name: Set up PHP Version ${{ matrix.php }}
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php }}
+                    tools: composer:v2
+                    coverage: none
+
+            -   name: Environment Check
+                run: |
+                    php --version
+                    composer --version
+            -   name: Validate composer.json and composer.lock
+                run: composer validate
+
+            -   name: Install
+                run: |
+                    export COMPOSER_ROOT_VERSION=5.8.6
+                    composer require --no-update \
+                          typo3/cms-backend="${{ matrix.typo3 }}" \
+                          typo3/cms-core="${{ matrix.typo3 }}" \
+                          typo3/cms-extbase="${{ matrix.typo3 }}" \
+                          typo3/cms-extensionmanager="${{ matrix.typo3 }}" \
+                          typo3/cms-fluid="${{ matrix.typo3 }}" \
+                          typo3/cms-frontend="${{ matrix.typo3 }}" \
+                          typo3/cms-install="${{ matrix.typo3 }}" \
+                          typo3/cms-recordlist="${{ matrix.typo3 }}"
+                    composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
+                    git checkout composer.json
+
+            -   name: Lint
+                run: .Build/bin/parallel-lint --exclude .Build .
+
+            # This fails when command reference is not up to date
+            -   name: Test Command Reference
+                run: |
+                    ./typo3cms commandreference:render > /dev/null 2>&1 && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)"
+                    git diff
+
+            -   name: Test
+                run: .Build/bin/phpunit
