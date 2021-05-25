@@ -10,27 +10,30 @@ jobs:
             -   name: Checkout
                 uses: actions/checkout@v2
 
-            -   name: Set up PHP Version ${{ matrix.php }}
+            -   name: Set up PHP Version 7.4
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: 7.4
                     tools: composer:v2
                     coverage: none
 
-            -   name: Environment Check
+            -   name: "Extract tag, branch, version from GITHUB_REF"
+                id: "github-ref"
                 run: |
-                    php --version
-                    composer --version
+                    echo "::set-output name=tag::$(echo $GITHUB_REF | sed -E -n 's#^refs/tags/(.*)$#\1#p')"
+                    echo "::set-output name=branch::$(echo $GITHUB_REF | sed -E -n 's#^refs/heads/(.*)$#\1#p')"
+                    echo "::set-output name=version::$(echo $GITHUB_REF | sed -E -n 's#^refs/tags/v?([0-9]+\.)([0-9]+\.)([0-9]+)#\1\2\3#p')"
 
-            -   name: "Determine tag"
-                id: "determine-tag"
-                run: "echo \"::set-output name=tag::${GITHUB_REF#refs/tags/}\""
-
-            -   name: Consistency Checks
+            -   name: Compare tag version with committed version
+                if: steps.github-ref.outputs.version != ''
                 run: |
-                    if [ -n "${{ steps.determine-tag.outputs.tag }}" ] && [[ "${{ steps.determine-tag.outputs.tag }}" =~ ^v?([0-9]+\.)([0-9]+\.)([0-9]+)$ ]]; then
-                      composer set-version $(echo ${{ steps.determine-tag.outputs.tag }} | sed s/^v//g)
-                      test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
-                    fi
+                    composer set-version $(echo ${{ steps.github-ref.outputs.tag }} | sed s/^v//g)
+                    test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
+
+            -   name: Compare extension composer.json with main composer.json
+                run: |
                     composer extension-verify-composer-json
+
+            -   name: Build extension artifact
+                run: |
                     composer extension-release
