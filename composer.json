@@ -53,10 +53,6 @@
         "nimut/testing-framework": "5.x-dev",
         "php-parallel-lint/php-parallel-lint": "^1.2"
     },
-    "conflict": {
-        "typo3-ter/dbal": "*",
-        "friendsoftypo3/dbal": "*"
-    },
     "autoload": {
         "psr-4": {
             "Helhum\\Typo3Console\\": [

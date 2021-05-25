@@ -20,7 +20,6 @@ $EM_CONF[$_EXTKEY] = [
       'install' => '10.4.0-11.2.99',
     ],
     'conflicts' => [
-        'dbal' => '',
     ],
     'suggests' => [
     ],
