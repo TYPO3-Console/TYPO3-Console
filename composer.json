@@ -38,7 +38,6 @@
         "typo3/cms-frontend": "^10.4.1 || >=11.2.0 <11.3",
         "typo3/cms-install": "^10.4.1 || >=11.2.0 <11.3",
 
-        "doctrine/annotations": "^1.4",
         "doctrine/dbal": "<2.13",
         "symfony/console": "^4.4 || ^5.0",
         "symfony/process": "^4.4 || ^5.0",
