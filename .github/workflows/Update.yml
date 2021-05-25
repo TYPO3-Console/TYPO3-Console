@@ -1,9 +1,10 @@
-name: Update Extension Repo
+name: Update
 
 on: [ push ]
 
 jobs:
-    Update-extension-repo:
+    Extension-Repo:
+        name: '🏗 Extension Repo'
         if: github.repository == 'TYPO3-Console/TYPO3-Console'
         runs-on: ubuntu-latest
 

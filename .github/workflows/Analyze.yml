@@ -1,4 +1,4 @@
-name: Sonar Cloud
+name: Analyze
 
 on:
     push:
@@ -8,9 +8,9 @@ on:
             - /^v?([0-9]+\.){1,2}(x|[0-9]+)-?[a-z]*[1-9]*$/
 
 jobs:
-    Sonar-cloud:
+    Sonar-Cloud:
+        name: '🐬 Sonar Cloud'
         if: github.repository == 'TYPO3-Console/TYPO3-Console'
-        name: Sonar Cloud
         runs-on: ubuntu-latest
 
         steps:

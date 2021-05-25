@@ -1,4 +1,4 @@
-name: Tests
+name: Test
 
 on:
     pull_request:
@@ -10,7 +10,43 @@ on:
             - "**"
 
 jobs:
+    Consistency:
+        name: '⛑ Consistency'
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+
+            -   name: Set up PHP Version 7.4
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: 7.4
+                    tools: composer:v2
+                    coverage: none
+
+            -   name: "Extract tag, branch, version from GITHUB_REF"
+                id: "github-ref"
+                run: |
+                    echo "::set-output name=tag::$(echo $GITHUB_REF | sed -E -n 's#^refs/tags/(.*)$#\1#p')"
+                    echo "::set-output name=branch::$(echo $GITHUB_REF | sed -E -n 's#^refs/heads/(.*)$#\1#p')"
+                    echo "::set-output name=version::$(echo $GITHUB_REF | sed -E -n 's#^refs/tags/v?([0-9]+\.)([0-9]+\.)([0-9]+)#\1\2\3#p')"
+
+            -   name: Compare tag version with committed version
+                if: steps.github-ref.outputs.version != ''
+                run: |
+                    composer set-version $(echo ${{ steps.github-ref.outputs.tag }} | sed s/^v//g)
+                    test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
+
+            -   name: Compare extension composer.json with main composer.json
+                run: |
+                    composer extension-verify-composer-json
+
+            -   name: Build extension artifact
+                run: |
+                    composer extension-release
+
     Tests:
+        name: '🚧 T3 ${{ matrix.typo3 }} - PHP ${{ matrix.php }} - ${{ matrix.dependency-version }}'
         runs-on: ubuntu-18.04
 
         strategy:
@@ -18,12 +54,12 @@ jobs:
             matrix:
                 typo3: [ '^10.4.1', '~11.2.0' ]
                 php: [ '7.2', '7.3', '7.4' ]
-                dependency-version: [ prefer-lowest, prefer-stable ]
+                dependency-version: [ lowest, stable ]
                 experimental: [ false ]
                 include:
                     -   php: 7.4
                         typo3: dev-master
-                        dependency-version: prefer-stable
+                        dependency-version: stable
                         experimental: true
                 exclude:
                     -   typo3: '~11.2.0'
@@ -32,8 +68,6 @@ jobs:
                         php: '7.3'
 
         continue-on-error: ${{ matrix.experimental }}
-
-        name: PHP ${{ matrix.php }} - TYPO3 ${{ matrix.typo3 }} - ${{ matrix.dependency-version }}
 
         steps:
             -   name: Start database server
@@ -68,7 +102,7 @@ jobs:
                           typo3/cms-frontend="${{ matrix.typo3 }}" \
                           typo3/cms-install="${{ matrix.typo3 }}" \
                           typo3/cms-recordlist="${{ matrix.typo3 }}"
-                    composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
+                    composer update --prefer-${{ matrix.dependency-version }} --prefer-dist --no-interaction
                     git checkout composer.json
 
             -   name: Lint
