@@ -1,17 +1,10 @@
 name: Test
 
-on:
-    pull_request:
-        branches:
-            - "**"
-    push:
-        branches:
-            - "latest"
-            - "**"
+on: [ push, pull_request ]
 
 jobs:
     Consistency:
-        name: '⛑ Consistency'
+        name: 'Consistency'
         runs-on: ubuntu-latest
         steps:
             -   name: Checkout
@@ -46,7 +39,7 @@ jobs:
                     composer extension-release
 
     Tests:
-        name: '🚧 T3 ${{ matrix.typo3 }} - PHP ${{ matrix.php }} - ${{ matrix.dependency-version }}'
+        name: 'T3 ${{ matrix.typo3 }} - PHP ${{ matrix.php }} - ${{ matrix.dependency-version }}'
         runs-on: ubuntu-18.04
 
         strategy:

@@ -7,7 +7,8 @@ on:
 
 jobs:
     Ship-to-TER:
-        name: '🚢 to TER'
+        name: 'Ship to TER'
+        if: github.repository == 'TYPO3-Console/TYPO3-Console'
         runs-on: ubuntu-latest
         steps:
             -   uses: actions/checkout@v2
