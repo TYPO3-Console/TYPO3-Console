@@ -41,7 +41,7 @@
         },
         "classmap-authoritative": true,
         "platform": {
-            "php": "7.2.0"
+            "php": "7.2.5"
         }
     },
     "autoload": {
@@ -56,8 +56,6 @@
         "typo3/cms-core": "^10.4.1 || >=11.2.0 <11.3"
     },
     "replace": {
-        "helhum/typo3-console-plugin": "*",
-
         "typo3/cms-backend": "*",
         "typo3/cms-core": "*",
         "typo3/cms-extbase": "*",
@@ -67,10 +65,11 @@
         "typo3/cms-install": "*",
         "typo3/cms-saltedpasswords": "*",
 
-        "doctrine/annotations": "*",
         "psr/log": "*",
+        "symfony/console": "*",
         "symfony/debug": "*",
-        "symfony/polyfill-mbstring": "*"
+        "symfony/polyfill-mbstring": "*",
+        "symfony/polyfill-php80": "*"
     },
     "scripts": {
         "post-autoload-dump": "Helhum\\Typo3Console\\Composer\\PopulateCommands::populate"
