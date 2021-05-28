@@ -58,7 +58,7 @@ class ScriptHelper
 
         $githubWorkflowFileTests = __DIR__ . '/../../../.github/workflows/Test.yml';
         $content = file_get_contents($githubWorkflowFileTests);
-        $content = preg_replace('/(export COMPOSER_ROOT_VERSION)=\d+\.\d+\.\d+/', '$1=' . $version, $content);
+        $content = preg_replace('/(COMPOSER_ROOT_VERSION): \d+\.\d+\.\d+/', '$1: ' . $version, $content);
         file_put_contents($githubWorkflowFileTests, $content);
 
         $appveyorYmlFile = __DIR__ . '/../../../appveyor.yml';
