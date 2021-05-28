@@ -39,26 +39,34 @@ jobs:
                     composer extension-release
 
     Tests:
-        name: 'T3 ${{ matrix.typo3 }} - PHP ${{ matrix.php }} - ${{ matrix.dependency-version }}'
-        runs-on: ubuntu-18.04
+        name: 'T3 ${{ matrix.typo3 }} - ${{ matrix.os }} - PHP ${{ matrix.php }} - ${{ matrix.dependency-version }}'
+        runs-on: ${{ matrix.os }}
 
         strategy:
             fail-fast: false
             matrix:
-                typo3: [ '^10.4.1', '~11.2.0' ]
+                os: [ 'ubuntu-18.04' ]
                 php: [ '7.2', '7.3', '7.4' ]
+                typo3: [ '^10.4.1', '~11.2.0' ]
                 dependency-version: [ lowest, stable ]
                 experimental: [ false ]
                 include:
-                    -   php: 7.4
+                    -   os: 'ubuntu-18.04'
+                        php: 7.4
                         typo3: dev-master
                         dependency-version: stable
                         experimental: true
+                    -   os: 'windows-latest'
+                        php: 7.4
+                        typo3: '^10.4.1'
+                        dependency-version: stable
+                        experimental: false
                 exclude:
-                    -   typo3: '~11.2.0'
-                        php: '7.2'
-                    -   typo3: '~11.2.0'
-                        php: '7.3'
+                    -   php: '7.2'
+                        typo3: '~11.2.0'
+
+                    -   php: '7.3'
+                        typo3: '~11.2.0'
 
         continue-on-error: ${{ matrix.experimental }}
 
@@ -80,12 +88,14 @@ jobs:
                 run: |
                     php --version
                     composer --version
+
             -   name: Validate composer.json and composer.lock
                 run: composer validate
 
             -   name: Install
+                env:
+                    COMPOSER_ROOT_VERSION: 6.5.0
                 run: |
-                    export COMPOSER_ROOT_VERSION=6.5.0
                     composer require --no-update \
                           typo3/cms-backend="${{ matrix.typo3 }}" \
                           typo3/cms-core="${{ matrix.typo3 }}" \
@@ -99,12 +109,12 @@ jobs:
                     git checkout composer.json
 
             -   name: Lint
-                run: .Build/bin/parallel-lint --exclude .Build .
+                run: php .Build/bin/parallel-lint --exclude .Build .
 
             # This fails when command reference is not up to date
             -   name: Test Command Reference
                 run: |
-                    ./typo3cms commandreference:render > /dev/null 2>&1 && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)"
+                    php ./typo3cms commandreference:render > /dev/null 2>&1 && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)"
 
             -   name: Test
                 run: .Build/bin/phpunit
