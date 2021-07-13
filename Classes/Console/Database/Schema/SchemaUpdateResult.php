@@ -72,7 +72,7 @@ class SchemaUpdateResult
      */
     public function addPerformedUpdates(SchemaUpdateType $schemaUpdateType, array $updates)
     {
-        $this->performedUpdates[(string)$schemaUpdateType] = array_merge((array)$this->performedUpdates[(string)$schemaUpdateType], $updates);
+        $this->performedUpdates[(string)$schemaUpdateType] = array_merge($this->performedUpdates[(string)$schemaUpdateType] ?? [], $updates);
     }
 
     /**
@@ -99,7 +99,7 @@ class SchemaUpdateResult
                 'statement' => $statements[$id],
             ];
         }
-        $this->errors[(string)$schemaUpdateType] = array_merge((array)$this->errors[(string)$schemaUpdateType], $collectedErrors);
+        $this->errors[(string)$schemaUpdateType] = array_merge($this->errors[(string)$schemaUpdateType] ?? [], $collectedErrors);
     }
 
     /**

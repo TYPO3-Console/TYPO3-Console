@@ -31,10 +31,10 @@ class ExceptionRendererTest extends UnitTestCase
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_VERBOSE);
         $subject->render(new \RuntimeException('Foo', 4223), $output);
         $renderedOutput = $output->fetch();
-        $this->assertContains('[ RuntimeException ]', $renderedOutput);
-        $this->assertContains('Foo', $renderedOutput);
-        $this->assertContains('Exception code: 4223', $renderedOutput);
-        $this->assertContains('Exception trace:', $renderedOutput);
+        $this->assertStringContainsString('[ RuntimeException ]', $renderedOutput);
+        $this->assertStringContainsString('Foo', $renderedOutput);
+        $this->assertStringContainsString('Exception code: 4223', $renderedOutput);
+        $this->assertStringContainsString('Exception trace:', $renderedOutput);
     }
 
     /**
@@ -46,10 +46,10 @@ class ExceptionRendererTest extends UnitTestCase
         $output = new BufferedOutput();
         $subject->render(new \RuntimeException('Foo', 4223), $output);
         $renderedOutput = $output->fetch();
-        $this->assertContains('[ RuntimeException ]', $renderedOutput);
-        $this->assertContains('Foo', $renderedOutput);
-        $this->assertNotContains('Exception code: 4223', $renderedOutput);
-        $this->assertNotContains('Exception trace:', $renderedOutput);
+        $this->assertStringContainsString('[ RuntimeException ]', $renderedOutput);
+        $this->assertStringContainsString('Foo', $renderedOutput);
+        $this->assertStringNotContainsString('Exception code: 4223', $renderedOutput);
+        $this->assertStringNotContainsString('Exception trace:', $renderedOutput);
     }
 
     /**
@@ -61,9 +61,9 @@ class ExceptionRendererTest extends UnitTestCase
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_VERBOSE);
         $subject->render(new \RuntimeException('Foo'), $output);
         $renderedOutput = $output->fetch();
-        $this->assertContains('[ RuntimeException ]', $renderedOutput);
-        $this->assertContains('Foo', $renderedOutput);
-        $this->assertNotContains('Exception code:', $renderedOutput);
+        $this->assertStringContainsString('[ RuntimeException ]', $renderedOutput);
+        $this->assertStringContainsString('Foo', $renderedOutput);
+        $this->assertStringNotContainsString('Exception code:', $renderedOutput);
     }
 
     /**
@@ -91,8 +91,8 @@ class ExceptionRendererTest extends UnitTestCase
         $subject->render($subProcessException, $output);
         $renderedOutput = $output->fetch();
 
-        $this->assertNotContains('SubProcessException', $renderedOutput);
-        $this->assertContains('Exception code: 4223', $renderedOutput);
+        $this->assertStringNotContainsString('SubProcessException', $renderedOutput);
+        $this->assertStringContainsString('Exception code: 4223', $renderedOutput);
     }
 
     /**
@@ -120,7 +120,7 @@ class ExceptionRendererTest extends UnitTestCase
         $subject->render($subProcessException, $output);
         $renderedOutput = $output->fetch();
 
-        $this->assertContains('Exception code: 42S23', $renderedOutput);
+        $this->assertStringContainsString('Exception code: 42S23', $renderedOutput);
     }
 
     private function getTerminalStub(): Terminal

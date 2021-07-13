@@ -46,8 +46,8 @@ class InstallCommandControllerTest extends AbstractCommandTest
                 'pdo_sqlite',
             ]
         );
-        $this->assertContains('Successfully installed TYPO3 CMS!', $output);
-        $this->assertContains('Set up extensions', $output);
+        $this->assertStringContainsString('Successfully installed TYPO3 CMS!', $output);
+        $this->assertStringContainsString('Set up extensions', $output);
         $this->assertFileNotExists(getenv('TYPO3_PATH_WEB') . '/.htaccess');
         $this->assertFileNotExists(getenv('TYPO3_PATH_WEB') . '/web.config');
     }
@@ -67,8 +67,8 @@ class InstallCommandControllerTest extends AbstractCommandTest
                 '--skip-extension-setup',
             ]
         );
-        $this->assertContains('Successfully installed TYPO3 CMS!', $output);
-        $this->assertContains('<comment>Skipped</comment> Set up extensions', $output);
+        $this->assertStringContainsString('Successfully installed TYPO3 CMS!', $output);
+        $this->assertStringContainsString('<comment>Skipped</comment> Set up extensions', $output);
     }
 
     /**
@@ -85,8 +85,8 @@ class InstallCommandControllerTest extends AbstractCommandTest
                 '--no-interaction',
             ]
         );
-        $this->assertContains('Successfully installed TYPO3 CMS!', $output);
-        $this->assertContains('Set up extensions', $output);
+        $this->assertStringContainsString('Successfully installed TYPO3 CMS!', $output);
+        $this->assertStringContainsString('Set up extensions', $output);
         $this->assertFileNotExists(getenv('TYPO3_PATH_WEB') . '/.htaccess');
         $this->assertFileNotExists(getenv('TYPO3_PATH_WEB') . '/web.config');
     }
@@ -106,9 +106,9 @@ class InstallCommandControllerTest extends AbstractCommandTest
                 'TYPO3_INSTALL_SETUP_STEPS' => __DIR__ . '/../../Fixtures/Install/custom-install.yaml',
             ]
         );
-        $this->assertContains('Successfully installed TYPO3 CMS!', $output);
-        $this->assertContains('Custom step', $output);
-        $this->assertNotContains('Set up extensions', $output);
+        $this->assertStringContainsString('Successfully installed TYPO3 CMS!', $output);
+        $this->assertStringContainsString('Custom step', $output);
+        $this->assertStringNotContainsString('Set up extensions', $output);
     }
 
     /**
@@ -126,10 +126,10 @@ class InstallCommandControllerTest extends AbstractCommandTest
                 'TYPO3_INSTALL_SETUP_STEPS' => __DIR__ . '/../../Fixtures/Install/custom-install.yaml',
             ]
         );
-        $this->assertContains('Successfully installed TYPO3 CMS!', $output);
-        $this->assertContains('Custom step', $output);
-        $this->assertContains('Option --non-interactive is deprecated. Please use --no-interaction instead.', $output);
-        $this->assertNotContains('Set up extensions', $output);
+        $this->assertStringContainsString('Successfully installed TYPO3 CMS!', $output);
+        $this->assertStringContainsString('Custom step', $output);
+        $this->assertStringContainsString('Option --non-interactive is deprecated. Please use --no-interaction instead.', $output);
+        $this->assertStringNotContainsString('Set up extensions', $output);
     }
 
     /**
@@ -148,7 +148,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
                 'apache',
             ]
         );
-        $this->assertContains('Successfully installed TYPO3 CMS!', $output);
+        $this->assertStringContainsString('Successfully installed TYPO3 CMS!', $output);
         $this->assertFileExists(getenv('TYPO3_PATH_WEB') . '/.htaccess');
         unlink(getenv('TYPO3_PATH_WEB') . '/.htaccess');
         $this->assertFileNotExists(getenv('TYPO3_PATH_WEB') . '/web.config');
@@ -170,7 +170,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
                 'iis',
             ]
         );
-        $this->assertContains('Successfully installed TYPO3 CMS!', $output);
+        $this->assertStringContainsString('Successfully installed TYPO3 CMS!', $output);
         $this->assertFileExists(getenv('TYPO3_PATH_WEB') . '/web.config');
         unlink(getenv('TYPO3_PATH_WEB') . '/web.config');
         $this->assertFileNotExists(getenv('TYPO3_PATH_WEB') . '/.htaccess');
@@ -191,9 +191,9 @@ class InstallCommandControllerTest extends AbstractCommandTest
                 'TYPO3_INSTALL_SETUP_STEPS' => 'Tests/Console/Functional/Fixtures/Install/custom-install.yaml',
             ]
         );
-        $this->assertContains('Successfully installed TYPO3 CMS!', $output);
-        $this->assertContains('Custom step', $output);
-        $this->assertNotContains('Set up extensions', $output);
+        $this->assertStringContainsString('Successfully installed TYPO3 CMS!', $output);
+        $this->assertStringContainsString('Custom step', $output);
+        $this->assertStringNotContainsString('Set up extensions', $output);
     }
 
     /**
@@ -210,9 +210,9 @@ class InstallCommandControllerTest extends AbstractCommandTest
                 'Tests/Console/Functional/Fixtures/Install/custom-install.yaml',
             ]
         );
-        $this->assertContains('Successfully installed TYPO3 CMS!', $output);
-        $this->assertContains('Custom step', $output);
-        $this->assertNotContains('Set up extensions', $output);
+        $this->assertStringContainsString('Successfully installed TYPO3 CMS!', $output);
+        $this->assertStringContainsString('Custom step', $output);
+        $this->assertStringNotContainsString('Set up extensions', $output);
     }
 
     /**
@@ -230,10 +230,10 @@ class InstallCommandControllerTest extends AbstractCommandTest
                 'TYPO3_INSTALL_SETUP_STEPS' => 'Tests/Console/Functional/Fixtures/Install/custom-install-import.yaml',
             ]
         );
-        $this->assertContains('Successfully installed TYPO3 CMS!', $output);
-        $this->assertContains('Check environment and create folders', $output);
-        $this->assertContains('Custom step', $output);
-        $this->assertNotContains('Set up extensions', $output);
+        $this->assertStringContainsString('Successfully installed TYPO3 CMS!', $output);
+        $this->assertStringContainsString('Check environment and create folders', $output);
+        $this->assertStringContainsString('Custom step', $output);
+        $this->assertStringNotContainsString('Set up extensions', $output);
     }
 
     /**

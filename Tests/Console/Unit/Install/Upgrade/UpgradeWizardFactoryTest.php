@@ -17,12 +17,13 @@ namespace Helhum\Typo3Console\Tests\Unit\Install\Upgrade;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardFactory;
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\LegacyUpgradeWizard;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
+use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Install\Updates\AbstractUpdate;
 
 class UpgradeWizardFactoryTest extends UnitTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->markTestSkipped('TODO: needs a complete rewrite');
     }
@@ -83,12 +84,12 @@ class UpgradeWizardFactoryTest extends UnitTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Console\Exception\RuntimeException
-     * @expectedExceptionCode 1491914890
      * @test
      */
     public function throwsExceptionForInvalidIdentifier()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionCode(1491914890);
         $registryFixture = [
             'TYPO3\\CMS\\Install\\Updates\\FooUpgrade' => 'TYPO3\\CMS\\Install\\Updates\\FooUpgrade',
         ];
@@ -99,12 +100,12 @@ class UpgradeWizardFactoryTest extends UnitTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Console\Exception\RuntimeException
-     * @expectedExceptionCode 1508495588
      * @test
      */
     public function throwsExceptionForInvalidIdentifierWhenFetchingShortIdentifier()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionCode(1508495588);
         $registryFixture = [
             'TYPO3\\CMS\\Install\\Updates\\FooUpgrade' => 'TYPO3\\CMS\\Install\\Updates\\FooUpgrade',
         ];

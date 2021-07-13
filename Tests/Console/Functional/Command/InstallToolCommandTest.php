@@ -23,12 +23,12 @@ class InstallToolCommandTest extends AbstractCommandTest
     public function installtoolCanBeLockedAndUnlocked()
     {
         $output = $this->executeConsoleCommand('install:unlock');
-        $this->assertContains('Install Tool has been unlocked and can be accessed now at \'typo3/install.php\'', $output);
+        $this->assertStringContainsString('Install Tool has been unlocked and can be accessed now at \'typo3/install.php\'', $output);
         $output = $this->executeConsoleCommand('install:unlock');
-        $this->assertContains('Install Tool is already unlocked', $output);
+        $this->assertStringContainsString('Install Tool is already unlocked', $output);
         $output = $this->executeConsoleCommand('install:lock');
-        $this->assertContains('Install Tool is locked and can not be accessed longer', $output);
+        $this->assertStringContainsString('Install Tool is locked and can not be accessed longer', $output);
         $output = $this->executeConsoleCommand('install:lock');
-        $this->assertContains('Install Tool is already locked', $output);
+        $this->assertStringContainsString('Install Tool is already locked', $output);
     }
 }

@@ -90,7 +90,7 @@ class CacheCommandControllerTest extends AbstractCommandTest
             $this->commandDispatcher->executeCommand('cache:flushgroups', ['foo']);
         } catch (FailedSubProcessCommandException $e) {
             $this->assertSame(1, $e->getExitCode());
-            $this->assertContains('Invalid cache groups "foo".', $e->getOutputMessage());
+            $this->assertStringContainsString('Invalid cache groups "foo".', $e->getOutputMessage());
         }
     }
 
@@ -100,7 +100,7 @@ class CacheCommandControllerTest extends AbstractCommandTest
     public function cacheGroupsCanBeListed()
     {
         $output = $this->executeConsoleCommand('cache:listgroups');
-        $this->assertContains('The following cache groups are registered: ', $output);
+        $this->assertStringContainsString('The following cache groups are registered: ', $output);
     }
 
     /**

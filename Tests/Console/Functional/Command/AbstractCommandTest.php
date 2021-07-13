@@ -28,7 +28,7 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
      */
     protected $commandDispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!file_exists(getenv('TYPO3_PATH_ROOT') . '/index.php')
             && strpos(getenv('TYPO3_PATH_ROOT'), '.Build/public') === false

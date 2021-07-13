@@ -19,13 +19,13 @@ use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 
 class ListCommandTest extends AbstractCommandTest
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::installFixtureExtensionCode('ext_command');
         CommandDispatcher::createFromTestRun()->executeCommand('install:generatepackagestates');
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         self::removeFixtureExtensionCode('ext_command');
         CommandDispatcher::createFromTestRun()->executeCommand('install:generatepackagestates');
@@ -37,10 +37,10 @@ class ListCommandTest extends AbstractCommandTest
     public function exampleCommandsAreProperlyRegistered(): void
     {
         $output = $this->executeConsoleCommand('list');
-        $this->assertContains('ext:alias', $output);
-        $this->assertContains('ext:command', $output);
-        $this->assertContains('ext_command:extension:list', $output);
-        $this->assertContains('ext_bla:extension:activate', $output);
+        $this->assertStringContainsString('ext:alias', $output);
+        $this->assertStringContainsString('ext:command', $output);
+        $this->assertStringContainsString('ext_command:extension:list', $output);
+        $this->assertStringContainsString('ext_bla:extension:activate', $output);
     }
 
     /**
@@ -49,16 +49,16 @@ class ListCommandTest extends AbstractCommandTest
     public function errorsDuringBootDoNotPreventListToBeShown(): void
     {
         $output = $this->executeConsoleCommand('list', [], ['THROWS_LOCAL_CONF_EXCEPTION' => '1']);
-        $this->assertContains('cache:flush', $output);
-        $this->assertContains('ext_command:extension:list', $output);
+        $this->assertStringContainsString('cache:flush', $output);
+        $this->assertStringContainsString('ext_command:extension:list', $output);
         try {
             $this->commandDispatcher->executeCommand('list', ['--all'], ['THROWS_LOCAL_CONF_EXCEPTION' => '1']);
             $this->fail('Exit code is expected to be not 0');
         } catch (FailedSubProcessCommandException $e) {
-            $this->assertNotContains('ext:alias', $e->getOutputMessage());
-            $this->assertContains('ext:command', $e->getOutputMessage());
-            $this->assertContains('ext_bla:extension:activate', $e->getOutputMessage());
-            $this->assertContains('ext_command:extension:list', $e->getOutputMessage());
+            $this->assertStringNotContainsString('ext:alias', $e->getOutputMessage());
+            $this->assertStringContainsString('ext:command', $e->getOutputMessage());
+            $this->assertStringContainsString('ext_bla:extension:activate', $e->getOutputMessage());
+            $this->assertStringContainsString('ext_command:extension:list', $e->getOutputMessage());
         }
     }
 
@@ -71,11 +71,11 @@ class ListCommandTest extends AbstractCommandTest
             $this->commandDispatcher->executeCommand('list', ['--verbose'], ['THROWS_LOCAL_CONF_EXCEPTION' => '1', 'TYPO3_CONSOLE_SUB_PROCESS' => '0']);
             $this->fail('Exit code is expected to be not 0');
         } catch (FailedSubProcessCommandException $e) {
-            $this->assertNotContains('ext:alias', $e->getOutputMessage());
-            $this->assertNotContains('ext:command', $e->getOutputMessage());
-            $this->assertNotContains('ext_bla:extension:activate', $e->getOutputMessage());
-            $this->assertNotContains('ext_command:extension:list', $e->getOutputMessage());
-            $this->assertContains('1589036075', $e->getErrorMessage());
+            $this->assertStringNotContainsString('ext:alias', $e->getOutputMessage());
+            $this->assertStringNotContainsString('ext:command', $e->getOutputMessage());
+            $this->assertStringNotContainsString('ext_bla:extension:activate', $e->getOutputMessage());
+            $this->assertStringNotContainsString('ext_command:extension:list', $e->getOutputMessage());
+            $this->assertStringContainsString('1589036075', $e->getErrorMessage());
         }
     }
 
@@ -88,24 +88,24 @@ class ListCommandTest extends AbstractCommandTest
             $this->commandDispatcher->executeCommand('list', [], ['THROWS_CONSTRUCT_EXCEPTION' => '1']);
             $this->fail('Exit code is expected to be not 0');
         } catch (FailedSubProcessCommandException $e) {
-            $this->assertNotContains('ext:alias', $e->getOutputMessage());
-            $this->assertContains('Command name: "ext:alias", error: "Error occurred during object creation"', $e->getErrorMessage());
-            $this->assertNotContains('1589036051', $e->getErrorMessage());
-            $this->assertContains('ext:command', $e->getOutputMessage());
-            $this->assertContains('ext_bla:extension:activate', $e->getOutputMessage());
-            $this->assertContains('ext_command:extension:list', $e->getOutputMessage());
+            $this->assertStringNotContainsString('ext:alias', $e->getOutputMessage());
+            $this->assertStringContainsString('Command name: "ext:alias", error: "Error occurred during object creation"', $e->getErrorMessage());
+            $this->assertStringNotContainsString('1589036051', $e->getErrorMessage());
+            $this->assertStringContainsString('ext:command', $e->getOutputMessage());
+            $this->assertStringContainsString('ext_bla:extension:activate', $e->getOutputMessage());
+            $this->assertStringContainsString('ext_command:extension:list', $e->getOutputMessage());
         }
 
         try {
             $this->commandDispatcher->executeCommand('list', ['--verbose'], ['THROWS_CONSTRUCT_EXCEPTION' => '1', 'TYPO3_CONSOLE_SUB_PROCESS' => '0']);
             $this->fail('Exit code is expected to be not 0');
         } catch (FailedSubProcessCommandException $e) {
-            $this->assertNotContains('ext:alias', $e->getOutputMessage());
-            $this->assertContains('Command name: "ext:alias", error: "Error occurred during object creation"', $e->getErrorMessage());
-            $this->assertContains('1589036051', $e->getErrorMessage());
-            $this->assertContains('ext:command', $e->getOutputMessage());
-            $this->assertContains('ext_bla:extension:activate', $e->getOutputMessage());
-            $this->assertContains('ext_command:extension:list', $e->getOutputMessage());
+            $this->assertStringNotContainsString('ext:alias', $e->getOutputMessage());
+            $this->assertStringContainsString('Command name: "ext:alias", error: "Error occurred during object creation"', $e->getErrorMessage());
+            $this->assertStringContainsString('1589036051', $e->getErrorMessage());
+            $this->assertStringContainsString('ext:command', $e->getOutputMessage());
+            $this->assertStringContainsString('ext_bla:extension:activate', $e->getOutputMessage());
+            $this->assertStringContainsString('ext_command:extension:list', $e->getOutputMessage());
         }
     }
 
@@ -115,10 +115,10 @@ class ListCommandTest extends AbstractCommandTest
     public function commandsClassesAreNotInstantiatedTwiceWhenDisabled(): void
     {
         $output = $this->executeConsoleCommand('list', [], ['TYPO3_CONSOLE_TEST_RUN' => '0']);
-        $this->assertNotContains('ext:alias', $output);
-        $this->assertNotContains('ext:command', $output);
-        $this->assertNotContains('ext_bla:extension:activate', $output);
-        $this->assertNotContains('ext_command:extension:list', $output);
+        $this->assertStringNotContainsString('ext:alias', $output);
+        $this->assertStringNotContainsString('ext:command', $output);
+        $this->assertStringNotContainsString('ext_bla:extension:activate', $output);
+        $this->assertStringNotContainsString('ext_command:extension:list', $output);
     }
 
     /**
@@ -127,8 +127,8 @@ class ListCommandTest extends AbstractCommandTest
     public function serviceCommandGetsDependenciesInjected(): void
     {
         $output = $this->executeConsoleCommand('ext:command');
-        $this->assertContains('injected', $output);
-        $this->assertContains('full RunLevel', $output);
+        $this->assertStringContainsString('injected', $output);
+        $this->assertStringContainsString('full RunLevel', $output);
     }
 
     /**
@@ -137,8 +137,8 @@ class ListCommandTest extends AbstractCommandTest
     public function exampleCommandHasRunLevelSet(): void
     {
         $output = $this->executeConsoleCommand('ext_command:extension:list');
-        $this->assertContains('no deps', $output);
-        $this->assertContains('compile RunLevel', $output);
+        $this->assertStringContainsString('no deps', $output);
+        $this->assertStringContainsString('compile RunLevel', $output);
     }
 
     /**
@@ -147,8 +147,8 @@ class ListCommandTest extends AbstractCommandTest
     public function exampleCommandCanHaveOverriddenVendor(): void
     {
         $output = $this->executeConsoleCommand('ext_bla:extension:activate');
-        $this->assertContains('no deps', $output);
-        $this->assertContains('full RunLevel', $output);
+        $this->assertStringContainsString('no deps', $output);
+        $this->assertStringContainsString('full RunLevel', $output);
     }
 
     public function exampleCommandsHaveAliasesSetDataProvider(): array
@@ -177,6 +177,6 @@ class ListCommandTest extends AbstractCommandTest
     public function exampleCommandsHaveAliasesSet(string $alias): void
     {
         $output = $this->executeConsoleCommand($alias);
-        $this->assertContains('full RunLevel', $output);
+        $this->assertStringContainsString('full RunLevel', $output);
     }
 }

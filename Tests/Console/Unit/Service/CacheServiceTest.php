@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\Tests\Unit\Service;
 
 use Helhum\Typo3Console\Service\CacheService;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
+use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 
 class CacheServiceTest extends UnitTestCase
 {
@@ -58,10 +59,10 @@ class CacheServiceTest extends UnitTestCase
 
     /**
      * @test
-     * @expectedException \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException
      */
     public function flushByGroupThrowsExceptionForInvalidGroups()
     {
+        $this->expectException(NoSuchCacheGroupException::class);
         $this->createCacheServiceWithConfiguration(
             [
                 'foo' => ['groups' => ['first', 'second']],

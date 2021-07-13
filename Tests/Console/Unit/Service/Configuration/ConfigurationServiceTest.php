@@ -77,7 +77,7 @@ class ConfigurationServiceTest extends UnitTestCase
         ],
     ];
 
-    public function setup()
+    public function setUp(): void
     {
         $this->configurationManager = $this->getMockBuilder(ConfigurationManager::class)->getMock();
         $this->configurationManager->expects($this->any())

@@ -49,7 +49,7 @@ class CliMessageRenderer
     private function renderSingle($statusMessage)
     {
         $severity = self::$severityMap[$statusMessage['severity']] ?? 'notice';
-        $subject = strtoupper($severity) . ': ' . $statusMessage['title'] ?? '';
+        $subject = strtoupper($severity) . ': ' . ($statusMessage['title'] ?? '');
         switch ($severity) {
             case 'error':
             case 'warning':

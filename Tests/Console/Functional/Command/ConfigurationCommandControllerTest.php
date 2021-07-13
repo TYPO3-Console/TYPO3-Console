@@ -25,7 +25,7 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     {
         $output = $this->executeConsoleCommand('configuration:show', ['BE/installToolPassword']);
         $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
-        $this->assertContains($config['BE']['installToolPassword'], $output);
+        $this->assertStringContainsString($config['BE']['installToolPassword'], $output);
     }
 
     /**
@@ -35,7 +35,7 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     {
         $output = $this->executeConsoleCommand('configuration:showlocal', ['BE/installToolPassword']);
         $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
-        $this->assertContains($config['BE']['installToolPassword'], $output);
+        $this->assertStringContainsString($config['BE']['installToolPassword'], $output);
     }
 
     /**
@@ -55,7 +55,7 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     {
         $output = $this->executeConsoleCommand('configuration:showactive', ['BE/installToolPassword']);
         $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
-        $this->assertContains($config['BE']['installToolPassword'], $output);
+        $this->assertStringContainsString($config['BE']['installToolPassword'], $output);
     }
 
     /**
@@ -156,7 +156,7 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
         try {
             $this->commandDispatcher->executeCommand('configuration:set', ['EXTCONF/foo/bla', '[asd{', '--json']);
         } catch (FailedSubProcessCommandException $e) {
-            $this->assertContains('Could not decode value', $e->getOutputMessage());
+            $this->assertStringContainsString('Could not decode value', $e->getOutputMessage());
         }
     }
 }

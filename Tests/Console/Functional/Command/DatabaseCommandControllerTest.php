@@ -24,8 +24,8 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     public function safeUpdatesCanBePerformedWithNoFurtherArguments()
     {
         $output = $this->executeConsoleCommand('database:updateschema');
-        $this->assertContains('No schema updates were performed for update types:', $output);
-        $this->assertContains('"field.add", "field.change", "table.add", "table.change"', $output);
+        $this->assertStringContainsString('No schema updates were performed for update types:', $output);
+        $this->assertStringContainsString('"field.add", "field.change", "table.add", "table.change"', $output);
     }
 
     /**
@@ -34,8 +34,8 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     public function multipleUpdateTypesCanBeSpecified()
     {
         $output = $this->executeConsoleCommand('database:updateschema', ['field.add,table.add', '--verbose']);
-        $this->assertContains('No schema updates were performed for update types:', $output);
-        $this->assertContains('"field.add", "table.add"', $output);
+        $this->assertStringContainsString('No schema updates were performed for update types:', $output);
+        $this->assertStringContainsString('"field.add", "table.add"', $output);
     }
 
     /**
@@ -44,8 +44,8 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     public function allUpdatesCanBePerformedWhenSpecified()
     {
         $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
-        $this->assertContains('No schema updates were performed for update types:', $output);
-        $this->assertContains('"field.add", "field.change", "field.prefix", "field.drop", "table.add", "table.change", "table.prefix", "table.drop"', $output);
+        $this->assertStringContainsString('No schema updates were performed for update types:', $output);
+        $this->assertStringContainsString('"field.add", "field.change", "field.prefix", "field.drop", "table.add", "table.change", "table.prefix", "table.drop"', $output);
     }
 
     /**
@@ -59,9 +59,9 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
 
             $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
 
-            $this->assertContains('The following database schema updates were performed:', $output);
-            $this->assertContains('Change fields', $output);
-            $this->assertContains('Add tables', $output);
+            $this->assertStringContainsString('The following database schema updates were performed:', $output);
+            $this->assertStringContainsString('Change fields', $output);
+            $this->assertStringContainsString('Add tables', $output);
         } finally {
             self::removeFixtureExtensionCode('ext_test');
         }
@@ -69,20 +69,20 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
 
         $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
 
-        $this->assertContains('The following database schema updates were performed:', $output);
-        $this->assertContains('SQL Statements ', $output);
-        $this->assertContains('Change fields', $output);
-        $this->assertContains('Prefix tables', $output);
+        $this->assertStringContainsString('The following database schema updates were performed:', $output);
+        $this->assertStringContainsString('SQL Statements ', $output);
+        $this->assertStringContainsString('Change fields', $output);
+        $this->assertStringContainsString('Prefix tables', $output);
 
         $output = $this->executeConsoleCommand('database:updateschema', ['*']);
 
-        $this->assertContains('The following database schema updates were performed:', $output);
-        $this->assertNotContains('SQL Statements ', $output);
-        $this->assertContains('Drop tables', $output);
+        $this->assertStringContainsString('The following database schema updates were performed:', $output);
+        $this->assertStringNotContainsString('SQL Statements ', $output);
+        $this->assertStringContainsString('Drop tables', $output);
 
         $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
 
-        $this->assertContains('No schema updates were performed for update types:', $output);
+        $this->assertStringContainsString('No schema updates were performed for update types:', $output);
     }
 
     /**
@@ -95,7 +95,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
         $this->executeMysqlQuery('DROP TABLE IF EXISTS `cache_rootline`');
         try {
             $output = $this->executeConsoleCommand('database:updateschema', ['--verbose']);
-            $this->assertContains('CREATE TABLE `cache_rootline`', $output);
+            $this->assertStringContainsString('CREATE TABLE `cache_rootline`', $output);
         } finally {
             self::removeFixtureExtensionCode('ext_test_cache');
             $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
@@ -111,7 +111,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
         $this->executeMysqlQuery('DROP DATABASE ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
         $this->executeMysqlQuery('CREATE DATABASE ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
         $output = $this->executeConsoleCommand('database:updateschema', ['*']);
-        $this->assertContains('The following database schema updates were performed:', $output);
+        $this->assertStringContainsString('The following database schema updates were performed:', $output);
         $this->restoreDatabase();
     }
 
@@ -124,7 +124,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
         $this->executeMysqlQuery('DROP DATABASE ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
         $this->executeMysqlQuery('CREATE DATABASE ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
         $output = $this->executeConsoleCommand('d:u', ['*']);
-        $this->assertContains('The following database schema updates were performed:', $output);
+        $this->assertStringContainsString('The following database schema updates were performed:', $output);
         $this->restoreDatabase();
     }
 
@@ -140,8 +140,8 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
         } catch (FailedSubProcessCommandException $e) {
             $output = $e->getOutputMessage();
         }
-        $this->assertContains('The following errors occurred:', $output);
-        $this->assertContains('SQL Statement', $output);
+        $this->assertStringContainsString('The following errors occurred:', $output);
+        $this->assertStringContainsString('SQL Statement', $output);
         self::removeFixtureExtensionCode('ext_broken_sql');
         $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
     }
@@ -177,7 +177,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
         } catch (FailedSubProcessCommandException $e) {
             $output = $e->getOutputMessage();
         }
-        $this->assertContains('No suitable MySQL connection found for import', $output);
+        $this->assertStringContainsString('No suitable MySQL connection found for import', $output);
     }
 
     /**
@@ -190,7 +190,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
         } catch (FailedSubProcessCommandException $e) {
             $output = $e->getOutputMessage();
         }
-        $this->assertContains('No MySQL connections found to export. Given connection "foo" is not configured as MySQL connection', $output);
+        $this->assertStringContainsString('No MySQL connections found to export. Given connection "foo" is not configured as MySQL connection', $output);
     }
 
     /**
@@ -199,7 +199,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     public function databaseExportWorksWithGivenConnection()
     {
         $output = $this->executeConsoleCommand('database:export', ['--connection', 'Default']);
-        $this->assertContains('-- Dump of TYPO3 Connection "Default"', $output);
+        $this->assertStringContainsString('-- Dump of TYPO3 Connection "Default"', $output);
     }
 
     /**
@@ -208,7 +208,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     public function databaseExportCanExcludeTables()
     {
         $output = $this->executeConsoleCommand('database:export', ['--exclude', 'sys_log']);
-        $this->assertNotContains('CREATE TABLE `sys_log`', $output);
+        $this->assertStringNotContainsString('CREATE TABLE `sys_log`', $output);
     }
 
     /**
@@ -217,8 +217,8 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     public function databaseExportCanExcludeTablesWithWildcards()
     {
         $output = $this->executeConsoleCommand('database:export', ['--exclude', 'cf_*', '-e', 'cache_*']);
-        $this->assertNotContains('CREATE TABLE `cf_', $output);
-        $this->assertNotContains('CREATE TABLE `cache_', $output);
+        $this->assertStringNotContainsString('CREATE TABLE `cf_', $output);
+        $this->assertStringNotContainsString('CREATE TABLE `cache_', $output);
     }
 
     /**
@@ -227,7 +227,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     public function databaseExportCanExcludeTablesWithDeprecatedOption()
     {
         $output = $this->executeConsoleCommand('database:export', ['--exclude-tables', 'sys_log']);
-        $this->assertNotContains('CREATE TABLE `sys_log`', $output);
+        $this->assertStringNotContainsString('CREATE TABLE `sys_log`', $output);
     }
 
     /**
@@ -236,7 +236,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     public function databaseExportCanExcludeTablesWithWildcardsWithDeprecatedOption()
     {
         $output = $this->executeConsoleCommand('database:export', ['--exclude-tables', 'cf_*,cache_*']);
-        $this->assertNotContains('CREATE TABLE `cf_', $output);
-        $this->assertNotContains('CREATE TABLE `cache_', $output);
+        $this->assertStringNotContainsString('CREATE TABLE `cf_', $output);
+        $this->assertStringNotContainsString('CREATE TABLE `cache_', $output);
     }
 }

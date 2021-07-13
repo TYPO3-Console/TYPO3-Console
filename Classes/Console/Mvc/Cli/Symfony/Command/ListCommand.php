@@ -16,20 +16,26 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony\Command;
 
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Descriptor\TextDescriptor;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\DescriptorHelper;
-use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Terminal;
 
-class ListCommand extends \Symfony\Component\Console\Command\ListCommand
+class ListCommand extends Command
 {
     protected function configure()
     {
-        parent::configure();
-        $this->amendDefinition($this->getDefinition());
+        $this->setName('list');
+        $this->setDefinition([
+            new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
+            new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list'),
+            new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
+            new InputOption('all', '-a', InputOption::VALUE_NONE, 'Show all commands, even the ones not available'),
+        ]);
         $this->setDescription('List commands');
         $this->setHelp(
             <<<'EOF'
@@ -52,11 +58,6 @@ EOF
         );
     }
 
-    public function getNativeDefinition()
-    {
-        return $this->amendDefinition(parent::getNativeDefinition());
-    }
-
     /**
      * Subclass Symfony list command to be able to register our own text descriptor
      *
@@ -72,8 +73,8 @@ EOF
         $helper->describe($output, $this->getApplication(), [
             'format' => $input->getOption('format'),
             'raw_text' => $input->getOption('raw'),
-            'show_unavailable' => $input->getOption('all'),
             'namespace' => $input->getArgument('namespace'),
+            'show_unavailable' => $input->getOption('all'),
             'screen_width' => (new Terminal())->getWidth() - 4,
         ]);
         $application = $this->getApplication();
@@ -123,17 +124,5 @@ EOF
         }
 
         return $exceptions === [] ? 0 : 1;
-    }
-
-    private function amendDefinition(InputDefinition $definition): InputDefinition
-    {
-        $definition->addOption(new InputOption(
-            'all',
-            '-a',
-            InputOption::VALUE_NONE,
-            'Show all commands, even the ones not available'
-        ));
-
-        return $definition;
     }
 }
