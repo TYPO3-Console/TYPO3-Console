@@ -14,8 +14,6 @@ namespace Helhum\Typo3Console\Install;
  *
  */
 
-use TYPO3\CMS\Install\Status\StatusInterface;
-
 /**
  * Response of an install step
  */
@@ -27,7 +25,7 @@ class InstallStepResponse
     private $actionNeedsExecution;
 
     /**
-     * @var StatusInterface[]
+     * @var array[]
      */
     private $messages = [];
 
@@ -38,7 +36,7 @@ class InstallStepResponse
 
     /**
      * @param bool $actionNeedsExecution
-     * @param StatusInterface[] $messages
+     * @param array[] $messages
      * @param bool $actionNeedsReevaluation
      */
     public function __construct($actionNeedsExecution, array $messages, $actionNeedsReevaluation = false)
@@ -57,7 +55,7 @@ class InstallStepResponse
     }
 
     /**
-     * @return StatusInterface[]
+     * @return array[]
      */
     public function getMessages()
     {
