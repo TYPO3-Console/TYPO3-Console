@@ -19,6 +19,7 @@ use Helhum\Typo3Console\Install\InstallStepResponse;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
+use Symfony\Component\Console\Exception\RuntimeException;
 
 class Typo3InstallAction implements InstallActionInterface
 {
@@ -104,6 +105,12 @@ class Typo3InstallAction implements InstallActionInterface
         $arguments = array_merge($arguments, $options);
         $actionResult = $this->commandDispatcher->executeCommand('install:' . $actionName, $arguments);
 
-        return @unserialize($actionResult);
+        $response = @unserialize($actionResult, ['allowed_classes' => [InstallStepResponse::class]]);
+
+        if (!$response instanceof InstallStepResponse) {
+            throw new RuntimeException(sprintf('Executing install action "%s" failed with errors. Returned result is:%s%s', $actionName, chr(10), $actionResult), 1626771483);
+        }
+
+        return $response;
     }
 }
