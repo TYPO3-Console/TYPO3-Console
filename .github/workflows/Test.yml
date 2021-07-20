@@ -51,11 +51,11 @@ jobs:
                 experimental: [ false ]
                 include:
                     -   php: 7.4
-                        typo3: '~11.3.0'
+                        typo3: '~11.3.1'
                         dependency-version: stable
                         experimental: false
                     -   php: 8.0
-                        typo3: '~11.3.0'
+                        typo3: '~11.3.1'
                         dependency-version: stable
                         experimental: false
                     -   php: 7.4
