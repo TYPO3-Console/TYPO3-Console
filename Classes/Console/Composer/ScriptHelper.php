@@ -53,12 +53,12 @@ class ScriptHelper
         $content = preg_replace('/(const TYPO3_CONSOLE_VERSION = \')\d+\.\d+\.\d+/', 'const TYPO3_CONSOLE_VERSION = \'' . $version, $content);
         file_put_contents($applicationFile, $content);
 
-        $githubWorkflowFileSonar = __DIR__ . '/../../../.github/workflows/SonarCloud.yml';
+        $githubWorkflowFileSonar = __DIR__ . '/../../../.github/workflows/Analyze.yml';
         $content = file_get_contents($githubWorkflowFileSonar);
         $content = preg_replace('/(export COMPOSER_ROOT_VERSION)=\d+\.\d+\.\d+/', '$1=' . $version, $content);
         file_put_contents($githubWorkflowFileSonar, $content);
 
-        $githubWorkflowFileTests = __DIR__ . '/../../../.github/workflows/Tests.yml';
+        $githubWorkflowFileTests = __DIR__ . '/../../../.github/workflows/Test.yml';
         $content = file_get_contents($githubWorkflowFileTests);
         $content = preg_replace('/(export COMPOSER_ROOT_VERSION)=\d+\.\d+\.\d+/', '$1=' . $version, $content);
         file_put_contents($githubWorkflowFileTests, $content);
