@@ -7,3 +7,5 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update']['repeatableWi
     = \Helhum\Typo3Console\Tests\Functional\Fixtures\Extensions\ext_upgrade\src\RepeatableUpgradeWizard::class;
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update']['confirmableWizard']
     = \Helhum\Typo3Console\Tests\Functional\Fixtures\Extensions\ext_upgrade\src\ConfirmableUpgradeWizard::class;
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update']['anotherConfirmableUpgradeWizard']
+    = \Helhum\Typo3Console\Tests\Functional\Fixtures\Extensions\ext_upgrade\src\AnotherConfirmableUpgradeWizard::class;

@@ -25,7 +25,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     public function canCheckExtensionConstraints(): void
     {
         $output = $this->executeConsoleCommand('upgrade:checkextensionconstraints');
-        $this->assertContains('All third party extensions claim to be compatible with TYPO3 version', $output);
+        $this->assertStringContainsString('All third party extensions claim to be compatible with TYPO3 version', $output);
     }
 
     /**
@@ -41,7 +41,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $this->fail('upgrade:checkextensionconstraints should have failed');
         } catch (FailedSubProcessCommandException $e) {
             $this->assertSame(1, $e->getExitCode());
-            $this->assertContains('"ext_test" requires TYPO3 versions 4.5.0', $e->getOutputMessage());
+            $this->assertStringContainsString('"ext_test" requires TYPO3 versions 4.5.0', $e->getOutputMessage());
         } finally {
             self::removeFixtureExtensionCode('ext_test');
             $this->executeConsoleCommand('install:generatepackagestates');
@@ -84,8 +84,8 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     public function checkExtensionConstraintsIssuesWarningForInvalidExtensionKeys(): void
     {
         $output = $this->executeConsoleCommand('upgrade:checkextensionconstraints', ['foo,bar']);
-        $this->assertContains('Extension "foo" is not found in the system', $output);
-        $this->assertContains('Extension "bar" is not found in the system', $output);
+        $this->assertStringContainsString('Extension "foo" is not found in the system', $output);
+        $this->assertStringContainsString('Extension "bar" is not found in the system', $output);
     }
 
     /**
@@ -95,11 +95,11 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     {
         $this->executeConsoleCommand('configuration:remove', ['EXTCONF/helhum-typo3-console', '--force']);
         $output = $this->executeConsoleCommand('upgrade:prepare');
-        $this->assertNotContains('Preparation has been done before, repeating preparation and checking extensions', $output);
-        $this->assertContains('Upgrade preparations successfully executed', $output);
+        $this->assertStringNotContainsString('Preparation has been done before, repeating preparation and checking extensions', $output);
+        $this->assertStringContainsString('Upgrade preparations successfully executed', $output);
         $output = $this->executeConsoleCommand('upgrade:prepare');
-        $this->assertContains('Preparation has been done before, repeating preparation and checking extensions', $output);
-        $this->assertContains('Upgrade preparations successfully executed', $output);
+        $this->assertStringContainsString('Preparation has been done before, repeating preparation and checking extensions', $output);
+        $this->assertStringContainsString('Upgrade preparations successfully executed', $output);
     }
 
     /**
@@ -113,13 +113,13 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         $this->executeConsoleCommand('upgrade:prepare');
 
         $output = $this->executeConsoleCommand('upgrade:list');
-        $this->assertContains('normalWizard', $output);
-        $this->assertContains('Just a regular wizard', $output);
+        $this->assertStringContainsString('normalWizard', $output);
+        $this->assertStringContainsString('Just a regular wizard', $output);
         $output = $this->executeConsoleCommand('upgrade:list', ['-v']);
-        $this->assertContains('normalWizard', $output);
-        $this->assertContains('Fly you fools', $output);
-        $this->assertContains('repeatableWizard', $output);
-        $this->assertContains('It is not despair', $output);
+        $this->assertStringContainsString('normalWizard', $output);
+        $this->assertStringContainsString('Fly you fools', $output);
+        $this->assertStringContainsString('repeatableWizard', $output);
+        $this->assertStringContainsString('It is not despair', $output);
 
         self::removeFixtureExtensionCode('ext_upgrade');
         $this->executeConsoleCommand('install:generatepackagestates');
@@ -137,24 +137,24 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $this->executeConsoleCommand('upgrade:prepare');
 
             $output = $this->executeConsoleCommand('upgrade:run', ['normalWizard']);
-            $this->assertContains('Successfully executed upgrade wizard "normalWizard"', $output);
+            $this->assertStringContainsString('Successfully executed upgrade wizard "normalWizard"', $output);
 
             $output = $this->executeConsoleCommand('upgrade:list');
-            $this->assertNotContains('normalWizard', $output);
-            $this->assertContains('repeatableWizard', $output);
+            $this->assertStringNotContainsString('normalWizard', $output);
+            $this->assertStringContainsString('repeatableWizard', $output);
 
             $output = $this->executeConsoleCommand('upgrade:run', ['normalWizard']);
-            $this->assertContains('Upgrade wizard "normalWizard" was skipped because it is marked as done', $output);
+            $this->assertStringContainsString('Upgrade wizard "normalWizard" was skipped because it is marked as done', $output);
 
             $output = $this->executeConsoleCommand('upgrade:run', ['normalWizard', '--force']);
-            $this->assertContains('Successfully executed upgrade wizard "normalWizard"', $output);
-            $this->assertContains('Upgrade wizard "normalWizard" was executed (forced)', $output);
+            $this->assertStringContainsString('Successfully executed upgrade wizard "normalWizard"', $output);
+            $this->assertStringContainsString('Upgrade wizard "normalWizard" was executed (forced)', $output);
 
             $output = $this->executeConsoleCommand('upgrade:run', ['repeatableWizard']);
-            $this->assertContains('Successfully executed upgrade wizard "repeatableWizard"', $output);
+            $this->assertStringContainsString('Successfully executed upgrade wizard "repeatableWizard"', $output);
 
             $output = $this->executeConsoleCommand('upgrade:run', ['repeatableWizard']);
-            $this->assertContains('Successfully executed upgrade wizard "repeatableWizard"', $output);
+            $this->assertStringContainsString('Successfully executed upgrade wizard "repeatableWizard"', $output);
         } finally {
             self::removeFixtureExtensionCode('ext_upgrade');
             $this->executeConsoleCommand('install:generatepackagestates');
@@ -173,16 +173,16 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $this->executeMysqlQuery('DELETE FROM sys_registry WHERE entry_namespace = \'installUpdate\' AND entry_key NOT LIKE \'%Argon2iPasswordHashes\'');
             $output = $this->executeConsoleCommand('upgrade:run', ['all', '--deny', 'all']);
             //TODO: FIXME
-//            $this->assertContains('pagesLanguageOverlayBeGroupsAccessRights', $output);
-//            $this->assertContains('Skipped wizard "typo3DbLegacyExtension"', $output);
-            $this->assertContains('Skipped wizard "rsaauthExtension"', $output);
-            $this->assertContains('Skipped wizard "confirmableWizard" but it needs confirmation', $output);
+//            $this->assertStringContainsString('pagesLanguageOverlayBeGroupsAccessRights', $output);
+//            $this->assertStringContainsString('Skipped wizard "typo3DbLegacyExtension"', $output);
+            $this->assertStringContainsString('Skipped wizard "anotherConfirmableUpgradeWizard"', $output);
+            $this->assertStringContainsString('Skipped wizard "confirmableWizard" but it needs confirmation', $output);
             $output = $this->executeConsoleCommand('upgrade:run', ['all', '--confirm', 'all']);
-            $this->assertContains('Successfully executed upgrade wizard "confirmableWizard"', $output);
+            $this->assertStringContainsString('Successfully executed upgrade wizard "confirmableWizard"', $output);
             $output = $this->executeConsoleCommand('upgrade:list', [], ['TYPO3_CONSOLE_DISABLE_REPEATABLE_WIZARD' => 1]);
-            $this->assertContains('None', $output);
+            $this->assertStringContainsString('None', $output);
             $output = $this->executeConsoleCommand('upgrade:run', ['all'], ['TYPO3_CONSOLE_DISABLE_REPEATABLE_WIZARD' => 1]);
-            $this->assertContains('All wizards done. Nothing to do.', $output);
+            $this->assertStringContainsString('All wizards done. Nothing to do.', $output);
         } finally {
             self::removeFixtureExtensionCode('ext_upgrade');
             $this->executeConsoleCommand('install:generatepackagestates');
@@ -199,13 +199,13 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         $this->executeConsoleCommand('extension:setup', ['ext_upgrade']);
         try {
             $this->executeMysqlQuery('DELETE FROM sys_registry WHERE entry_namespace = \'installUpdate\' AND entry_key LIKE \'%ext_upgrade%\'');
-            $output = $this->executeConsoleCommand('upgrade:run', ['normalWizard', 'confirmableWizard', '--confirm', 'all']);
-            $this->assertContains('Successfully executed upgrade wizard "confirmableWizard"', $output);
-            $this->assertContains('Successfully executed upgrade wizard "normalWizard"', $output);
+            $output = $this->executeConsoleCommand('upgrade:run', ['normalWizard', 'confirmableWizard', 'anotherConfirmableUpgradeWizard', '--confirm', 'all']);
+            $this->assertStringContainsString('Successfully executed upgrade wizard "confirmableWizard"', $output);
+            $this->assertStringContainsString('Successfully executed upgrade wizard "normalWizard"', $output);
             $output = $this->executeConsoleCommand('upgrade:list', [], ['TYPO3_CONSOLE_DISABLE_REPEATABLE_WIZARD' => 1]);
-            $this->assertContains('None', $output);
+            $this->assertStringContainsString('None', $output);
             $output = $this->executeConsoleCommand('upgrade:run', ['all'], ['TYPO3_CONSOLE_DISABLE_REPEATABLE_WIZARD' => 1]);
-            $this->assertContains('All wizards done. Nothing to do.', $output);
+            $this->assertStringContainsString('All wizards done. Nothing to do.', $output);
         } finally {
             self::removeFixtureExtensionCode('ext_upgrade');
             $this->executeConsoleCommand('install:generatepackagestates');
@@ -222,10 +222,10 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         $this->executeConsoleCommand('extension:setup', ['ext_upgrade']);
         try {
             $this->executeMysqlQuery('DELETE FROM sys_registry WHERE entry_namespace = \'installUpdate\' AND (entry_key LIKE \'%ext_upgrade%\' OR entry_key LIKE \'%RsaauthExtractionUpdate%\')');
-            $output = $this->executeConsoleCommand('upgrade:run', ['all', '--confirm', 'all', '--deny', 'rsaauthExtension']);
-            $this->assertContains('Skipped wizard "rsaauthExtension"', $output);
-            $this->assertContains('Successfully executed upgrade wizard "confirmableWizard"', $output);
-            $this->assertContains('Successfully executed upgrade wizard "normalWizard"', $output);
+            $output = $this->executeConsoleCommand('upgrade:run', ['all', '--confirm', 'all', '--deny', 'anotherConfirmableUpgradeWizard']);
+            $this->assertStringContainsString('Skipped wizard "anotherConfirmableUpgradeWizard"', $output);
+            $this->assertStringContainsString('Successfully executed upgrade wizard "confirmableWizard"', $output);
+            $this->assertStringContainsString('Successfully executed upgrade wizard "normalWizard"', $output);
         } finally {
             self::removeFixtureExtensionCode('ext_upgrade');
             $this->executeConsoleCommand('install:generatepackagestates');
@@ -243,9 +243,9 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         try {
             $this->executeMysqlQuery('DELETE FROM sys_registry WHERE entry_namespace = \'installUpdate\' AND (entry_key LIKE \'%ext_upgrade%\' OR entry_key LIKE \'%RsaauthExtractionUpdate%\')');
             $output = $this->executeConsoleCommand('upgrade:run', ['all', '--deny', 'all', '--confirm', 'confirmableWizard']);
-            $this->assertContains('Skipped wizard "rsaauthExtension"', $output);
-            $this->assertContains('Successfully executed upgrade wizard "confirmableWizard"', $output);
-            $this->assertContains('Successfully executed upgrade wizard "normalWizard"', $output);
+            $this->assertStringContainsString('Skipped wizard "anotherConfirmableUpgradeWizard"', $output);
+            $this->assertStringContainsString('Successfully executed upgrade wizard "confirmableWizard"', $output);
+            $this->assertStringContainsString('Successfully executed upgrade wizard "normalWizard"', $output);
         } finally {
             self::removeFixtureExtensionCode('ext_upgrade');
             $this->executeConsoleCommand('install:generatepackagestates');
@@ -258,13 +258,13 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     public function rowUpdaterCanBeForced(): void
     {
         $output = $this->executeConsoleCommand('upgrade:list');
-        $this->assertContains('None', $output);
+        $this->assertStringContainsString('None', $output);
         $output = $this->executeConsoleCommand('upgrade:list', ['--all']);
-        $this->assertContains('Row Updaters:', $output);
-        $this->assertContains(WorkspaceVersionRecordsMigration::class, $output);
+        $this->assertStringContainsString('Row Updaters:', $output);
+        $this->assertStringContainsString(WorkspaceVersionRecordsMigration::class, $output);
         $output = $this->executeConsoleCommand('upgrade:run', ['databaseRowsUpdateWizard']);
-        $this->assertContains('Upgrade wizard "databaseRowsUpdateWizard" was skipped because no operation is needed', $output);
+        $this->assertStringContainsString('Upgrade wizard "databaseRowsUpdateWizard" was skipped because no operation is needed', $output);
         $output = $this->executeConsoleCommand('upgrade:run', ['databaseRowsUpdateWizard', '--force-row-updater', WorkspaceVersionRecordsMigration::class]);
-        $this->assertContains('Successfully executed upgrade wizard "databaseRowsUpdateWizard"', $output);
+        $this->assertStringContainsString('Successfully executed upgrade wizard "databaseRowsUpdateWizard"', $output);
     }
 }

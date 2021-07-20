@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\Tests\Unit\Database\Schema;
 
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
+use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 
 class SchemaUpdateTypeTest extends UnitTestCase
 {
@@ -147,10 +148,10 @@ class SchemaUpdateTypeTest extends UnitTestCase
      * @test
      * @dataProvider expandTypesFailsForInvalidTypesDataProvider
      * @param string $expandable
-     * @expectedException \TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException
      */
     public function expandTypesFailsForInvalidTypes($expandable)
     {
+        $this->expectException(InvalidEnumerationValueException::class);
         SchemaUpdateType::expandSchemaUpdateTypes([$expandable]);
     }
 }

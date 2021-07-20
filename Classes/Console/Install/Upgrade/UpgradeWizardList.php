@@ -96,7 +96,8 @@ class UpgradeWizardList
                         'isRequired' => $confirmation->isRequired(),
                     ];
                 }
-                $markedAsDone = $this->upgradeWizardsService->isWizardDone($shortIdentifier);
+                // TODO: TYPO3 is inconsistent here and does not really use the identifier of the wizard itself for this API, but the one in the configuration
+                $markedAsDone = $this->upgradeWizardsService->isWizardDone($identifier);
                 if ($markedAsDone || !$updateObject->updateNecessary()) {
                     $availableUpgradeWizards[$shortIdentifier]['done'] = true;
                 }

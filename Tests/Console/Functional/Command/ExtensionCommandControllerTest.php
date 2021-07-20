@@ -24,9 +24,9 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
     public function extensionListShowsActiveAndInactiveExtensions()
     {
         $output = $this->executeConsoleCommand('extension:list');
-        $this->assertContains('Extension key', $output);
-        $this->assertContains('extbase', $output);
-        $this->assertContains('filemetadata', $output);
+        $this->assertStringContainsString('Extension key', $output);
+        $this->assertStringContainsString('extbase', $output);
+        $this->assertStringContainsString('filemetadata', $output);
     }
 
     /**
@@ -35,9 +35,9 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
     public function extensionListRawShowsActiveAndInactiveExtensionsButNoHeader()
     {
         $output = $this->executeConsoleCommand('extension:list', ['--raw']);
-        $this->assertNotContains('Extension key', $output);
-        $this->assertContains('extbase', $output);
-        $this->assertContains('filemetadata', $output);
+        $this->assertStringNotContainsString('Extension key', $output);
+        $this->assertStringContainsString('extbase', $output);
+        $this->assertStringContainsString('filemetadata', $output);
     }
 
     /**
@@ -46,8 +46,8 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
     public function extensionListCanShowOnlyActiveExtensions()
     {
         $output = $this->executeConsoleCommand('extension:list', ['--active', '--raw']);
-        $this->assertContains('extbase', $output);
-        $this->assertNotContains('filemetadata', $output);
+        $this->assertStringContainsString('extbase', $output);
+        $this->assertStringNotContainsString('filemetadata', $output);
     }
 
     /**
@@ -56,8 +56,8 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
     public function extensionListCanShowOnlyInActiveExtensions()
     {
         $output = $this->executeConsoleCommand('extension:list', ['--inactive', '--raw']);
-        $this->assertNotContains('extbase', $output);
-        $this->assertContains('filemetadata', $output);
+        $this->assertStringNotContainsString('extbase', $output);
+        $this->assertStringContainsString('filemetadata', $output);
     }
 
     /**
@@ -69,8 +69,8 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
         try {
             $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
             $output = $this->executeConsoleCommand('extension:setupactive');
-            $this->assertContains('ext_config', $output);
-            $this->assertContains('are now set up.', $output);
+            $this->assertStringContainsString('ext_config', $output);
+            $this->assertStringContainsString('are now set up.', $output);
             $config = @\json_decode(trim($this->executeConsoleCommand('configuration:showlocal', ['EXTENSIONS', '--json'])), true);
             $this->assertArrayHasKey('ext_config', $config);
         } finally {
@@ -91,11 +91,11 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
             $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
 
             $output = $this->executeConsoleCommand('extension:setupactive');
-            $this->assertContains('ext_test', $output);
-            $this->assertContains('are now set up.', $output);
+            $this->assertStringContainsString('ext_test', $output);
+            $this->assertStringContainsString('are now set up.', $output);
 
             $output = $this->executeConsoleCommand('database:updateschema');
-            $this->assertContains('No schema updates were performed for update types:', $output);
+            $this->assertStringContainsString('No schema updates were performed for update types:', $output);
         } finally {
             self::removeFixtureExtensionCode('ext_test');
             $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
@@ -112,7 +112,7 @@ class ExtensionCommandControllerTest extends AbstractCommandTest
         $filesystem = new Filesystem();
         $filesystem->chmod(getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php', 0444);
         $output = $this->executeConsoleCommand('extension:setupactive');
-        $this->assertContains('are now set up.', $output);
+        $this->assertStringContainsString('are now set up.', $output);
 
         $filesystem->chmod(getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php', 0664);
         $this->restoreDatabase();

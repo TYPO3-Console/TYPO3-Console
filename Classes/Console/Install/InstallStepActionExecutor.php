@@ -50,10 +50,13 @@ class InstallStepActionExecutor
         $this->silentConfigurationUpgrade = $silentConfigurationUpgrade;
         $this->installerController = $installerController ?? GeneralUtility::makeInstance(InstallerController::class);
         $this->requestFactory = $requestFactory ?: function (array $arguments) {
+            $values = $arguments;
+            $values['availableSet'] = 'none';
+
             return (new ServerRequest())->withParsedBody(
                 [
                     'install' => [
-                        'values' => $arguments,
+                        'values' => $values,
                     ],
                 ]
             // The TYPO3 code used to install is nor prepared to run on cli, so we provide a fake web request here

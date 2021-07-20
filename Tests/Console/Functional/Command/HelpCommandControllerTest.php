@@ -36,6 +36,6 @@ class HelpCommandControllerTest extends AbstractCommandTest
     public function helpCanBeShown()
     {
         $output = $this->executeConsoleCommand('help');
-        $this->assertContains('Usage:', $output);
+        $this->assertStringContainsString('Usage:', $output);
     }
 }

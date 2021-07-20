@@ -24,13 +24,13 @@ class BackendCommandControllerTest extends AbstractCommandTest
     public function backendCanBeLockedAndUnlocked()
     {
         $output = $this->executeConsoleCommand('backend:lock');
-        $this->assertContains('Backend has been locked', $output);
+        $this->assertStringContainsString('Backend has been locked', $output);
         $output = $this->executeConsoleCommand('backend:lock');
-        $this->assertContains('Backend is already locked', $output);
+        $this->assertStringContainsString('Backend is already locked', $output);
         $output = $this->executeConsoleCommand('backend:unlock');
-        $this->assertContains('Backend lock is removed', $output);
+        $this->assertStringContainsString('Backend lock is removed', $output);
         $output = $this->executeConsoleCommand('backend:unlock');
-        $this->assertContains('Backend is already unlocked', $output);
+        $this->assertStringContainsString('Backend is already unlocked', $output);
     }
 
     /**
@@ -39,13 +39,13 @@ class BackendCommandControllerTest extends AbstractCommandTest
     public function backendCanBeLockedAndUnlockedForEditors()
     {
         $output = $this->executeConsoleCommand('backend:lockforeditors');
-        $this->assertContains('Locked backend for editor access', $output);
+        $this->assertStringContainsString('Locked backend for editor access', $output);
         $output = $this->executeConsoleCommand('backend:lockforeditors');
-        $this->assertContains('The backend was already locked for editors', $output);
+        $this->assertStringContainsString('The backend was already locked for editors', $output);
         $output = $this->executeConsoleCommand('backend:unlockforeditors');
-        $this->assertContains('Unlocked backend for editors', $output);
+        $this->assertStringContainsString('Unlocked backend for editors', $output);
         $output = $this->executeConsoleCommand('backend:unlockforeditors');
-        $this->assertContains('The backend was not locked for editors', $output);
+        $this->assertStringContainsString('The backend was not locked for editors', $output);
     }
 
     public function createAdminUserRemovesSpacesFromUserNameDataProvider(): array
@@ -80,7 +80,7 @@ class BackendCommandControllerTest extends AbstractCommandTest
             $this->commandDispatcher->executeCommand('backend:createadmin', [$username, 'password']);
             $this->fail(sprintf('Creating user %s should have failed', $username));
         } catch (FailedSubProcessCommandException $e) {
-            $this->assertContains('No special characters are allowed in username', $e->getOutputMessage());
+            $this->assertStringContainsString('No special characters are allowed in username', $e->getOutputMessage());
         } finally {
             $this->executeMysqlQuery('DELETE FROM be_users WHERE username LIKE "test\_%"');
         }
@@ -154,7 +154,7 @@ class BackendCommandControllerTest extends AbstractCommandTest
             $this->commandDispatcher->executeCommand('backend:createadmin', ['', 'bar', '--no-interaction']);
             $this->fail('Command did not fail as expected (user is created)');
         } catch (FailedSubProcessCommandException $e) {
-            $this->assertContains('Username must not be empty', $e->getOutputMessage());
+            $this->assertStringContainsString('Username must not be empty', $e->getOutputMessage());
         }
     }
 
@@ -167,7 +167,7 @@ class BackendCommandControllerTest extends AbstractCommandTest
             $this->commandDispatcher->executeCommand('backend:createadmin', ['foobar', 'baz']);
             $this->fail('Command did not fail as expected (user is created)');
         } catch (FailedSubProcessCommandException $e) {
-            $this->assertContains('Password must have at least 8 characters', $e->getOutputMessage());
+            $this->assertStringContainsString('Password must have at least 8 characters', $e->getOutputMessage());
         }
     }
 
@@ -177,7 +177,7 @@ class BackendCommandControllerTest extends AbstractCommandTest
     public function adminUserWithValidCredentialsWillBeCreated(): void
     {
         $output = $this->executeConsoleCommand('backend:createadmin', ['administrator', 'password']);
-        $this->assertContains('Created admin user with username "administrator"', $output);
+        $this->assertStringContainsString('Created admin user with username "administrator"', $output);
         $queryResult = $this->executeMysqlQuery('SELECT username FROM be_users WHERE username="administrator"');
         $this->assertSame('administrator', trim($queryResult));
     }
@@ -191,7 +191,7 @@ class BackendCommandControllerTest extends AbstractCommandTest
             $this->commandDispatcher->executeCommand('backend:createadmin', ['administrator', 'password2']);
             $this->fail('Command did not fail as expected (user is created)');
         } catch (FailedSubProcessCommandException $e) {
-            $this->assertContains('A user with username "administrator" already exists', $e->getOutputMessage());
+            $this->assertStringContainsString('A user with username "administrator" already exists', $e->getOutputMessage());
         } finally {
             $this->executeMysqlQuery('DELETE FROM be_users WHERE username="administrator"');
         }
