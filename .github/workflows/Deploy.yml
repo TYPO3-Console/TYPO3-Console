@@ -11,7 +11,8 @@ jobs:
         if: github.repository == 'TYPO3-Console/TYPO3-Console'
         runs-on: ubuntu-latest
         steps:
-            -   uses: actions/checkout@v2
+            -   name: Checkout
+                uses: actions/checkout@v2
 
             -   name: Get composer cache directory
                 id: composer-cache
