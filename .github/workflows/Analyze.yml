@@ -30,9 +30,9 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: ${{ steps.composer-cache.outputs.dir }}
-                    key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+                    key: ${{ runner.os }}-7.4-stable-composer-${{ hashFiles('**/composer.lock') }}
                     restore-keys: |
-                        ${{ runner.os }}-composer-
+                        ${{ runner.os }}-7.4-stable-composer-
 
             -   name: Set up PHP
                 uses: shivammathur/setup-php@v2

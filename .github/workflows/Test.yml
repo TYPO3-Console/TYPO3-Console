@@ -18,9 +18,9 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: ${{ steps.composer-cache.outputs.dir }}
-                    key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+                    key: ${{ runner.os }}-7.4-stable-composer-${{ hashFiles('**/composer.lock') }}
                     restore-keys: |
-                        ${{ runner.os }}-composer-
+                        ${{ runner.os }}-7.4-stable-composer-
 
             -   name: Set up PHP Version 7.4
                 uses: shivammathur/setup-php@v2
@@ -96,9 +96,9 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: ${{ steps.composer-cache.outputs.dir }}
-                    key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+                    key: ${{ runner.os }}-${{ matrix.php }}-${{ matrix.dependency-version }}-composer-${{ hashFiles('**/composer.lock') }}
                     restore-keys: |
-                        ${{ runner.os }}-composer-
+                        ${{ runner.os }}-${{ matrix.php }}-${{ matrix.dependency-version }}-composer-
 
             -   name: Set up PHP Version ${{ matrix.php }}
                 uses: shivammathur/setup-php@v2

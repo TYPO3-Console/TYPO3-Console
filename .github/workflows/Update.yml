@@ -15,11 +15,23 @@ jobs:
                     path: ./typo3-console
 
             -   name: Checkout extension repo
-                uses: actions/checkout@master
+                uses: actions/checkout@v2
                 with:
                     repository: TYPO3-Console/Extension
                     token: ${{ secrets.EXTENSION_UPDATE_TOKEN }}
                     path: ./extension
+
+            -   name: Get composer cache directory
+                id: composer-cache
+                run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+            -   name: Cache dependencies
+                uses: actions/cache@v2
+                with:
+                    path: ${{ steps.composer-cache.outputs.dir }}
+                    key: ${{ runner.os }}-7.4-stable-composer-${{ hashFiles('**/composer.lock') }}
+                    restore-keys: |
+                        ${{ runner.os }}-7.4-stable-composer-
 
             -   name: Set up PHP Version 7.4
                 uses: shivammathur/setup-php@v2
