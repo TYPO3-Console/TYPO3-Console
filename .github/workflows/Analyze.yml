@@ -39,6 +39,9 @@ jobs:
                 with:
                     php-version: 7.4
 
+            -   name: Setup authentication for Composer
+                run: composer config github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
+
             -   name: Test
                 run: |
                     if [ -n "${{ secrets.SONAR_TOKEN }}" ]; then

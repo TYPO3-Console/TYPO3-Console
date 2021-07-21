@@ -31,6 +31,9 @@ jobs:
                     php-version: 7.4
                     coverage: none
 
+            -   name: Setup authentication for Composer
+                run: composer config github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
+
             -   name: "Extract tag, branch, version from GITHUB_REF"
                 id: "github-ref"
                 run: |
