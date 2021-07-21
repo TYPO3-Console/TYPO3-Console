@@ -15,11 +15,28 @@ jobs:
                     path: ./typo3-console
 
             -   name: Checkout extension repo
-                uses: actions/checkout@master
+                uses: actions/checkout@v2
                 with:
                     repository: TYPO3-Console/Extension
                     token: ${{ secrets.EXTENSION_UPDATE_TOKEN }}
                     path: ./extension
+
+            -   name: Composer Cache Vars
+                id: composer-cache-vars
+                run: |
+                    echo "::set-output name=dir::$(composer config cache-files-dir)"
+                    echo "::set-output name=timestamp::$(date +"%s")"
+
+            -   name: Cache Composer dependencies
+                uses: actions/cache@v2
+                with:
+                    path: ${{ steps.composer-cache-vars.outputs.dir }}
+                    key: ${{ runner.os }}-composer-^10.4.1-stable-7.4-${{ steps.composer-cache-vars.outputs.timestamp }}
+                    restore-keys: |
+                        ${{ runner.os }}-composer-^10.4.1-stable-7.4-
+                        ${{ runner.os }}-composer-^10.4.1-stable-
+                        ${{ runner.os }}-composer-^10.4.1-
+                        ${{ runner.os }}-composer-
 
             -   name: Set up PHP Version 7.4
                 uses: shivammathur/setup-php@v2
