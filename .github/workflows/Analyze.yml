@@ -22,16 +22,21 @@ jobs:
                 with:
                     fetch-depth: 0
 
-            -   name: Get composer cache directory
-                id: composer-cache
-                run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+            -   name: Composer Cache Vars
+                id: composer-cache-vars
+                run: |
+                    echo "::set-output name=dir::$(composer config cache-files-dir)"
+                    echo "::set-output name=timestamp::$(date +"%s")"
 
-            -   name: Cache dependencies
+            -   name: Cache Composer dependencies
                 uses: actions/cache@v2
                 with:
-                    path: ${{ steps.composer-cache.outputs.dir }}
-                    key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+                    path: ${{ steps.composer-cache-vars.outputs.dir }}
+                    key: ${{ runner.os }}-composer-^10.4.1-stable-7.4-${{ steps.composer-cache-vars.outputs.timestamp }}
                     restore-keys: |
+                        ${{ runner.os }}-composer-^10.4.1-stable-7.4-
+                        ${{ runner.os }}-composer-^10.4.1-stable-
+                        ${{ runner.os }}-composer-^10.4.1-
                         ${{ runner.os }}-composer-
 
             -   name: Set up PHP
