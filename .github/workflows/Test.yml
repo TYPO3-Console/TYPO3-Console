@@ -1,0 +1,147 @@
+name: Test
+
+on: [ push, pull_request ]
+
+jobs:
+    Consistency:
+        name: 'Consistency'
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+
+            -   name: Composer Cache Vars
+                id: composer-cache-vars
+                run: |
+                    echo "::set-output name=dir::$(composer config cache-files-dir)"
+                    echo "::set-output name=timestamp::$(date +"%s")"
+
+            -   name: Cache Composer dependencies
+                uses: actions/cache@v2
+                with:
+                    path: ${{ steps.composer-cache-vars.outputs.dir }}
+                    key: ${{ runner.os }}-composer-^9.5.8-stable-7.4-${{ steps.composer-cache-vars.outputs.timestamp }}
+                    restore-keys: |
+                        ${{ runner.os }}-composer-^9.5.8-stable-7.4-
+                        ${{ runner.os }}-composer-^9.5.8-stable-
+                        ${{ runner.os }}-composer-^9.5.8-
+                        ${{ runner.os }}-composer-
+
+            -   name: Set up PHP Version 7.4
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: 7.4
+                    tools: composer:v2
+                    coverage: none
+
+            -   name: "Extract tag, branch, version from GITHUB_REF"
+                id: "github-ref"
+                run: |
+                    echo "::set-output name=tag::$(echo $GITHUB_REF | sed -E -n 's#^refs/tags/(.*)$#\1#p')"
+                    echo "::set-output name=branch::$(echo $GITHUB_REF | sed -E -n 's#^refs/heads/(.*)$#\1#p')"
+                    echo "::set-output name=version::$(echo $GITHUB_REF | sed -E -n 's#^refs/tags/v?([0-9]+\.)([0-9]+\.)([0-9]+)#\1\2\3#p')"
+
+            -   name: Compare tag version with committed version
+                if: steps.github-ref.outputs.version != ''
+                run: |
+                    composer set-version $(echo ${{ steps.github-ref.outputs.tag }} | sed s/^v//g)
+                    test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
+
+            -   name: Compare extension composer.json with main composer.json
+                run: |
+                    composer extension-verify-composer-json
+
+            -   name: Build extension artifact
+                run: |
+                    composer extension-release
+
+    Tests:
+        name: 'T3 ${{ matrix.typo3 }} - PHP ${{ matrix.php }} - Composer ${{ matrix.composer }} ${{ matrix.dependency-version }}'
+        runs-on: ubuntu-18.04
+
+        strategy:
+            fail-fast: false
+            matrix:
+                typo3: [ '^8.7.22', '^9.5.8' ]
+                php: [ '7.0', '7.1', '7.2', '7.3', '7.4' ]
+                composer: [ '1', '2' ]
+                dependency-version: [ lowest, stable ]
+                experimental: [ false ]
+                exclude:
+                    -   typo3: '^9.5.8'
+                        php: '7.0'
+                    -   typo3: '^9.5.8'
+                        php: '7.1'
+
+        continue-on-error: ${{ matrix.experimental }}
+
+        steps:
+            -   name: Start database server
+                run: sudo /etc/init.d/mysql start
+
+            -   name: Checkout
+                uses: actions/checkout@v2
+
+            -   name: Composer Cache Vars
+                id: composer-cache-vars
+                run: |
+                    echo "::set-output name=dir::$(composer config cache-files-dir)"
+                    echo "::set-output name=timestamp::$(date +"%s")"
+
+            -   name: Cache Composer dependencies
+                uses: actions/cache@v2
+                with:
+                    path: ${{ steps.composer-cache-vars.outputs.dir }}
+                    key: ${{ runner.os }}-composer-${{ matrix.typo3 }}-${{ matrix.dependency-version }}-${{ matrix.php }}-${{ steps.composer-cache-vars.outputs.timestamp }}
+                    restore-keys: |
+                        ${{ runner.os }}-composer-${{ matrix.typo3 }}-${{ matrix.dependency-version }}-${{ matrix.php }}-
+                        ${{ runner.os }}-composer-${{ matrix.typo3 }}-${{ matrix.dependency-version }}-
+                        ${{ runner.os }}-composer-${{ matrix.typo3 }}-
+                        ${{ runner.os }}-composer-
+
+            -   name: Set up PHP Version ${{ matrix.php }}
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php }}
+                    tools: composer:${{ matrix.composer }}
+                    coverage: none
+
+            -   name: Environment Check
+                run: |
+                    php --version
+                    composer --version
+
+            -   name: Validate composer.json and composer.lock
+                run: composer validate
+
+            -   name: Install
+                run: |
+                    export COMPOSER_ROOT_VERSION=5.8.6
+                    composer require --no-update \
+                          typo3/cms-backend="${{ matrix.typo3 }}" \
+                          typo3/cms-core="${{ matrix.typo3 }}" \
+                          typo3/cms-extbase="${{ matrix.typo3 }}" \
+                          typo3/cms-extensionmanager="${{ matrix.typo3 }}" \
+                          typo3/cms-fluid="${{ matrix.typo3 }}" \
+                          typo3/cms-frontend="${{ matrix.typo3 }}" \
+                          typo3/cms-install="${{ matrix.typo3 }}" \
+                          typo3/cms-scheduler="${{ matrix.typo3 }}" \
+                          typo3/cms-recordlist="${{ matrix.typo3 }}"
+                    composer update --prefer-${{ matrix.dependency-version }} --prefer-dist --no-interaction
+                    git checkout composer.json
+
+            -   name: Lint
+                run: .Build/bin/parallel-lint --exclude .Build .
+
+            # This fails when command reference is not up to date
+            -   name: Test Command Reference
+                continue-on-error: ${{ matrix.dependency-version == 'lowest' || matrix.php == '7.0' }}
+                run: ./typo3cms commandreference:render > /dev/null 2>&1 && git diff && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)"
+
+            -   name: Test Install
+                run: './typo3cms install:setup --database-host-name=127.0.0.1 --database-user-name=root --database-user-password=root --database-name=typo3_test_ci_github  --admin-user-name=admin --admin-password=password --no-interaction -vvv'
+
+            -   name: Test
+                env:
+                    TYPO3_VERSION: ${{ matrix.typo3 }}
+                run: .Build/bin/phpunit

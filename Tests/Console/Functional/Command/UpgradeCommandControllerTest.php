@@ -113,6 +113,14 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         $this->consoleRootPath = getenv('TYPO3_PATH_COMPOSER_ROOT');
         $this->upgradeInstancePath = dirname(__DIR__, 4) . '/.Build/upgrade_test';
         $this->upgradeInstanceDatabase = getenv('TYPO3_INSTALL_DB_DBNAME') . '_up';
+
+        // remove the path to the current instance so it will be set again
+        // correctly for the upgrade test.
+        $typo3PathRoot = $_ENV['TYPO3_PATH_ROOT'];
+        $typo3PathWeb = $_ENV['TYPO3_PATH_WEB'];
+        unset($_ENV['TYPO3_PATH_ROOT']);
+        unset($_ENV['TYPO3_PATH_WEB']);
+
         try {
             $this->setUpNewTypo3Instance();
             $this->upgradeCodeToTypo3Version(getenv('TYPO3_VERSION'));
@@ -126,6 +134,10 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             throw $e;
         } finally {
             $this->tearDownTypo3Instance();
+
+            // restore previously removed paths
+            $_ENV['TYPO3_PATH_ROOT'] = $typo3PathRoot;
+            $_ENV['TYPO3_PATH_WEB'] = $typo3PathWeb;
         }
     }
 

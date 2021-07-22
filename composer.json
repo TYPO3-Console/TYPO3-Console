@@ -29,7 +29,7 @@
     "license": "GPL-2.0-or-later",
     "require": {
         "php": "^7",
-        "helhum/typo3-console-plugin": "^2.0.2",
+        "helhum/typo3-console-plugin": "^2.0.7",
 
         "typo3/cms-backend": "~8.7.22 || ~9.5.8",
         "typo3/cms-core": "~8.7.22 || ~9.5.8",
@@ -57,11 +57,12 @@
         "nimut/testing-framework": "^4.1",
         "cweagans/composer-patches": "^1.6",
         "jakub-onderka/php-parallel-lint": "^1.0",
-        "phpunit/phpunit": "^6"
+        "phpunit/phpunit": "^6.5"
     },
     "conflict": {
         "typo3-ter/dbal": "*",
-        "friendsoftypo3/dbal": "*"
+        "friendsoftypo3/dbal": "*",
+        "helhum/typo3-composer-setup": "<0.5.7"
     },
     "autoload": {
         "psr-4": {

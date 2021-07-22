@@ -53,10 +53,20 @@ class ScriptHelper
         $content = preg_replace('/(const TYPO3_CONSOLE_VERSION = \')\d+\.\d+\.\d+/', 'const TYPO3_CONSOLE_VERSION = \'' . $version, $content);
         file_put_contents($applicationFile, $content);
 
-        $travisYmlFile = __DIR__ . '/../../../.travis.yml';
-        $content = file_get_contents($travisYmlFile);
+        $githubWorkflowFileSonar = __DIR__ . '/../../../.github/workflows/Analyze.yml';
+        $content = file_get_contents($githubWorkflowFileSonar);
         $content = preg_replace('/(export COMPOSER_ROOT_VERSION)=\d+\.\d+\.\d+/', '$1=' . $version, $content);
-        file_put_contents($travisYmlFile, $content);
+        file_put_contents($githubWorkflowFileSonar, $content);
+
+        $githubWorkflowFileTests = __DIR__ . '/../../../.github/workflows/Test.yml';
+        $content = file_get_contents($githubWorkflowFileTests);
+        $content = preg_replace('/(export COMPOSER_ROOT_VERSION)=\d+\.\d+\.\d+/', '$1=' . $version, $content);
+        file_put_contents($githubWorkflowFileTests, $content);
+
+        $appveyorYmlFile = __DIR__ . '/../../../appveyor.yml';
+        $content = file_get_contents($appveyorYmlFile);
+        $content = preg_replace('/(SET COMPOSER_ROOT_VERSION)=\d+\.\d+\.\d+/', '$1=' . $version, $content);
+        file_put_contents($appveyorYmlFile, $content);
 
         $sonarConfigFile = __DIR__ . '/../../../sonar-project.properties';
         $content = file_get_contents($sonarConfigFile);

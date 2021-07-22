@@ -1,0 +1,65 @@
+name: Analyze
+
+on:
+    push:
+        branches:
+            - latest
+            - develop
+            - /^v?([0-9]+\.){1,2}(x|[0-9]+)-?[a-z]*[1-9]*$/
+
+jobs:
+    Sonar-Cloud:
+        name: 'Sonar Cloud'
+        if: github.repository == 'TYPO3-Console/TYPO3-Console'
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Start database server
+                run: sudo /etc/init.d/mysql start
+
+            -   name: Checkout
+                uses: actions/checkout@v2
+                with:
+                    fetch-depth: 0
+
+            -   name: Composer Cache Vars
+                id: composer-cache-vars
+                run: |
+                    echo "::set-output name=dir::$(composer config cache-files-dir)"
+                    echo "::set-output name=timestamp::$(date +"%s")"
+
+            -   name: Cache Composer dependencies
+                uses: actions/cache@v2
+                with:
+                    path: ${{ steps.composer-cache-vars.outputs.dir }}
+                    key: ${{ runner.os }}-composer-^9.5.8-stable-7.4-${{ steps.composer-cache-vars.outputs.timestamp }}
+                    restore-keys: |
+                        ${{ runner.os }}-composer-^9.5.8-stable-7.4-
+                        ${{ runner.os }}-composer-^9.5.8-stable-
+                        ${{ runner.os }}-composer-^9.5.8-
+                        ${{ runner.os }}-composer-
+
+            -   name: Set up PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: 7.4
+
+            -   name: Test
+                run: |
+                    if [ -n "${{ secrets.SONAR_TOKEN }}" ]; then
+                        export COMPOSER_ROOT_VERSION=5.8.6
+                        composer update
+                        .Build/bin/phpunit --whitelist Classes --coverage-clover .Build/clover.xml --log-junit .Build/junit.xml
+                    fi
+
+            -   name: Setup sonarqube
+                uses: warchant/setup-sonar-scanner@v3
+
+            -   name: Run sonarqube
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+                run: |
+                    if [ -n "${{ secrets.SONAR_TOKEN }}" ]; then
+                        sonar-scanner -Dsonar.host.url=https://sonarcloud.io/
+                    fi

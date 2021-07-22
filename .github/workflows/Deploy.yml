@@ -1,0 +1,61 @@
+name: Deploy
+
+on:
+    push:
+        tags:
+            - "v?[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+    Ship-to-TER:
+        name: 'Ship to TER'
+        if: github.repository == 'TYPO3-Console/TYPO3-Console'
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+
+            -   name: Composer Cache Vars
+                id: composer-cache-vars
+                run: |
+                    echo "::set-output name=dir::$(composer config cache-files-dir)"
+                    echo "::set-output name=timestamp::$(date +"%s")"
+
+            -   name: Cache Composer dependencies
+                uses: actions/cache@v2
+                with:
+                    path: ${{ steps.composer-cache-vars.outputs.dir }}
+                    key: ${{ runner.os }}-composer-^9.5.8-stable-7.4-${{ steps.composer-cache-vars.outputs.timestamp }}
+                    restore-keys: |
+                        ${{ runner.os }}-composer-^9.5.8-stable-7.4-
+                        ${{ runner.os }}-composer-^9.5.8-stable-
+                        ${{ runner.os }}-composer-^9.5.8-
+                        ${{ runner.os }}-composer-
+
+            -   name: Set up PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: 7.4
+                    coverage: none
+
+            -   name: "Extract tag, branch, version from GITHUB_REF"
+                id: "github-ref"
+                run: |
+                    echo "::set-output name=tag::$(echo $GITHUB_REF | sed -E -n 's#^refs/tags/(.*)$#\1#p')"
+                    echo "::set-output name=branch::$(echo $GITHUB_REF | sed -E -n 's#^refs/heads/(.*)$#\1#p')"
+                    echo "::set-output name=version::$(echo $GITHUB_REF | sed -E -n 's#^refs/tags/v?([0-9]+\.)([0-9]+\.)([0-9]+)#\1\2\3#p')"
+
+            -   name: Deploy to TER
+                run: |
+                    if [ -n "${{ secrets.TYPO3_ORG_USERNAME }}" ] && [ -n "${{ secrets.TYPO3_ORG_PASSWORD }}" ]; then
+                      echo -e "Preparing upload of release ${{ steps.github-ref.outputs.version }} to TER\n";
+                      # Install ter client
+                      composer global require helhum/ter-client
+
+                      # Build extension files
+                      composer extension-release
+
+                      # Upload
+                      TAG_MESSAGE=`git tag -n10 -l ${{ steps.github-ref.outputs.tag }} | sed 's/^[v]*[0-9.]*[ ]*//g'`
+                      echo "Uploading release ${{ steps.github-ref.outputs.version }} to TER"
+                      $HOME/.composer/vendor/helhum/ter-client/ter-client upload typo3_console ../extension -u "${{ secrets.TYPO3_ORG_USERNAME }}" -p "${{ secrets.TYPO3_ORG_PASSWORD }}" -m "$TAG_MESSAGE"
+                    fi;
