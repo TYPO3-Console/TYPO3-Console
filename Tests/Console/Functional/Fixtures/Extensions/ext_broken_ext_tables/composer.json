@@ -1,0 +1,8 @@
+{
+    "name": "typo3-console/tests-ext-broken-ext-tables",
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "ext_broken_ext_tables"
+        }
+    }
+}

@@ -149,6 +149,7 @@ return [
         'replace' => [
             \TYPO3\CMS\Install\Command\UpgradeWizardListCommand::class,
         ],
+        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_FULL,
     ],
     'upgrade:prepare' => [
         'vendor' => 'typo3_console',
@@ -161,5 +162,6 @@ return [
         'replace' => [
             \TYPO3\CMS\Install\Command\UpgradeWizardRunCommand::class,
         ],
+        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_FULL,
     ],
 ];

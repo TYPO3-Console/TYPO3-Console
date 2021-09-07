@@ -19,8 +19,8 @@ use Helhum\Typo3Console\Error\ExceptionHandler;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
+use TYPO3\CMS\Core\Core\BootService;
 use TYPO3\CMS\Core\Core\Bootstrap;
-use TYPO3\CMS\Core\Imaging\IconRegistry;
 use TYPO3\CMS\Core\Page\PageRenderer;
 
 class Scripts
@@ -49,15 +49,14 @@ class Scripts
     public static function initializeExtensionConfiguration(ContainerInterface $container): void
     {
         if ($container instanceof Container && $container->get('boot.state')->runLevel === RunLevel::LEVEL_FULL) {
-            self::enableEarlyCachesInContainer($container);
+            // Fetch a "cached" instance of the container
+            $bootService = $container->get(BootService::class);
+            $container = $bootService->getContainer();
+            $bootService->makeCurrent($container);
         }
         $container->get('boot.state')->done = false;
         $assetsCache = $container->get('cache.assets');
         $coreCache = $container->get('cache.core');
-        // compatibility to < v11
-        if (method_exists(IconRegistry::class, 'setCache')) {
-            IconRegistry::setCache($assetsCache);
-        }
         PageRenderer::setCache($assetsCache);
         Bootstrap::loadTypo3LoadedExtAndExtLocalconf(true, $coreCache);
         Bootstrap::unsetReservedGlobalVariables();
@@ -81,19 +80,5 @@ class Scripts
         Bootstrap::initializeBackendUser(CommandLineUserAuthentication::class);
         Bootstrap::initializeBackendAuthentication();
         Bootstrap::initializeLanguageObject();
-    }
-
-    /**
-     * We simulate caches in full boot mode, although we booted failsafe
-     *
-     * @param Container $container
-     * @throws \TYPO3\CMS\Core\Cache\Exception\InvalidBackendException
-     * @throws \TYPO3\CMS\Core\Cache\Exception\InvalidCacheException
-     */
-    private static function enableEarlyCachesInContainer(Container $container): void
-    {
-        $container->get('boot.state')->cacheDisabled = false;
-        $container->set('cache.core', Bootstrap::createCache('core'));
-        $container->set('cache.assets', Bootstrap::createCache('assets'));
     }
 }

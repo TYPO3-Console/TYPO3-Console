@@ -13,7 +13,7 @@ install:generatepackagestates
 =============================
 
 
-**Generate PackageStates.php file**
+**Generate PackageStates.php file in non Composer enabled TYPO3 projects**
 
 Generates and writes `typo3conf/PackageStates.php` file.
 Goal is to not have this file in version control, but generate it on `composer install`.

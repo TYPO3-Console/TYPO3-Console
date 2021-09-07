@@ -16,7 +16,8 @@ namespace Helhum\Typo3Console\Core\Booting;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
-use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Configuration\ConfigurationManager;
+use TYPO3\CMS\Core\Core\Bootstrap;
 
 class RunLevel
 {
@@ -59,9 +60,7 @@ class RunLevel
      */
     public function setRunLevelForCommand(string $commandIdentifier, string $runLevel)
     {
-        if (!isset($this->commandOptions[$commandIdentifier]['runLevel'])) {
-            $this->commandOptions[$commandIdentifier]['runLevel'] = $runLevel;
-        }
+        $this->commandOptions[$commandIdentifier]['runLevel'] = $runLevel;
     }
 
     /**
@@ -160,7 +159,7 @@ class RunLevel
      */
     public function getMaximumAvailableRunLevel(): string
     {
-        if (!file_exists(Environment::getPublicPath() . '/typo3conf/PackageStates.php') || !file_exists(Environment::getPublicPath() . '/typo3conf/LocalConfiguration.php')) {
+        if (!Bootstrap::checkIfEssentialConfigurationExists(new ConfigurationManager())) {
             return self::LEVEL_COMPILE;
         }
 
