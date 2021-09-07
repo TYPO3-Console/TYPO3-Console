@@ -26,10 +26,4 @@ required folders for all active extensions.
 
 
 
-Related commands
-~~~~~~~~~~~~~~~~
-
-`install:generatepackagestates`
-  Generate PackageStates.php file
-
 

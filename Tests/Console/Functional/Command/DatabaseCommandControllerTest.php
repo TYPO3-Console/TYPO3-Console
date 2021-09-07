@@ -55,8 +55,6 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     {
         self::installFixtureExtensionCode('ext_test');
         try {
-            $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
-
             $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
 
             $this->assertStringContainsString('The following database schema updates were performed:', $output);
@@ -65,8 +63,6 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
         } finally {
             self::removeFixtureExtensionCode('ext_test');
         }
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
-
         $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
 
         $this->assertStringContainsString('The following database schema updates were performed:', $output);
@@ -91,14 +87,12 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     public function databaseSchemaCanBeUpdatedWithExtensionsAccessingDatabaseCaches()
     {
         self::installFixtureExtensionCode('ext_test_cache');
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
         $this->executeMysqlQuery('DROP TABLE IF EXISTS `cache_rootline`');
         try {
             $output = $this->executeConsoleCommand('database:updateschema', ['--verbose']);
             $this->assertStringContainsString('CREATE TABLE `cache_rootline`', $output);
         } finally {
             self::removeFixtureExtensionCode('ext_test_cache');
-            $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
         }
     }
 
@@ -134,7 +128,6 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     public function schemaUpdateShowsErrorMessageWithStatementsIfTheyOccur()
     {
         self::installFixtureExtensionCode('ext_broken_sql');
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
         try {
             $output = $this->commandDispatcher->executeCommand('database:updateschema', ['*', '--verbose']);
         } catch (FailedSubProcessCommandException $e) {
@@ -143,7 +136,6 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
         $this->assertStringContainsString('The following errors occurred:', $output);
         $this->assertStringContainsString('SQL Statement', $output);
         self::removeFixtureExtensionCode('ext_broken_sql');
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
     }
 
     /**
@@ -217,25 +209,6 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     public function databaseExportCanExcludeTablesWithWildcards()
     {
         $output = $this->executeConsoleCommand('database:export', ['--exclude', 'cf_*', '-e', 'cache_*']);
-        $this->assertStringNotContainsString('CREATE TABLE `cf_', $output);
-        $this->assertStringNotContainsString('CREATE TABLE `cache_', $output);
-    }
-
-    /**
-     * @test
-     */
-    public function databaseExportCanExcludeTablesWithDeprecatedOption()
-    {
-        $output = $this->executeConsoleCommand('database:export', ['--exclude-tables', 'sys_log']);
-        $this->assertStringNotContainsString('CREATE TABLE `sys_log`', $output);
-    }
-
-    /**
-     * @test
-     */
-    public function databaseExportCanExcludeTablesWithWildcardsWithDeprecatedOption()
-    {
-        $output = $this->executeConsoleCommand('database:export', ['--exclude-tables', 'cf_*,cache_*']);
         $this->assertStringNotContainsString('CREATE TABLE `cf_', $output);
         $this->assertStringNotContainsString('CREATE TABLE `cache_', $output);
     }

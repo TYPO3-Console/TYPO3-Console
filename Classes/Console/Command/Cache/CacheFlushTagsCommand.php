@@ -14,8 +14,8 @@ namespace Helhum\Typo3Console\Command\Cache;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Service\CacheService;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,7 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class CacheFlushTagsCommand extends AbstractConvertedCommand
+class CacheFlushTagsCommand extends Command
 {
     protected function configure()
     {
@@ -37,16 +37,7 @@ Flushes caches by tags, optionally only caches in specified groups.
   <code>%command.full_name% news_123 --groups pages,all</code>
 EOH
         );
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [
+        $this->setDefinition([
             new InputArgument(
                 'tags',
                 InputArgument::REQUIRED,
@@ -58,15 +49,7 @@ EOH
                 InputOption::VALUE_REQUIRED,
                 'Optional array of groups (specified as comma separated values) for which to flush tags. If no group is specified, caches of all groups are flushed.'
             ),
-        ];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        // nothing to do here
+        ]);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

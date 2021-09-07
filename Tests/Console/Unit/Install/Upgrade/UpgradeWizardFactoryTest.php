@@ -15,107 +15,99 @@ namespace Helhum\Typo3Console\Tests\Unit\Install\Upgrade;
  */
 
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardFactory;
-use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\LegacyUpgradeWizard;
+use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\DummyUpgradeWizard;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Exception\RuntimeException;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\CMS\Install\Updates\AbstractUpdate;
+use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
 
 class UpgradeWizardFactoryTest extends UnitTestCase
 {
-    protected function setUp(): void
-    {
-        $this->markTestSkipped('TODO: needs a complete rewrite');
-    }
-
     /**
      * @test
      */
-    public function createsWizardFromRegistry()
+    public function createsWizardFromRegistry(): void
     {
         $registryFixture = [
             'id' => 'Foo\\Test',
         ];
 
-        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
-        $upgradeWizardProphecy = $this->prophesize(AbstractUpdate::class);
+        $containerProphecy = $this->prophesize(ContainerInterface::class);
+        $upgradeWizardProphecy = $this->prophesize(UpgradeWizardInterface::class);
 
-        $objectManagerProphecy->get('Foo\\Test')->willReturn($upgradeWizardProphecy->reveal());
-        $upgradeWizardProphecy->setIdentifier('id');
+        $containerProphecy->get('Foo\\Test')->willReturn($upgradeWizardProphecy->reveal());
 
-        $subject = new UpgradeWizardFactory($objectManagerProphecy->reveal(), $registryFixture);
-        $this->assertSame($upgradeWizardProphecy->reveal(), $subject->create('id'));
+        $subject = new UpgradeWizardFactory($containerProphecy->reveal(), $registryFixture);
+        self::assertSame($upgradeWizardProphecy->reveal(), $subject->create('id'));
     }
 
     /**
      * @test
      */
-    public function createsWizardWithClassName()
+    public function createsWizardWithClassName(): void
     {
         $registryFixture = [];
 
-        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
-        $upgradeWizardProphecy = $this->prophesize(LegacyUpgradeWizard::class);
+        $containerProphecy = $this->prophesize(ContainerInterface::class);
+        $upgradeWizardProphecy = $this->prophesize(DummyUpgradeWizard::class);
 
-        $objectManagerProphecy->get(LegacyUpgradeWizard::class)->willReturn($upgradeWizardProphecy->reveal());
-        $upgradeWizardProphecy->setIdentifier(LegacyUpgradeWizard::class);
+        $containerProphecy->get(DummyUpgradeWizard::class)->willReturn($upgradeWizardProphecy->reveal());
 
-        $subject = new UpgradeWizardFactory($objectManagerProphecy->reveal(), $registryFixture);
-        $this->assertSame($upgradeWizardProphecy->reveal(), $subject->create(LegacyUpgradeWizard::class));
+        $subject = new UpgradeWizardFactory($containerProphecy->reveal(), $registryFixture);
+        self::assertSame($upgradeWizardProphecy->reveal(), $subject->create(DummyUpgradeWizard::class));
     }
 
     /**
      * @test
      */
-    public function createsCoreWizardFromRegistry()
+    public function createsCoreWizardFromRegistry(): void
     {
         $registryFixture = [
             'TYPO3\\CMS\\Install\\Updates\\FooUpgrade' => 'TYPO3\\CMS\\Install\\Updates\\FooUpgrade',
         ];
 
-        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
-        $upgradeWizardProphecy = $this->prophesize(AbstractUpdate::class);
+        $containerProphecy = $this->prophesize(ContainerInterface::class);
+        $upgradeWizardProphecy = $this->prophesize(UpgradeWizardInterface::class);
 
-        $objectManagerProphecy->get('TYPO3\\CMS\\Install\\Updates\\FooUpgrade')->willReturn($upgradeWizardProphecy->reveal());
-        $upgradeWizardProphecy->setIdentifier('TYPO3\\CMS\\Install\\Updates\\FooUpgrade');
+        $containerProphecy->get('TYPO3\\CMS\\Install\\Updates\\FooUpgrade')->willReturn($upgradeWizardProphecy->reveal());
 
-        $subject = new UpgradeWizardFactory($objectManagerProphecy->reveal(), $registryFixture);
-        $this->assertSame($upgradeWizardProphecy->reveal(), $subject->create('FooUpgrade'));
+        $subject = new UpgradeWizardFactory($containerProphecy->reveal(), $registryFixture);
+        self::assertSame($upgradeWizardProphecy->reveal(), $subject->create('FooUpgrade'));
     }
 
     /**
      * @test
      */
-    public function throwsExceptionForInvalidIdentifier()
+    public function throwsExceptionForInvalidIdentifier(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionCode(1491914890);
         $registryFixture = [
             'TYPO3\\CMS\\Install\\Updates\\FooUpgrade' => 'TYPO3\\CMS\\Install\\Updates\\FooUpgrade',
         ];
-        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
+        $containerProphecy = $this->prophesize(ContainerInterface::class);
 
-        $subject = new UpgradeWizardFactory($objectManagerProphecy->reveal(), $registryFixture);
+        $subject = new UpgradeWizardFactory($containerProphecy->reveal(), $registryFixture);
         $subject->create('foo');
     }
 
     /**
      * @test
      */
-    public function throwsExceptionForInvalidIdentifierWhenFetchingShortIdentifier()
+    public function throwsExceptionForInvalidIdentifierWhenFetchingShortIdentifier(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionCode(1508495588);
         $registryFixture = [
             'TYPO3\\CMS\\Install\\Updates\\FooUpgrade' => 'TYPO3\\CMS\\Install\\Updates\\FooUpgrade',
         ];
-        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
+        $containerProphecy = $this->prophesize(ContainerInterface::class);
 
-        $subject = new UpgradeWizardFactory($objectManagerProphecy->reveal(), $registryFixture);
+        $subject = new UpgradeWizardFactory($containerProphecy->reveal(), $registryFixture);
         $subject->getShortIdentifier('foo');
     }
 
-    public function shortIdentifierCanBeDeterminedDataProvider()
+    public function shortIdentifierCanBeDeterminedDataProvider(): array
     {
         return [
             'Core class name' => [
@@ -143,16 +135,16 @@ class UpgradeWizardFactoryTest extends UnitTestCase
      * @param string $identifierOrClassName
      * @param string $expectedIdentifier
      */
-    public function shortIdentifierCanBeDetermined($identifierOrClassName, $expectedIdentifier)
+    public function shortIdentifierCanBeDetermined($identifierOrClassName, $expectedIdentifier): void
     {
         $registryFixture = [
             'TYPO3\\CMS\\Install\\Updates\\FooUpgrade' => 'TYPO3\\CMS\\Install\\Updates\\FooUpgrade',
             'bar' => 'Helhum\\Install\\Updates\\BarUpgrade',
             'Helhum\\Install\\Updates\\FooUpgrade' => 'Helhum\\Install\\Updates\\FooUpgrade',
         ];
-        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
+        $containerProphecy = $this->prophesize(ContainerInterface::class);
 
-        $subject = new UpgradeWizardFactory($objectManagerProphecy->reveal(), $registryFixture);
-        $this->assertSame($expectedIdentifier, $subject->getShortIdentifier($identifierOrClassName));
+        $subject = new UpgradeWizardFactory($containerProphecy->reveal(), $registryFixture);
+        self::assertSame($expectedIdentifier, $subject->getShortIdentifier($identifierOrClassName));
     }
 }

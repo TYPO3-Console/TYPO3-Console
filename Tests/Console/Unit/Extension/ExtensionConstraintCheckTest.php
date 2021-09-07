@@ -14,10 +14,10 @@ namespace Helhum\Typo3Console\Tests\Unit\Extension;
  *
  */
 
-use Helhum\Typo3Console\Compatibility\EmConfReader;
 use Helhum\Typo3Console\Extension\ExtensionConstraintCheck;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 use TYPO3\CMS\Core\Package\PackageInterface;
+use TYPO3\CMS\Extensionmanager\Utility\EmConfUtility;
 
 class ExtensionConstraintCheckTest extends UnitTestCase
 {
@@ -70,7 +70,7 @@ class ExtensionConstraintCheckTest extends UnitTestCase
         $packageProphecy->getPackageKey()->willReturn('dummy');
         $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3conf/ext/dummy/');
 
-        $emConfUtilityProphecy = $this->prophesize(EmConfReader::class);
+        $emConfUtilityProphecy = $this->prophesize(EmConfUtility::class);
         $emConfUtilityProphecy->includeEmConf(
             'dummy',
             PATH_site . 'typo3conf/ext/dummy/'
@@ -100,7 +100,7 @@ class ExtensionConstraintCheckTest extends UnitTestCase
         $packageProphecy->getPackageKey()->willReturn('dummy');
         $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3/sysext/dummy/');
 
-        $emConfUtilityProphecy = $this->prophesize(EmConfReader::class);
+        $emConfUtilityProphecy = $this->prophesize(EmConfUtility::class);
         $emConfUtilityProphecy->includeEmConf(
             'dummy',
             'typo3conf/ext/dummy/'

@@ -170,7 +170,7 @@ class UpgradeHandling
         $this->configurationService->setLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone', TYPO3_branch, 'string');
         $this->commandDispatcher->executeCommand('install:fixfolderstructure');
         $this->silentConfigurationUpgrade->executeSilentConfigurationUpgradesIfNeeded();
-        $this->commandDispatcher->executeCommand('cache:flush', ['--files-only']);
+        $this->commandDispatcher->executeCommand('cache:flush', ['--group', 'system']);
         $this->commandDispatcher->executeCommand('database:updateschema');
         $this->commandDispatcher->executeCommand('cache:flush');
 

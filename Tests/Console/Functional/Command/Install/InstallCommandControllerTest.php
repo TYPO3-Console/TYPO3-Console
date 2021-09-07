@@ -114,27 +114,6 @@ class InstallCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
-    public function deprecatedSetupOptionNonInteractiveWorks()
-    {
-        $output = $this->executeConsoleCommand(
-            'install:setup',
-            [
-                '--non-interactive',
-                '--skip-integrity-check',
-            ],
-            [
-                'TYPO3_INSTALL_SETUP_STEPS' => __DIR__ . '/../../Fixtures/Install/custom-install.yaml',
-            ]
-        );
-        $this->assertStringContainsString('Successfully installed TYPO3 CMS!', $output);
-        $this->assertStringContainsString('Custom step', $output);
-        $this->assertStringContainsString('Option --non-interactive is deprecated. Please use --no-interaction instead.', $output);
-        $this->assertStringNotContainsString('Set up extensions', $output);
-    }
-
-    /**
-     * @test
-     */
     public function setupCreatesHtaccessIfRequested()
     {
         $output = $this->executeConsoleCommand(

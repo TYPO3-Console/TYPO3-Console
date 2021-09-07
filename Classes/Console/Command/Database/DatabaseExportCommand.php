@@ -14,19 +14,17 @@ namespace Helhum\Typo3Console\Command\Database;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
 use Helhum\Typo3Console\Database\Process\MysqlCommand;
 use Helhum\Typo3Console\Database\Schema\TableMatcher;
-use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class DatabaseExportCommand extends AbstractConvertedCommand
+class DatabaseExportCommand extends Command
 {
     /**
      * @var ConnectionConfiguration
@@ -55,16 +53,7 @@ Tables to be excluded from the export can be specified fully qualified or with w
   <code>%command.full_name% -c Default -e 'cf_*' -e 'cache_*' -e '[bf]e_sessions' -e sys_log</code>
 EOH
         );
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [
+        $this->setDefinition([
             new InputOption(
                 'exclude',
                 '-e',
@@ -79,7 +68,7 @@ EOH
                 'TYPO3 database connection name (defaults to all configured MySQL connections)',
                 null
             ),
-        ];
+        ]);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -100,7 +89,7 @@ EOH
         }
 
         foreach ($availableConnectionNames as $mysqlConnectionName) {
-            $mysqlCommand = new MysqlCommand($this->connectionConfiguration->build($mysqlConnectionName), [], $output);
+            $mysqlCommand = new MysqlCommand($this->connectionConfiguration->build($mysqlConnectionName), $output);
             $exitCode = $mysqlCommand->mysqldump(
                 $this->buildArguments($mysqlConnectionName, $excludes, $output),
                 null,
@@ -145,50 +134,5 @@ EOH
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName($connection);
 
         return (new TableMatcher())->match($connection, ...$excludes);
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     *
-     * @return array
-     */
-    protected function createDeprecatedDefinition(): array
-    {
-        return [
-            new InputArgument(
-                'excludeTables',
-                null,
-                'Comma-separated list of table names to exclude from the export. Wildcards are supported.'
-            ),
-            new InputOption(
-                'exclude-tables',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Comma-separated list of table names to exclude from the export. Wildcards are supported.'
-            ),
-        ];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        $excludeTables = null;
-        $messages = null;
-        if ($input->getArgument('excludeTables')) {
-            $excludeTables = explode(',', $input->getArgument('excludeTables'));
-            $messages[] = '<warning>Passing excluded tables as argument is deprecated. Please use --exclude instead.</warning>';
-        }
-        if ($input->getOption('exclude-tables')) {
-            $excludeTables = explode(',', $input->getOption('exclude-tables'));
-            $messages[] = '<warning>Option --exclude-tables is deprecated. Please use --exclude for each exclude instead.</warning>';
-        }
-        if ($messages !== null && $excludeTables !== null) {
-            $input->setOption('exclude', $excludeTables);
-            if ($output instanceof ConsoleOutput) {
-                $output->getErrorOutput()->writeln($messages);
-            }
-        }
     }
 }

@@ -185,14 +185,6 @@ Options
 - Is multiple: no
 - Default: '/'
 
-`--non-interactive`
-   Deprecated. Use `--no-interaction` instead.
-
-- Accept value: no
-- Is value required: no
-- Is multiple: no
-- Default: false
-
 
 
 

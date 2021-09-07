@@ -57,25 +57,15 @@ Available Commands
    :titlesonly:
 
 
-   Dumpautoload
-
    Help
 
    List
 
    BackendCreateadmin
 
-   BackendLock
-
    BackendLockforeditors
 
-   BackendUnlock
-
    BackendUnlockforeditors
-
-   CacheFlush
-
-   CacheFlushgroups
 
    CacheFlushtags
 
@@ -96,12 +86,6 @@ Available Commands
    DatabaseImport
 
    DatabaseUpdateschema
-
-   ExtensionList
-
-   ExtensionSetup
-
-   ExtensionSetupactive
 
    FrontendRequest
 

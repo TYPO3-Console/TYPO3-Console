@@ -14,27 +14,27 @@ namespace Helhum\Typo3Console\Extension;
  *
  */
 
-use Helhum\Typo3Console\Compatibility\EmConfReader;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+use TYPO3\CMS\Extensionmanager\Utility\EmConfUtility;
 
 class ExtensionConstraintCheck
 {
     /**
-     * @var EmConfReader
+     * @var EmConfUtility
      */
     private $emConfReader;
 
     /**
      * ExtensionConstraintCheck constructor.
      *
-     * @param EmConfReader|null $emConfReader
+     * @param EmConfUtility|null $emConfReader
      */
-    public function __construct(EmConfReader $emConfReader = null)
+    public function __construct(EmConfUtility $emConfReader = null)
     {
-        $this->emConfReader = $emConfReader ?: new EmConfReader();
+        $this->emConfReader = $emConfReader ?: new EmConfUtility();
     }
 
     /**
