@@ -12,3 +12,8 @@ services:
       - { name: 'console.command', command: 'ext:command' }
       - { name: 'console.command', command: 'ext:command-alias', alias: true }
 
+  Helhum\Typo3Console\Tests\Functional\Fixtures\Extensions\ext_command\src\ExtAlias:
+    tags:
+      - { name: 'console.command', command: 'ext:alias' }
+      - { name: 'console.command', command: 'ext:alias1', alias: true }
+      - { name: 'console.command', command: 'ext2:alias', alias: true }

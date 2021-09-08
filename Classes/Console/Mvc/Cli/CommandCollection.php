@@ -166,7 +166,7 @@ class CommandCollection implements CommandLoaderInterface
 
     private function populateCommands(): void
     {
-        $definitions = array_merge($this->commandConfiguration->getCommandDefinitions(), $this->getTypo3ServiceDefinitions(), $this->typo3CommandRegistry->getCommandConfiguration());
+        $definitions = array_merge($this->commandConfiguration->getCommandDefinitions(), $this->getTypo3ServiceDefinitions());
         $this->replaces = $this->commandConfiguration->getReplaces();
         foreach ($definitions as $commandConfig) {
             $this->add($commandConfig);

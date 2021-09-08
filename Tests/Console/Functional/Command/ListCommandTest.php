@@ -34,10 +34,8 @@ class ListCommandTest extends AbstractCommandTest
     public function exampleCommandsAreProperlyRegistered(): void
     {
         $output = $this->executeConsoleCommand('list');
-        $this->assertStringContainsString('ext:alias', $output);
-        $this->assertStringContainsString('ext:command', $output);
-        $this->assertStringContainsString('ext_command:extension:list', $output);
-        $this->assertStringContainsString('ext_bla:extension:activate', $output);
+        self::assertStringContainsString('ext:alias', $output);
+        self::assertStringContainsString('ext:command', $output);
     }
 
     /**
@@ -46,16 +44,13 @@ class ListCommandTest extends AbstractCommandTest
     public function errorsDuringBootDoNotPreventListToBeShown(): void
     {
         $output = $this->executeConsoleCommand('list', [], ['THROWS_LOCAL_CONF_EXCEPTION' => '1']);
-        $this->assertStringContainsString('cache:flush', $output);
-        $this->assertStringContainsString('ext_command:extension:list', $output);
+        self::assertStringContainsString('cache:flush', $output);
         try {
             $this->commandDispatcher->executeCommand('list', ['--all'], ['THROWS_LOCAL_CONF_EXCEPTION' => '1']);
             $this->fail('Exit code is expected to be not 0');
         } catch (FailedSubProcessCommandException $e) {
-            $this->assertStringNotContainsString('ext:alias', $e->getOutputMessage());
-            $this->assertStringContainsString('ext:command', $e->getOutputMessage());
-            $this->assertStringContainsString('ext_bla:extension:activate', $e->getOutputMessage());
-            $this->assertStringContainsString('ext_command:extension:list', $e->getOutputMessage());
+            self::assertStringNotContainsString('ext:alias', $e->getOutputMessage());
+            self::assertStringContainsString('ext:command', $e->getOutputMessage());
         }
     }
 
@@ -68,11 +63,9 @@ class ListCommandTest extends AbstractCommandTest
             $this->commandDispatcher->executeCommand('list', ['--verbose'], ['THROWS_LOCAL_CONF_EXCEPTION' => '1', 'TYPO3_CONSOLE_SUB_PROCESS' => '0']);
             $this->fail('Exit code is expected to be not 0');
         } catch (FailedSubProcessCommandException $e) {
-            $this->assertStringNotContainsString('ext:alias', $e->getOutputMessage());
-            $this->assertStringNotContainsString('ext:command', $e->getOutputMessage());
-            $this->assertStringNotContainsString('ext_bla:extension:activate', $e->getOutputMessage());
-            $this->assertStringNotContainsString('ext_command:extension:list', $e->getOutputMessage());
-            $this->assertStringContainsString('1589036075', $e->getErrorMessage());
+            self::assertStringNotContainsString('ext:alias', $e->getOutputMessage());
+            self::assertStringNotContainsString('ext:command', $e->getOutputMessage());
+            self::assertStringContainsString('1589036075', $e->getErrorMessage());
         }
     }
 
@@ -85,24 +78,20 @@ class ListCommandTest extends AbstractCommandTest
             $this->commandDispatcher->executeCommand('list', [], ['THROWS_CONSTRUCT_EXCEPTION' => '1']);
             $this->fail('Exit code is expected to be not 0');
         } catch (FailedSubProcessCommandException $e) {
-            $this->assertStringNotContainsString('ext:alias', $e->getOutputMessage());
-            $this->assertStringContainsString('Command name: "ext:alias", error: "Error occurred during object creation"', $e->getErrorMessage());
-            $this->assertStringNotContainsString('1589036051', $e->getErrorMessage());
-            $this->assertStringContainsString('ext:command', $e->getOutputMessage());
-            $this->assertStringContainsString('ext_bla:extension:activate', $e->getOutputMessage());
-            $this->assertStringContainsString('ext_command:extension:list', $e->getOutputMessage());
+            self::assertStringNotContainsString('ext:alias', $e->getOutputMessage());
+            self::assertStringContainsString('Command name: "ext:alias", error: "Error occurred during object creation"', $e->getErrorMessage());
+            self::assertStringNotContainsString('1589036051', $e->getErrorMessage());
+            self::assertStringContainsString('ext:command', $e->getOutputMessage());
         }
 
         try {
             $this->commandDispatcher->executeCommand('list', ['--verbose'], ['THROWS_CONSTRUCT_EXCEPTION' => '1', 'TYPO3_CONSOLE_SUB_PROCESS' => '0']);
             $this->fail('Exit code is expected to be not 0');
         } catch (FailedSubProcessCommandException $e) {
-            $this->assertStringNotContainsString('ext:alias', $e->getOutputMessage());
-            $this->assertStringContainsString('Command name: "ext:alias", error: "Error occurred during object creation"', $e->getErrorMessage());
-            $this->assertStringContainsString('1589036051', $e->getErrorMessage());
-            $this->assertStringContainsString('ext:command', $e->getOutputMessage());
-            $this->assertStringContainsString('ext_bla:extension:activate', $e->getOutputMessage());
-            $this->assertStringContainsString('ext_command:extension:list', $e->getOutputMessage());
+            self::assertStringNotContainsString('ext:alias', $e->getOutputMessage());
+            self::assertStringContainsString('Command name: "ext:alias", error: "Error occurred during object creation"', $e->getErrorMessage());
+            self::assertStringContainsString('1589036051', $e->getErrorMessage());
+            self::assertStringContainsString('ext:command', $e->getOutputMessage());
         }
     }
 
@@ -112,10 +101,8 @@ class ListCommandTest extends AbstractCommandTest
     public function commandsClassesAreNotInstantiatedTwiceWhenDisabled(): void
     {
         $output = $this->executeConsoleCommand('list', [], ['TYPO3_CONSOLE_TEST_RUN' => '0']);
-        $this->assertStringNotContainsString('ext:alias', $output);
-        $this->assertStringNotContainsString('ext:command', $output);
-        $this->assertStringNotContainsString('ext_bla:extension:activate', $output);
-        $this->assertStringNotContainsString('ext_command:extension:list', $output);
+        self::assertStringNotContainsString('ext:alias', $output);
+        self::assertStringNotContainsString('ext:command', $output);
     }
 
     /**
@@ -124,28 +111,8 @@ class ListCommandTest extends AbstractCommandTest
     public function serviceCommandGetsDependenciesInjected(): void
     {
         $output = $this->executeConsoleCommand('ext:command');
-        $this->assertStringContainsString('injected', $output);
-        $this->assertStringContainsString('full RunLevel', $output);
-    }
-
-    /**
-     * @test
-     */
-    public function exampleCommandHasRunLevelSet(): void
-    {
-        $output = $this->executeConsoleCommand('ext_command:extension:list');
-        $this->assertStringContainsString('no deps', $output);
-        $this->assertStringContainsString('compile RunLevel', $output);
-    }
-
-    /**
-     * @test
-     */
-    public function exampleCommandCanHaveOverriddenVendor(): void
-    {
-        $output = $this->executeConsoleCommand('ext_bla:extension:activate');
-        $this->assertStringContainsString('no deps', $output);
-        $this->assertStringContainsString('full RunLevel', $output);
+        self::assertStringContainsString('injected', $output);
+        self::assertStringContainsString('full RunLevel', $output);
     }
 
     public function exampleCommandsHaveAliasesSetDataProvider(): array
@@ -153,9 +120,6 @@ class ListCommandTest extends AbstractCommandTest
         return [
             'alias set in service definition' => [
                 'ext:command-alias',
-            ],
-            'namespaced name implicitly set as alias' => [
-                'ext_command:ext:alias',
             ],
             'first explicit alias works' => [
                 'ext:alias1',
@@ -174,6 +138,6 @@ class ListCommandTest extends AbstractCommandTest
     public function exampleCommandsHaveAliasesSet(string $alias): void
     {
         $output = $this->executeConsoleCommand($alias);
-        $this->assertStringContainsString('full RunLevel', $output);
+        self::assertStringContainsString('full RunLevel', $output);
     }
 }
