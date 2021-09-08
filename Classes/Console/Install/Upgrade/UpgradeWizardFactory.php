@@ -14,10 +14,10 @@ namespace Helhum\Typo3Console\Install\Upgrade;
  *
  */
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Output\BufferedOutput;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Install\Updates\ChattyInterface;
 use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
 
@@ -27,9 +27,9 @@ use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
 class UpgradeWizardFactory
 {
     /**
-     * @var ObjectManager
+     * @var ContainerInterface
      */
-    private $objectManager;
+    private $container;
 
     /**
      * @var array
@@ -37,15 +37,24 @@ class UpgradeWizardFactory
     private $wizardRegistry;
 
     /**
-     * @param ObjectManager $objectManager
+     * @param ContainerInterface $container
      * @param array $wizardRegistry
      */
     public function __construct(
-        ObjectManager $objectManager = null,
+        ContainerInterface $container = null,
         array $wizardRegistry = []
     ) {
-        // @deprecated Object Manager can be removed, once TYPO3 7.6 support is removed
-        $this->objectManager = $objectManager ?: GeneralUtility::makeInstance(ObjectManager::class);
+        $this->container = $container ?: new class() implements ContainerInterface {
+            public function get(string $id)
+            {
+                return GeneralUtility::makeInstance($id);
+            }
+
+            public function has(string $id)
+            {
+                return true;
+            }
+        };
         $this->wizardRegistry = $wizardRegistry ?: $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update'];
     }
 
@@ -59,7 +68,7 @@ class UpgradeWizardFactory
     public function create(string $identifier)
     {
         /** @var UpgradeWizardInterface $upgradeWizard */
-        $upgradeWizard = $this->objectManager->get($this->getClassNameFromIdentifier($identifier));
+        $upgradeWizard = $this->container->get($this->getClassNameFromIdentifier($identifier));
         if ($upgradeWizard instanceof ChattyInterface) {
             $output = new BufferedOutput();
             $upgradeWizard->setOutput($output);

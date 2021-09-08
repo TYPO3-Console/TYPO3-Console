@@ -18,7 +18,7 @@ use Composer\Composer;
 use Composer\IO\IOInterface;
 use Composer\Package\PackageInterface;
 use Composer\Script\Event as ScriptEvent;
-use Helhum\Typo3Console\Composer\Util\PackageSorter;
+use Composer\Util\PackageSorter;
 use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Composer\Plugin\Core\InstallerScript;
 
@@ -111,10 +111,6 @@ class PopulateCommandConfiguration implements InstallerScript
         }
 
         $sortedPackages = PackageSorter::sortPackages($packages);
-
-        if (PackageSorter::isDeprecated()) {
-            $this->io->writeError('<error>Your Composer version is outdated. Please update by running "composer self-update".</error>');
-        }
 
         $sortedPackageMap = [];
         $sortedPackageMap[] = [$packages['helhum/typo3-console'], $paths['helhum/typo3-console']];

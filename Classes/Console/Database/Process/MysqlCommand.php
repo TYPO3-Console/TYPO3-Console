@@ -23,11 +23,6 @@ class MysqlCommand
     /**
      * @var array
      */
-    private $commandLine;
-
-    /**
-     * @var array
-     */
     private $dbConfig;
 
     /**
@@ -40,11 +35,9 @@ class MysqlCommand
      */
     private $output;
 
-    public function __construct(array $dbConfig, array $commandLine = [], ConsoleOutput $output = null)
+    public function __construct(array $dbConfig, ConsoleOutput $output = null)
     {
         $this->dbConfig = $dbConfig;
-        // @deprecated commandline will be removed in 6.0
-        $this->commandLine = $commandLine;
         $this->output = $output ?: new ConsoleOutput(); // output being optional is @deprecated. Will become required in 6.0
     }
 
@@ -57,8 +50,7 @@ class MysqlCommand
      */
     public function mysql(array $additionalArguments = [], $inputStream = STDIN, $outputCallback = null, $interactive = false)
     {
-        $commandLine = $this->commandLine;
-        array_unshift($commandLine, 'mysql');
+        $commandLine = ['mysql'];
         $commandLine = array_merge($commandLine, $this->buildConnectionArguments(), $additionalArguments);
         $process = new Process($commandLine, null, null, $inputStream, 0.0);
         if ($interactive) {
@@ -79,8 +71,7 @@ class MysqlCommand
      */
     public function mysqldump(array $additionalArguments = [], $outputCallback = null, string $connectionName = 'Default'): int
     {
-        $commandLine = $this->commandLine;
-        array_unshift($commandLine, 'mysqldump');
+        $commandLine = ['mysqldump'];
         $commandLine = array_merge($commandLine, $this->buildConnectionArguments(), $additionalArguments);
         $process = new Process($commandLine, null, null, null, 0.0);
 

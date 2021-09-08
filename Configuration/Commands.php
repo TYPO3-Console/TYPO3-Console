@@ -6,36 +6,13 @@ return [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Backend\CreateBackendAdminUserCommand::class,
     ],
-    'backend:lock' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Backend\LockBackendCommand::class,
-        'replace' => [
-            \TYPO3\CMS\Backend\Command\LockBackendCommand::class,
-        ],
-    ],
     'backend:lockforeditors' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Backend\LockBackendForEditorsCommand::class,
     ],
-    'backend:unlock' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Backend\UnlockBackendCommand::class,
-        'replace' => [
-            \TYPO3\CMS\Backend\Command\UnlockBackendCommand::class,
-        ],
-    ],
     'backend:unlockforeditors' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Backend\UnlockBackendForEditorsCommand::class,
-    ],
-    'cache:flush' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Cache\CacheFlushCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-    ],
-    'cache:flushgroups' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Cache\CacheFlushGroupsCommand::class,
     ],
     'cache:flushtags' => [
         'vendor' => 'typo3_console',
@@ -85,30 +62,6 @@ return [
         'bootingSteps' => [
             'helhum.typo3console:persistence',
         ],
-    ],
-    'dumpautoload' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Extension\DumpAutoloadCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-        'replace' => [
-            \TYPO3\CMS\Core\Command\DumpAutoloadCommand::class,
-        ],
-    ],
-    'extension:list' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Extension\ExtensionListCommand::class,
-        'schedulable' => false,
-        'replace' => [
-            \TYPO3\CMS\Core\Command\ExtensionListCommand::class,
-        ],
-    ],
-    'extension:setup' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Extension\ExtensionSetupCommand::class,
-    ],
-    'extension:setupactive' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Extension\ExtensionSetupActiveCommand::class,
     ],
     'frontend:request' => [
         'vendor' => 'typo3_console',
@@ -196,6 +149,7 @@ return [
         'replace' => [
             \TYPO3\CMS\Install\Command\UpgradeWizardListCommand::class,
         ],
+        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_FULL,
     ],
     'upgrade:prepare' => [
         'vendor' => 'typo3_console',
@@ -208,5 +162,6 @@ return [
         'replace' => [
             \TYPO3\CMS\Install\Command\UpgradeWizardRunCommand::class,
         ],
+        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_FULL,
     ],
 ];

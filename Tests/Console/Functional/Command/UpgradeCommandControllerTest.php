@@ -34,8 +34,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     public function checkExtensionConstraintsReturnsErrorCodeOnFailure(): void
     {
         self::installFixtureExtensionCode('ext_test');
-        $this->executeConsoleCommand('install:generatepackagestates');
-        $this->executeConsoleCommand('extension:setup', ['ext_test']);
+        $this->executeConsoleCommand('extension:setup', ['-e', 'ext_test']);
         try {
             $this->commandDispatcher->executeCommand('upgrade:checkextensionconstraints', ['--typo3-version' => '3.6.0']);
             $this->fail('upgrade:checkextensionconstraints should have failed');
@@ -44,7 +43,6 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $this->assertStringContainsString('"ext_test" requires TYPO3 versions 4.5.0', $e->getOutputMessage());
         } finally {
             self::removeFixtureExtensionCode('ext_test');
-            $this->executeConsoleCommand('install:generatepackagestates');
         }
     }
 
@@ -54,13 +52,11 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     public function checkExtensionCompatibilityReportsBrokenCodeInExtTables(): void
     {
         self::installFixtureExtensionCode('ext_broken_ext_tables');
-        $this->executeConsoleCommand('install:generatepackagestates');
 
         $output = $this->commandDispatcher->executeCommand('upgrade:checkextensioncompatibility', ['ext_broken_ext_tables']);
         $this->assertSame('false', $output);
 
         self::removeFixtureExtensionCode('ext_broken_ext_tables');
-        $this->executeConsoleCommand('install:generatepackagestates');
     }
 
     /**
@@ -69,13 +65,11 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     public function checkExtensionCompatibilityDoeNotReportBrokenCodeInExtTablesWithConfigOnlyCheck(): void
     {
         self::installFixtureExtensionCode('ext_broken_ext_tables');
-        $this->executeConsoleCommand('install:generatepackagestates');
 
         $output = $this->commandDispatcher->executeCommand('upgrade:checkextensioncompatibility', ['ext_broken_ext_tables', '--config-only']);
         $this->assertSame('true', $output);
 
         self::removeFixtureExtensionCode('ext_broken_ext_tables');
-        $this->executeConsoleCommand('install:generatepackagestates');
     }
 
     /**
@@ -108,21 +102,21 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     public function upgradeListShowsActiveWizards(): void
     {
         self::installFixtureExtensionCode('ext_upgrade');
-        $this->executeConsoleCommand('install:generatepackagestates');
-        $this->executeConsoleCommand('extension:setup', ['ext_upgrade']);
-        $this->executeConsoleCommand('upgrade:prepare');
+        try {
+            $this->executeConsoleCommand('extension:setup', ['-e', 'ext_upgrade']);
+            $this->executeConsoleCommand('upgrade:prepare');
 
-        $output = $this->executeConsoleCommand('upgrade:list');
-        $this->assertStringContainsString('normalWizard', $output);
-        $this->assertStringContainsString('Just a regular wizard', $output);
-        $output = $this->executeConsoleCommand('upgrade:list', ['-v']);
-        $this->assertStringContainsString('normalWizard', $output);
-        $this->assertStringContainsString('Fly you fools', $output);
-        $this->assertStringContainsString('repeatableWizard', $output);
-        $this->assertStringContainsString('It is not despair', $output);
-
-        self::removeFixtureExtensionCode('ext_upgrade');
-        $this->executeConsoleCommand('install:generatepackagestates');
+            $output = $this->executeConsoleCommand('upgrade:list');
+            $this->assertStringContainsString('normalWizard', $output);
+            $this->assertStringContainsString('Just a regular wizard', $output);
+            $output = $this->executeConsoleCommand('upgrade:list', ['-v']);
+            $this->assertStringContainsString('normalWizard', $output);
+            $this->assertStringContainsString('Fly you fools', $output);
+            $this->assertStringContainsString('repeatableWizard', $output);
+            $this->assertStringContainsString('It is not despair', $output);
+        } finally {
+            self::removeFixtureExtensionCode('ext_upgrade');
+        }
     }
 
     /**
@@ -131,8 +125,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     public function upgradeRunCanRunIndividualWizardWhichIsMarkedExecutedAndCanBeRunForced(): void
     {
         self::installFixtureExtensionCode('ext_upgrade');
-        $this->executeConsoleCommand('install:generatepackagestates');
-        $this->executeConsoleCommand('extension:setup', ['ext_upgrade']);
+        $this->executeConsoleCommand('extension:setup', ['-e', 'ext_upgrade']);
         try {
             $this->executeConsoleCommand('upgrade:prepare');
 
@@ -157,7 +150,6 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $this->assertStringContainsString('Successfully executed upgrade wizard "repeatableWizard"', $output);
         } finally {
             self::removeFixtureExtensionCode('ext_upgrade');
-            $this->executeConsoleCommand('install:generatepackagestates');
         }
     }
 
@@ -167,8 +159,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     public function upgradeRunAllRunsAllWizards(): void
     {
         self::installFixtureExtensionCode('ext_upgrade');
-        $this->executeConsoleCommand('install:generatepackagestates');
-        $this->executeConsoleCommand('extension:setup', ['ext_upgrade']);
+        $this->executeConsoleCommand('extension:setup', ['-e', 'ext_upgrade']);
         try {
             $this->executeMysqlQuery('DELETE FROM sys_registry WHERE entry_namespace = \'installUpdate\' AND entry_key NOT LIKE \'%Argon2iPasswordHashes\'');
             $output = $this->executeConsoleCommand('upgrade:run', ['all', '--deny', 'all']);
@@ -185,7 +176,6 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $this->assertStringContainsString('All wizards done. Nothing to do.', $output);
         } finally {
             self::removeFixtureExtensionCode('ext_upgrade');
-            $this->executeConsoleCommand('install:generatepackagestates');
         }
     }
 
@@ -195,8 +185,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     public function upgradeRunCanRunMultipleSpecifiedWizards(): void
     {
         self::installFixtureExtensionCode('ext_upgrade');
-        $this->executeConsoleCommand('install:generatepackagestates');
-        $this->executeConsoleCommand('extension:setup', ['ext_upgrade']);
+        $this->executeConsoleCommand('extension:setup', ['-e', 'ext_upgrade']);
         try {
             $this->executeMysqlQuery('DELETE FROM sys_registry WHERE entry_namespace = \'installUpdate\' AND entry_key LIKE \'%ext_upgrade%\'');
             $output = $this->executeConsoleCommand('upgrade:run', ['normalWizard', 'confirmableWizard', 'anotherConfirmableUpgradeWizard', '--confirm', 'all']);
@@ -208,7 +197,6 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $this->assertStringContainsString('All wizards done. Nothing to do.', $output);
         } finally {
             self::removeFixtureExtensionCode('ext_upgrade');
-            $this->executeConsoleCommand('install:generatepackagestates');
         }
     }
 
@@ -218,8 +206,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     public function upgradeRunCanConfirmAllAndDenySomeConfirmableWizards(): void
     {
         self::installFixtureExtensionCode('ext_upgrade');
-        $this->executeConsoleCommand('install:generatepackagestates');
-        $this->executeConsoleCommand('extension:setup', ['ext_upgrade']);
+        $this->executeConsoleCommand('extension:setup', ['-e', 'ext_upgrade']);
         try {
             $this->executeMysqlQuery('DELETE FROM sys_registry WHERE entry_namespace = \'installUpdate\' AND (entry_key LIKE \'%ext_upgrade%\' OR entry_key LIKE \'%RsaauthExtractionUpdate%\')');
             $output = $this->executeConsoleCommand('upgrade:run', ['all', '--confirm', 'all', '--deny', 'anotherConfirmableUpgradeWizard']);
@@ -228,7 +215,6 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $this->assertStringContainsString('Successfully executed upgrade wizard "normalWizard"', $output);
         } finally {
             self::removeFixtureExtensionCode('ext_upgrade');
-            $this->executeConsoleCommand('install:generatepackagestates');
         }
     }
 
@@ -238,8 +224,7 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     public function upgradeRunCanDenyAllAndConfirmSomeConfirmableWizards(): void
     {
         self::installFixtureExtensionCode('ext_upgrade');
-        $this->executeConsoleCommand('install:generatepackagestates');
-        $this->executeConsoleCommand('extension:setup', ['ext_upgrade']);
+        $this->executeConsoleCommand('extension:setup', ['-e', 'ext_upgrade']);
         try {
             $this->executeMysqlQuery('DELETE FROM sys_registry WHERE entry_namespace = \'installUpdate\' AND (entry_key LIKE \'%ext_upgrade%\' OR entry_key LIKE \'%RsaauthExtractionUpdate%\')');
             $output = $this->executeConsoleCommand('upgrade:run', ['all', '--deny', 'all', '--confirm', 'confirmableWizard']);
@@ -248,7 +233,6 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $this->assertStringContainsString('Successfully executed upgrade wizard "normalWizard"', $output);
         } finally {
             self::removeFixtureExtensionCode('ext_upgrade');
-            $this->executeConsoleCommand('install:generatepackagestates');
         }
     }
 

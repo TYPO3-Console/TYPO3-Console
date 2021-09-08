@@ -14,22 +14,14 @@ namespace Helhum\Typo3Console\Command\Install;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
-use Helhum\Typo3Console\Command\RelatableCommandInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\FolderStructure\DefaultFactory;
 
-class InstallFixFolderStructureCommand extends AbstractConvertedCommand implements RelatableCommandInterface
+class InstallFixFolderStructureCommand extends Command
 {
-    public function getRelatedCommandNames(): array
-    {
-        return [
-            'typo3_console:install:generatepackagestates',
-        ];
-    }
-
     protected function configure()
     {
         $this->setDescription('Fix folder structure');
@@ -43,31 +35,12 @@ It is recommended to be executed <b>after</b> executing
 required folders for all active extensions.
 EOH
         );
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        // nothing to do here
     }
 
     /**
      * @throws \TYPO3\CMS\Install\FolderStructure\Exception
      * @throws \TYPO3\CMS\Install\FolderStructure\Exception\InvalidArgumentException
      * @throws \TYPO3\CMS\Install\FolderStructure\Exception\RootNodeException
-     * @throws \TYPO3\CMS\Install\Status\Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

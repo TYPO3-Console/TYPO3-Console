@@ -14,14 +14,14 @@ namespace Helhum\Typo3Console\Command\Frontend;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpProcess;
 use TYPO3\CMS\Core\Core\Environment;
 
-class FrontendRequestCommand extends AbstractConvertedCommand
+class FrontendRequestCommand extends Command
 {
     protected function configure()
     {
@@ -31,30 +31,13 @@ class FrontendRequestCommand extends AbstractConvertedCommand
 Submits a frontend request to TYPO3 on the specified URL.
 EOH
         );
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [
+        $this->setDefinition([
             new InputArgument(
                 'requestUrl',
                 InputArgument::REQUIRED,
                 'URL to make a frontend request'
             ),
-        ];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        // nothing to do here
+        ]);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

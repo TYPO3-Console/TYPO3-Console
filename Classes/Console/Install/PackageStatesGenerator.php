@@ -31,20 +31,14 @@ class PackageStatesGenerator
     private $packageManager;
 
     /**
-     * @var bool
-     */
-    private $isComposerMode;
-
-    /**
      * PackageStatesGenerator constructor.
      *
      * @param UncachedPackageManager $packageManager
      * @param bool|null $isComposerMode
      */
-    public function __construct(UncachedPackageManager $packageManager, bool $isComposerMode = null)
+    public function __construct(UncachedPackageManager $packageManager)
     {
         $this->packageManager = $packageManager;
-        $this->isComposerMode = $isComposerMode ?? Environment::isComposerMode();
     }
 
     /**
@@ -57,11 +51,10 @@ class PackageStatesGenerator
     {
         $this->ensureDirectoryExists(Environment::getPublicPath() . '/typo3conf');
         $this->packageManager->scanAvailablePackages();
-        $allFrameWorkExtensions = $this->isComposerMode && $frameworkExtensionsToActivate === [];
         foreach ($this->packageManager->getAvailablePackages() as $package) {
             $extKey = $package->getPackageKey();
             $isLocalExt = strpos(PathUtility::stripPathSitePrefix($package->getPackagePath()), 'typo3conf/ext/') !== false;
-            $isFrameWorkExtToActivate = (!$isLocalExt && $allFrameWorkExtensions) || in_array($extKey, $frameworkExtensionsToActivate, true);
+            $isFrameWorkExtToActivate = in_array($extKey, $frameworkExtensionsToActivate, true);
             $isExcludedExt = in_array($extKey, $excludedExtensions, true);
             $isFactoryDefault = $activateDefaultExtensions && $package->isPartOfFactoryDefault();
             $isRequiredFrameworkExt = $isFrameWorkExtToActivate || $package->isProtected() || $package->isPartOfMinimalUsableSystem();

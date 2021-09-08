@@ -14,15 +14,16 @@ namespace Helhum\Typo3Console\Command\Upgrade;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Install\Upgrade\UpgradeHandling;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Package\Exception\UnknownPackageException;
 
-class UpgradeCheckExtensionConstraintsCommand extends AbstractConvertedCommand
+class UpgradeCheckExtensionConstraintsCommand extends Command
 {
     protected function configure()
     {
@@ -34,16 +35,7 @@ It checks the version constraints of all third party extensions against a given 
 It therefore relies on the constraints to be correct.
 EOH
         );
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [
+        $this->setDefinition([
             new InputArgument(
                 'extensionKeys',
                 InputArgument::OPTIONAL,
@@ -54,17 +46,9 @@ EOH
                 null,
                 InputOption::VALUE_REQUIRED,
                 'TYPO3 version to check against. Defaults to current TYPO3 version',
-                TYPO3_version
+                (string)(new Typo3Version())
             ),
-        ];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        // nothing to do here
+        ]);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

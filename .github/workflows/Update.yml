@@ -31,11 +31,11 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: ${{ steps.composer-cache-vars.outputs.dir }}
-                    key: ${{ runner.os }}-composer-^10.4.1-stable-7.4-${{ steps.composer-cache-vars.outputs.timestamp }}
+                    key: ${{ runner.os }}-composer-~11.4.0-stable-7.4-${{ steps.composer-cache-vars.outputs.timestamp }}
                     restore-keys: |
-                        ${{ runner.os }}-composer-^10.4.1-stable-7.4-
-                        ${{ runner.os }}-composer-^10.4.1-stable-
-                        ${{ runner.os }}-composer-^10.4.1-
+                        ${{ runner.os }}-composer-~11.4.0-stable-7.4-
+                        ${{ runner.os }}-composer-~11.4.0-stable-
+                        ${{ runner.os }}-composer-~11.4.0-
                         ${{ runner.os }}-composer-
 
             -   name: Set up PHP Version 7.4

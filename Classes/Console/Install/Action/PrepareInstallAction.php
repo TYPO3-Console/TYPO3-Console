@@ -21,11 +21,6 @@ use TYPO3\CMS\Core\Core\Environment;
 class PrepareInstallAction implements InstallActionInterface
 {
     /**
-     * @var CommandDispatcher
-     */
-    private $commandDispatcher;
-
-    /**
      * @var ConsoleOutput
      */
     private $output;
@@ -37,7 +32,7 @@ class PrepareInstallAction implements InstallActionInterface
 
     public function setCommandDispatcher(CommandDispatcher $commandDispatcher)
     {
-        $this->commandDispatcher = $commandDispatcher;
+        // Not needed here
     }
 
     public function shouldExecute(array $actionDefinition, array $options = []): bool
@@ -54,17 +49,6 @@ class PrepareInstallAction implements InstallActionInterface
         $typo3RootPath = getenv('TYPO3_PATH_ROOT');
         $firstInstallPath = $typo3RootPath . '/FIRST_INSTALL';
         touch($firstInstallPath);
-
-        if (isset($options['extensionSetup']) && !$options['extensionSetup']) {
-            return true;
-        }
-
-        $packageStatesArguments = [];
-        // Exclude all local extensions in case any are present, to avoid interference with the setup
-        foreach (glob($typo3RootPath . '/typo3conf/ext/*') as $item) {
-            $packageStatesArguments['--excluded-extensions'][] = basename($item);
-        }
-        $this->commandDispatcher->executeCommand('install:generatepackagestates', $packageStatesArguments);
 
         return true;
     }
@@ -86,7 +70,6 @@ class PrepareInstallAction implements InstallActionInterface
         $forceInstall = $options['forceInstall'] ?? false;
 
         $localConfFile = Environment::getLegacyConfigPath() . '/LocalConfiguration.php';
-        $packageStatesFile = Environment::getLegacyConfigPath() . '/PackageStates.php';
         if (!$forceInstall && file_exists($localConfFile)) {
             $this->output->outputLine();
             $this->output->outputLine('<error>TYPO3 seems to be already set up!</error>');
@@ -94,7 +77,7 @@ class PrepareInstallAction implements InstallActionInterface
             if ($isInteractive) {
                 $this->output->outputLine();
                 $this->output->outputLine('<info>If you continue, your <code>typo3conf/LocalConfiguration.php</code></info>');
-                $this->output->outputLine('<info>and <code>typo3conf/PackageStates.php</code> files will be deleted!</info>');
+                $this->output->outputLine('<info>file will be deleted!</info>');
                 $this->output->outputLine();
                 $proceed = $this->output->askConfirmation('<info>Do you really want to proceed?</info> (<comment>no</comment>) ', false);
             }
@@ -104,7 +87,6 @@ class PrepareInstallAction implements InstallActionInterface
             }
         }
         @unlink($localConfFile);
-        @unlink($packageStatesFile);
         clearstatcache();
         if (file_exists($localConfFile)) {
             $this->output->outputLine();

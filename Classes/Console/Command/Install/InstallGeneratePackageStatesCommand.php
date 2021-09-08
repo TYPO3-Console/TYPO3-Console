@@ -14,11 +14,11 @@ namespace Helhum\Typo3Console\Command\Install;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Install\PackageStatesGenerator;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Helhum\Typo3Console\Package\UncachedPackageManager;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -27,11 +27,11 @@ use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Service\DependencyOrderingService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class InstallGeneratePackageStatesCommand extends AbstractConvertedCommand
+class InstallGeneratePackageStatesCommand extends Command
 {
     protected function configure()
     {
-        $this->setDescription('Generate PackageStates.php file');
+        $this->setDescription('Generate PackageStates.php file in non Composer enabled TYPO3 projects');
         $this->setHelp(
             <<<'EOH'
 Generates and writes <code>typo3conf/PackageStates.php</code> file.
@@ -55,16 +55,7 @@ This updates your composer.json and composer.lock without any other changes.
   <code>%command.full_name%</code>
 EOH
         );
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [
+        $this->setDefinition([
             new InputOption(
                 'framework-extensions',
                 null,
@@ -83,15 +74,12 @@ EOH
                 InputOption::VALUE_NONE,
                 '(DEPRECATED) If true, `typo3/cms` extensions that are marked as TYPO3 factory default, will be activated, even if not in the list of configured active framework extensions.'
             ),
-        ];
+        ]);
     }
 
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
+    public function isEnabled()
     {
-        // nothing to do here
+        return getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') || !Environment::isComposerMode();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -109,15 +97,9 @@ EOH
         if ($input->getOption('excluded-extensions')) {
             $excludedExtensions = explode(',', $input->getOption('excluded-extensions'));
         }
-
-        if ($activateDefault && Environment::isComposerMode()) {
-            // @deprecated for composer usage in 5.0 will be removed with 6.0
-            $output->writeln('<warning>Using --activate-default is deprecated in composer managed TYPO3 installations.</warning>');
-            $output->writeln('<warning>Instead of requiring typo3/cms in your project, you should consider only requiring individual packages you need.</warning>');
-        }
         $dependencyOrderingService = GeneralUtility::makeInstance(DependencyOrderingService::class);
         $packageManager = GeneralUtility::makeInstance(UncachedPackageManager::class, $dependencyOrderingService);
-        $packageStatesGenerator = new PackageStatesGenerator($packageManager, Environment::isComposerMode());
+        $packageStatesGenerator = new PackageStatesGenerator($packageManager);
         $activatedExtensions = $packageStatesGenerator->generate(
             $frameworkExtensions ?? [],
             $excludedExtensions ?? [],
@@ -126,7 +108,7 @@ EOH
 
         try {
             // Make sure file caches are empty after generating package states file
-            CommandDispatcher::createFromCommandRun()->executeCommand('cache:flush', ['--files-only']);
+            CommandDispatcher::createFromCommandRun()->executeCommand('cache:flush', ['--group', 'system']);
         } catch (FailedSubProcessCommandException $e) {
             // Ignore errors here.
             // They might be triggered from extensions accessing db or having other things

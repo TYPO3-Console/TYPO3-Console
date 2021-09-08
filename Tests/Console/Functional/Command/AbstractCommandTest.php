@@ -19,7 +19,9 @@ use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
 {
@@ -38,6 +40,43 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
         putenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS=core');
         $_ENV['TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS'] = 'core';
         $this->commandDispatcher = CommandDispatcher::createFromTestRun();
+    }
+
+    /**
+     * @param array $arguments
+     * @param array $environmentVariables
+     * @param bool $dryRun
+     * @return string
+     */
+    protected static function executeComposerCommand(array $arguments = [], array $environmentVariables = [], $dryRun = false): string
+    {
+        $environmentVariables['TYPO3_CONSOLE_SUB_PROCESS'] = 'yes';
+        $commandLine = [];
+
+        if (getenv('PHP_PATH')) {
+            $commandLine[] = getenv('PHP_PATH');
+        }
+        $composerFinder = new ExecutableFinder();
+        $composerBin = $composerFinder->find('composer');
+        $commandLine[] = $composerBin;
+
+        foreach ($arguments as $argument) {
+            $commandLine[] = $argument;
+        }
+        $commandLine[] = '--no-ansi';
+        $commandLine[] = '-d';
+        $commandLine[] = getenv('TYPO3_PATH_COMPOSER_ROOT');
+
+        $process = new Process($commandLine, null, $environmentVariables, null, 0);
+        if ($dryRun) {
+            return $process->getCommandLine();
+        }
+        $process->run();
+        if (!$process->isSuccessful()) {
+            self::fail(sprintf('Composer command "%s" failed with message: "%s", output: "%s"', $process->getCommandLine(), $process->getErrorOutput(), $process->getOutput()));
+        }
+
+        return $process->getOutput() . $process->getErrorOutput();
     }
 
     /**
@@ -117,6 +156,8 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
         $sourcePath = dirname(__DIR__) . '/Fixtures/Extensions/' . $extensionKey;
         $targetPath = getenv('TYPO3_PATH_ROOT') . '/typo3conf/ext/' . $extensionKey;
         self::copyDirectory($sourcePath, $targetPath);
+        GeneralUtility::rmdir(getenv('TYPO3_PATH_APP') . '/var/cache', true);
+        self::executeComposerCommand(['du']);
     }
 
     /**
@@ -154,6 +195,8 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
     protected static function removeFixtureExtensionCode($extensionKey)
     {
         self::removeDirectory(getenv('TYPO3_PATH_ROOT') . '/typo3conf/ext/' . $extensionKey);
+        GeneralUtility::rmdir(getenv('TYPO3_PATH_APP') . '/var/cache', true);
+        self::executeComposerCommand(['du']);
     }
 
     /**

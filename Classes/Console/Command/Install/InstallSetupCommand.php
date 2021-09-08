@@ -14,16 +14,16 @@ namespace Helhum\Typo3Console\Command\Install;
  *
  */
 
-use Helhum\Typo3Console\Command\AbstractConvertedCommand;
 use Helhum\Typo3Console\Install\Action\InstallActionDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Input\ArgvInput;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Core\Environment;
 
-class InstallSetupCommand extends AbstractConvertedCommand
+class InstallSetupCommand extends Command
 {
     protected function configure()
     {
@@ -52,16 +52,7 @@ The following environment variables are evaluated:
 - TYPO3_INSTALL_WEB_SERVER_CONFIG
 EOH
         );
-        /** @deprecated Will be removed with 6.0 */
-        $this->setDefinition($this->createCompleteInputDefinition());
-    }
-
-    /**
-     * @deprecated Will be removed with 6.0
-     */
-    protected function createNativeDefinition(): array
-    {
-        return [
+        $this->setDefinition([
             new InputOption(
                 'force',
                 'f',
@@ -180,21 +171,7 @@ EOH
                 'When `site-setup-type` is set to `site`, this base url is used for the created site configuration',
                 '/'
             ),
-            new InputOption(
-                'non-interactive',
-                null,
-                InputOption::VALUE_NONE,
-                'Deprecated. Use `--no-interaction` instead.'
-            ),
-        ];
-    }
-
-    /**
-     * @deprecated will be removed with 6.0
-     */
-    protected function handleDeprecatedArgumentsAndOptions(InputInterface $input, OutputInterface $output)
-    {
-        // nothing to do here
+        ]);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -203,14 +180,7 @@ EOH
         $skipIntegrityCheck = $input->getOption('skip-integrity-check');
         $skipExtensionSetup = $input->getOption('skip-extension-setup');
         $installStepsConfig = $input->getOption('install-steps-config');
-        $nonInteractive = $input->getOption('non-interactive');
         $isInteractive = $input->isInteractive();
-
-        if ($nonInteractive) {
-            // @deprecated in 5.0 will be removed with 6.0
-            $output->writeln('<warning>Option --non-interactive is deprecated. Please use --no-interaction instead.</warning>');
-            $isInteractive = false;
-        }
 
         $output->writeln('');
         $output->writeln('<i>Welcome to the TYPO3 Console installer!</i>');

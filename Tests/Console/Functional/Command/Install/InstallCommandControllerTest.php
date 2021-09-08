@@ -114,27 +114,6 @@ class InstallCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
-    public function deprecatedSetupOptionNonInteractiveWorks()
-    {
-        $output = $this->executeConsoleCommand(
-            'install:setup',
-            [
-                '--non-interactive',
-                '--skip-integrity-check',
-            ],
-            [
-                'TYPO3_INSTALL_SETUP_STEPS' => __DIR__ . '/../../Fixtures/Install/custom-install.yaml',
-            ]
-        );
-        $this->assertStringContainsString('Successfully installed TYPO3 CMS!', $output);
-        $this->assertStringContainsString('Custom step', $output);
-        $this->assertStringContainsString('Option --non-interactive is deprecated. Please use --no-interaction instead.', $output);
-        $this->assertStringNotContainsString('Set up extensions', $output);
-    }
-
-    /**
-     * @test
-     */
     public function setupCreatesHtaccessIfRequested()
     {
         $output = $this->executeConsoleCommand(
@@ -263,52 +242,5 @@ class InstallCommandControllerTest extends AbstractCommandTest
         @unlink($indexFile);
         $this->executeConsoleCommand('install:fixfolderstructure');
         $this->assertTrue(file_exists($indexFile));
-    }
-
-    /**
-     * @test
-     */
-    public function packageStatesFileIsCreatedWithoutDependentExtensions()
-    {
-        $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
-        self::installFixtureExtensionCode('ext_no_dep');
-        self::installFixtureExtensionCode('ext_with_dep');
-        @unlink($packageStatesFile);
-        $this->executeConsoleCommand('install:generatepackagestates');
-        $this->assertTrue(file_exists($packageStatesFile));
-        $packageConfig = require $packageStatesFile;
-        $this->assertArrayNotHasKey('reports', $packageConfig['packages']);
-        self::removeFixtureExtensionCode('ext_no_dep');
-        self::removeFixtureExtensionCode('ext_with_dep');
-        $this->executeConsoleCommand('install:generatepackagestates');
-    }
-
-    /**
-     * @test
-     */
-    public function packageStatesFileIsCreatedWithoutDefaultPackages()
-    {
-        $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
-        @unlink($packageStatesFile);
-        $this->executeConsoleCommand('install:generatepackagestates');
-        $this->assertTrue(file_exists($packageStatesFile));
-        $packageConfig = require $packageStatesFile;
-        $this->assertArrayNotHasKey('reports', $packageConfig['packages']);
-    }
-
-    /**
-     * @test
-     */
-    public function packageStatesFileIsCreatedWithDefaultPackages()
-    {
-        $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
-        copy($packageStatesFile, $packageStatesFile . '_');
-        @unlink($packageStatesFile);
-        $this->executeConsoleCommand('install:generatepackagestates', ['--activate-default']);
-        $this->assertTrue(file_exists($packageStatesFile));
-        $packageConfig = require $packageStatesFile;
-        copy($packageStatesFile . '_', $packageStatesFile);
-        @unlink($packageStatesFile . '_');
-        $this->assertArrayHasKey('reports', $packageConfig['packages']);
     }
 }

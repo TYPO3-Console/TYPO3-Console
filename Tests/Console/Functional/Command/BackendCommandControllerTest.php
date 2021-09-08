@@ -21,21 +21,6 @@ class BackendCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
-    public function backendCanBeLockedAndUnlocked()
-    {
-        $output = $this->executeConsoleCommand('backend:lock');
-        $this->assertStringContainsString('Backend has been locked', $output);
-        $output = $this->executeConsoleCommand('backend:lock');
-        $this->assertStringContainsString('Backend is already locked', $output);
-        $output = $this->executeConsoleCommand('backend:unlock');
-        $this->assertStringContainsString('Backend lock is removed', $output);
-        $output = $this->executeConsoleCommand('backend:unlock');
-        $this->assertStringContainsString('Backend is already unlocked', $output);
-    }
-
-    /**
-     * @test
-     */
     public function backendCanBeLockedAndUnlockedForEditors()
     {
         $output = $this->executeConsoleCommand('backend:lockforeditors');

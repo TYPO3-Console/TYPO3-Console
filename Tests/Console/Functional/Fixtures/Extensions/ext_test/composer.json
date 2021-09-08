@@ -1,0 +1,8 @@
+{
+    "name": "typo3-console/tests-ext-test",
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "ext_test"
+        }
+    }
+}

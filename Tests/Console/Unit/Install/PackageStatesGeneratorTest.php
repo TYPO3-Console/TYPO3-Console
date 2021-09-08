@@ -95,34 +95,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageManagerProphecy->deactivatePackage('foo')->shouldBeCalled();
         $packageManagerProphecy->getAvailablePackages()->willReturn($packages);
         $packageManagerProphecy->getActivePackages()->shouldBeCalled();
-        $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal(), false);
-        $packageStatesGenerator->generate();
-    }
-
-    /**
-     * @test
-     */
-    public function frameworkExtensionsAreMarkedAsActiveByDefaultInComposerMode()
-    {
-        $packageProphecy = $this->prophesize(PackageInterface::class);
-        $packageProphecy->getPackageKey()->willReturn('foo');
-        $packageProphecy->isProtected()->willReturn(false);
-        $packageProphecy->isPartOfMinimalUsableSystem()->willReturn(false);
-        $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3/sysext/foo');
-
-        $packages = [
-            $packageProphecy->reveal(),
-        ];
-
-        $packageManagerProphecy = $this->prophesize(UncachedPackageManager::class);
-        $packageManagerProphecy->scanAvailablePackages()->shouldBeCalled();
-        $packageManagerProphecy->forceSortAndSavePackageStates()->shouldBeCalled();
-
-        $packageManagerProphecy->deactivatePackage('foo')->shouldNotBeCalled();
-        $packageManagerProphecy->activatePackage('foo')->shouldBeCalled();
-        $packageManagerProphecy->getAvailablePackages()->willReturn($packages);
-        $packageManagerProphecy->getActivePackages()->shouldBeCalled();
-        $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal(), true);
+        $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal());
         $packageStatesGenerator->generate();
     }
 
@@ -149,7 +122,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageManagerProphecy->deactivatePackage('foo')->shouldBeCalled();
         $packageManagerProphecy->getAvailablePackages()->willReturn($packages);
         $packageManagerProphecy->getActivePackages()->shouldBeCalled();
-        $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal(), false);
+        $packageStatesGenerator = new PackageStatesGenerator($packageManagerProphecy->reveal());
         $packageStatesGenerator->generate();
     }
 

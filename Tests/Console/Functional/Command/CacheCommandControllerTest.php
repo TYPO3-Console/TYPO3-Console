@@ -14,86 +14,8 @@ namespace Helhum\Typo3Console\Tests\Functional\Command;
  *
  */
 
-use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
-
 class CacheCommandControllerTest extends AbstractCommandTest
 {
-    /**
-     * @test
-     */
-    public function cacheCanBeFlushed()
-    {
-        $output = $this->executeConsoleCommand('cache:flush');
-        $this->assertSame('Flushed all caches.', $output);
-    }
-
-    /**
-     * @test
-     */
-    public function cacheCanBeFlushedWhenNotSetUp()
-    {
-        $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
-        $localConfFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
-        rename($packageStatesFile, $packageStatesFile . '_');
-        rename($localConfFile, $localConfFile . '_');
-        try {
-            $output = $this->executeConsoleCommand('cache:flush');
-            $this->assertSame('Flushed all file caches.', $output);
-        } finally {
-            rename($packageStatesFile . '_', $packageStatesFile);
-            rename($localConfFile . '_', $localConfFile);
-        }
-    }
-
-    /**
-     * @test
-     */
-    public function cacheCanBeFlushedAsFilesOnlyWhenNotSetUp()
-    {
-        $packageStatesFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php';
-        $localConfFile = getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
-        rename($packageStatesFile, $packageStatesFile . '_');
-        rename($localConfFile, $localConfFile . '_');
-        try {
-            $output = $this->executeConsoleCommand('cache:flush', ['--files-only']);
-            $this->assertSame('Flushed all file caches.', $output);
-        } finally {
-            rename($packageStatesFile . '_', $packageStatesFile);
-            rename($localConfFile . '_', $localConfFile);
-        }
-    }
-
-    /**
-     * @test
-     */
-    public function fileCachesCanBeFlushed()
-    {
-        $output = $this->executeConsoleCommand('cache:flush', ['--files-only']);
-        $this->assertSame('Flushed all file caches.', $output);
-    }
-
-    /**
-     * @test
-     */
-    public function cacheGroupsCanBeFlushed()
-    {
-        $output = $this->executeConsoleCommand('cache:flushgroups', ['pages']);
-        $this->assertSame('Flushed all caches for group(s): "pages".', $output);
-    }
-
-    /**
-     * @test
-     */
-    public function invalidGroupsMakesCommandFail()
-    {
-        try {
-            $this->commandDispatcher->executeCommand('cache:flushgroups', ['foo']);
-        } catch (FailedSubProcessCommandException $e) {
-            $this->assertSame(1, $e->getExitCode());
-            $this->assertStringContainsString('Invalid cache groups "foo".', $e->getOutputMessage());
-        }
-    }
-
     /**
      * @test
      */

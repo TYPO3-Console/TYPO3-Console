@@ -10,5 +10,10 @@
         "psr-4": {
             "Helhum\\Typo3Console\\Tests\\Functional\\Fixtures\\Extensions\\ext_command\\": ""
         }
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "ext_command"
+        }
     }
 }
