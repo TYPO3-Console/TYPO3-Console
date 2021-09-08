@@ -6,8 +6,8 @@
 conf.py:
   copyright: 2016
   project: TYPO3 Console
-  version: 6.6.0
-  release: 6.6.0
+  version: 7.0.0
+  release: 7.0.0
   latex_documents:
   - - Index
     - typo3_console.tex
