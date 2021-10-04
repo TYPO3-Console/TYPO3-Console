@@ -119,7 +119,7 @@ jobs:
 
             -   name: Install
                 run: |
-                    export COMPOSER_ROOT_VERSION=7.0.1
+                    export COMPOSER_ROOT_VERSION=7.0.2
                     composer require --no-update \
                           typo3/cms-backend="${{ matrix.typo3 }}" \
                           typo3/cms-core="${{ matrix.typo3 }}" \
