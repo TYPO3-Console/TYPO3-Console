@@ -55,7 +55,7 @@ jobs:
                       composer extension-release
 
                       # Upload
-                      TAG_MESSAGE=`git tag -n10 -l ${{ steps.github-ref.outputs.tag }} | sed 's/^[v]*[0-9.]*[ ]*//g'`
+                      TAG_MESSAGE=$(git tag -n10 -l ${{ steps.github-ref.outputs.tag }} | sed 's/^[v]*[0-9.]*[ ]*//g')
                       echo "Uploading release ${{ steps.github-ref.outputs.version }} to TER"
                       $HOME/.composer/vendor/helhum/ter-client/ter-client upload typo3_console ../extension -u "${{ secrets.TYPO3_ORG_USERNAME }}" -p "${{ secrets.TYPO3_ORG_PASSWORD }}" -m "$TAG_MESSAGE"
                     fi;
