@@ -13,11 +13,7 @@ $EM_CONF[$_EXTKEY] = [
   'constraints' => [
     'depends' => [
       'php' => '7.4.1-8.99.99',
-      'typo3' => '11.4.0-11.5.99',
-      'extbase' => '11.4.0-11.5.99',
-      'extensionmanager' => '11.4.0-11.5.99',
-      'fluid' => '11.4.0-11.5.99',
-      'install' => '11.4.0-11.5.99',
+      'typo3' => '11.5.1-11.5.99',
     ],
     'conflicts' => [
     ],

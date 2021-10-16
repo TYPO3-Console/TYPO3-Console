@@ -53,7 +53,7 @@
     },
     "require": {
         "helhum/typo3-console": "@dev",
-        "typo3/cms-core": "^11.4.0"
+        "typo3/cms-core": "^11.5.1"
     },
     "replace": {
         "typo3/cms-backend": "*",
@@ -69,7 +69,7 @@
         "symfony/console": "*",
         "symfony/debug": "*",
         "symfony/polyfill-mbstring": "*",
-        "symfony/polyfill-php80": "*"
+        "symfony/polyfill-php80": ">=1.23.1"
     },
     "scripts": {
         "post-autoload-dump": "Helhum\\Typo3Console\\Composer\\PopulateCommands::populate"
