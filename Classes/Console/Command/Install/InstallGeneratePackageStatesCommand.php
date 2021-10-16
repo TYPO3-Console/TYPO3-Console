@@ -77,13 +77,20 @@ EOH
         ]);
     }
 
-    public function isEnabled()
+    public function isHidden()
     {
-        return getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') || !Environment::isComposerMode();
+        return !getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') && Environment::isComposerMode();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (Environment::isComposerMode()) {
+            $output->writeln('<error>The command "install:generatepackagestates" is not available, because TYPO3 does not need this file any more in Composer mode.</error>');
+            $output->writeln('<comment>For more details read: https://docs.typo3.org/c/typo3/cms-core/master/en-us/Changelog/11.4/Feature-94996-ConsiderAllComposerInstalledExtensionsAsActive.html</comment>');
+
+            return 1;
+        }
+
         $frameworkExtensions = $excludedExtensions = null;
         $activateDefault = $input->getOption('activate-default');
         if ($input->getOption('framework-extensions')) {
