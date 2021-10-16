@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Install\Action;
  *
  */
 
+use Composer\InstalledVersions;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
 use TYPO3\CMS\Core\Core\Environment;
@@ -54,14 +55,10 @@ class WriteWebServerConfigAction implements InstallActionInterface
             return true;
         }
         $publicPath = getenv('TYPO3_PATH_WEB');
-        $rootPath = getenv('TYPO3_PATH_ROOT');
         if (!$publicPath) {
             $publicPath = Environment::getPublicPath();
         }
-        if (!$rootPath) {
-            $rootPath = Environment::getPublicPath();
-        }
-        $sourcePath = $rootPath . '/typo3/sysext/install/Resources/Private/FolderStructureTemplateFiles';
+        $sourcePath = $this->getInstallPackagePath() . '/Resources/Private/FolderStructureTemplateFiles';
         if ($arguments['webServerConfig'] === 'apache') {
             $source = $sourcePath . '/root-htaccess';
             $target = $publicPath . '/.htaccess';
@@ -81,5 +78,20 @@ class WriteWebServerConfigAction implements InstallActionInterface
         }
 
         return copy($source, $target);
+    }
+
+    private function getInstallPackagePath(): string
+    {
+        $installPackagePath = InstalledVersions::getInstallPath('typo3/cms-install');
+        if ($installPackagePath !== null) {
+            return $installPackagePath;
+        }
+
+        $rootPath = getenv('TYPO3_PATH_ROOT');
+        if (!$rootPath) {
+            $rootPath = Environment::getPublicPath();
+        }
+
+        return $rootPath . '/typo3/sysext/install';
     }
 }
