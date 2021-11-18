@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\Composer;
 
 use Composer\Script\Event;
 use Helhum\Typo3Console\Composer\InstallerScript\PopulateCommandConfiguration;
+use Helhum\Typo3Console\Composer\InstallerScript\WarnDevBranchInstall;
 use TYPO3\CMS\Composer\Plugin\Core\InstallerScriptsRegistration;
 use TYPO3\CMS\Composer\Plugin\Core\ScriptDispatcher;
 
@@ -35,5 +36,6 @@ class InstallerScripts implements InstallerScriptsRegistration
     public static function register(Event $event, ScriptDispatcher $scriptDispatcher)
     {
         $scriptDispatcher->addInstallerScript(new PopulateCommandConfiguration(), 70);
+        $scriptDispatcher->addInstallerScript(new WarnDevBranchInstall(), 90);
     }
 }
