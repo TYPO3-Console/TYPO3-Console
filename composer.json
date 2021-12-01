@@ -35,13 +35,13 @@
         "php": ">=7.4.1",
         "composer-runtime-api": "^2.1",
 
-        "typo3/cms-backend": "^11.5.1 || dev-master",
-        "typo3/cms-core": "^11.5.1 || dev-master",
-        "typo3/cms-extbase": "^11.5.1 || dev-master",
-        "typo3/cms-extensionmanager": "^11.5.1 || dev-master",
-        "typo3/cms-fluid": "^11.5.1 || dev-master",
-        "typo3/cms-frontend": "^11.5.1 || dev-master",
-        "typo3/cms-install": "^11.5.1 || dev-master",
+        "typo3/cms-backend": "^11.5.3 || dev-main",
+        "typo3/cms-core": "^11.5.3 || dev-main",
+        "typo3/cms-extbase": "^11.5.3 || dev-main",
+        "typo3/cms-extensionmanager": "^11.5.3 || dev-main",
+        "typo3/cms-fluid": "^11.5.3 || dev-main",
+        "typo3/cms-frontend": "^11.5.3 || dev-main",
+        "typo3/cms-install": "^11.5.3 || dev-main",
 
         "symfony/console": "^4.4 || ^5.0",
         "symfony/process": "^4.4 || ^5.0",
@@ -52,9 +52,9 @@
         "symfony/polyfill-php80": "<1.23.1"
     },
     "require-dev": {
-        "typo3/cms-filemetadata": "^11.5.1 || dev-master",
-        "typo3/cms-recordlist": "^11.5.1 || dev-master",
-        "typo3/cms-reports": "^11.5.1 || dev-master",
+        "typo3/cms-filemetadata": "^11.5.3 || dev-main",
+        "typo3/cms-recordlist": "^11.5.3 || dev-main",
+        "typo3/cms-reports": "^11.5.3 || dev-main",
         "typo3-console/create-reference-command": "@dev",
         "symfony/expression-language": "^4.4 || ^5.0",
         "symfony/filesystem": "^4.4 || ^5.0",
