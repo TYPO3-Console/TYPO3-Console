@@ -53,50 +53,6 @@ class ErrorHandler
     }
 
     /**
-     * Converts error level int to friendly error type text
-     *
-     * @param int $errorLevel The error level - one of the E_* constants
-     * @return string Error level as text
-     */
-    public function errorLevelToText(int $errorLevel): string
-    {
-        switch ($errorLevel) {
-            case E_ERROR: // 1 //
-                return 'Error';
-            case E_WARNING: // 2 //
-                return 'Warning';
-            case E_PARSE: // 4 //
-                return 'Parse errors';
-            case E_NOTICE: // 8 //
-                return 'Runtime notices';
-            case E_CORE_ERROR: // 16 //
-                return 'Core Fatal Error';
-            case E_CORE_WARNING: // 32 //
-                return 'Core Warning';
-            case E_COMPILE_ERROR: // 64 //
-                return 'Compile Error';
-            case E_COMPILE_WARNING: // 128 //
-                return 'Compile Warning';
-            case E_USER_ERROR: // 256 //
-                return 'User Error';
-            case E_USER_WARNING: // 512 //
-                return 'User Warning';
-            case E_USER_NOTICE: // 1024 //
-                return 'User Notice';
-            case E_STRICT: // 2048 //
-                return 'Runtime Notice';
-            case E_RECOVERABLE_ERROR: // 4096 //
-                return 'Catchable Fatal Error';
-            case E_DEPRECATED: // 8192 //
-                return 'Deprecation Notice';
-            case E_USER_DEPRECATED: // 16384 //
-                return 'User Deprecation Notice';
-            default:
-                return 'Unknown error level';
-        }
-    }
-
-    /**
      * Handles an error by converting it into an exception.
      *
      * If error reporting is disabled, either in the php.ini or temporarily through
@@ -116,8 +72,20 @@ class ErrorHandler
             return false;
         }
 
+        $errorLevels = [
+            E_WARNING => 'Warning',
+            E_NOTICE => 'Notice',
+            E_USER_ERROR => 'User Error',
+            E_USER_WARNING => 'User Warning',
+            E_USER_NOTICE => 'User Notice',
+            E_STRICT => 'Runtime Notice',
+            E_RECOVERABLE_ERROR => 'Catchable Fatal Error',
+            E_DEPRECATED => 'PHP Deprecation Notice',
+            E_USER_DEPRECATED => 'Deprecation Notice',
+        ];
+
         if ($errorLevel & $this->exceptionalErrors) {
-            throw new \TYPO3\CMS\Core\Error\Exception($this->errorLevelToText($errorLevel) . ': ' . $errorMessage . ' in ' . $errorFile . ' line ' . $errorLine, 1);
+            throw new \TYPO3\CMS\Core\Error\Exception(($errorLevels[$errorLevel] ?? sprintf('Unknown error level (%d)', $errorLevel)) . ': ' . $errorMessage . ' in ' . $errorFile . ' line ' . $errorLine, 1);
         }
 
         if ($errorLevel === E_USER_DEPRECATED) {
