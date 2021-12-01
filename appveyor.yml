@@ -11,7 +11,7 @@ environment:
   TYPO3_INSTALL_DB_DBNAME: 'appveyor_console_test'
 
   matrix:
-    - TYPO3_VERSION: '~11.5.1'
+    - TYPO3_VERSION: '~11.5.3'
       PHP_VERSION: '7.4.22-Win32-VC15'
 
 matrix:
@@ -47,10 +47,9 @@ install:
   - IF NOT EXIST php-installed.txt type nul >> php-installed.txt
 
   - cd c:\t3c
-  - composer require --no-update "typo3/cms-backend=%TYPO3_VERSION%" "typo3/cms-core=%TYPO3_VERSION%" "typo3/cms-extbase=%TYPO3_VERSION%" "typo3/cms-extensionmanager=%TYPO3_VERSION%" "typo3/cms-fluid=%TYPO3_VERSION%" "typo3/cms-frontend=%TYPO3_VERSION%" "typo3/cms-install=%TYPO3_VERSION%" "typo3/cms-recordlist=%TYPO3_VERSION%" --prefer-dist --no-progress --ansi
-  - composer update
+  - composer update --with "typo3/cms-backend:%TYPO3_VERSION%" --prefer-dist --no-interaction --ansi
   - git checkout .
 
 test_script:
   - cd c:\t3c
-  - .Build\bin\phpunit
+  - php .Build\bin\phpunit
