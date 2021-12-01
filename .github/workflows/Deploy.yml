@@ -24,11 +24,11 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: ${{ steps.composer-cache-vars.outputs.dir }}
-                    key: ${{ runner.os }}-composer-^11.5.1-stable-7.4-${{ steps.composer-cache-vars.outputs.timestamp }}
+                    key: ${{ runner.os }}-composer-^11.5.3-stable-7.4-${{ steps.composer-cache-vars.outputs.timestamp }}
                     restore-keys: |
-                        ${{ runner.os }}-composer-^11.5.1-stable-7.4-
-                        ${{ runner.os }}-composer-^11.5.1-stable-
-                        ${{ runner.os }}-composer-^11.5.1-
+                        ${{ runner.os }}-composer-^11.5.3-stable-7.4-
+                        ${{ runner.os }}-composer-^11.5.3-stable-
+                        ${{ runner.os }}-composer-^11.5.3-
                         ${{ runner.os }}-composer-
 
             -   name: Set up PHP

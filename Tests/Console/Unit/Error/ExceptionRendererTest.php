@@ -18,7 +18,6 @@ use Helhum\Typo3Console\Error\ExceptionRenderer;
 use Helhum\Typo3Console\Mvc\Cli\SubProcessException;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\Console\Terminal;
 
 class ExceptionRendererTest extends UnitTestCase
 {
@@ -27,7 +26,7 @@ class ExceptionRendererTest extends UnitTestCase
      */
     public function exceptionClassIsRenderedAsTitleMessageAsLinesAndCodeExplicitly()
     {
-        $subject = new ExceptionRenderer($this->getTerminalStub());
+        $subject = new ExceptionRenderer(255);
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_VERBOSE);
         $subject->render(new \RuntimeException('Foo', 4223), $output);
         $renderedOutput = $output->fetch();
@@ -42,7 +41,7 @@ class ExceptionRendererTest extends UnitTestCase
      */
     public function exceptionCodeNotRenderedWhenNotVerbose()
     {
-        $subject = new ExceptionRenderer($this->getTerminalStub());
+        $subject = new ExceptionRenderer(255);
         $output = new BufferedOutput();
         $subject->render(new \RuntimeException('Foo', 4223), $output);
         $renderedOutput = $output->fetch();
@@ -57,7 +56,7 @@ class ExceptionRendererTest extends UnitTestCase
      */
     public function exceptionCodeNotRenderedWhenEmpty()
     {
-        $subject = new ExceptionRenderer($this->getTerminalStub());
+        $subject = new ExceptionRenderer(255);
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_VERBOSE);
         $subject->render(new \RuntimeException('Foo'), $output);
         $renderedOutput = $output->fetch();
@@ -86,7 +85,7 @@ class ExceptionRendererTest extends UnitTestCase
             ]
         );
 
-        $subject = new ExceptionRenderer($this->getTerminalStub());
+        $subject = new ExceptionRenderer(255);
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_VERBOSE);
         $subject->render($subProcessException, $output);
         $renderedOutput = $output->fetch();
@@ -115,31 +114,11 @@ class ExceptionRendererTest extends UnitTestCase
             ]
         );
 
-        $subject = new ExceptionRenderer($this->getTerminalStub());
+        $subject = new ExceptionRenderer(255);
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_VERBOSE);
         $subject->render($subProcessException, $output);
         $renderedOutput = $output->fetch();
 
         $this->assertStringContainsString('Exception code: 42S23', $renderedOutput);
-    }
-
-    private function getTerminalStub(): Terminal
-    {
-        return new class() extends Terminal {
-            public function getWidth()
-            {
-                return 256;
-            }
-
-            public function getHeight()
-            {
-                return 256;
-            }
-
-            public static function hasSttyAvailable()
-            {
-                return false;
-            }
-        };
     }
 }
