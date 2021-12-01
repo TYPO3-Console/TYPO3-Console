@@ -21,7 +21,7 @@ use cogpowered\FineDiff\Render\Renderer;
  */
 class DiffConsoleRenderer extends Renderer
 {
-    public function callback($opcode, $from, $from_offset, $from_len)
+    public function callback(string $opcode, string $from, int $from_offset, int $from_len): string
     {
         if ($opcode === 'c') {
             $output = substr($from, $from_offset, $from_len);

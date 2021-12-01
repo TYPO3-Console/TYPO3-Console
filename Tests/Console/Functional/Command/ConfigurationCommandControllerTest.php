@@ -31,6 +31,16 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
+    public function configurationShowsDiff()
+    {
+        $output = $this->executeConsoleCommand('configuration:show', ['SC_OPTIONS/"ext/install"']);
+        $this->assertStringContainsString('update', $output);
+        $this->assertStringContainsString('++ AdditionalConfiguration.php', $output);
+    }
+
+    /**
+     * @test
+     */
     public function localConfigurationCanBeShown()
     {
         $output = $this->executeConsoleCommand('configuration:showlocal', ['BE/installToolPassword']);
