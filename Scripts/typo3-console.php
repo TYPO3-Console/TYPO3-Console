@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
 (static function () {
-    if (file_exists($vendorAutoLoadFile = dirname(__DIR__) . '/.Build/vendor/autoload.php')) {
+    if ($vendorAutoLoadFile = $GLOBALS['_composer_autoload_path'] ?? null) {
+        $classLoader = require $vendorAutoLoadFile;
+    } elseif (file_exists($vendorAutoLoadFile = dirname(__DIR__) . '/.Build/vendor/autoload.php')) {
         // Console is root package, thus vendor folder is .Build/vendor
         $classLoader = require $vendorAutoLoadFile;
     } elseif (file_exists($vendorAutoLoadFile = dirname(dirname(dirname(__DIR__))) . '/autoload.php')) {
