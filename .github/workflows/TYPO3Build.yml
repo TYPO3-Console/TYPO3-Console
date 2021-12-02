@@ -1,0 +1,89 @@
+name: TYPO3Build
+
+on:
+    workflow_call:
+        inputs:
+            name:
+                required: true
+                type: string
+            typo3:
+                required: true
+                type: string
+            php:
+                required: false
+                type: string
+                default: '7.4'
+            dependency-version:
+                required: false
+                type: string
+                default: 'stable'
+            experimental:
+                required: false
+                type: bool
+                default: false
+            uses-db:
+                required: false
+                type: bool
+                default: false
+            pre-install:
+                required: false
+                type: string
+                default: ''
+            post-install:
+                required: false
+                type: string
+                default: ''
+jobs:
+
+    Build:
+        name: '${{ inputs.name }}'
+        runs-on: ubuntu-18.04
+
+        continue-on-error: ${{ inputs.experimental }}
+
+        steps:
+            -   name: Start database server
+                if: 'inputs.uses-db'
+                run: sudo /etc/init.d/mysql start
+
+            -   name: Checkout
+                uses: actions/checkout@v2
+
+            -   name: Composer Cache Vars
+                id: composer-cache-vars
+                run: |
+                    echo "::set-output name=dir::$(composer config cache-files-dir)"
+                    echo "::set-output name=timestamp::$(date +"%s")"
+
+            -   name: Cache Composer dependencies
+                uses: actions/cache@v2
+                with:
+                    path: ${{ steps.composer-cache-vars.outputs.dir }}
+                    key: ${{ runner.os }}-composer-${{ inputs.typo3 }}-${{ inputs.dependency-version }}-${{ inputs.php }}-${{ steps.composer-cache-vars.outputs.timestamp }}
+                    restore-keys: |
+                        ${{ runner.os }}-composer-${{ inputs.typo3 }}-${{ inputs.dependency-version }}-${{ inputs.php }}-
+                        ${{ runner.os }}-composer-${{ inputs.typo3 }}-${{ inputs.dependency-version }}-
+                        ${{ runner.os }}-composer-${{ inputs.typo3 }}-
+                        ${{ runner.os }}-composer-
+
+            -   name: Set up PHP Version ${{ inputs.php }}
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ inputs.php }}
+                    tools: composer:v2
+                    coverage: none
+
+            -   name: Environment Check
+                run: |
+                    php --version
+                    composer --version
+
+            -   name: Validate composer.json and composer.lock
+                run: composer validate
+
+            -   name: Install
+                run: |
+                    export COMPOSER_ROOT_VERSION=7.0.4
+                    ${{ inputs.pre-install }}
+                    composer update --with "typo3/cms-core:${{ inputs.typo3 }}" --prefer-${{ inputs.dependency-version }} --prefer-dist --no-interaction
+                    ${{ inputs.post-install }}
