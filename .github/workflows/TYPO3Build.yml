@@ -33,6 +33,18 @@ on:
                 required: false
                 type: string
                 default: ''
+            lint:
+                required: false
+                type: string
+                default: ''
+            test:
+                required: false
+                type: string
+                default: ''
+            experimental-test:
+                required: false
+                type: string
+                default: ''
 jobs:
 
     Build:
@@ -87,3 +99,14 @@ jobs:
                     ${{ inputs.pre-install }}
                     composer update --with "typo3/cms-core:${{ inputs.typo3 }}" --prefer-${{ inputs.dependency-version }} --prefer-dist --no-interaction
                     ${{ inputs.post-install }}
+
+            -   name: Lint
+                run: '${{ inputs.lint }}'
+
+            -   name: Test
+                if: '!matrix.experimental'
+                run: '${{ inputs.test }}'
+
+            -   name: Test allow failure
+                if: 'matrix.experimental'
+                run: '${{ inputs.test }}'
