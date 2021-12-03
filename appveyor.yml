@@ -47,7 +47,6 @@ install:
 
   - cd c:\t3c
   - composer update --with "typo3/cms-backend:%TYPO3_VERSION%" --prefer-dist --no-interaction --ansi
-  - git checkout .
 
 test_script:
   - cd c:\t3c

@@ -120,7 +120,6 @@ jobs:
             -   name: Install
                 run: |
                     composer update --with "typo3/cms-core:${{ matrix.typo3 }}" --prefer-${{ matrix.dependency-version }} --prefer-dist --no-interaction
-                    git checkout composer.json
 
             -   name: Lint
                 run: .Build/bin/parallel-lint --exclude .Build .
