@@ -27,7 +27,7 @@ class ScriptHelper
      * @internal
      * @throws Exception
      */
-    public static function setVersion(ScriptEvent $event)
+    public static function setVersion(ScriptEvent $event): void
     {
         $version = $event->getArguments()[0];
         if (!preg_match('/\d+\.\d+\.\d+/', $version)) {
@@ -74,10 +74,14 @@ class ScriptHelper
         file_put_contents($sonarConfigFile, $content);
     }
 
-    public static function verifyComposerJsonOfExtension()
+    /**
+     * @throws Exception
+     * @throws \JsonException
+     */
+    public static function verifyComposerJsonOfExtension(): void
     {
-        $main = json_decode(file_get_contents('composer.json'), true);
-        $extension = json_decode(file_get_contents('Resources/Private/ExtensionArtifacts/composer.json'), true);
+        $main = json_decode(file_get_contents('composer.json') ?: '', true, 512, JSON_THROW_ON_ERROR);
+        $extension = json_decode(file_get_contents('Resources/Private/ExtensionArtifacts/composer.json') ?: '', true, 512, JSON_THROW_ON_ERROR);
         foreach (['description', 'keywords', 'support', 'homepage', 'authors', 'license'] as $name) {
             if ($main[$name] !== $extension[$name]) {
                 throw new Exception(sprintf('Property "%s" is not the same', $name));
