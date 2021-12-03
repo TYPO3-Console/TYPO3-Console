@@ -119,7 +119,6 @@ jobs:
 
             -   name: Install
                 run: |
-                    export COMPOSER_ROOT_VERSION=7.0.5
                     composer update --with "typo3/cms-core:${{ matrix.typo3 }}" --prefer-${{ matrix.dependency-version }} --prefer-dist --no-interaction
                     git checkout composer.json
 

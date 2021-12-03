@@ -127,8 +127,9 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-latest": "7.x-dev"
+            "dev-latest": "7.0.x-dev"
         },
+        "branch-version": "7.0.x-dev",
         "typo3/cms": {
             "ignore-as-root": false,
             "app-dir": ".Build",
