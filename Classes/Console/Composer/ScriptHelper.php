@@ -30,9 +30,12 @@ class ScriptHelper
     public static function setVersion(ScriptEvent $event): void
     {
         $version = $event->getArguments()[0];
-        if (!preg_match('/\d+\.\d+\.\d+/', $version)) {
+        if (!preg_match('/(\d+)\.(\d+)\.(\d+)/', $version, $matches)) {
             throw new Exception('No valid version number provided!', 1468672604);
         }
+        [, $major, $minor, ] = $matches;
+        $branchVersion = sprintf('%d.%d.x-dev', $major, $minor);
+
         $docConfigFile = __DIR__ . '/../../../Documentation/Settings.yml';
         $content = file_get_contents($docConfigFile);
         $content = preg_replace('/(version|release): \d+\.\d+\.\d+/', '$1: ' . $version, $content);
@@ -67,6 +70,11 @@ class ScriptHelper
         $content = file_get_contents($appveyorYmlFile);
         $content = preg_replace('/(SET COMPOSER_ROOT_VERSION)=\d+\.\d+\.\d+/', '$1=' . $version, $content);
         file_put_contents($appveyorYmlFile, $content);
+
+        $composerJson = __DIR__ . '/../../../composer.json';
+        $content = file_get_contents($composerJson);
+        $content = preg_replace('/("dev-latest": )"\d+\.\d+\.x-dev/', '$1"' . $branchVersion, $content);
+        file_put_contents($composerJson, $content);
 
         $sonarConfigFile = __DIR__ . '/../../../sonar-project.properties';
         $content = file_get_contents($sonarConfigFile);
