@@ -127,7 +127,8 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-latest": "7.x-dev"
+            "dev-latest": "7.0.x-dev",
+            "dev-main": "7.0.x-dev"
         },
         "typo3/cms": {
             "ignore-as-root": false,

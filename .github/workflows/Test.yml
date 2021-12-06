@@ -121,23 +121,24 @@ jobs:
                 run: |
                     export COMPOSER_ROOT_VERSION=7.0.5
                     composer update --with "typo3/cms-core:${{ matrix.typo3 }}" --prefer-${{ matrix.dependency-version }} --prefer-dist --no-interaction
-                    git checkout composer.json
 
             -   name: Lint
                 run: .Build/bin/parallel-lint --exclude .Build .
 
             # This fails when command reference is not up to date
             -   name: Test Command Reference
+                if: '!matrix.experimental'
                 run: |
                     ./typo3cms commandreference:render > /dev/null 2>&1 && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)"
 
             -   name: Test Install
+                if: '!matrix.experimental'
                 run: './typo3cms install:setup --database-host-name=127.0.0.1 --database-user-name=root --database-user-password=root --database-name=typo3_test_ci_github  --admin-user-name=admin --admin-password=password --no-interaction -vvv'
 
             -   name: Test
                 if: '!matrix.experimental'
                 run: .Build/bin/phpunit
 
-            -   name: Test allow failure
+            -   name: Test - allow failure
                 if: 'matrix.experimental'
                 run: .Build/bin/phpunit || true
