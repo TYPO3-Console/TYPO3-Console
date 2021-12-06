@@ -8,7 +8,7 @@ Introduction
 What does it do?
 ================
 
-The goal of this extension to improve the command line usage with TYPO3 CMS
+The goal of this extension is to improve the command line usage with TYPO3 CMS
 inspired by the command line interface of TYPO3 Flow. It aims to provide a
 consistent and easy to use interface for users and an easy API for developers.
 Every command that is shipped provides helpful information about usage and is
