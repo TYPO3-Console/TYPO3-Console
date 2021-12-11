@@ -30,4 +30,3 @@ https://typo3.org/.
    Introduction/Index
    AdministratorManual/Index
    CommandReference/Index
-   Targets
