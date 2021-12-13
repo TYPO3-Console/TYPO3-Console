@@ -75,7 +75,6 @@ EOH
                 'Adds --no-tablespaces to the resulting query. Does not dump any tablespace information.',
                 null
             ),
-
         ]);
     }
 
