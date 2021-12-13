@@ -23,7 +23,7 @@ Tables to be excluded from the export can be specified fully qualified or with w
 
 **Example:**
 
-  `typo3cms database:export -c Default -e 'cf_*' -e 'cache_*' -e '[bf]e_sessions' -e sys_log`
+  `typo3cms database:export -y -c Default -e 'cf_*' -e 'cache_*' -e '[bf]e_sessions' -e sys_log`
 
 
 
@@ -44,6 +44,11 @@ Options
 - Accept value: yes
 - Is value required: yes
 - Is multiple: no
+
+`--no-tablespaces|-y`
+   Does not dump any tablespace information.
+
+- Is value required: no
 
 
 

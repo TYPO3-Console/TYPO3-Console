@@ -68,6 +68,14 @@ EOH
                 'TYPO3 database connection name (defaults to all configured MySQL connections)',
                 null
             ),
+            new InputOption(
+                'no-tablespaces',
+                '-y',
+                InputOption::VALUE_NONE,
+                'Adds --no-tablespaces to the resulting query. Does not dump any tablespace information.',
+                null
+            ),
+
         ]);
     }
 
@@ -75,6 +83,7 @@ EOH
     {
         $connection = $input->getOption('connection');
         $excludes = $input->getOption('exclude');
+        $noTablespaces = $input->getOption('no-tablespaces');
 
         $availableConnectionNames = $connectionNames = $this->connectionConfiguration->getAvailableConnectionNames('mysql');
         $failureReason = '';
@@ -91,7 +100,7 @@ EOH
         foreach ($availableConnectionNames as $mysqlConnectionName) {
             $mysqlCommand = new MysqlCommand($this->connectionConfiguration->build($mysqlConnectionName), $output);
             $exitCode = $mysqlCommand->mysqldump(
-                $this->buildArguments($mysqlConnectionName, $excludes, $output),
+                $this->buildArguments($mysqlConnectionName, $excludes, $noTablespaces, $output),
                 null,
                 $mysqlConnectionName
             );
@@ -106,7 +115,7 @@ EOH
         return 0;
     }
 
-    private function buildArguments(string $mysqlConnectionName, array $excludes, OutputInterface $output): array
+    private function buildArguments(string $mysqlConnectionName, array $excludes, bool $noTablespaces, OutputInterface $output): array
     {
         $dbConfig = $this->connectionConfiguration->build($mysqlConnectionName);
         $arguments = [
@@ -121,6 +130,10 @@ EOH
 
         foreach ($this->matchTables($excludes, $mysqlConnectionName) as $table) {
             $arguments[] = sprintf('--ignore-table=%s.%s', $dbConfig['dbname'], $table);
+        }
+
+        if($noTablespaces){
+            $arguments[] = '--no-tablespaces';
         }
 
         return $arguments;
