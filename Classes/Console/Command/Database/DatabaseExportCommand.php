@@ -132,7 +132,7 @@ EOH
             $arguments[] = sprintf('--ignore-table=%s.%s', $dbConfig['dbname'], $table);
         }
 
-        if ($noTablespaces){
+        if ($noTablespaces) {
             $arguments[] = '--no-tablespaces';
         }
 
