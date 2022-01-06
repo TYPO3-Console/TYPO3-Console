@@ -150,7 +150,7 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
     protected function describeApplication(Application $application, array $options = [])
     {
         $describedNamespace = isset($options['namespace']) ? $options['namespace'] : null;
-        $description = new ApplicationDescription($application, $describedNamespace);
+        $description = new ApplicationDescription($application, $describedNamespace, $options['show_unavailable'] ?? false);
 
         if (isset($options['raw_text']) && $options['raw_text']) {
             $width = $this->getColumnWidth($description->getCommands());
@@ -173,17 +173,8 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
             $this->writeText("\n");
 
             $commands = $description->getCommands();
-
-            if ($application instanceof \Helhum\Typo3Console\Mvc\Cli\Symfony\Application) {
-                $showUnavailable = $options['show_unavailable'] ?? false;
-                $commands = array_filter(
-                    $commands,
-                    function ($command) use ($application, $showUnavailable) {
-                        return $showUnavailable || $application->isCommandAvailable($command);
-                    }
-                );
-            }
             $namespaces = $description->getNamespaces();
+
             if ($describedNamespace && $namespaces) {
                 // make sure all alias commands are included when describing a specific namespace
                 $describedNamespaceInfo = reset($namespaces);
