@@ -33,6 +33,8 @@ This updates your composer.json and composer.lock without any other changes.
 
 **Example:**
 
+.. code-block:: bash
+
   `typo3cms install:generatepackagestates`
 
 
