@@ -1,12 +1,10 @@
 
 .. include:: /Includes.rst.txt
 
-
+.. The following reference was automatically generated from code. It should not
+.. be changed directly.
 
 .. _typo3_console-command-reference-configuration-showactive:
-
-The following reference was automatically generated from code.
-
 
 ========================
 configuration:showactive
@@ -20,10 +18,14 @@ Shows the configuration value that is currently effective, no matter where and h
 
 **Example:**
 
-  `typo3cms configuration:showactive DB --json`
+
+.. code-block:: shell 
+
+   typo3cms configuration:showactive DB --json
+
 
 Arguments
-~~~~~~~~~
+=========
 
 `path`
    Path to system configuration
@@ -31,7 +33,7 @@ Arguments
 
 
 Options
-~~~~~~~
+=======
 
 `--json`
    If set, the configuration is shown as JSON

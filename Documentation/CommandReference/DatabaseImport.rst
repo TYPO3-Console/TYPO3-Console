@@ -1,12 +1,10 @@
 
 .. include:: /Includes.rst.txt
 
-
+.. The following reference was automatically generated from code. It should not
+.. be changed directly.
 
 .. _typo3_console-command-reference-database-import:
-
-The following reference was automatically generated from code.
-
 
 ===============
 database:import
@@ -22,20 +20,30 @@ This obviously only works when MySQL is used as DBMS.
 
 **Example (import):**
 
-  `ssh remote.server '/path/to/typo3cms database:export' | typo3cms database:import`
+
+.. code-block:: shell 
+
+   ssh remote.server '/path/to/typo3cms database:export' | typo3cms database:import
 
 **Example (select):**
 
-  `echo 'SELECT username from be_users WHERE admin=1;' | typo3cms database:import`
+
+.. code-block:: shell 
+
+   echo 'SELECT username from be_users WHERE admin=1;' | typo3cms database:import
 
 **Example (interactive):**
 
-  `typo3cms database:import --interactive`
+
+.. code-block:: shell 
+
+   typo3cms database:import --interactive
+
 
 
 
 Options
-~~~~~~~
+=======
 
 `--interactive`
    Open an interactive mysql shell using the TYPO3 connection settings.

@@ -1,8 +1,6 @@
 
 .. include:: /Includes.rst.txt
 
-
-
 .. _typo3_console-command-reference:
 
 =================
@@ -17,10 +15,7 @@ Command Reference
    located in the binary directory specified in the root composer.json (by
    default `vendor/bin`)
 
-
 The following reference was automatically generated from code.
-
-
 
 Application Options
 -------------------

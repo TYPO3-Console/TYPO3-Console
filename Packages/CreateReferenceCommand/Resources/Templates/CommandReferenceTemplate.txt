@@ -1,8 +1,6 @@
 {namespace d=Typo3Console\CreateReferenceCommand\ViewHelpers}
 .. include:: /Includes.rst.txt
 
-
-
 .. _typo3_console-command-reference:
 
 {title -> d:format.headline(lineCharacter: '=', withOverline: 1)}
@@ -15,10 +13,7 @@
    located in the binary directory specified in the root composer.json (by
    default `vendor/bin`)
 
-
 The following reference was automatically generated from code.
-
-
 
 <d:format.headline>Application Options</d:format.headline>
 

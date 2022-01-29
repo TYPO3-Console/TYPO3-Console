@@ -1,12 +1,10 @@
 
 .. include:: /Includes.rst.txt
 
-
+.. The following reference was automatically generated from code. It should not
+.. be changed directly.
 
 .. _typo3_console-command-reference-backend-lockforeditors:
-
-The following reference was automatically generated from code.
-
 
 ======================
 backend:lockforeditors
@@ -23,9 +21,9 @@ Admins will still be able to log in and work with the backend.
 
 
 Related commands
-~~~~~~~~~~~~~~~~
+================
 
-`backend:unlockforeditors`
-  Unlock backend for editors
+
+*   :ref:`typo3_console-command-reference-backend-unlockforeditors`
 
 

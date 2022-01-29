@@ -1,12 +1,10 @@
 
 .. include:: /Includes.rst.txt
 
-
+.. The following reference was automatically generated from code. It should not
+.. be changed directly.
 
 .. _typo3_console-command-reference-install-unlock:
-
-The following reference was automatically generated from code.
-
 
 ==============
 install:unlock
@@ -22,9 +20,9 @@ Allow install tool access.
 
 
 Related commands
-~~~~~~~~~~~~~~~~
+================
 
-`install:lock`
-  Lock Install Tool
+
+*   :ref:`typo3_console-command-reference-install-lock`
 
 

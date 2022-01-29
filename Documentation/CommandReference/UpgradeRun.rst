@@ -1,12 +1,10 @@
 
 .. include:: /Includes.rst.txt
 
-
+.. The following reference was automatically generated from code. It should not
+.. be changed directly.
 
 .. _typo3_console-command-reference-upgrade-run:
-
-The following reference was automatically generated from code.
-
 
 ===========
 upgrade:run
@@ -22,21 +20,39 @@ When no identifier is specified a select UI is presented to select a wizard out 
 
 **Examples:**
 
-  `typo3cms upgrade:run all`
 
-  `typo3cms upgrade:run all --confirm all`
+.. code-block:: shell 
 
-  `typo3cms upgrade:run argon2iPasswordHashes --confirm all`
+   typo3cms upgrade:run all
 
-  `typo3cms upgrade:run all --confirm all --deny typo3DbLegacyExtension --deny funcExtension`
 
-  `typo3cms upgrade:run all --deny all`
+.. code-block:: shell 
 
-  `typo3cms upgrade:run all --no-interaction --deny all --confirm argon2iPasswordHashes`
+   typo3cms upgrade:run all --confirm all
+
+
+.. code-block:: shell 
+
+   typo3cms upgrade:run argon2iPasswordHashes --confirm all
+
+
+.. code-block:: shell 
+
+   typo3cms upgrade:run all --confirm all --deny typo3DbLegacyExtension --deny funcExtension
+
+
+.. code-block:: shell 
+
+   typo3cms upgrade:run all --deny all
+
+
+.. code-block:: shell 
+
+   typo3cms upgrade:run all --no-interaction --deny all --confirm argon2iPasswordHashes
 
 
 Arguments
-~~~~~~~~~
+=========
 
 `wizardIdentifiers`
    One or more wizard identifiers to run
@@ -44,7 +60,7 @@ Arguments
 
 
 Options
-~~~~~~~
+=======
 
 `--confirm|-y`
    Identifier of the wizard, that should be confirmed. Keyword "all" confirms all wizards.

@@ -1,12 +1,10 @@
 
 .. include:: /Includes.rst.txt
 
-
+.. The following reference was automatically generated from code. It should not
+.. be changed directly.
 
 .. _typo3_console-command-reference-upgrade-checkextensionconstraints:
-
-The following reference was automatically generated from code.
-
 
 =================================
 upgrade:checkextensionconstraints
@@ -20,7 +18,7 @@ It checks the version constraints of all third party extensions against a given 
 It therefore relies on the constraints to be correct.
 
 Arguments
-~~~~~~~~~
+=========
 
 `extensionKeys`
    Extension keys to check. Separate multiple extension keys with comma
@@ -28,7 +26,7 @@ Arguments
 
 
 Options
-~~~~~~~
+=======
 
 `--typo3-version`
    TYPO3 version to check against. Defaults to current TYPO3 version
