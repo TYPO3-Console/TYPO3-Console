@@ -1,5 +1,5 @@
 {namespace d=Typo3Console\CreateReferenceCommand\ViewHelpers}
-.. include:: ../Includes.txt
+.. include:: /Includes.rst.txt
 
 
 
