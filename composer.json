@@ -34,13 +34,13 @@
     "require": {
         "php": ">=7.2",
 
-        "typo3/cms-backend": "^10.4.1 || ~11.3.1",
-        "typo3/cms-core": "^10.4.1 || ~11.3.1",
-        "typo3/cms-extbase": "^10.4.1 || ~11.3.1",
-        "typo3/cms-extensionmanager": "^10.4.1 || ~11.3.1",
-        "typo3/cms-fluid": "^10.4.1 || ~11.3.1",
-        "typo3/cms-frontend": "^10.4.1 || ~11.3.1",
-        "typo3/cms-install": "^10.4.1 || ~11.3.1",
+        "typo3/cms-backend": "^10.4.22",
+        "typo3/cms-core": "^10.4.22",
+        "typo3/cms-extbase": "^10.4.22",
+        "typo3/cms-extensionmanager": "^10.4.22",
+        "typo3/cms-fluid": "^10.4.22",
+        "typo3/cms-frontend": "^10.4.22",
+        "typo3/cms-install": "^10.4.22",
 
         "symfony/console": "^4.4 || ^5.0",
         "symfony/process": "^4.4 || ^5.0",
@@ -50,8 +50,8 @@
         "doctrine/dbal": "2.13.0 || 2.13.1"
     },
     "require-dev": {
-        "typo3/cms-reports": "^10.4.1 || ~11.3.1 || dev-master",
-        "typo3/cms-filemetadata": "^10.4.1 || ~11.3.1 || dev-master",
+        "typo3/cms-reports": "^10.4.22",
+        "typo3/cms-filemetadata": "^10.4.22",
         "typo3-console/create-reference-command": "@dev",
         "typo3-console/php-server-command": "@dev",
         "symfony/expression-language": "^4.4 || ^5.0",
@@ -81,7 +81,11 @@
             "*": "dist"
         },
         "vendor-dir": ".Build/vendor",
-        "bin-dir": ".Build/bin"
+        "bin-dir": ".Build/bin",
+        "allow-plugins": {
+            "typo3/class-alias-loader": true,
+            "typo3/cms-composer-installers": true
+        }
     },
     "bin": [
         "typo3cms"

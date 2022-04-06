@@ -136,7 +136,7 @@ class ExceptionRendererTest extends UnitTestCase
                 return 256;
             }
 
-            public static function hasSttyAvailable()
+            public static function hasSttyAvailable(): bool
             {
                 return false;
             }

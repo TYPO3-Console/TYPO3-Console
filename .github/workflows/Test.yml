@@ -20,11 +20,11 @@ jobs:
                 uses: actions/cache@v2
                 with:
                     path: ${{ steps.composer-cache-vars.outputs.dir }}
-                    key: ${{ runner.os }}-composer-^10.4.1-stable-7.4-${{ steps.composer-cache-vars.outputs.timestamp }}
+                    key: ${{ runner.os }}-composer-^10.4.22-stable-7.4-${{ steps.composer-cache-vars.outputs.timestamp }}
                     restore-keys: |
-                        ${{ runner.os }}-composer-^10.4.1-stable-7.4-
-                        ${{ runner.os }}-composer-^10.4.1-stable-
-                        ${{ runner.os }}-composer-^10.4.1-
+                        ${{ runner.os }}-composer-^10.4.22-stable-7.4-
+                        ${{ runner.os }}-composer-^10.4.22-stable-
+                        ${{ runner.os }}-composer-^10.4.22-
                         ${{ runner.os }}-composer-
 
             -   name: Set up PHP Version 7.4
@@ -62,27 +62,10 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                typo3: [ '^10.4.1' ]
+                typo3: [ '^10.4.22' ]
                 php: [ '7.2', '7.3', '7.4' ]
                 dependency-version: [ lowest, stable ]
                 experimental: [ false ]
-                include:
-                    -   php: 7.4
-                        typo3: '~11.3.1'
-                        dependency-version: stable
-                        experimental: false
-                    -   php: 8.0
-                        typo3: '~11.3.1'
-                        dependency-version: stable
-                        experimental: false
-                    -   php: 7.4
-                        typo3: dev-master
-                        dependency-version: stable
-                        experimental: true
-                    -   php: 8.0
-                        typo3: dev-master
-                        dependency-version: stable
-                        experimental: true
 
         continue-on-error: ${{ matrix.experimental }}
 
