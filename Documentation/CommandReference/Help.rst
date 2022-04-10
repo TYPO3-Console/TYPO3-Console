@@ -1,12 +1,10 @@
 
 .. include:: /Includes.rst.txt
 
-
+.. The following reference was automatically generated from code. It should not
+.. be changed directly.
 
 .. _typo3_console-command-reference-help:
-
-The following reference was automatically generated from code.
-
 
 ====
 help
@@ -17,16 +15,22 @@ help
 
 The `help` command displays help for a given command:
 
-  `typo3cms help list`
+
+.. code-block:: shell 
+
+   typo3cms help list
 
 You can also output the help in other formats by using the **--format** option:
 
-  `typo3cms help --format=xml list`
+
+.. code-block:: shell 
+
+   typo3cms help --format=xml list
 
 To display the list of available commands, please use the `list` command.
 
 Arguments
-~~~~~~~~~
+=========
 
 `command_name`
    The command name
@@ -34,7 +38,7 @@ Arguments
 
 
 Options
-~~~~~~~
+=======
 
 `--format`
    The output format (txt, xml, json, or md)

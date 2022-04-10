@@ -41,19 +41,19 @@ class ListCommand extends Command
             <<<'EOF'
 The <info>%command.name%</info> command lists all commands:
 
-  <info>%command.full_name%</info>
+  <code>%command.full_name%</code>
 
 You can also display the commands for a specific namespace:
 
-  <info>%command.full_name% test</info>
+  <code>%command.full_name% test</code>
 
 You can also output the information in other formats by using the <comment>--format</comment> option:
 
-  <info>%command.full_name% --format=xml</info>
+  <code>%command.full_name% --format=xml</code>
 
 It's also possible to get raw list of commands (useful for embedding command runner):
 
-  <info>%command.full_name% --raw</info>
+  <code>%command.full_name% --raw</code>
 EOF
         );
     }

@@ -1,6 +1,7 @@
 /.Build/*
 /Classes/Console/Hook/*
 /Configuration/ComposerPackagesCommands.php
+/Documentation-GENERATED-temp
 /Libraries/vendor
 /Resources/Public/*
 

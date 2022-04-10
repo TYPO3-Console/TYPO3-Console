@@ -155,10 +155,10 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
                     }
                     if (isset($commands[$relatedCommandIdentifier])) {
                         $relatedCommand = $commands[$relatedCommandIdentifier];
-                        $relatedCommands[$relatedCommandIdentifier] = $relatedCommand->getDescription();
+                        $relatedCommands[$relatedCommandIdentifier] = str_replace(':', '-', $relatedCommand->getName());
                     } elseif (isset($commands[$shortCommandIdentifier])) {
                         $relatedCommand = $commands[$shortCommandIdentifier];
-                        $relatedCommands[$shortCommandIdentifier] = $relatedCommand->getDescription();
+                        $relatedCommands[$shortCommandIdentifier] = str_replace(':', '-', $relatedCommand->getName());
                     } else {
                         $relatedCommands[$relatedCommandIdentifier] = '*Command not available*';
                     }
@@ -231,13 +231,17 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
      */
     private function transformMarkup($input): string
     {
-        $output = preg_replace('|\<b>(((?!\</b>).)*)\</b>|', '**$1**', $input);
+        $output = $input;
+        // replace multiline comments with a code-block
+        $output = preg_replace('/^(\s*\<code\>)(.*)(\<\/code\>\s*)$/m', "\n\n.. code-block:: shell \n\n   $2\n", $output);
+        $output = preg_replace('|\<b>(((?!\</b>).)*)\</b>|', '**$1**', $output);
         $output = preg_replace('|\<i>(((?!\</i>).)*)\</i>|', '*$1*', $output);
         $output = preg_replace('|\<u>(((?!\</u>).)*)\</u>|', '*$1*', $output);
         $output = preg_replace('|\<em>(((?!\</em>).)*)\</em>|', '*$1*', $output);
         $output = preg_replace('|\<comment>(((?!\</comment>).)*)\</comment>|', '**$1**', $output);
         $output = preg_replace('|\<warning>(((?!\</warning>).)*)\</warning>|', '**$1**', $output);
         $output = preg_replace('|\<strike>(((?!\</strike>).)*)\</strike>|', '[$1]', $output);
+        // replace inline code-blocks
         $output = preg_replace('|\<code>(((?!\</code>).)*)\</code>|', '`$1`', $output);
         $output = preg_replace('|\<info>(((?!\</info>).)*)\</info>|', '`$1`', $output);
 

@@ -1,12 +1,10 @@
 
 .. include:: /Includes.rst.txt
 
-
+.. The following reference was automatically generated from code. It should not
+.. be changed directly.
 
 .. _typo3_console-command-reference-database-updateschema:
-
-The following reference was automatically generated from code.
-
 
 =====================
 database:updateschema
@@ -41,12 +39,26 @@ To avoid shell matching all types with wildcards should be quoted.
 
 **Example:**
 
-  `typo3cms database:updateschema "*.add,*.change"`
-  `typo3cms database:updateschema "*.add" --raw`
-  `typo3cms database:updateschema "*" --verbose`
+
+.. code-block:: shell 
+
+   typo3cms database:updateschema "*.add,*.change"
+
+
+
+.. code-block:: shell 
+
+   typo3cms database:updateschema "*.add" --raw
+
+
+
+.. code-block:: shell 
+
+   typo3cms database:updateschema "*" --verbose
+
 
 Arguments
-~~~~~~~~~
+=========
 
 `schemaUpdateTypes`
    List of schema update types
@@ -54,7 +66,7 @@ Arguments
 
 
 Options
-~~~~~~~
+=======
 
 `--dry-run`
    If set the updates are only collected and shown, but not executed

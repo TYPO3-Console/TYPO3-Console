@@ -1,12 +1,10 @@
 
 .. include:: /Includes.rst.txt
 
-
+.. The following reference was automatically generated from code. It should not
+.. be changed directly.
 
 .. _typo3_console-command-reference-install-extensionsetupifpossible:
-
-The following reference was automatically generated from code.
-
 
 ================================
 install:extensionsetupifpossible
@@ -26,7 +24,7 @@ but also works for subsequent deployments.
 
 
 Options
-~~~~~~~
+=======
 
 `--fail-on-error`
    Instead of gracefully exiting this command if something goes wrong, throw an error

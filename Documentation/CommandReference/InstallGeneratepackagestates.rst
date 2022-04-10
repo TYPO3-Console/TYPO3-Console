@@ -1,12 +1,10 @@
 
 .. include:: /Includes.rst.txt
 
-
+.. The following reference was automatically generated from code. It should not
+.. be changed directly.
 
 .. _typo3_console-command-reference-install-generatepackagestates:
-
-The following reference was automatically generated from code.
-
 
 =============================
 install:generatepackagestates
@@ -27,18 +25,25 @@ Marks the following extensions as active:
 
 To require TYPO3 core extensions use the following command:
 
-`composer require typo3/cms-foo "*"`
+
+.. code-block:: shell 
+
+   composer require typo3/cms-foo "*"
 
 This updates your composer.json and composer.lock without any other changes.
 
 **Example:**
 
-  `typo3cms install:generatepackagestates`
+
+.. code-block:: shell 
+
+   typo3cms install:generatepackagestates
+
 
 
 
 Options
-~~~~~~~
+=======
 
 `--framework-extensions`
    TYPO3 system extensions that should be marked as active. Extension keys separated by comma.

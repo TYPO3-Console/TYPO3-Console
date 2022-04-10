@@ -1,12 +1,10 @@
 
 .. include:: /Includes.rst.txt
 
-
+.. The following reference was automatically generated from code. It should not
+.. be changed directly.
 
 .. _typo3_console-command-reference-list:
-
-The following reference was automatically generated from code.
-
 
 ====
 list
@@ -17,22 +15,35 @@ list
 
 The `list` command lists all commands:
 
-  `typo3cms list`
+
+.. code-block:: shell 
+
+   typo3cms list
 
 You can also display the commands for a specific namespace:
 
-  `typo3cms list test`
+
+.. code-block:: shell 
+
+   typo3cms list test
 
 You can also output the information in other formats by using the **--format** option:
 
-  `typo3cms list --format=xml`
+
+.. code-block:: shell 
+
+   typo3cms list --format=xml
 
 It's also possible to get raw list of commands (useful for embedding command runner):
 
-  `typo3cms list --raw`
+
+.. code-block:: shell 
+
+   typo3cms list --raw
+
 
 Arguments
-~~~~~~~~~
+=========
 
 `namespace`
    The namespace name
@@ -40,7 +51,7 @@ Arguments
 
 
 Options
-~~~~~~~
+=======
 
 `--raw`
    To output raw command list

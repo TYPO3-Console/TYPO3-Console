@@ -1,12 +1,10 @@
 
 .. include:: /Includes.rst.txt
 
-
+.. The following reference was automatically generated from code. It should not
+.. be changed directly.
 
 .. _typo3_console-command-reference-install-setup:
-
-The following reference was automatically generated from code.
-
 
 =============
 install:setup
@@ -39,7 +37,7 @@ The following environment variables are evaluated:
 
 
 Options
-~~~~~~~
+=======
 
 `--force|-f`
    Force installation of TYPO3, even if `LocalConfiguration.php` file already exists.
