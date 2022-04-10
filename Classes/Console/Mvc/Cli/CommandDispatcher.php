@@ -212,7 +212,7 @@ class CommandDispatcher
      */
     private function getProcess(array $commandLine, array $envVars, $input): Process
     {
-        if (isset($envVars['TYPO3_CONSOLE_PLUGIN_RUN'])) {
+        if (isset($envVars['TYPO3_CONSOLE_PLUGIN_RUN']) && version_compare($envVars['COMPOSER_VERSION'], '2.3.0', '<')) {
             // During a composer run, we have symfony/console 2.8 unfortunately,
             // thus we must handle convert the arguments to a string.
             $process = new Process(
