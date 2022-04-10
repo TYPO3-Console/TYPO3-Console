@@ -233,7 +233,7 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
     {
         $output = $input;
         // replace multiline comments with a code-block
-        $output = preg_replace('/^(\s*\<code\>)(.*)(\<\/code\>\s*)$/m', "\n\n.. code-block:: shell \n\n   $2\n", $output);
+        $output = preg_replace('/^(\s*\<code\>)(.*)(\<\/code\>\s*)$/m', "\n\n.. code-block:: shell\n\n   $2\n", $output);
         $output = preg_replace('|\<b>(((?!\</b>).)*)\</b>|', '**$1**', $output);
         $output = preg_replace('|\<i>(((?!\</i>).)*)\</i>|', '*$1*', $output);
         $output = preg_replace('|\<u>(((?!\</u>).)*)\</u>|', '*$1*', $output);

@@ -22,7 +22,7 @@ Tables to be excluded from the export can be specified fully qualified or with w
 **Example:**
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    typo3cms database:export -c Default -e 'cf_*' -e 'cache_*' -e '[bf]e_sessions' -e sys_log
 

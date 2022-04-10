@@ -18,7 +18,7 @@ Flushes caches by tags, optionally only caches in specified groups.
 **Example:**
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    typo3cms cache:flushtags news_123 --groups pages,all
 

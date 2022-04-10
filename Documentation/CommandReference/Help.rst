@@ -16,14 +16,14 @@ help
 The `help` command displays help for a given command:
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    typo3cms help list
 
 You can also output the help in other formats by using the **--format** option:
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    typo3cms help --format=xml list
 
