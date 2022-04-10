@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Package\Exception\UnknownPackageException;
 
@@ -46,13 +47,24 @@ EOH
                 null,
                 InputOption::VALUE_REQUIRED,
                 'TYPO3 version to check against. Defaults to current TYPO3 version',
-                (string)(new Typo3Version())
+                (new Typo3Version())->getVersion()
             ),
         ]);
     }
 
+    public function isHidden()
+    {
+        return !getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') && Environment::isComposerMode();
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (Environment::isComposerMode()) {
+            $output->writeln('<error>The command "upgrade:checkextensionconstraints" is not available in Composer mode, because Composer already enforces such constraints.</error>');
+
+            return 1;
+        }
+
         $extensionKeys = $input->getArgument('extensionKeys');
         $typo3Version = $input->getOption('typo3-version');
         $upgradeHandling = new UpgradeHandling();

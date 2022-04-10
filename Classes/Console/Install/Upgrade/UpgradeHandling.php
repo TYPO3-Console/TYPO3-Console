@@ -19,6 +19,8 @@ use Helhum\Typo3Console\Extension\ExtensionConstraintCheck;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
 use Symfony\Component\Console\Style\OutputStyle;
+use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Updates\ConfirmableInterface;
@@ -77,6 +79,8 @@ class UpgradeHandling
      */
     private $initialUpgradeDone = false;
 
+    private Typo3Version $typo3Version;
+
     public function __construct(
         UpgradeWizardFactory $factory = null,
         UpgradeWizardExecutor $executor = null,
@@ -97,6 +101,7 @@ class UpgradeHandling
         $this->packageManager = $packageManager ?: GeneralUtility::makeInstance(PackageManager::class);
         $this->extensionConstraintCheck = $extensionConstraintCheck ?: new ExtensionConstraintCheck();
         $this->extensionCompatibilityCheck = $extensionCompatibilityCheck ?: new ExtensionCompatibilityCheck($this->packageManager, $this->commandDispatcher);
+        $this->typo3Version = new Typo3Version();
     }
 
     public function runWizards(OutputStyle $io, array $wizards, array $confirmations, array $denies, bool $force): array
@@ -167,7 +172,7 @@ class UpgradeHandling
 
     public function prepareUpgrade(): array
     {
-        $this->configurationService->setLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone', TYPO3_branch, 'string');
+        $this->configurationService->setLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone', $this->typo3Version->getBranch(), 'string');
         $this->commandDispatcher->executeCommand('install:fixfolderstructure');
         $this->silentConfigurationUpgrade->executeSilentConfigurationUpgradesIfNeeded();
         $this->commandDispatcher->executeCommand('cache:flush', ['--group', 'system']);
@@ -182,16 +187,16 @@ class UpgradeHandling
         return $this->initialUpgradeDone
             || (
                 $this->configurationService->hasLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone')
-                && $this->configurationService->getLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone') === TYPO3_branch
+                && $this->configurationService->getLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone') === $this->typo3Version->getBranch()
             );
     }
 
     private function checkExtensionCompatibility(): array
     {
         $messages = [];
-        $failedPackageMessages = $this->matchAllExtensionConstraints(TYPO3_version);
+        $failedPackageMessages = $this->matchAllExtensionConstraints($this->typo3Version->getVersion());
         foreach ($failedPackageMessages as $extensionKey => $constraintMessage) {
-            $this->packageManager->deactivatePackage($extensionKey);
+            !Environment::isComposerMode() && $this->packageManager->deactivatePackage($extensionKey);
             $messages[] = sprintf('<error>%s</error>', $constraintMessage);
             $messages[] = sprintf('<info>Deactivated extension "%s".</info>', $extensionKey);
         }

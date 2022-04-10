@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Extension;
  *
  */
 
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
@@ -44,6 +45,9 @@ class ExtensionConstraintCheck
      */
     public function matchConstraints(PackageInterface $package, $typo3Version)
     {
+        if (Environment::isComposerMode()) {
+            return '';
+        }
         $message = '';
         $extConf = $this->emConfReader->includeEmConf($package->getPackageKey(), $package->getPackagePath());
         if (!empty($extConf['constraints']['depends']['typo3'])) {
