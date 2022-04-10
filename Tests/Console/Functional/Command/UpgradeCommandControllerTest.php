@@ -14,38 +14,10 @@ namespace Helhum\Typo3Console\Tests\Functional\Command;
  *
  */
 
-use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use TYPO3\CMS\Install\Updates\RowUpdater\WorkspaceVersionRecordsMigration;
 
 class UpgradeCommandControllerTest extends AbstractCommandTest
 {
-    /**
-     * @test
-     */
-    public function canCheckExtensionConstraints(): void
-    {
-        $output = $this->executeConsoleCommand('upgrade:checkextensionconstraints');
-        $this->assertStringContainsString('All third party extensions claim to be compatible with TYPO3 version', $output);
-    }
-
-    /**
-     * @test
-     */
-    public function checkExtensionConstraintsReturnsErrorCodeOnFailure(): void
-    {
-        self::installFixtureExtensionCode('ext_test');
-        $this->executeConsoleCommand('extension:setup', ['-e', 'ext_test']);
-        try {
-            $this->commandDispatcher->executeCommand('upgrade:checkextensionconstraints', ['--typo3-version' => '3.6.0']);
-            $this->fail('upgrade:checkextensionconstraints should have failed');
-        } catch (FailedSubProcessCommandException $e) {
-            $this->assertSame(1, $e->getExitCode());
-            $this->assertStringContainsString('"ext_test" requires TYPO3 versions 4.5.0', $e->getOutputMessage());
-        } finally {
-            self::removeFixtureExtensionCode('ext_test');
-        }
-    }
-
     /**
      * @test
      */
@@ -70,16 +42,6 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         $this->assertSame('true', $output);
 
         self::removeFixtureExtensionCode('ext_broken_ext_tables');
-    }
-
-    /**
-     * @test
-     */
-    public function checkExtensionConstraintsIssuesWarningForInvalidExtensionKeys(): void
-    {
-        $output = $this->executeConsoleCommand('upgrade:checkextensionconstraints', ['foo,bar']);
-        $this->assertStringContainsString('Extension "foo" is not found in the system', $output);
-        $this->assertStringContainsString('Extension "bar" is not found in the system', $output);
     }
 
     /**

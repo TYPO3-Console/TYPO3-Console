@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Extension;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Core\Package\PackageManager;
 
@@ -71,13 +72,13 @@ class ExtensionCompatibilityCheck
             }
             $isCompatible = @\json_decode($this->commandDispatcher->executeCommand('upgrade:checkextensioncompatibility', [$package->getPackageKey(), '--config-only']));
             if (!$isCompatible) {
-                $this->packageManager->deactivatePackage($package->getPackageKey());
+                !Environment::isComposerMode() && $this->packageManager->deactivatePackage($package->getPackageKey());
                 $failedPackages[] = $package->getPackageKey();
                 continue;
             }
             $isCompatible = @\json_decode($this->commandDispatcher->executeCommand('upgrade:checkextensioncompatibility', [$package->getPackageKey()]));
             if (!$isCompatible) {
-                $this->packageManager->deactivatePackage($package->getPackageKey());
+                !Environment::isComposerMode() && $this->packageManager->deactivatePackage($package->getPackageKey());
                 $failedPackages[] = $package->getPackageKey();
             }
         }

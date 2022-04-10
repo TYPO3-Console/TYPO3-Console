@@ -19,6 +19,7 @@ use Helhum\Typo3Console\Extension\ExtensionConstraintCheck;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
 use Symfony\Component\Console\Style\OutputStyle;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -195,7 +196,7 @@ class UpgradeHandling
         $messages = [];
         $failedPackageMessages = $this->matchAllExtensionConstraints($this->typo3Version->getVersion());
         foreach ($failedPackageMessages as $extensionKey => $constraintMessage) {
-            $this->packageManager->deactivatePackage($extensionKey);
+            !Environment::isComposerMode() && $this->packageManager->deactivatePackage($extensionKey);
             $messages[] = sprintf('<error>%s</error>', $constraintMessage);
             $messages[] = sprintf('<info>Deactivated extension "%s".</info>', $extensionKey);
         }
