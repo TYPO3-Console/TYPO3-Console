@@ -3,10 +3,6 @@
         "local": {
             "type": "path",
             "url": "Packages/*"
-        },
-        "testing-framework": {
-            "type": "vcs",
-            "url": "https://github.com/helhum/TYPO3-testing-framework/"
         }
     },
     "name": "helhum/typo3-console",
@@ -18,16 +14,18 @@
         "command",
         "commandline"
     ],
-    "homepage": "http://insight.helhum.io/post/104528981610/about-the-beauty-and-power-of-typo3-console",
+    "homepage": "https://insight.helhum.io/post/104528981610/about-the-beauty-and-power-of-typo3-console",
     "support": {
-        "issues": "https://github.com/TYPO3-Console/typo3_console/issues"
+        "issues": "https://github.com/TYPO3-Console/TYPO3-Console/issues",
+        "source": "https://github.com/TYPO3-Console/TYPO3-Console",
+        "docs": "https://docs.typo3.org/p/helhum/typo3-console/main/en-us/"
     },
     "authors": [
         {
             "name": "Helmut Hummel",
             "email": "info@helhum.io",
             "role": "Developer",
-            "homepage": "http://helhum.io"
+            "homepage": "https://helhum.io"
         }
     ],
     "license": "GPL-2.0-or-later",
@@ -56,7 +54,7 @@
         "typo3-console/php-server-command": "@dev",
         "symfony/expression-language": "^4.4 || ^5.0",
         "symfony/filesystem": "^4.4 || ^5.0",
-        "nimut/testing-framework": "dev-php8",
+        "nimut/testing-framework": "^6.0.1",
         "phpunit/phpunit": "^8.5.18",
         "php-parallel-lint/php-parallel-lint": "^1.2"
     },
