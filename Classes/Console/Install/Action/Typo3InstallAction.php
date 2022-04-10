@@ -108,7 +108,7 @@ class Typo3InstallAction implements InstallActionInterface
         $response = @unserialize($actionResult, ['allowed_classes' => [InstallStepResponse::class]]);
 
         if (!$response instanceof InstallStepResponse) {
-            throw new RuntimeException(sprintf('Executing install action "%s" failed with errors. Returned result is:%s%s', $actionName, chr(10), $actionResult), 1626771483);
+            throw new RuntimeException(sprintf('Executing install action "%s" failed with errors. Returned result is:%s%s', $actionName, chr(10), $actionResult . implode(' ', $arguments)), 1626771483);
         }
 
         return $response;

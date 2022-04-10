@@ -185,7 +185,7 @@ class CommandDispatcher
         $output = str_replace("\r\n", "\n", trim($process->getOutput()));
 
         if (!$process->isSuccessful()) {
-            throw FailedSubProcessCommandException::forProcess($command, $process);
+            throw FailedSubProcessCommandException::forProcess(implode(' ', $commandLine), $process);
         }
 
         return $output;
@@ -212,6 +212,8 @@ class CommandDispatcher
      */
     private function getProcess(array $commandLine, array $envVars, $input): Process
     {
+        // Make sure to output is not suppressed for sub processes, because it can be parsed by the parent process
+        $envVars['SHELL_VERBOSITY'] = 0;
         if ($this->isCurrentSymfonyImplementation()) {
             $process = new Process($commandLine, null, $envVars, $input, 0);
         } else {
