@@ -16,28 +16,28 @@ list
 The `list` command lists all commands:
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    typo3cms list
 
 You can also display the commands for a specific namespace:
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    typo3cms list test
 
 You can also output the information in other formats by using the **--format** option:
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    typo3cms list --format=xml
 
 It's also possible to get raw list of commands (useful for embedding command runner):
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    typo3cms list --raw
 

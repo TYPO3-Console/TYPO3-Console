@@ -22,10 +22,22 @@ Tables to be excluded from the export can be specified fully qualified or with w
 **Example:**
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    typo3cms database:export -c Default -e 'cf_*' -e 'cache_*' -e '[bf]e_sessions' -e sys_log
 
+
+
+.. code-block:: shell
+
+   typo3cms database:export database:export -c Default -- --column-statistics=0
+
+
+Arguments
+=========
+
+`additionalMysqlDumpArguments`
+   Pass one or more additional arguments to the mysqldump command; see examples
 
 
 

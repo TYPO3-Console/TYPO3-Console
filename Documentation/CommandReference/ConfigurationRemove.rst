@@ -21,7 +21,7 @@ LocalConfiguration.php and not be overridden elsewhere.
 **Example:**
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    typo3cms configuration:remove DB,EXT/EXTCONF/realurl
 

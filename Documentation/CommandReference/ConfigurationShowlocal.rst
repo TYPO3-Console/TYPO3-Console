@@ -20,7 +20,7 @@ Note that this value could be overridden. Use `typo3cms configuration:show <path
 **Example:**
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    typo3cms configuration:showlocal DB
 

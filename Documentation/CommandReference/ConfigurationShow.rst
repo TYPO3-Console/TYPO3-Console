@@ -20,7 +20,7 @@ the difference between these values is shown.
 **Example:**
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    typo3cms configuration:show DB
 

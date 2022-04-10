@@ -18,22 +18,22 @@ Set system configuration option value by path.
 **Examples:**
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    typo3cms configuration:set SYS/fileCreateMask 0664
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    typo3cms configuration:set EXTCONF/processor_enabled true --json
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    typo3cms configuration:set EXTCONF/lang/availableLanguages '["de", "fr"]' --json
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    typo3cms configuration:set configuration:set BE/adminOnly -- -1
 

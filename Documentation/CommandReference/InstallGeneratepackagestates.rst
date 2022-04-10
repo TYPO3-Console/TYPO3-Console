@@ -26,7 +26,7 @@ Marks the following extensions as active:
 To require TYPO3 core extensions use the following command:
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    composer require typo3/cms-foo "*"
 
@@ -35,7 +35,7 @@ This updates your composer.json and composer.lock without any other changes.
 **Example:**
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    typo3cms install:generatepackagestates
 

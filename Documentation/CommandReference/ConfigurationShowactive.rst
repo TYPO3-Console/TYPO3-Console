@@ -19,7 +19,7 @@ Shows the configuration value that is currently effective, no matter where and h
 **Example:**
 
 
-.. code-block:: shell 
+.. code-block:: shell
 
    typo3cms configuration:showactive DB --json
 
