@@ -14,16 +14,18 @@
         "command",
         "commandline"
     ],
-    "homepage": "http://insight.helhum.io/post/104528981610/about-the-beauty-and-power-of-typo3-console",
+    "homepage": "https://insight.helhum.io/post/104528981610/about-the-beauty-and-power-of-typo3-console",
     "support": {
-        "issues": "https://github.com/TYPO3-Console/typo3_console/issues"
+        "issues": "https://github.com/TYPO3-Console/TYPO3-Console/issues",
+        "source": "https://github.com/TYPO3-Console/TYPO3-Console",
+        "docs": "https://docs.typo3.org/p/helhum/typo3-console/main/en-us/"
     },
     "authors": [
         {
             "name": "Helmut Hummel",
             "email": "info@helhum.io",
             "role": "Developer",
-            "homepage": "http://helhum.io"
+            "homepage": "https://helhum.io"
         }
     ],
     "license": "GPL-2.0-or-later",
