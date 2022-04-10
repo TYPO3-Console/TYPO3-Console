@@ -36,11 +36,6 @@ class ScriptHelper
         [, $major, $minor, ] = $matches;
         $branchVersion = sprintf('%d.%d.x-dev', $major, $minor);
 
-        $docConfigFile = __DIR__ . '/../../../Documentation/Settings.yml';
-        $content = file_get_contents($docConfigFile);
-        $content = preg_replace('/(version|release): \d+\.\d+\.\d+/', '$1: ' . $version, $content);
-        file_put_contents($docConfigFile, $content);
-
         $docConfigFile = __DIR__ . '/../../../Documentation/Settings.cfg';
         $content = file_get_contents($docConfigFile);
         $content = preg_replace('/(version|release) = \d+\.\d+\.\d+/', '$1 = ' . $version, $content);
