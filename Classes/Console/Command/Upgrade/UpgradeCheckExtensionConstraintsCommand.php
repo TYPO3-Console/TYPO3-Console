@@ -46,7 +46,7 @@ EOH
                 null,
                 InputOption::VALUE_REQUIRED,
                 'TYPO3 version to check against. Defaults to current TYPO3 version',
-                (string)(new Typo3Version())
+                (new Typo3Version())->getVersion()
             ),
         ]);
     }
