@@ -18,6 +18,7 @@ use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
 use Helhum\Typo3Console\Database\Process\MysqlCommand;
 use Helhum\Typo3Console\Database\Schema\TableMatcher;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -51,6 +52,7 @@ Tables to be excluded from the export can be specified fully qualified or with w
 <b>Example:</b>
 
   <code>%command.full_name% -c Default -e 'cf_*' -e 'cache_*' -e '[bf]e_sessions' -e sys_log</code>
+  <code>%command.full_name% database:export -c Default -- --column-statistics=0</code>
 EOH
         );
         $this->setDefinition([
@@ -68,11 +70,18 @@ EOH
                 'TYPO3 database connection name (defaults to all configured MySQL connections)',
                 null
             ),
+            new InputArgument(
+                'additionalMysqlDumpArguments',
+                InputArgument::IS_ARRAY,
+                'Pass one or more additional arguments to the mysqldump command; see examples',
+                []
+            ),
         ]);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $additionalMysqlDumpArguments = $input->getArgument('additionalMysqlDumpArguments');
         $connection = $input->getOption('connection');
         $excludes = $input->getOption('exclude');
 
@@ -91,7 +100,7 @@ EOH
         foreach ($availableConnectionNames as $mysqlConnectionName) {
             $mysqlCommand = new MysqlCommand($this->connectionConfiguration->build($mysqlConnectionName), $output);
             $exitCode = $mysqlCommand->mysqldump(
-                $this->buildArguments($mysqlConnectionName, $excludes, $output),
+                array_merge($this->buildArguments($mysqlConnectionName, $excludes, $output), $additionalMysqlDumpArguments),
                 null,
                 $mysqlConnectionName
             );
