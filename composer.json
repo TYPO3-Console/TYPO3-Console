@@ -3,10 +3,6 @@
         "local": {
             "type": "path",
             "url": "Packages/*"
-        },
-        "testing-framework": {
-            "type": "vcs",
-            "url": "https://github.com/helhum/TYPO3-testing-framework/"
         }
     },
     "name": "helhum/typo3-console",
@@ -58,7 +54,7 @@
         "typo3-console/create-reference-command": "@dev",
         "symfony/expression-language": "^4.4 || ^5.0",
         "symfony/filesystem": "^4.4 || ^5.0",
-        "nimut/testing-framework": "dev-php8",
+        "nimut/testing-framework": "^6.0.1",
         "phpunit/phpunit": "^8.5.18",
         "php-parallel-lint/php-parallel-lint": "^1.2"
     },
