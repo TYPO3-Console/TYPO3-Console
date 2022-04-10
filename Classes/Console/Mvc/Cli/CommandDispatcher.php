@@ -212,9 +212,9 @@ class CommandDispatcher
      */
     private function getProcess(array $commandLine, array $envVars, $input): Process
     {
-        if (isset($envVars['TYPO3_CONSOLE_PLUGIN_RUN']) && version_compare($envVars['COMPOSER_VERSION'], '2.3.0', '<')) {
-            // During a composer run, we have symfony/console 2.8 unfortunately,
-            // thus we must handle convert the arguments to a string.
+        if ($this->isCurrentSymfonyImplementation()) {
+            $process = new Process($commandLine, null, $envVars, $input, 0);
+        } else {
             $process = new Process(
                 implode(' ', array_map(ProcessExecutor::class . '::escape', $commandLine)),
                 null,
@@ -222,11 +222,30 @@ class CommandDispatcher
                 $input,
                 0
             );
-        } else {
-            $process = new Process($commandLine, null, $envVars, $input, 0);
         }
 
         return $process;
+    }
+
+    /**
+     * In older Composer versions, it could happen that an old symfony/console (2.8)
+     * Process class is loaded, which does not accept an array of command line arguments
+     * as first argument. Therefor check for argument type of first constructor argument to
+     * verify we have a more current version of the package.
+     *
+     * @return bool
+     */
+    private function isCurrentSymfonyImplementation(): bool
+    {
+        $constructorReflector = new \ReflectionMethod(Process::class, '__construct');
+        $commandParameters = $constructorReflector->getParameters();
+        if (isset($commandParameters[0]) && $commandParameters[0]->getType() !== null) {
+            return $commandParameters[0]->getType()->getName() === 'array';
+        }
+        // No PHP type hint, look in annotation
+        preg_match("/@param[ ]*([^ ]*)[ ]*\\\${$commandParameters[0]->getName()}/", $constructorReflector->getDocComment(), $matches);
+
+        return ($matches[1] ?? '') === 'array';
     }
 
     private function getDefaultEnv(): array
