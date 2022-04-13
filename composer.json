@@ -30,7 +30,7 @@
     ],
     "license": "GPL-2.0-or-later",
     "require": {
-        "php": ">=7.4.1",
+        "php": ">=7.4",
         "composer-runtime-api": "^2.1",
 
         "typo3/cms-backend": "^11.5.3 || dev-main",
