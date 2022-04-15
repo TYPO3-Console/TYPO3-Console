@@ -36,4 +36,5 @@ workflows or anything else where automation is required or beneficial.
 .. toctree::
    :hidden:
 
-   Sitemap/Index
+   Sitemap
+   genindex

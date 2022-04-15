@@ -1,7 +1,7 @@
 # EditorConfig is awesome: http://EditorConfig.org
 
 # top-most EditorConfig file? false = no!
-root = false
+root = true
 
 [{*.rst,*.rst.txt}]
 charset = utf-8
