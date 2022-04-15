@@ -1,0 +1,45 @@
+imports:
+    - { resource: 'InstallSteps.yaml', type: console }
+
+databaseConnect:
+    arguments:
+        databaseDriver:
+            value: 'mysqli'
+        databaseUserName:
+            value: 'root'
+        databaseUserPassword:
+            value: 'root'
+        databaseHostName:
+            value: '127.0.0.1'
+        databasePort:
+            value: 3306'
+        databaseSocket:
+            value: ''
+
+databaseSelect:
+    arguments:
+        useExistingDatabase:
+            value: false
+        databaseName:
+            value: 'typo3_test_ci_github'
+
+databaseData:
+    arguments:
+        adminUserName:
+            value: 'admin'
+        adminPassword:
+            value: 'password'
+        siteName:
+            value: 'New TYPO3 Console site'
+
+defaultConfiguration:
+    arguments:
+        siteSetupType:
+            value: 'site'
+        siteUrl:
+            value: '/'
+
+writeWebserverConfiguration:
+    arguments:
+        webServerConfig:
+            value: 'none'

@@ -57,7 +57,9 @@ class InstallCommandControllerTest extends AbstractCommandTest
      */
     public function setupCommandDoesNotSetupExtensionsIfRequested()
     {
-        $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
+        if (!$this->runsOnSqlite()) {
+            $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
+        }
         @unlink(getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php');
         @unlink(getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php');
         $output = $this->executeConsoleCommand(
@@ -76,7 +78,9 @@ class InstallCommandControllerTest extends AbstractCommandTest
      */
     public function setupCommandWorksWithoutErrors()
     {
-        $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
+        if (!$this->runsOnSqlite()) {
+            $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
+        }
         @unlink(getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php');
         @unlink(getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php');
         $output = $this->executeConsoleCommand(

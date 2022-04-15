@@ -1,0 +1,17 @@
+{
+    "name": "typo3-console/sql-command",
+    "description": "TYPO3 Console command that executes SQL",
+    "license": "GPL-2.0-or-later",
+    "type": "typo3-console-command",
+    "authors": [
+        {
+            "name": "Helmut Hummel",
+            "email": "info@helhum.io"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Typo3Console\\SQLCommand\\": "src/"
+        }
+    }
+}
