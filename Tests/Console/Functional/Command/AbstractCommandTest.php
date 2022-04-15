@@ -86,29 +86,17 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
      */
     protected function executeMysqlQuery($sql, $useDatabase = true)
     {
-        $commandLine = [
-            'mysql',
-            '--skip-column-names',
-            '-u',
-            getenv('TYPO3_INSTALL_DB_USER'),
-            '-h',
-            getenv('TYPO3_INSTALL_DB_HOST'),
-            '--password=' . getenv('TYPO3_INSTALL_DB_PASSWORD'),
-        ];
-        if ($useDatabase) {
-            $commandLine[] = getenv('TYPO3_INSTALL_DB_DBNAME');
-        }
-        $mysqlProcess = new Process($commandLine, null, null, $sql, 0);
-        $mysqlProcess->run();
-        if (!$mysqlProcess->isSuccessful()) {
-            throw new \RuntimeException(sprintf('Executing query "%s" failed. Did you set TYPO3_INSTALL_DB_* correctly? Is your database server running? Output: "%s", Error Output: "%s"', $sql, $mysqlProcess->getOutput(), $mysqlProcess->getErrorOutput()), 1493634196);
+        $arguments = [];
+        if (!$useDatabase) {
+            $arguments[] = '--no-db';
         }
 
-        return $mysqlProcess->getOutput();
+        return $this->executeConsoleCommand('sql', $arguments, [], $sql);
     }
 
     protected function backupDatabase()
     {
+        $this->skipOnSqlite();
         $commandLine = [
             'mysqldump',
             '-u',
@@ -129,6 +117,7 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
 
     protected function restoreDatabase()
     {
+        $this->skipOnSqlite();
         $commandLine = [
             'mysql',
             '--skip-column-names',
@@ -225,5 +214,17 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
         }
 
         return '';
+    }
+
+    protected function skipOnSqlite(): void
+    {
+        if ($this->runsOnSqlite()) {
+            $this->markTestSkipped('This test can not be run on sqlite databases');
+        }
+    }
+
+    protected function runsOnSqlite(): bool
+    {
+        return getenv('TYPO3_INSTALL_DB_DRIVER') === 'pdo_sqlite';
     }
 }

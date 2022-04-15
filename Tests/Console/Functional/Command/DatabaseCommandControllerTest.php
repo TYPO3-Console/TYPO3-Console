@@ -90,7 +90,8 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
         $this->executeMysqlQuery('DROP TABLE IF EXISTS `cache_rootline`');
         try {
             $output = $this->executeConsoleCommand('database:updateschema', ['--verbose']);
-            $this->assertStringContainsString('CREATE TABLE `cache_rootline`', $output);
+            $this->assertStringContainsString('CREATE TABLE', $output);
+            $this->assertStringContainsString('cache_rootline', $output);
         } finally {
             self::removeFixtureExtensionCode('ext_test_cache');
         }
@@ -127,6 +128,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
      */
     public function schemaUpdateShowsErrorMessageWithStatementsIfTheyOccur()
     {
+        $this->skipOnSqlite();
         self::installFixtureExtensionCode('ext_broken_sql');
         try {
             $output = $this->commandDispatcher->executeCommand('database:updateschema', ['*', '--verbose']);
@@ -143,6 +145,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
      */
     public function sqlCanBeImported()
     {
+        $this->skipOnSqlite();
         $sql = 'SELECT username from be_users where username="_cli_";';
         $output = $this->executeConsoleCommand('database:import', [], [], $sql);
         $this->assertSame('_cli_', trim($output));
@@ -153,6 +156,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
      */
     public function sqlCanBeImportedWithSpecifiedConnection()
     {
+        $this->skipOnSqlite();
         $sql = 'SELECT username from be_users where username="_cli_";';
         $output = $this->executeConsoleCommand('database:import', ['--connection', 'Default'], [], $sql);
         $this->assertSame('_cli_', trim($output));
@@ -163,6 +167,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
      */
     public function databaseImportFailsWithNotExistingConnection()
     {
+        $this->skipOnSqlite();
         $sql = 'SELECT username from be_users where username="_cli_";';
         try {
             $output = $this->commandDispatcher->executeCommand('database:import', ['--connection', 'foo'], [], $sql);
@@ -177,6 +182,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
      */
     public function databaseExportFailsWithNotExistingConnection()
     {
+        $this->skipOnSqlite();
         try {
             $output = $this->commandDispatcher->executeCommand('database:export', ['--connection', 'foo']);
         } catch (FailedSubProcessCommandException $e) {
@@ -190,6 +196,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
      */
     public function databaseExportWorksWithGivenConnection()
     {
+        $this->skipOnSqlite();
         $output = $this->executeConsoleCommand('database:export', ['--connection', 'Default']);
         $this->assertStringContainsString('-- Dump of TYPO3 Connection "Default"', $output);
     }
@@ -199,6 +206,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
      */
     public function databaseExportCanExcludeTables()
     {
+        $this->skipOnSqlite();
         $output = $this->executeConsoleCommand('database:export', ['--exclude', 'sys_log']);
         $this->assertStringNotContainsString('CREATE TABLE `sys_log`', $output);
     }
@@ -208,6 +216,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
      */
     public function databaseExportCanExcludeTablesWithWildcards()
     {
+        $this->skipOnSqlite();
         $output = $this->executeConsoleCommand('database:export', ['--exclude', 'cf_*', '-e', 'cache_*']);
         $this->assertStringNotContainsString('CREATE TABLE `cf_', $output);
         $this->assertStringNotContainsString('CREATE TABLE `cache_', $output);
