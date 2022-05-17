@@ -34,7 +34,10 @@ use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Information\Typo3Version;
+use TYPO3\CMS\Core\Site\SiteFinder;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Represents the complete console application
@@ -186,6 +189,17 @@ class Application extends BaseApplication
         $this->ensureCommandAvailable($command);
         $this->ensureStableEnvironmentForCommand($command, $output->isVerbose());
 
+        if ($siteIdentifier = $input->getOption('site')) {
+            try {
+                $site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByIdentifier($siteIdentifier);
+                $input->setOption('site', $site);
+            } catch (SiteNotFoundException $exception) {
+                $output->writeln(sprintf('<error>Site with identifier "%s" not found</error>', $siteIdentifier));
+
+                return Command::FAILURE;
+            }
+        }
+
         $exitCode = parent::doRunCommand($command, $input, $output);
 
         if ($bootingError = $this->runLevel->getError($command->getName())) {
@@ -239,6 +253,7 @@ class Application extends BaseApplication
             new InputOption('--ansi', '', InputOption::VALUE_NONE, 'Force ANSI output'),
             new InputOption('--no-ansi', '', InputOption::VALUE_NONE, 'Disable ANSI output'),
             new InputOption('--no-interaction', '-n', InputOption::VALUE_NONE, 'Do not ask any interactive question'),
+            new InputOption('--site', null, InputOption::VALUE_REQUIRED, 'The site identifier for the site, the command is associated with. Not all commands evaluate this option.'),
         ]);
     }
 
