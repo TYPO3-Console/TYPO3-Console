@@ -25,7 +25,7 @@ init:
   - SET PATH=c:\php\%PHP_VERSION%;"C:\Program Files\MySQL\MySQL Server 5.7\bin\";%PATH%
 
 install:
-  - SET COMPOSER_ROOT_VERSION=6.7.2
+  - SET COMPOSER_ROOT_VERSION=6.7.3
   - mysql --version
   - IF NOT EXIST c:\php mkdir c:\php
   - IF NOT EXIST c:\php\%PHP_VERSION% mkdir c:\php\%PHP_VERSION%
