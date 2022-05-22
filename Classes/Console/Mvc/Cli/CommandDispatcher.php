@@ -212,6 +212,8 @@ class CommandDispatcher
      */
     private function getProcess(array $commandLine, array $envVars, $input): Process
     {
+        // Make sure to output is not suppressed for sub processes, because it can be parsed by the parent process
+        $envVars['SHELL_VERBOSITY'] = 0;
         if ($this->isCurrentSymfonyImplementation()) {
             $process = new Process($commandLine, null, $envVars, $input, 0);
         } else {
