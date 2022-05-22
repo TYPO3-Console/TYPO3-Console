@@ -3,7 +3,6 @@
 [![Total Downloads](https://poser.pugx.org/helhum/typo3-console/downloads.svg)](https://packagist.org/packages/helhum/typo3-console)
 [![Monthly Downloads](https://poser.pugx.org/helhum/typo3-console/d/monthly)](https://packagist.org/packages/helhum/typo3-console)
 [![Build Status](https://github.com/TYPO3-Console/TYPO3-Console/actions/workflows/Test.yml/badge.svg?branch=main)](https://github.com/TYPO3-Console/TYPO3-Console/actions/workflows/Test.yml)
-[![Build Status (Windows)](https://ci.appveyor.com/api/projects/status/github/TYPO3-Console/TYPO3-Console?branch=main&svg=true)](https://ci.appveyor.com/project/helhum/typo3-console-qpjaf/branch/main)
 [![StyleCI](https://styleci.io/repos/19455482/shield?branch=main)](https://styleci.io/repos/19455482)
 [![License](https://poser.pugx.org/helhum/typo3-console/license)](https://packagist.org/packages/helhum/typo3-console)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/helhum/19.99)
