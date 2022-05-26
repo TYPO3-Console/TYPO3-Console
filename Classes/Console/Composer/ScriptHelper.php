@@ -68,7 +68,6 @@ class ScriptHelper
 
         $composerJson = __DIR__ . '/../../../composer.json';
         $content = file_get_contents($composerJson);
-        $content = preg_replace('/("dev-latest": )"\d+\.\d+\.x-dev/', '$1"' . $branchVersion, $content);
         $content = preg_replace('/("dev-main": )"\d+\.\d+\.x-dev/', '$1"' . $branchVersion, $content);
         file_put_contents($composerJson, $content);
 

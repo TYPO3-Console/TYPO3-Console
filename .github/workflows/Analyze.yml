@@ -3,7 +3,7 @@ name: Analyze
 on:
     push:
         branches:
-            - latest
+            - main
             - develop
             - /^v?([0-9]+\.){1,2}(x|[0-9]+)-?[a-z]*[1-9]*$/
 

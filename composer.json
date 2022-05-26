@@ -130,7 +130,6 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-latest": "7.1.x-dev",
             "dev-main": "7.1.x-dev"
         },
         "typo3/cms": {
