@@ -67,8 +67,7 @@ EOH
         $this->addArgument(
             'wizardIdentifiers',
             InputArgument::REQUIRED | InputArgument::IS_ARRAY,
-            'One or more wizard identifiers to run',
-            []
+            'One or more wizard identifiers to run'
         );
         $this->addOption(
             'confirm',
