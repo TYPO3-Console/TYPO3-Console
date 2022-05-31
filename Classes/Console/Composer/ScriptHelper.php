@@ -61,11 +61,6 @@ class ScriptHelper
         $content = preg_replace('/(COMPOSER_ROOT_VERSION): \d+\.\d+\.\d+/', '$1: ' . $version, $content);
         file_put_contents($githubWorkflowFileTests, $content);
 
-        $appveyorYmlFile = __DIR__ . '/../../../appveyor.yml';
-        $content = file_get_contents($appveyorYmlFile);
-        $content = preg_replace('/(SET COMPOSER_ROOT_VERSION)=\d+\.\d+\.\d+/', '$1=' . $version, $content);
-        file_put_contents($appveyorYmlFile, $content);
-
         $composerJson = __DIR__ . '/../../../composer.json';
         $content = file_get_contents($composerJson);
         $content = preg_replace('/("dev-main": )"\d+\.\d+\.x-dev/', '$1"' . $branchVersion, $content);
