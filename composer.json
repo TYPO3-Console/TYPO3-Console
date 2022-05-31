@@ -45,10 +45,6 @@
         "symfony/process": "^4.4 || ^5.0",
         "helhum/config-loader": ">=0.9 <0.13"
     },
-    "conflict": {
-        "doctrine/dbal": "2.13.0 || 2.13.1",
-        "symfony/polyfill-php80": "<1.23.1"
-    },
     "require-dev": {
         "typo3/cms-filemetadata": "^11.5.3 || dev-main",
         "typo3/cms-recordlist": "^11.5.3 || dev-main",
