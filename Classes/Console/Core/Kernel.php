@@ -33,6 +33,7 @@ use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * @internal
@@ -90,9 +91,10 @@ class Kernel
         $this->initialize();
 
         $commandConfiguration = new CommandConfiguration();
+        $typo3CommandRegistry = new Typo3CommandRegistry($this->container->get(CommandRegistry::class));
         $commandCollection = new CommandCollection(
             $commandConfiguration,
-            new Typo3CommandRegistry($this->container->get(CommandRegistry::class))
+            $typo3CommandRegistry
         );
         $commandCollection->initializeRunLevel($this->runLevel);
 
@@ -101,6 +103,8 @@ class Kernel
         $commandName = $commandCollection->find($givenCommandName);
         if ($this->runLevel->isCommandAvailable($commandName)) {
             $this->runLevel->runSequenceForCommand($commandName);
+            $this->container = GeneralUtility::getContainer();
+            $typo3CommandRegistry->updateContainer($this->container);
             if ($this->runLevel->getError()) {
                 // If a booting error occurred, we cannot boot further,
                 // thus can assume booting is "done".

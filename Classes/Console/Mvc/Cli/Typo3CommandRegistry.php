@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Mvc\Cli;
  *
  */
 
+use Psr\Container\ContainerInterface;
 use TYPO3\CMS\Core\Console\CommandRegistry;
 
 /**
@@ -25,6 +26,17 @@ class Typo3CommandRegistry extends CommandRegistry
     {
         parent::__construct($commandRegistry->container);
         $this->commandConfigurations = $commandRegistry->commandConfigurations;
+    }
+
+    /**
+     * After TYPO3 is fully booted, a new container instance is built with all caches enabled
+     * Make sure to instantiate all commands with this container instance
+     *
+     * @param ContainerInterface $container
+     */
+    public function updateContainer(ContainerInterface $container): void
+    {
+        $this->container = $container;
     }
 
     public function getServiceConfiguration(): array

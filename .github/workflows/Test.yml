@@ -68,11 +68,11 @@ jobs:
                 dependency-version: [ lowest, stable ]
                 experimental: [ false ]
                 include:
-                    -   os: 'ubuntu-18.04'
-                        php: 8.1
-                        typo3: dev-main
-                        dependency-version: stable
-                        experimental: true
+#                    -   os: 'ubuntu-18.04'
+#                        php: 8.1
+#                        typo3: dev-main
+#                        dependency-version: stable
+#                        experimental: true
                     -   os: 'windows-latest'
                         php: 7.4
                         typo3: '^11.5.3'
