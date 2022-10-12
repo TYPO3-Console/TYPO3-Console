@@ -7,6 +7,10 @@ on:
             - develop
             - /^v?([0-9]+\.){1,2}(x|[0-9]+)-?[a-z]*[1-9]*$/
 
+defaults:
+    run:
+        shell: bash
+
 jobs:
     Sonar-Cloud:
         name: 'Sonar Cloud'
@@ -25,8 +29,8 @@ jobs:
             -   name: Composer Cache Vars
                 id: composer-cache-vars
                 run: |
-                    echo "::set-output name=dir::$(composer config cache-files-dir)"
-                    echo "::set-output name=timestamp::$(date +"%s")"
+                    echo "dir::$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+                    echo "timestamp::$(date +"%s")" >> $GITHUB_OUTPUT
 
             -   name: Cache Composer dependencies
                 uses: actions/cache@v3

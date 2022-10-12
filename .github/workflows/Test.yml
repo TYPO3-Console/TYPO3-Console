@@ -2,6 +2,10 @@ name: Test
 
 on: [ push, pull_request ]
 
+defaults:
+    run:
+        shell: bash
+
 jobs:
     Consistency:
         name: 'Consistency'
@@ -13,8 +17,8 @@ jobs:
             -   name: Composer Cache Vars
                 id: composer-cache-vars
                 run: |
-                    echo "::set-output name=dir::$(composer config cache-files-dir)"
-                    echo "::set-output name=timestamp::$(date +"%s")"
+                    echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+                    echo "timestamp=$(date +"%s")" >> $GITHUB_OUTPUT
 
             -   name: Cache Composer dependencies
                 uses: actions/cache@v3
@@ -37,9 +41,9 @@ jobs:
             -   name: "Extract tag, branch, version from GITHUB_REF"
                 id: "github-ref"
                 run: |
-                    echo "::set-output name=tag::$(echo $GITHUB_REF | sed -E -n 's#^refs/tags/(.*)$#\1#p')"
-                    echo "::set-output name=branch::$(echo $GITHUB_REF | sed -E -n 's#^refs/heads/(.*)$#\1#p')"
-                    echo "::set-output name=version::$(echo $GITHUB_REF | sed -E -n 's#^refs/tags/v?([0-9]+\.)([0-9]+\.)([0-9]+)#\1\2\3#p')"
+                    echo "tag=$(echo $GITHUB_REF | sed -E -n 's#^refs/tags/(.*)$#\1#p')" >> $GITHUB_OUTPUT
+                    echo "branch=$(echo $GITHUB_REF | sed -E -n 's#^refs/heads/(.*)$#\1#p')" >> $GITHUB_OUTPUT
+                    echo "version=$(echo $GITHUB_REF | sed -E -n 's#^refs/tags/v?([0-9]+\.)([0-9]+\.)([0-9]+)#\1\2\3#p')" >> $GITHUB_OUTPUT
 
             -   name: Compare tag version with committed version
                 if: steps.github-ref.outputs.version != ''
@@ -92,8 +96,8 @@ jobs:
             -   name: Composer Cache Vars
                 id: composer-cache-vars
                 run: |
-                    echo "::set-output name=dir::$(composer config cache-files-dir)"
-                    echo "::set-output name=timestamp::$(date +"%s")"
+                    echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+                    echo "timestamp=$(date +"%s")" >> $GITHUB_OUTPUT
 
             -   name: Cache Composer dependencies
                 uses: actions/cache@v3
