@@ -66,13 +66,13 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                os: [ 'ubuntu-18.04' ]
+                os: [ 'ubuntu-latest' ]
                 typo3: [ '^11.5.3' ]
                 php: [ '7.4', '8.0', '8.1' ]
                 dependency-version: [ lowest, stable ]
                 experimental: [ false ]
                 include:
-#                    -   os: 'ubuntu-18.04'
+#                    -   os: 'ubuntu-latest'
 #                        php: 8.1
 #                        typo3: dev-main
 #                        dependency-version: stable
@@ -87,7 +87,7 @@ jobs:
 
         steps:
             -   name: Start database server
-                if: matrix.os == 'ubuntu-18.04'
+                if: matrix.os == 'ubuntu-latest'
                 run: sudo /etc/init.d/mysql start
 
             -   name: Checkout
@@ -137,13 +137,13 @@ jobs:
 
             # This fails when command reference is not up to date
             -   name: Test Command Reference
-                if: matrix.os == 'ubuntu-18.04' && !matrix.experimental
+                if: matrix.os == 'ubuntu-latest' && !matrix.experimental
                 run: |
                     ./typo3cms commandreference:render
                     git diff --exit-code
 
             -   name: Test Install (Unix)
-                if: matrix.os == 'ubuntu-18.04' && !matrix.experimental
+                if: matrix.os == 'ubuntu-latest' && !matrix.experimental
                 run: 'php ./typo3cms install:setup --install-steps-config=Tests/Console/Functional/Fixtures/Install/mysql-install.yaml --no-interaction -vvv'
 
             -   name: Test Install (Windows)
@@ -151,7 +151,7 @@ jobs:
                 run: 'php ./typo3cms install:setup --install-steps-config=Tests/Console/Functional/Fixtures/Install/sqlite-install.yaml --no-interaction -vvv'
 
             -   name: Test
-                if: matrix.os == 'ubuntu-18.04' && !matrix.experimental
+                if: matrix.os == 'ubuntu-latest' && !matrix.experimental
                 run: .Build/bin/phpunit
 
             -   name: Test - allow failure
