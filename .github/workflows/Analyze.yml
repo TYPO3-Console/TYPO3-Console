@@ -29,8 +29,8 @@ jobs:
             -   name: Composer Cache Vars
                 id: composer-cache-vars
                 run: |
-                    echo "dir::$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-                    echo "timestamp::$(date +"%s")" >> $GITHUB_OUTPUT
+                    echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+                    echo "timestamp=$(date +"%s")" >> $GITHUB_OUTPUT
 
             -   name: Cache Composer dependencies
                 uses: actions/cache@v3
