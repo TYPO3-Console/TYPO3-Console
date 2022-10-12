@@ -18,7 +18,7 @@ jobs:
                 run: sudo /etc/init.d/mysql start
 
             -   name: Checkout
-                uses: actions/checkout@v2
+                uses: actions/checkout@v3
                 with:
                     fetch-depth: 0
 
@@ -29,7 +29,7 @@ jobs:
                     echo "::set-output name=timestamp::$(date +"%s")"
 
             -   name: Cache Composer dependencies
-                uses: actions/cache@v2
+                uses: actions/cache@v3
                 with:
                     path: ${{ steps.composer-cache-vars.outputs.dir }}
                     key: ${{ runner.os }}-composer-^11.5.3-stable-7.4-${{ steps.composer-cache-vars.outputs.timestamp }}
