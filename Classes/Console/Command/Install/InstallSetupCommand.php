@@ -174,7 +174,7 @@ EOH
         ]);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $force = $input->getOption('force');
         $skipIntegrityCheck = $input->getOption('skip-integrity-check');

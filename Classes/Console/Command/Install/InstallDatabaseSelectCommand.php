@@ -47,7 +47,7 @@ class InstallDatabaseSelectCommand extends Command
         return getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') === false;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $databaseName = $input->getOption('database-name');
         $useExistingDatabase = $input->getOption('use-existing-database');

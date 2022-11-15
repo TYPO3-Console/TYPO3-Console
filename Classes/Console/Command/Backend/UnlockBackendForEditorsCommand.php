@@ -37,7 +37,7 @@ class UnlockBackendForEditorsCommand extends Command implements RelatableCommand
         $this->setHelp('Allow backend access for editors again (e.g. after having been locked with backend:lockforeditors command).');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $configurationService = new ConfigurationService();
         if (!$configurationService->localIsActive('BE/adminOnly')) {

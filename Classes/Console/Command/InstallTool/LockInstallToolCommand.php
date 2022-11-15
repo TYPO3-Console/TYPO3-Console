@@ -38,7 +38,7 @@ class LockInstallToolCommand extends Command implements RelatableCommandInterfac
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!EnableFileService::checkInstallToolEnableFile()) {
             $output->writeln('<info>Install Tool is already locked.</info>');

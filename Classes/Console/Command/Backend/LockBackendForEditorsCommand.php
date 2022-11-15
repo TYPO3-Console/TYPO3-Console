@@ -39,7 +39,7 @@ class LockBackendForEditorsCommand extends Command implements RelatableCommandIn
 Admins will still be able to log in and work with the backend.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $configurationService = new ConfigurationService();
         if (!$configurationService->localIsActive('BE/adminOnly')) {

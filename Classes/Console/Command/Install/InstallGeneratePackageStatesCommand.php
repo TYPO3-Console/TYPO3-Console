@@ -77,12 +77,12 @@ EOH
         ]);
     }
 
-    public function isHidden()
+    public function isHidden(): bool
     {
         return !getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') && Environment::isComposerMode();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (Environment::isComposerMode()) {
             $output->writeln('<error>The command "install:generatepackagestates" is not available, because TYPO3 does not need this file any more in Composer mode.</error>');

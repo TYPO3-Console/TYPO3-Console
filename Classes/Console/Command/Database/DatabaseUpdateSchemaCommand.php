@@ -88,7 +88,7 @@ EOH
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $schemaService = new SchemaService(new SchemaUpdate());
         $schemaUpdateResultRenderer = new SchemaUpdateResultRenderer();

@@ -38,7 +38,7 @@ class InstallActionNeedsExecutionCommand extends Command
         return getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') === false;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $actionName = $input->getArgument('actionName');
         $installStepActionExecutor = new InstallStepActionExecutor(

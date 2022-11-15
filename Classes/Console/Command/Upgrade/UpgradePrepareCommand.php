@@ -26,7 +26,7 @@ class UpgradePrepareCommand extends Command
         $this->setDescription('Executes preparational upgrade steps and checks basic extension compatibility');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $upgradeHandling = new UpgradeHandling();
         if ($upgradeHandling->isUpgradePrepared()) {

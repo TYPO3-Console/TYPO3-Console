@@ -54,7 +54,7 @@ class InstallDatabaseDataCommand extends Command
         return getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') === false;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $adminUserName = $input->getOption('admin-user-name');
         $adminPassword = $input->getOption('admin-password');
