@@ -55,7 +55,7 @@ EOH
         ]);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $paths = explode(',', $input->getArgument('paths'));
         $force = $input->getOption('force');

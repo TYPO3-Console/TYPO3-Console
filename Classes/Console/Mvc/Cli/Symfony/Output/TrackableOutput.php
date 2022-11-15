@@ -63,7 +63,7 @@ class TrackableOutput extends ConsoleOutput
         return $this->outputTracked;
     }
 
-    public function getErrorOutput()
+    public function getErrorOutput(): OutputInterface
     {
         if ($this->output instanceof ConsoleOutput) {
             return $this->output->getErrorOutput();
@@ -96,7 +96,7 @@ class TrackableOutput extends ConsoleOutput
         $this->output->setVerbosity($level);
     }
 
-    public function getVerbosity()
+    public function getVerbosity(): int
     {
         return $this->output->getVerbosity();
     }
@@ -116,7 +116,7 @@ class TrackableOutput extends ConsoleOutput
         $this->output->setFormatter($formatter);
     }
 
-    public function getFormatter()
+    public function getFormatter(): OutputFormatterInterface
     {
         return $this->output->getFormatter();
     }

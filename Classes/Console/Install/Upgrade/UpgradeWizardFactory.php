@@ -50,7 +50,7 @@ class UpgradeWizardFactory
                 return GeneralUtility::makeInstance($id);
             }
 
-            public function has(string $id)
+            public function has(string $id): bool
             {
                 return true;
             }

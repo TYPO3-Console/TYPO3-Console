@@ -63,7 +63,7 @@ EOH
         ]);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $interactive = $input->getOption('interactive');
         $connection = (string)$input->getOption('connection');

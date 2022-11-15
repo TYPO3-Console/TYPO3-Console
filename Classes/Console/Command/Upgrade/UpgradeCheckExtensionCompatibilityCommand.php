@@ -49,7 +49,7 @@ EOH
         );
     }
 
-    public function isHidden()
+    public function isHidden(): bool
     {
         return true;
     }
@@ -59,7 +59,7 @@ EOH
         return getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') === false;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $extensionKey = $input->getArgument('extensionKey');
         $configOnly = $input->getOption('config-only');

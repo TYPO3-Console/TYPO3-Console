@@ -27,7 +27,7 @@ class CacheListGroupsCommand extends Command
         $this->setHelp('Lists all registered cache groups.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $cacheService = new CacheService();
         $groups = $cacheService->getValidCacheGroups();

@@ -60,7 +60,7 @@ EOH
         return getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') === false;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $siteSetupType = $input->getOption('site-setup-type');
         $arguments['siteUrl'] = $input->getOption('site-base-url');

@@ -35,7 +35,7 @@ class UpgradeListCommand extends Command
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $upgradeHandling = new UpgradeHandling();
         if (!$upgradeHandling->isUpgradePrepared()) {

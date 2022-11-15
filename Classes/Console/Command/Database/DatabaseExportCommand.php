@@ -79,7 +79,7 @@ EOH
         ]);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $additionalMysqlDumpArguments = $input->getArgument('additionalMysqlDumpArguments');
         $connection = $input->getOption('connection');

@@ -42,7 +42,7 @@ EOH
      * @throws \TYPO3\CMS\Install\FolderStructure\Exception\InvalidArgumentException
      * @throws \TYPO3\CMS\Install\FolderStructure\Exception\RootNodeException
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $folderStructureFactory = GeneralUtility::makeInstance(DefaultFactory::class);
         $messages = $folderStructureFactory

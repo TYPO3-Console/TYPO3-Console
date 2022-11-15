@@ -52,7 +52,7 @@ EOH
         ]);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $tags = GeneralUtility::trimExplode(',', $input->getArgument('tags'), true);
         if ($input->getOption('groups') !== null) {

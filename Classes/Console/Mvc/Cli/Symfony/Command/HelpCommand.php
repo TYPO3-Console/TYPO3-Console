@@ -86,7 +86,7 @@ EOF
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      * @throws \Symfony\Component\Console\Exception\CommandNotFoundException
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($this->command === null) {
             $this->command = $this->getApplication()->find($input->getArgument('command_name'));
