@@ -35,6 +35,7 @@ class SymfonyCompatibilityBridge
         if (method_exists(Helper::class, 'length')) {
             return Helper::length($string);
         }
+
         return Helper::strlen($string);
     }
 }
