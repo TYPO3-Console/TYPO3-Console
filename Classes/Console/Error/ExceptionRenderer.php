@@ -16,9 +16,9 @@ namespace Helhum\Typo3Console\Error;
 
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 use Helhum\Typo3Console\Mvc\Cli\SubProcessException;
+use Helhum\Typo3Console\SymfonyCompatibilityBridge;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
@@ -103,13 +103,13 @@ class ExceptionRenderer
 
         $title = sprintf('[ %s ]', $exceptionClass);
 
-        $messageLength = Helper::strlen($title);
+        $messageLength = SymfonyCompatibilityBridge::helperLength($title);
 
         $lines = [];
         foreach (preg_split('/\r?\n/', trim($exceptionMessage)) as $line) {
             foreach ($this->splitStringByWidth($line, $this->renderingWidth - 4) as $splitLine) {
                 $lines[] = $splitLine;
-                $messageLength = max(Helper::strlen($splitLine), $messageLength);
+                $messageLength = max(SymfonyCompatibilityBridge::helperLength($splitLine), $messageLength);
             }
         }
 
