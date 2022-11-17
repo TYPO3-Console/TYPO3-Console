@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Container;
 use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
 use TYPO3\CMS\Core\Core\BootService;
 use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Page\PageRenderer;
 
 class Scripts
@@ -57,7 +58,9 @@ class Scripts
         $container->get('boot.state')->done = false;
         $assetsCache = $container->get('cache.assets');
         $coreCache = $container->get('cache.core');
-        PageRenderer::setCache($assetsCache);
+        if ((new Typo3Version())->getMajorVersion() < 12) {
+            PageRenderer::setCache($assetsCache);
+        }
         Bootstrap::loadTypo3LoadedExtAndExtLocalconf(true, $coreCache);
         Bootstrap::unsetReservedGlobalVariables();
         $container->get('boot.state')->done = true;
