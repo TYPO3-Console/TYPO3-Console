@@ -63,7 +63,7 @@ class CompatibilityClassLoader
         }
         $compatibilityClassName = str_replace('Helhum\\Typo3Console\\', $this->compatibilityNamespace, $class);
         if ($file = $this->originalClassLoader->findFile($compatibilityClassName)) {
-            $this->includeFile($file);
+            ($this->includeFile)($file);
             class_alias($compatibilityClassName, $class);
 
             return true;
