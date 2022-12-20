@@ -49,13 +49,14 @@ jobs:
                     if [ -n "${{ secrets.TYPO3_ORG_USERNAME }}" ] && [ -n "${{ secrets.TYPO3_ORG_PASSWORD }}" ]; then
                       echo -e "Preparing upload of release ${{ steps.github-ref.outputs.version }} to TER\n";
                       # Install ter client
-                      composer global require helhum/ter-client
+                      composer global require typo3/tailor
+                      export PATH=$PATH:$(composer global config bin-dir --absolute --quiet);
 
                       # Build extension files
                       composer extension-release
 
                       # Upload
-                      TAG_MESSAGE=`git tag -n10 -l ${{ steps.github-ref.outputs.tag }} | sed 's/^[v]*[0-9.]*[ ]*//g'`
+                      export TAG_MESSAGE=$(git tag -n10 -l ${{ steps.github-ref.outputs.tag }} | sed 's/^[v]*[0-9.]*[ ]*//g')
                       echo "Uploading release ${{ steps.github-ref.outputs.version }} to TER"
-                      $HOME/.composer/vendor/helhum/ter-client/ter-client upload typo3_console ../extension -u "${{ secrets.TYPO3_ORG_USERNAME }}" -p "${{ secrets.TYPO3_ORG_PASSWORD }}" -m "$TAG_MESSAGE"
+                      TYPO3_API_USERNAME="${{ secrets.TYPO3_ORG_USERNAME }}" TYPO3_API_PASSWORD="${{ secrets.TYPO3_ORG_PASSWORD }}" tailor ter:publish --path ../extension --comment "$TAG_MESSAGE" "${{ steps.github-ref.outputs.version }}" typo3_console
                     fi;
