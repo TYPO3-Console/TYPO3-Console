@@ -41,7 +41,7 @@ use TYPO3\CMS\Core\Information\Typo3Version;
  */
 class Application extends BaseApplication
 {
-    const TYPO3_CONSOLE_VERSION = '6.7.4';
+    const TYPO3_CONSOLE_VERSION = '6.7.5';
     const COMMAND_NAME = 'typo3cms';
 
     /**
