@@ -31,11 +31,27 @@ class CompatibilityClassLoader
      */
     private $compatibilityNamespace;
 
+    /**
+     * @var \Closure(string):void
+     */
+    private $includeFile;
+
     public function __construct(ClassLoader $originalClassLoader)
     {
         $this->originalClassLoader = $this->typo3ClassLoader = $originalClassLoader;
         $this->handleExtensionCompatibility($originalClassLoader);
         $this->handleTypo3Compatibility();
+        /**
+         * Scope isolated include.
+         *
+         * Prevents access to $this/self from included files.
+         *
+         * @param  string $file
+         * @return void
+         */
+        $this->includeFile = static function ($file) {
+            include $file;
+        };
     }
 
     public function loadClass($class): bool
@@ -46,7 +62,7 @@ class CompatibilityClassLoader
         }
         $compatibilityClassName = str_replace('Helhum\\Typo3Console\\', $this->compatibilityNamespace, $class);
         if ($file = $this->originalClassLoader->findFile($compatibilityClassName)) {
-            \Composer\Autoload\includeFile($file);
+            $this->includeFile($file);
             class_alias($compatibilityClassName, $class);
 
             return true;
