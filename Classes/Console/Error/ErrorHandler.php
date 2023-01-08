@@ -74,16 +74,24 @@ class ErrorHandler
 
         $errorLevels = [
             E_WARNING => 'Warning',
+            E_NOTICE => 'Notice',
             E_USER_ERROR => 'User Error',
             E_USER_WARNING => 'User Warning',
             E_USER_NOTICE => 'User Notice',
             E_STRICT => 'Runtime Notice',
             E_RECOVERABLE_ERROR => 'Catchable Fatal Error',
+            E_DEPRECATED => 'PHP Deprecation Notice',
             E_USER_DEPRECATED => 'Deprecation Notice',
         ];
 
         if ($errorLevel & $this->exceptionalErrors) {
-            throw new \TYPO3\CMS\Core\Error\Exception($errorLevels[$errorLevel] . ': ' . $errorMessage . ' in ' . $errorFile . ' line ' . $errorLine, 1);
+            throw $this->cleanBacktraceFromErrorHandlerFrames(new \ErrorException(
+                $errorLevels[$errorLevel] . ': ' . $errorMessage,
+                1,
+                $errorLevel,
+                $errorFile,
+                $errorLine
+            ));
         }
 
         if ($errorLevel === E_USER_DEPRECATED) {
@@ -99,5 +107,23 @@ class ErrorHandler
         $logger->notice($errorMessage, ['file' => $errorFile, 'line' => $errorLine]);
 
         return true;
+    }
+
+    private function cleanBacktraceFromErrorHandlerFrames(\ErrorException $exception): \ErrorException
+    {
+        $cleanedBacktrace = $backtrace = $exception->getTrace();
+        $index = 0;
+        while ($index < \count($backtrace)) {
+            if (isset($backtrace[$index]['file'], $backtrace[$index]['line']) && $backtrace[$index]['line'] === $exception->getLine() && $backtrace[$index]['file'] === $exception->getFile()) {
+                $cleanedBacktrace = \array_slice($backtrace, $index + 1);
+                break;
+            }
+            ++$index;
+        }
+        $exceptionReflection = new \ReflectionProperty(\Exception::class, 'trace');
+        $exceptionReflection->setAccessible(true);
+        $exceptionReflection->setValue($exception, $cleanedBacktrace);
+
+        return $exception;
     }
 }
