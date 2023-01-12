@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Error;
  *
  */
 
+use ErrorReporting\ErrorException;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -62,7 +63,7 @@ class ErrorHandler
      * @param string $errorMessage The error message
      * @param string $errorFile Name of the file the error occurred in
      * @param int $errorLine Line number where the error occurred
-     * @throws \TYPO3\CMS\Core\Error\Exception with the data passed to this method
+     * @throws ErrorException with the data passed to this method
      * @return bool
      */
     public function handleError($errorLevel, $errorMessage, $errorFile, $errorLine): bool
@@ -71,32 +72,14 @@ class ErrorHandler
         if (($configuredErrorReporting & $errorLevel) === 0 || ($errorLevel & $this->errorsToHandle) === 0) {
             return false;
         }
-
-        $errorLevels = [
-            E_WARNING => 'Warning',
-            E_NOTICE => 'Notice',
-            E_USER_ERROR => 'User Error',
-            E_USER_WARNING => 'User Warning',
-            E_USER_NOTICE => 'User Notice',
-            E_STRICT => 'Runtime Notice',
-            E_RECOVERABLE_ERROR => 'Catchable Fatal Error',
-            E_DEPRECATED => 'PHP Deprecation Notice',
-            E_USER_DEPRECATED => 'Deprecation Notice',
-        ];
-
+        $errorAsException = ErrorException::fromError($errorLevel, $errorMessage, $errorFile, $errorLine);
         if ($errorLevel & $this->exceptionalErrors) {
-            throw $this->cleanBacktraceFromErrorHandlerFrames(new \ErrorException(
-                $errorLevels[$errorLevel] . ': ' . $errorMessage,
-                1,
-                $errorLevel,
-                $errorFile,
-                $errorLine
-            ));
+            throw $errorAsException;
         }
 
         if ($errorLevel === E_USER_DEPRECATED) {
             $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger('TYPO3.CMS.deprecations');
-            $logger->notice($errorMessage, ['file' => $errorFile, 'line' => $errorLine]);
+            $logger->notice($errorAsException->getMessage(), ['exception' => $errorAsException]);
 
             return true;
         }
@@ -104,26 +87,8 @@ class ErrorHandler
         // Since all other severities are enforced to throw an exception (see: \Helhum\Typo3Console\Core\Booting\Scripts::initializeErrorHandling)
         // we can just log a notice here.
         $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
-        $logger->notice($errorMessage, ['file' => $errorFile, 'line' => $errorLine]);
+        $logger->notice($errorAsException->getMessage(), ['exception' => $errorAsException]);
 
         return true;
-    }
-
-    private function cleanBacktraceFromErrorHandlerFrames(\ErrorException $exception): \ErrorException
-    {
-        $cleanedBacktrace = $backtrace = $exception->getTrace();
-        $index = 0;
-        while ($index < \count($backtrace)) {
-            if (isset($backtrace[$index]['file'], $backtrace[$index]['line']) && $backtrace[$index]['line'] === $exception->getLine() && $backtrace[$index]['file'] === $exception->getFile()) {
-                $cleanedBacktrace = \array_slice($backtrace, $index + 1);
-                break;
-            }
-            ++$index;
-        }
-        $exceptionReflection = new \ReflectionProperty(\Exception::class, 'trace');
-        $exceptionReflection->setAccessible(true);
-        $exceptionReflection->setValue($exception, $cleanedBacktrace);
-
-        return $exception;
     }
 }
