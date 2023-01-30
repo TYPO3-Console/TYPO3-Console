@@ -37,7 +37,7 @@ class ConnectionConfiguration
             array_filter(
                 $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections'],
                 function (array $connectionConfig) use ($type) {
-                    return strpos($connectionConfig['driver'], $type) !== false;
+                    return strpos($connectionConfig['driver'] ?? '', $type) !== false;
                 }
             )
         );
