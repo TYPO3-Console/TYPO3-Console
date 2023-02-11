@@ -25,7 +25,6 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\EndTimeRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\StartTimeRestriction;
-use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CreateBackendAdminUserCommand extends Command
@@ -132,17 +131,11 @@ class CreateBackendAdminUserCommand extends Command
              ->removeByType(StartTimeRestriction::class)
              ->removeByType(EndTimeRestriction::class)
              ->removeByType(HiddenRestriction::class);
-        $queryBuilder->count('uid')
+        $userExists = $queryBuilder->count('uid')
             ->from('be_users')
             ->where(
                 $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username))
-            );
-
-        if ((new Typo3Version())->getMajorVersion() > 11) {
-            $userExists = $queryBuilder->executeQuery()->fetchOne() > 0;
-        } else {
-            $userExists = $queryBuilder->execute()->fetchColumn() > 0;
-        }
+            )->execute()->fetchOne() > 0;
 
         if ($userExists) {
             return sprintf('A user with username "%s" already exists.', $username);
