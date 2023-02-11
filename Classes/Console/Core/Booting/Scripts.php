@@ -55,9 +55,10 @@ class Scripts
             $bootService->makeCurrent($container);
         }
         $container->get('boot.state')->done = false;
-        $assetsCache = $container->get('cache.assets');
         $coreCache = $container->get('cache.core');
-        PageRenderer::setCache($assetsCache);
+        if (method_exists(PageRenderer::class, 'setCache')) {
+            PageRenderer::setCache($container->get('cache.assets'));
+        }
         Bootstrap::loadTypo3LoadedExtAndExtLocalconf(true, $coreCache);
         Bootstrap::unsetReservedGlobalVariables();
         $container->get('boot.state')->done = true;

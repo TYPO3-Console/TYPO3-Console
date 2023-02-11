@@ -135,7 +135,7 @@ class CreateBackendAdminUserCommand extends Command
             ->from('be_users')
             ->where(
                 $queryBuilder->expr()->eq('username', $queryBuilder->createNamedParameter($username))
-            )->execute()->fetchColumn() > 0;
+            )->execute()->fetchOne() > 0;
 
         if ($userExists) {
             return sprintf('A user with username "%s" already exists.', $username);
