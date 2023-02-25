@@ -35,17 +35,17 @@ jobs:
                 uses: actions/cache@v3
                 with:
                     path: ${{ steps.composer-cache-vars.outputs.dir }}
-                    key: ${{ runner.os }}-composer-^11.5.3-stable-7.4-${{ steps.composer-cache-vars.outputs.timestamp }}
+                    key: ${{ runner.os }}-composer-^11.5.3-stable-8.1-${{ steps.composer-cache-vars.outputs.timestamp }}
                     restore-keys: |
-                        ${{ runner.os }}-composer-^11.5.3-stable-7.4-
+                        ${{ runner.os }}-composer-^11.5.3-stable-8.1-
                         ${{ runner.os }}-composer-^11.5.3-stable-
                         ${{ runner.os }}-composer-^11.5.3-
                         ${{ runner.os }}-composer-
 
-            -   name: Set up PHP Version 7.4
+            -   name: Set up PHP Version 8.1
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: 7.4
+                    php-version: 8.1
                     tools: composer:v2
                     coverage: none
 
