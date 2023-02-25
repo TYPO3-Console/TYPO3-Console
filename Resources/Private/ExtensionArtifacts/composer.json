@@ -41,10 +41,7 @@
         "preferred-install": {
             "*": "dist"
         },
-        "classmap-authoritative": true,
-        "platform": {
-            "php": "7.4.1"
-        }
+        "classmap-authoritative": true
     },
     "autoload": {
         "psr-4": {
