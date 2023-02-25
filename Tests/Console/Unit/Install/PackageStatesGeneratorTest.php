@@ -16,11 +16,14 @@ namespace Helhum\Typo3Console\Tests\Unit\Install;
 
 use Helhum\Typo3Console\Install\PackageStatesGenerator;
 use Helhum\Typo3Console\Package\UncachedPackageManager;
-use Nimut\TestingFramework\TestCase\UnitTestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use TYPO3\CMS\Core\Package\PackageInterface;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 class PackageStatesGeneratorTest extends UnitTestCase
 {
+    use ProphecyTrait;
+
     /**
      * @test
      */
@@ -30,7 +33,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageProphecy->getPackageKey()->willReturn('foo');
         $packageProphecy->isProtected()->willReturn(false);
         $packageProphecy->isPartOfMinimalUsableSystem()->willReturn(false);
-        $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3conf/ext/foo');
+        $packageProphecy->getPackagePath()->willReturn(getenv('TYPO3_PATH_ROOT') . '/typo3conf/ext/foo');
 
         $packages = [
             $packageProphecy->reveal(),
@@ -56,7 +59,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageProphecy->getPackageKey()->willReturn('foo');
         $packageProphecy->isProtected()->willReturn(false);
         $packageProphecy->isPartOfMinimalUsableSystem()->willReturn(false);
-        $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3conf/ext/foo');
+        $packageProphecy->getPackagePath()->willReturn(getenv('TYPO3_PATH_ROOT') . '/typo3conf/ext/foo');
 
         $packages = [
             $packageProphecy->reveal(),
@@ -82,7 +85,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageProphecy->getPackageKey()->willReturn('foo');
         $packageProphecy->isProtected()->willReturn(false);
         $packageProphecy->isPartOfMinimalUsableSystem()->willReturn(false);
-        $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3/sysext/foo');
+        $packageProphecy->getPackagePath()->willReturn(getenv('TYPO3_PATH_ROOT') . '/typo3/sysext/foo');
 
         $packages = [
             $packageProphecy->reveal(),
@@ -109,7 +112,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageProphecy->isProtected()->willReturn(false);
         $packageProphecy->isPartOfMinimalUsableSystem()->willReturn(false);
         $packageProphecy->isPartOfFactoryDefault()->willReturn(true);
-        $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3/sysext/foo');
+        $packageProphecy->getPackagePath()->willReturn(getenv('TYPO3_PATH_ROOT') . '/typo3/sysext/foo');
 
         $packages = [
             $packageProphecy->reveal(),
@@ -136,7 +139,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageProphecy->isProtected()->willReturn(false);
         $packageProphecy->isPartOfMinimalUsableSystem()->willReturn(false);
         $packageProphecy->isPartOfFactoryDefault()->willReturn(true);
-        $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3/sysext/foo');
+        $packageProphecy->getPackagePath()->willReturn(getenv('TYPO3_PATH_ROOT') . '/typo3/sysext/foo');
 
         $packages = [
             $packageProphecy->reveal(),
@@ -163,7 +166,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageProphecy->isProtected()->willReturn(false);
         $packageProphecy->isPartOfMinimalUsableSystem()->willReturn(false);
         $packageProphecy->isPartOfFactoryDefault()->willReturn(true);
-        $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3/sysext/foo');
+        $packageProphecy->getPackagePath()->willReturn(getenv('TYPO3_PATH_ROOT') . '/typo3/sysext/foo');
 
         $packages = [
             $packageProphecy->reveal(),
@@ -189,7 +192,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageProphecy->getPackageKey()->willReturn('foo');
         $packageProphecy->isProtected()->willReturn(false);
         $packageProphecy->isPartOfMinimalUsableSystem()->willReturn(false);
-        $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3/sysext/foo');
+        $packageProphecy->getPackagePath()->willReturn(getenv('TYPO3_PATH_ROOT') . '/typo3/sysext/foo');
 
         $packages = [
             $packageProphecy->reveal(),
@@ -215,7 +218,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageProphecy->getPackageKey()->willReturn('foo');
         $packageProphecy->isProtected()->willReturn(false);
         $packageProphecy->isPartOfMinimalUsableSystem()->willReturn(false);
-        $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3/sysext/foo');
+        $packageProphecy->getPackagePath()->willReturn(getenv('TYPO3_PATH_ROOT') . '/typo3/sysext/foo');
 
         $packages = [
             $packageProphecy->reveal(),
@@ -241,7 +244,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageProphecy->getPackageKey()->willReturn('foo');
         $packageProphecy->isProtected()->willReturn(true);
         $packageProphecy->isPartOfMinimalUsableSystem()->willReturn(false);
-        $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3/sysext/foo');
+        $packageProphecy->getPackagePath()->willReturn(getenv('TYPO3_PATH_ROOT') . '/typo3/sysext/foo');
 
         $packages = [
             $packageProphecy->reveal(),
@@ -267,7 +270,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageProphecy->getPackageKey()->willReturn('foo');
         $packageProphecy->isProtected()->willReturn(true);
         $packageProphecy->isPartOfMinimalUsableSystem()->willReturn(false);
-        $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3/sysext/foo');
+        $packageProphecy->getPackagePath()->willReturn(getenv('TYPO3_PATH_ROOT') . '/typo3/sysext/foo');
 
         $packages = [
             $packageProphecy->reveal(),
@@ -293,7 +296,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageProphecy->getPackageKey()->willReturn('foo');
         $packageProphecy->isProtected()->willReturn(false);
         $packageProphecy->isPartOfMinimalUsableSystem()->willReturn(true);
-        $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3/sysext/foo');
+        $packageProphecy->getPackagePath()->willReturn(getenv('TYPO3_PATH_ROOT') . '/typo3/sysext/foo');
 
         $packages = [
             $packageProphecy->reveal(),
@@ -319,7 +322,7 @@ class PackageStatesGeneratorTest extends UnitTestCase
         $packageProphecy->getPackageKey()->willReturn('foo');
         $packageProphecy->isProtected()->willReturn(false);
         $packageProphecy->isPartOfMinimalUsableSystem()->willReturn(true);
-        $packageProphecy->getPackagePath()->willReturn(PATH_site . 'typo3/sysext/foo');
+        $packageProphecy->getPackagePath()->willReturn(getenv('TYPO3_PATH_ROOT') . '/typo3/sysext/foo');
 
         $packages = [
             $packageProphecy->reveal(),

@@ -16,11 +16,14 @@ namespace Helhum\Typo3Console\Tests\Unit\Database\Schema;
 
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Helhum\Typo3Console\Database\Schema\TableMatcher;
-use Nimut\TestingFramework\TestCase\UnitTestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 class TableMatcherTest extends UnitTestCase
 {
+    use ProphecyTrait;
+
     public function matchReturnsCorrectTableMatchesDataProvider(): array
     {
         return [

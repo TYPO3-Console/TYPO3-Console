@@ -15,8 +15,8 @@ namespace Helhum\Typo3Console\Tests\Unit\Service;
  */
 
 use Helhum\Typo3Console\Service\CacheService;
-use Nimut\TestingFramework\TestCase\UnitTestCase;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 class CacheServiceTest extends UnitTestCase
 {

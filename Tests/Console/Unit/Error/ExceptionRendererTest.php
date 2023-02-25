@@ -16,8 +16,8 @@ namespace Helhum\Typo3Console\Tests\Unit\Mvc\Cli;
 
 use Helhum\Typo3Console\Error\ExceptionRenderer;
 use Helhum\Typo3Console\Mvc\Cli\SubProcessException;
-use Nimut\TestingFramework\TestCase\UnitTestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 class ExceptionRendererTest extends UnitTestCase
 {
