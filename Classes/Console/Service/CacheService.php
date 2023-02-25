@@ -79,7 +79,6 @@ class CacheService implements SingletonInterface
      *
      * @param array $groups
      * @throws NoSuchCacheGroupException
-     * @return void
      */
     public function flushGroups(array $groups): void
     {
@@ -95,7 +94,6 @@ class CacheService implements SingletonInterface
      * @param array $tags
      * @param string $group
      * @throws NoSuchCacheGroupException
-     * @return void
      */
     public function flushByTags(array $tags, $group = null): void
     {
@@ -114,7 +112,6 @@ class CacheService implements SingletonInterface
      * @param array $tags
      * @param array $groups
      * @throws NoSuchCacheGroupException
-     * @return void
      */
     public function flushByTagsAndGroups(array $tags, array $groups = null): void
     {

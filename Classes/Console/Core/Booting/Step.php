@@ -41,8 +41,6 @@ class Step
 
     /**
      * Invokes / executes this step
-     *
-     * @return void
      */
     public function __invoke()
     {

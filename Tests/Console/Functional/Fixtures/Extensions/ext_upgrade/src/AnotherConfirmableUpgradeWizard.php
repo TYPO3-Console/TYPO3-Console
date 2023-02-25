@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 namespace Helhum\Typo3Console\Tests\Functional\Fixtures\Extensions\ext_upgrade\src;
 
 use TYPO3\CMS\Install\Updates\ConfirmableInterface;

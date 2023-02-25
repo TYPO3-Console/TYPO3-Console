@@ -37,6 +37,7 @@ class InstallStepActionExecutor
      * @var InstallerController
      */
     private $installerController;
+
     /**
      * @var callable
      */

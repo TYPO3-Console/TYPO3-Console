@@ -31,7 +31,6 @@ class InstallerScripts implements InstallerScriptsRegistration
      *
      * @param Event $event
      * @param ScriptDispatcher $scriptDispatcher
-     * @return void
      */
     public static function register(Event $event, ScriptDispatcher $scriptDispatcher)
     {

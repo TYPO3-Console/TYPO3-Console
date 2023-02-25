@@ -39,7 +39,6 @@ class ExceptionHandler
      * Formats and echoes the exception for the command line.
      *
      * @param \Throwable $exception The exception object
-     * @return void
      */
     public function handleException(\Throwable $exception)
     {

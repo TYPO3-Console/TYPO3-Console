@@ -88,7 +88,6 @@ class SqlCommand extends Command
 
     /**
      * @param ForwardCompatibility\DriverStatement|ForwardCompatibility\DriverResultStatement $result
-     * @return void
      */
     private function renderResult($result, OutputInterface $output): void
     {

@@ -49,7 +49,6 @@ class Sequence
      *
      * @param \Helhum\Typo3Console\Core\Booting\Step $step The new step to add
      * @param string $previousStepIdentifier The preceding step
-     * @return void
      */
     public function addStep(Step $step, $previousStepIdentifier = 'start'): void
     {
@@ -63,7 +62,6 @@ class Sequence
      *
      * @param \Helhum\Typo3Console\Core\Booting\Step $step The new step to add
      * @param string $prependStepIdentifier The preceding step
-     * @return void
      */
     public function prependStep(Step $step, $prependStepIdentifier = 'start'): void
     {
@@ -75,7 +73,6 @@ class Sequence
      *
      * @param string $stepIdentifier
      * @throws Exception
-     * @return void
      */
     public function removeStep($stepIdentifier): void
     {
@@ -97,7 +94,6 @@ class Sequence
      * Executes all steps of this sequence
      *
      * @throws StepFailedException
-     * @return void
      */
     public function invoke()
     {
@@ -114,7 +110,6 @@ class Sequence
      *
      * @param Step $step The step to invoke
      * @throws StepFailedException
-     * @return void
      */
     protected function invokeStep(Step $step)
     {
