@@ -26,24 +26,13 @@ To achieve this, you need to acquire the TYPO3 Console source code:
 
 1. Run `git clone https://github.com/TYPO3-Console/typo3_console.git`
 2. Download the [`composer.phar`](https://getcomposer.org/composer.phar) executable
-3. Run Composer to get the dependencies: `cd typo3_console && php ../composer.phar install`
+3. Run `ddev start` (assuming [ddev](https://ddev.com/) is installed on your system)
+4. Run Composer to get the dependencies: `ddev composer update`
 
-You can run the test suite by executing `vendor/bin/phpunit` when inside the
-typo3_console directory. Please note, that some of these tests need a database connection
-with a database user that is allowed to create databases. By default user `root` with no password is used.
-
-The name of the created database is `travis_console_test`. You can change the username,
- password and database name by setting the following environment variables accordingly
- prior to executing the phpunit command, on bash, e.g. like this:
- 
-```bash
-export TYPO3_INSTALL_DB_USER=root
-export TYPO3_INSTALL_DB_PASSWORD=root
-export TYPO3_INSTALL_DB_DBNAME=my_console_test_db
-```
+You can run the test suite by executing `ddev exec vendor/bin/phpunit`.
 
 Before you submit a pull request with a new or changed command,
-make sure you run `./typo3cms commandreference:render` beforehand
+make sure you run `ddev exec ./typo3cms commandreference:render` beforehand
 and include the changes in the PR
 
 Contributing policy
@@ -56,4 +45,4 @@ the [PSR-2 Coding Standards](http://www.php-fig.org/psr/psr-2/). You can also
 run [php-cs-fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer) with the
 configuration file that can be found in the project root directory.
 
-If you would like to help, take a look at the [list of open issues](https://github.com/TYPO3-Console/typo3_console/issues).
+If you would like to help, take a look at the [list of open issues](https://github.com/TYPO3-Console/TYPO3-Console/issues).
