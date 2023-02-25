@@ -167,25 +167,16 @@ class SubProcessException extends \Exception
         return $this->previousExceptionFile;
     }
 
-    /**
-     * @return null
-     */
     public function getCommandLine()
     {
         return $this->previousExceptionCommandLine;
     }
 
-    /**
-     * @return null
-     */
     public function getOutputMessage()
     {
         return $this->previousExceptionOutputMessage;
     }
 
-    /**
-     * @return null
-     */
     public function getErrorMessage()
     {
         return $this->previousExceptionErrorMessage;

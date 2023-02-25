@@ -123,7 +123,6 @@ class ConsoleOutput
      *
      * @param string $text Text to output
      * @param array $arguments Optional arguments to use for sprintf
-     * @return void
      */
     public function output($text, array $arguments = [])
     {
@@ -142,7 +141,6 @@ class ConsoleOutput
      *
      * @param string $text Text to output
      * @param array $arguments Optional arguments to use for sprintf
-     * @return void
      * @see output()
      * @see outputLines()
      */
@@ -158,7 +156,6 @@ class ConsoleOutput
      * @param string $text Text to output
      * @param array $arguments Optional arguments to use for sprintf
      * @param int $leftPadding The number of spaces to use for indentation
-     * @return void
      * @see outputLine()
      */
     public function outputFormatted($text = '', array $arguments = [], $leftPadding = 0)
@@ -319,7 +316,6 @@ class ConsoleOutput
      * Starts the progress output
      *
      * @param int $max Maximum steps. If NULL an indeterminate progress bar is rendered
-     * @return void
      */
     public function progressStart($max = null)
     {
@@ -331,7 +327,6 @@ class ConsoleOutput
      *
      * @param int $step Number of steps to advance
      * @throws \LogicException
-     * @return void
      */
     public function progressAdvance($step = 1)
     {
@@ -343,7 +338,6 @@ class ConsoleOutput
      *
      * @param int $current The current progress
      * @throws \LogicException
-     * @return void
      */
     public function progressSet($current)
     {
@@ -352,8 +346,6 @@ class ConsoleOutput
 
     /**
      * Finishes the progress output
-     *
-     * @return void
      */
     public function progressFinish()
     {

@@ -58,7 +58,8 @@
         "typo3-console/sql-command": "@dev",
         "phpspec/prophecy": "^1.15",
         "typo3/testing-framework": "^7.0@dev",
-        "phpspec/prophecy-phpunit": "^2.0"
+        "phpspec/prophecy-phpunit": "^2.0",
+        "friendsofphp/php-cs-fixer": "^3.2"
     },
     "autoload": {
         "psr-4": {

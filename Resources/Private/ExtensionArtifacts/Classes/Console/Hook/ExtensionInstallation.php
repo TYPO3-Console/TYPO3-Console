@@ -30,6 +30,7 @@ class ExtensionInstallation
     const COPY_SUCCESS_MESSAGE = 'Successfully copied the %s script to TYPO3 root directory. Let\'s dance!';
     const EXTKEY = 'typo3_console';
     const EM_FLASH_MESSAGE_QUEUE_ID = 'extbase.flashmessages.tx_extensionmanager_tools_extensionmanagerextensionmanager';
+
     // Replicate Application::COMMAND_NAME to avoid class loading issues in non composer mode
     const COMMAND_NAME = 'typo3cms';
 
@@ -61,7 +62,6 @@ class ExtensionInstallation
      * @param bool $storeInSession Optional, defines whether the message should be stored in the session (default) or not
      * @throws \TYPO3\CMS\Core\Exception
      * @throws \InvalidArgumentException if the message body is no string
-     * @return void
      */
     protected function addFlashMessage($messageBody, $messageTitle = '', $severity = AbstractMessage::OK, $storeInSession = true)
     {

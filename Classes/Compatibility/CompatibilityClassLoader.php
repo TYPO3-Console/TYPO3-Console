@@ -48,7 +48,6 @@ class CompatibilityClassLoader
          * Prevents access to $this/self from included files.
          *
          * @param  string $file
-         * @return void
          */
         $this->includeFile = static function ($file) {
             include $file;

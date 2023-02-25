@@ -44,6 +44,7 @@ class UpgradeWizardList
      * @var array
      */
     private $listCache = [];
+
     /**
      * @var UpgradeWizardsService
      */
