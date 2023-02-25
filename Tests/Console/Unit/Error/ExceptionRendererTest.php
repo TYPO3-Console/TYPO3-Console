@@ -16,10 +16,10 @@ namespace Helhum\Typo3Console\Tests\Unit\Mvc\Cli;
 
 use Helhum\Typo3Console\Error\ExceptionRenderer;
 use Helhum\Typo3Console\Mvc\Cli\SubProcessException;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
-use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
-class ExceptionRendererTest extends UnitTestCase
+class ExceptionRendererTest extends TestCase
 {
     /**
      * @test

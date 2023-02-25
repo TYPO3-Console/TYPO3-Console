@@ -15,9 +15,9 @@ namespace Helhum\Typo3Console\Tests\Unit\Mvc\Cli;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\SubProcessException;
-use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
+use PHPUnit\Framework\TestCase;
 
-class SubProcessExceptionTest extends UnitTestCase
+class SubProcessExceptionTest extends TestCase
 {
     /**
      * @test

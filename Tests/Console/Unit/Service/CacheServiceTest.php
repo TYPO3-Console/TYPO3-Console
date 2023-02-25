@@ -15,10 +15,10 @@ namespace Helhum\Typo3Console\Tests\Unit\Service;
  */
 
 use Helhum\Typo3Console\Service\CacheService;
+use PHPUnit\Framework\TestCase;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
-use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
-class CacheServiceTest extends UnitTestCase
+class CacheServiceTest extends TestCase
 {
     /**
      * @var \Helhum\Typo3Console\Service\CacheService

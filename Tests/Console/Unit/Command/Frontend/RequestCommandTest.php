@@ -3,9 +3,9 @@ declare(strict_types=1);
 namespace  Helhum\Typo3Console\Tests\Unit\Command\Frontend;
 
 use Helhum\Typo3Console\Command\Frontend\FrontendRequestCommand;
-use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
+use PHPUnit\Framework\TestCase;
 
-class RequestCommandTest extends UnitTestCase
+class RequestCommandTest extends TestCase
 {
     /**
      * Call protected/private method of a class.

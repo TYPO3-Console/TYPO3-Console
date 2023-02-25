@@ -15,10 +15,10 @@ namespace Helhum\Typo3Console\Tests\Unit\Database\Schema;
  */
 
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
+use PHPUnit\Framework\TestCase;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
-use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
-class SchemaUpdateTypeTest extends UnitTestCase
+class SchemaUpdateTypeTest extends TestCase
 {
     /**
      * @return array
