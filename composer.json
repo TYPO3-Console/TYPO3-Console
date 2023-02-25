@@ -6,6 +6,7 @@
         }
     },
     "name": "helhum/typo3-console",
+    "type": "typo3-cms-extension",
     "description": "A reliable and powerful command line interface for TYPO3 CMS",
     "keywords": [
         "TYPO3",
@@ -47,6 +48,7 @@
         "helhum/php-error-reporting": "^1.0"
     },
     "require-dev": {
+        "typo3/cms-composer-installers": "^4.0@rc || ^5.0",
         "typo3/cms-filemetadata": "^11.5.3 || dev-main",
         "typo3/cms-recordlist": "^11.5.3 || dev-main",
         "typo3/cms-reports": "^11.5.3 || dev-main",
@@ -81,8 +83,6 @@
         "preferred-install": {
             "*": "dist"
         },
-        "vendor-dir": ".Build/vendor",
-        "bin-dir": ".Build/bin",
         "allow-plugins": {
             "typo3/class-alias-loader": true,
             "typo3/cms-composer-installers": true
@@ -130,12 +130,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "7.1.x-dev"
+            "dev-main": "8.0.x-dev"
         },
         "typo3/cms": {
-            "ignore-as-root": false,
-            "app-dir": ".Build",
-            "web-dir": ".Build/public"
+            "extension-key": "typo3_console",
+            "ignore-as-root": false
         }
     }
 }

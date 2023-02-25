@@ -28,7 +28,7 @@ To achieve this, you need to acquire the TYPO3 Console source code:
 2. Download the [`composer.phar`](https://getcomposer.org/composer.phar) executable
 3. Run Composer to get the dependencies: `cd typo3_console && php ../composer.phar install`
 
-You can run the test suite by executing `.Build/bin/phpunit` when inside the
+You can run the test suite by executing `vendor/bin/phpunit` when inside the
 typo3_console directory. Please note, that some of these tests need a database connection
 with a database user that is allowed to create databases. By default user `root` with no password is used.
 

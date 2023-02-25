@@ -1,4 +1,7 @@
-/.Build/*
+/config
+/public
+/var
+/vendor
 /Classes/Console/Hook/*
 /Configuration/ComposerPackagesCommands.php
 /Documentation-GENERATED-temp
