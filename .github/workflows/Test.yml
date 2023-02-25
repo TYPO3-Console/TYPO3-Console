@@ -2,22 +2,26 @@ name: Test
 
 on: [ push, pull_request ]
 
+defaults:
+    run:
+        shell: bash
+
 jobs:
     Consistency:
         name: 'Consistency'
         runs-on: ubuntu-latest
         steps:
             -   name: Checkout
-                uses: actions/checkout@v2
+                uses: actions/checkout@v3
 
             -   name: Composer Cache Vars
                 id: composer-cache-vars
                 run: |
-                    echo "::set-output name=dir::$(composer config cache-files-dir)"
-                    echo "::set-output name=timestamp::$(date +"%s")"
+                    echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+                    echo "timestamp=$(date +"%s")" >> $GITHUB_OUTPUT
 
             -   name: Cache Composer dependencies
-                uses: actions/cache@v2
+                uses: actions/cache@v3
                 with:
                     path: ${{ steps.composer-cache-vars.outputs.dir }}
                     key: ${{ runner.os }}-composer-^11.5.3-stable-7.4-${{ steps.composer-cache-vars.outputs.timestamp }}
@@ -37,9 +41,9 @@ jobs:
             -   name: "Extract tag, branch, version from GITHUB_REF"
                 id: "github-ref"
                 run: |
-                    echo "::set-output name=tag::$(echo $GITHUB_REF | sed -E -n 's#^refs/tags/(.*)$#\1#p')"
-                    echo "::set-output name=branch::$(echo $GITHUB_REF | sed -E -n 's#^refs/heads/(.*)$#\1#p')"
-                    echo "::set-output name=version::$(echo $GITHUB_REF | sed -E -n 's#^refs/tags/v?([0-9]+\.)([0-9]+\.)([0-9]+)#\1\2\3#p')"
+                    echo "tag=$(echo $GITHUB_REF | sed -E -n 's#^refs/tags/(.*)$#\1#p')" >> $GITHUB_OUTPUT
+                    echo "branch=$(echo $GITHUB_REF | sed -E -n 's#^refs/heads/(.*)$#\1#p')" >> $GITHUB_OUTPUT
+                    echo "version=$(echo $GITHUB_REF | sed -E -n 's#^refs/tags/v?([0-9]+\.)([0-9]+\.)([0-9]+)#\1\2\3#p')" >> $GITHUB_OUTPUT
 
             -   name: Compare tag version with committed version
                 if: steps.github-ref.outputs.version != ''
@@ -62,13 +66,13 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                os: [ 'ubuntu-18.04' ]
+                os: [ 'ubuntu-latest' ]
                 typo3: [ '^11.5.3' ]
                 php: [ '7.4', '8.0', '8.1' ]
                 dependency-version: [ lowest, stable ]
                 experimental: [ false ]
                 include:
-#                    -   os: 'ubuntu-18.04'
+#                    -   os: 'ubuntu-latest'
 #                        php: 8.1
 #                        typo3: dev-main
 #                        dependency-version: stable
@@ -83,20 +87,20 @@ jobs:
 
         steps:
             -   name: Start database server
-                if: matrix.os == 'ubuntu-18.04'
+                if: matrix.os == 'ubuntu-latest'
                 run: sudo /etc/init.d/mysql start
 
             -   name: Checkout
-                uses: actions/checkout@v2
+                uses: actions/checkout@v3
 
             -   name: Composer Cache Vars
                 id: composer-cache-vars
                 run: |
-                    echo "::set-output name=dir::$(composer config cache-files-dir)"
-                    echo "::set-output name=timestamp::$(date +"%s")"
+                    echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+                    echo "timestamp=$(date +"%s")" >> $GITHUB_OUTPUT
 
             -   name: Cache Composer dependencies
-                uses: actions/cache@v2
+                uses: actions/cache@v3
                 with:
                     path: ${{ steps.composer-cache-vars.outputs.dir }}
                     key: ${{ runner.os }}-composer-${{ matrix.typo3 }}-${{ matrix.dependency-version }}-${{ matrix.php }}-${{ steps.composer-cache-vars.outputs.timestamp }}
@@ -133,13 +137,13 @@ jobs:
 
             # This fails when command reference is not up to date
             -   name: Test Command Reference
-                if: matrix.os == 'ubuntu-18.04' && !matrix.experimental
+                if: matrix.os == 'ubuntu-latest' && !matrix.experimental
                 run: |
                     ./typo3cms commandreference:render
                     git diff --exit-code
 
             -   name: Test Install (Unix)
-                if: matrix.os == 'ubuntu-18.04' && !matrix.experimental
+                if: matrix.os == 'ubuntu-latest' && !matrix.experimental
                 run: 'php ./typo3cms install:setup --install-steps-config=Tests/Console/Functional/Fixtures/Install/mysql-install.yaml --no-interaction -vvv'
 
             -   name: Test Install (Windows)
@@ -147,7 +151,7 @@ jobs:
                 run: 'php ./typo3cms install:setup --install-steps-config=Tests/Console/Functional/Fixtures/Install/sqlite-install.yaml --no-interaction -vvv'
 
             -   name: Test
-                if: matrix.os == 'ubuntu-18.04' && !matrix.experimental
+                if: matrix.os == 'ubuntu-latest' && !matrix.experimental
                 run: .Build/bin/phpunit
 
             -   name: Test - allow failure
