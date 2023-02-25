@@ -1,0 +1,64 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    Helhum\Typo3Console\:
+        resource: '../Classes/Console/*'
+
+    Helhum\Typo3Console\Command\Backend\CreateBackendAdminUserCommand:
+        tags:
+            -
+                name: 'console.command'
+                command: 'backend:createadmin'
+                description: 'Create admin backend user'
+
+    Helhum\Typo3Console\Command\Backend\LockBackendForEditorsCommand:
+        tags:
+            -
+                name: 'console.command'
+                command: 'backend:lockforeditors'
+                description: 'Lock backend for editors'
+
+    Helhum\Typo3Console\Command\Backend\UnlockBackendForEditorsCommand:
+        tags:
+            -
+                name: 'console.command'
+                command: 'backend:unlockforeditors'
+                description: 'Unlock backend for editors'
+
+    Helhum\Typo3Console\Command\Cache\CacheFlushTagsCommand:
+        tags:
+            -
+                name: 'console.command'
+                command: 'cache:flushtags'
+                description: 'Flush cache by tags'
+
+    Helhum\Typo3Console\Command\Cache\CacheListGroupsCommand:
+        tags:
+            -
+                name: 'console.command'
+                command: 'cache:listgroups'
+                description: 'List cache groups'
+
+    Helhum\Typo3Console\Command\Configuration\ConfigurationShowCommand:
+        tags:
+            -
+                name: 'console.command'
+                command: 'configuration:show'
+                description: 'Show configuration value'
+
+    Helhum\Typo3Console\Command\Configuration\ConfigurationShowActiveCommand:
+        tags:
+            -
+                name: 'console.command'
+                command: 'configuration:showactive'
+                description: 'Show active configuration value'
+
+    Helhum\Typo3Console\Command\Frontend\FrontendRequestCommand:
+        tags:
+            -
+                name: 'console.command'
+                command: 'frontend:request'
+                description: 'Submit frontend request'
