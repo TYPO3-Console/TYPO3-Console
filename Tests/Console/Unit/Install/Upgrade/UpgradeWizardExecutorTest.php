@@ -20,11 +20,11 @@ use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\ChattyUpgradeWizard;
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\ConfirmableUpgradeWizard;
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\DummyUpgradeWizard;
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\RepeatableUpgradeWizard;
+use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use TYPO3\CMS\Install\Service\UpgradeWizardsService;
-use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
-class UpgradeWizardExecutorTest extends UnitTestCase
+class UpgradeWizardExecutorTest extends TestCase
 {
     use ProphecyTrait;
 

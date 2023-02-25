@@ -15,38 +15,38 @@ namespace Helhum\Typo3Console\Tests\Unit\Extension;
  */
 
 use Helhum\Typo3Console\Extension\ExtensionConstraintCheck;
+use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use TYPO3\CMS\Core\Package\PackageInterface;
 use TYPO3\CMS\Extensionmanager\Utility\EmConfUtility;
-use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
-class ExtensionConstraintCheckTest extends UnitTestCase
+class ExtensionConstraintCheckTest extends TestCase
 {
     use ProphecyTrait;
 
     public function constraintsDataProvider()
     {
         return [
-//            'matching constraint' => [
-//                '6.2.0 - 7.6.99',
-//                '7.6.0',
-//                '',
-//            ],
-//            'matching constraint no upper' => [
-//                '6.2.0 - ',
-//                '7.6.0',
-//                '',
-//            ],
-//            'matching constraint no lower' => [
-//                '- 7.6.99',
-//                '4.5.0',
-//                '',
-//            ],
-//            'matching constraint no value' => [
-//                '',
-//                '4.5.0',
-//                '',
-//            ],
+            'matching constraint' => [
+                '6.2.0 - 7.6.99',
+                '7.6.0',
+                '',
+            ],
+            'matching constraint no upper' => [
+                '6.2.0 - ',
+                '7.6.0',
+                '',
+            ],
+            'matching constraint no lower' => [
+                '- 7.6.99',
+                '4.5.0',
+                '',
+            ],
+            'matching constraint no value' => [
+                '',
+                '4.5.0',
+                '',
+            ],
             'failing lower constraint' => [
                 '6.2.0 - 7.6.99',
                 '4.5.0',

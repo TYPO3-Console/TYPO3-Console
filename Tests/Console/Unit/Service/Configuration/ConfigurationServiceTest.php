@@ -15,14 +15,14 @@ namespace Helhum\Typo3Console\Tests\Unit\Service\Configuration;
  */
 
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
+use PHPUnit\Framework\TestCase;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
-use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 /**
  * Class ConfigurationServiceTest
  */
-class ConfigurationServiceTest extends UnitTestCase
+class ConfigurationServiceTest extends TestCase
 {
     /**
      * @var ConfigurationService
@@ -30,7 +30,7 @@ class ConfigurationServiceTest extends UnitTestCase
     protected $subject;
 
     /**
-     * @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigurationManager
      */
     protected $configurationManager;
 

@@ -16,11 +16,11 @@ namespace Helhum\Typo3Console\Tests\Unit\Install;
 
 use Helhum\Typo3Console\Install\PackageStatesGenerator;
 use Helhum\Typo3Console\Package\UncachedPackageManager;
+use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use TYPO3\CMS\Core\Package\PackageInterface;
-use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
-class PackageStatesGeneratorTest extends UnitTestCase
+class PackageStatesGeneratorTest extends TestCase
 {
     use ProphecyTrait;
 
