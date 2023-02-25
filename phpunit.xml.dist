@@ -1,7 +1,7 @@
 <phpunit
     backupGlobals="true"
     backupStaticAttributes="false"
-    bootstrap=".Build/vendor/nimut/testing-framework/res/Configuration/UnitTestsBootstrap.php"
+    bootstrap="Tests/Console/bootstrap.php"
     colors="true"
     convertErrorsToExceptions="true"
     convertWarningsToExceptions="true"

@@ -16,13 +16,16 @@ namespace Helhum\Typo3Console\Tests\Unit\Install\Upgrade;
 
 use Helhum\Typo3Console\Install\Upgrade\UpgradeWizardFactory;
 use Helhum\Typo3Console\Tests\Unit\Install\Upgrade\Fixture\DummyUpgradeWizard;
-use Nimut\TestingFramework\TestCase\UnitTestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 class UpgradeWizardFactoryTest extends UnitTestCase
 {
+    use ProphecyTrait;
+
     /**
      * @test
      */

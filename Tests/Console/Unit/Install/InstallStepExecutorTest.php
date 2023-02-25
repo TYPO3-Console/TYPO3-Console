@@ -16,13 +16,16 @@ namespace Helhum\Typo3Console\Tests\Unit\Install;
 
 use Helhum\Typo3Console\Install\InstallStepActionExecutor;
 use Helhum\Typo3Console\Install\Upgrade\SilentConfigurationUpgrade;
-use Nimut\TestingFramework\TestCase\UnitTestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use TYPO3\CMS\Core\Http\JsonResponse;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Install\Controller\InstallerController;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 class InstallStepExecutorTest extends UnitTestCase
 {
+    use ProphecyTrait;
+
     /**
      * @test
      */

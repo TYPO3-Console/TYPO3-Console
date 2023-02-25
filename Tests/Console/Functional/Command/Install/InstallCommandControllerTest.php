@@ -48,8 +48,8 @@ class InstallCommandControllerTest extends AbstractCommandTest
         );
         $this->assertStringContainsString('Successfully installed TYPO3 CMS!', $output);
         $this->assertStringContainsString('Set up extensions', $output);
-        $this->assertFileNotExists(getenv('TYPO3_PATH_WEB') . '/.htaccess');
-        $this->assertFileNotExists(getenv('TYPO3_PATH_WEB') . '/web.config');
+        $this->assertFileDoesNotExist(getenv('TYPO3_PATH_WEB') . '/.htaccess');
+        $this->assertFileDoesNotExist(getenv('TYPO3_PATH_WEB') . '/web.config');
     }
 
     /**
@@ -91,8 +91,8 @@ class InstallCommandControllerTest extends AbstractCommandTest
         );
         $this->assertStringContainsString('Successfully installed TYPO3 CMS!', $output);
         $this->assertStringContainsString('Set up extensions', $output);
-        $this->assertFileNotExists(getenv('TYPO3_PATH_WEB') . '/.htaccess');
-        $this->assertFileNotExists(getenv('TYPO3_PATH_WEB') . '/web.config');
+        $this->assertFileDoesNotExist(getenv('TYPO3_PATH_WEB') . '/.htaccess');
+        $this->assertFileDoesNotExist(getenv('TYPO3_PATH_WEB') . '/web.config');
     }
 
     /**
@@ -134,7 +134,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
         $this->assertStringContainsString('Successfully installed TYPO3 CMS!', $output);
         $this->assertFileExists(getenv('TYPO3_PATH_WEB') . '/.htaccess');
         unlink(getenv('TYPO3_PATH_WEB') . '/.htaccess');
-        $this->assertFileNotExists(getenv('TYPO3_PATH_WEB') . '/web.config');
+        $this->assertFileDoesNotExist(getenv('TYPO3_PATH_WEB') . '/web.config');
     }
 
     /**
@@ -156,7 +156,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
         $this->assertStringContainsString('Successfully installed TYPO3 CMS!', $output);
         $this->assertFileExists(getenv('TYPO3_PATH_WEB') . '/web.config');
         unlink(getenv('TYPO3_PATH_WEB') . '/web.config');
-        $this->assertFileNotExists(getenv('TYPO3_PATH_WEB') . '/.htaccess');
+        $this->assertFileDoesNotExist(getenv('TYPO3_PATH_WEB') . '/.htaccess');
     }
 
     /**
