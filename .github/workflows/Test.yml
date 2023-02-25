@@ -133,7 +133,7 @@ jobs:
                     composer update --with "typo3/cms-core:${{ matrix.typo3 }}" --prefer-${{ matrix.dependency-version }} --prefer-dist --no-interaction
 
             -   name: Lint
-                run: php .Build/bin/parallel-lint --exclude .Build .
+                run: php vendor/bin/parallel-lint  --exclude vendor --exclude var --exclude public .
 
             # This fails when command reference is not up to date
             -   name: Test Command Reference
@@ -152,14 +152,14 @@ jobs:
 
             -   name: Test
                 if: matrix.os == 'ubuntu-latest' && !matrix.experimental
-                run: .Build/bin/phpunit
+                run: vendor/bin/phpunit
 
             -   name: Test - allow failure
                 if: matrix.experimental
-                run: .Build/bin/phpunit || true
+                run: vendor/bin/phpunit || true
 
             -   name: Test - Windows
                 if: matrix.os == 'windows-latest'
                 env:
                     TYPO3_INSTALL_DB_DRIVER: pdo_sqlite
-                run: .Build/bin/phpunit
+                run: vendor/bin/phpunit

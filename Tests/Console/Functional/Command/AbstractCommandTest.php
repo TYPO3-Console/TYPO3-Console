@@ -17,13 +17,14 @@ namespace Helhum\Typo3Console\Tests\Functional\Command;
 use Helhum\Typo3Console\Error\ExceptionRenderer;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
+abstract class AbstractCommandTest extends TestCase
 {
     /**
      * @var CommandDispatcher
@@ -33,7 +34,7 @@ abstract class AbstractCommandTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         if (!file_exists(getenv('TYPO3_PATH_ROOT') . '/index.php')
-            && strpos(getenv('TYPO3_PATH_ROOT'), '.Build/public') === false
+            && strpos(getenv('TYPO3_PATH_ROOT'), '/public') === false
         ) {
             throw new \RuntimeException('TYPO3_PATH_ROOT is not properly set!', 1493574402);
         }

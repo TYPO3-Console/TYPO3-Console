@@ -53,7 +53,7 @@ jobs:
                     if [ -n "${{ secrets.SONAR_TOKEN }}" ]; then
                         export COMPOSER_ROOT_VERSION=7.1.6
                         composer update
-                        .Build/bin/phpunit --whitelist Classes --coverage-clover .Build/clover.xml --log-junit .Build/junit.xml
+                        vendor/bin/phpunit --whitelist Classes --coverage-clover var/clover.xml --log-junit var/junit.xml
                     fi
 
             -   name: Setup sonarqube
