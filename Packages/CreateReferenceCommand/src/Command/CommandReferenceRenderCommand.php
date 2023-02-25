@@ -25,8 +25,6 @@ namespace Typo3Console\CreateReferenceCommand\Command;
  *                                                                        */
 
 use Helhum\Typo3Console\Command\RelatableCommandInterface;
-use Helhum\Typo3Console\Mvc\Cli\CommandCollection;
-use Helhum\Typo3Console\Mvc\Cli\CommandConfiguration;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Symfony\Component\Console\Descriptor\ApplicationDescription;
 use Symfony\Component\Console\Input\InputArgument;
@@ -36,7 +34,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
-use Typo3Console\CreateReferenceCommand\EmptyTypo3CommandRegistry;
 
 /**
  * "Command Reference" command controller for the Documentation package.
@@ -44,6 +41,42 @@ use Typo3Console\CreateReferenceCommand\EmptyTypo3CommandRegistry;
  */
 class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\Command
 {
+    private const consoleCommands = [
+        'backend:createadmin',
+        'backend:lockforeditors',
+        'backend:unlockforeditors',
+        'cache:flushtags',
+        'cache:listgroups',
+        'configuration:remove',
+        'configuration:set',
+        'configuration:show',
+        'configuration:showactive',
+        'configuration:showlocal',
+        'database:export',
+        'database:import',
+        'database:updateschema',
+        'frontend:request',
+        'install:setup',
+        'install:generatepackagestates',
+        'install:fixfolderstructure',
+        'install:extensionsetupifpossible',
+        'install:environmentandfolders',
+        'install:databaseconnect',
+        'install:databaseselect',
+        'install:databasedata',
+        'install:defaultconfiguration',
+        'install:actionneedsexecution',
+        'install:lock',
+        'install:unlock',
+        'upgrade:checkextensioncompatibility',
+        'upgrade:checkextensionconstraints',
+        'upgrade:list',
+        'upgrade:prepare',
+        'upgrade:run',
+        'help',
+        'list',
+    ];
+
     private $skipCommands = [
         'server:run',
     ];
@@ -90,35 +123,16 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
         $commandReferenceDir = getenv('TYPO3_PATH_COMPOSER_ROOT') . '/Documentation/CommandReference/';
         GeneralUtility::rmdir($commandReferenceDir, true);
         GeneralUtility::mkdir($commandReferenceDir);
-        $commandCollection = new CommandCollection(new CommandConfiguration(), new EmptyTypo3CommandRegistry());
-        $application = new class($this->getApplication()) extends \Symfony\Component\Console\Application {
-            /**
-             * @var Application
-             */
-            private $application;
-
-            public function __construct(Application $application, string $name = 'UNKNOWN', string $version = 'UNKNOWN')
-            {
-                parent::__construct($name, $version);
-                $this->application = $application;
-            }
-
-            protected function getDefaultInputDefinition()
-            {
-                return $this->application->getDefaultInputDefinition();
-            }
-
-            protected function getDefaultCommands()
-            {
-                return $this->application->getDefaultCommands();
-            }
-        };
-        $application->setCommandLoader($commandCollection);
+        $application = $this->getApplication();
+        assert($application instanceof Application);
         $applicationDescription = new ApplicationDescription($application, null, true);
         $commands = $applicationDescription->getCommands();
         $allCommands = [];
         foreach ($commands as $command) {
-            if (in_array($command->getName(), $this->skipCommands, true)) {
+            $commandName = $command->getName();
+            if (in_array($commandName, $this->skipCommands, true)
+                || !in_array($commandName, self::consoleCommands, true)
+            ) {
                 continue;
             }
 
@@ -164,24 +178,23 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
                     }
                 }
             }
-
-            $allCommands[$command->getName()] = [
-                'identifier' => $command->getName(),
+            $allCommands[$commandName] = [
+                'identifier' => $commandName,
                 'shortDescription' => $this->transformMarkup($command->getDescription()),
                 'description' => $this->transformMarkup($command->getHelp() ? $command->getProcessedHelp() : ''),
                 'options' => $optionDescriptions,
                 'arguments' => $argumentDescriptions,
                 'relatedCommands' => $relatedCommands,
-                'docIdentifier' => str_replace(':', '-', $command->getName()),
-                'docDirectory' => str_replace(':', '', ucwords($command->getName(), ':')),
+                'docIdentifier' => str_replace(':', '-', $commandName),
+                'docDirectory' => str_replace(':', '', ucwords($commandName, ':')),
             ];
 
             $standaloneView = new StandaloneView();
             $templatePathAndFilename = __DIR__ . '/../../Resources/Templates/CommandTemplate.txt';
             $standaloneView->setTemplatePathAndFilename($templatePathAndFilename);
-            $standaloneView->assignMultiple(['command' => $allCommands[$command->getName()]]);
+            $standaloneView->assignMultiple(['command' => $allCommands[$commandName]]);
 
-            $renderedOutputFile = $commandReferenceDir . $allCommands[$command->getName()]['docDirectory'] . '.rst';
+            $renderedOutputFile = $commandReferenceDir . $allCommands[$commandName]['docDirectory'] . '.rst';
             file_put_contents($renderedOutputFile, $standaloneView->render());
         }
 

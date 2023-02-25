@@ -2,26 +2,6 @@
 declare(strict_types=1);
 
 return [
-    'backend:createadmin' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Backend\CreateBackendAdminUserCommand::class,
-    ],
-    'backend:lockforeditors' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Backend\LockBackendForEditorsCommand::class,
-    ],
-    'backend:unlockforeditors' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Backend\UnlockBackendForEditorsCommand::class,
-    ],
-    'cache:flushtags' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Cache\CacheFlushTagsCommand::class,
-    ],
-    'cache:listgroups' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Cache\CacheListGroupsCommand::class,
-    ],
     'configuration:remove' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Configuration\ConfigurationRemoveCommand::class,
@@ -31,14 +11,6 @@ return [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Configuration\ConfigurationSetCommand::class,
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
-    ],
-    'configuration:show' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Configuration\ConfigurationShowCommand::class,
-    ],
-    'configuration:showactive' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Configuration\ConfigurationShowActiveCommand::class,
     ],
     'configuration:showlocal' => [
         'vendor' => 'typo3_console',
@@ -62,10 +34,6 @@ return [
         'bootingSteps' => [
             'helhum.typo3console:persistence',
         ],
-    ],
-    'frontend:request' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Frontend\FrontendRequestCommand::class,
     ],
     'install:setup' => [
         'vendor' => 'typo3_console',
