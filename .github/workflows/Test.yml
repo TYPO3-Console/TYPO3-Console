@@ -135,7 +135,8 @@ jobs:
             -   name: Test Command Reference
                 if: matrix.os == 'ubuntu-18.04' && !matrix.experimental
                 run: |
-                    php ./typo3cms commandreference:render > /dev/null 2>&1 && test -z "$(git diff --shortstat 2> /dev/null | tail -n1)"
+                    ./typo3cms commandreference:render
+                    git diff --exit-code
 
             -   name: Test Install (Unix)
                 if: matrix.os == 'ubuntu-18.04' && !matrix.experimental
