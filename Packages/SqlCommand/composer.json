@@ -13,5 +13,15 @@
         "psr-4": {
             "Typo3Console\\SQLCommand\\": "src/"
         }
+    },
+    "extra": {
+        "typo3/cms": {
+            "Package": {
+                "serviceProvider": "Typo3Console\\SQLCommand\\ServiceProvider",
+                "protected": true,
+                "partOfMinimalUsableSystem": true
+            },
+            "extension-key": "typo3_console_sql"
+        }
     }
 }
