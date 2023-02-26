@@ -7,6 +7,7 @@ use Helhum\Typo3Console\Command\Install\InstallActionNeedsExecutionCommand;
 use Helhum\Typo3Console\Command\Install\InstallDatabaseConnectCommand;
 use Helhum\Typo3Console\Command\Install\InstallDatabaseDataCommand;
 use Helhum\Typo3Console\Command\Install\InstallDatabaseSelectCommand;
+use Helhum\Typo3Console\Command\Install\InstallDefaultConfigurationCommand;
 use Helhum\Typo3Console\Command\Install\InstallEnvironmentAndFoldersCommand;
 use Helhum\Typo3Console\Command\Install\InstallExtensionSetupIfPossibleCommand;
 use Helhum\Typo3Console\Command\Install\InstallFixFolderStructureCommand;
@@ -36,6 +37,7 @@ class ServiceProvider extends AbstractServiceProvider
             InstallDatabaseConnectCommand::class => [ static::class, 'getInstallDatabaseConnectCommand' ],
             InstallDatabaseDataCommand::class => [ static::class, 'getInstallDatabaseDataCommand' ],
             InstallDatabaseSelectCommand::class => [ static::class, 'getInstallDatabaseSelectCommand' ],
+            InstallDefaultConfigurationCommand::class => [ static::class, 'getInstallDefaultConfigurationCommand' ],
             InstallActionNeedsExecutionCommand::class => [ static::class, 'getInstallActionNeedsExecutionCommand' ],
             LockInstallToolCommand::class => [ static::class, 'getLockInstallToolCommand' ],
             UnlockInstallToolCommand::class => [ static::class, 'getUnlockInstallToolCommand' ],
@@ -89,6 +91,11 @@ class ServiceProvider extends AbstractServiceProvider
         return new InstallDatabaseSelectCommand('install:databaseselect');
     }
 
+    public static function getInstallDefaultConfigurationCommand(ContainerInterface $container): InstallDefaultConfigurationCommand
+    {
+        return new InstallDefaultConfigurationCommand($container->get(BootService::class));
+    }
+
     public static function getInstallActionNeedsExecutionCommand(): InstallActionNeedsExecutionCommand
     {
         return new InstallActionNeedsExecutionCommand('install:actionneedsexecution');
@@ -114,6 +121,7 @@ class ServiceProvider extends AbstractServiceProvider
         $commandRegistry->addLazyCommand('install:databaseconnect', InstallDatabaseConnectCommand::class, 'Connect to database');
         $commandRegistry->addLazyCommand('install:databasedata', InstallDatabaseDataCommand::class, 'Add database data');
         $commandRegistry->addLazyCommand('install:databaseselect', InstallDatabaseSelectCommand::class, 'Select database');
+        $commandRegistry->addLazyCommand('install:defaultconfiguration', InstallDefaultConfigurationCommand::class, 'Select database');
         $commandRegistry->addLazyCommand('install:actionneedsexecution', InstallActionNeedsExecutionCommand::class, 'Calls needs execution on the given action and returns the result');
         $commandRegistry->addLazyCommand('install:lock', LockInstallToolCommand::class, 'Lock Install Tool');
         $commandRegistry->addLazyCommand('install:unlock', UnlockInstallToolCommand::class, 'Unlock Install Tool');
