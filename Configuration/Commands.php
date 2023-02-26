@@ -104,11 +104,6 @@ return [
         ],
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_FULL,
     ],
-    'upgrade:prepare' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradePrepareCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-    ],
     'upgrade:run' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeRunCommand::class,

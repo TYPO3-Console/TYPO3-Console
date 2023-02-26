@@ -21,26 +21,11 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
-    public function upgradePrepareCanBeRun(): void
-    {
-        $this->executeConsoleCommand('configuration:remove', ['EXTCONF/helhum-typo3-console', '--force']);
-        $output = $this->executeConsoleCommand('upgrade:prepare');
-        $this->assertStringNotContainsString('Preparation has been done before, repeating preparation and checking extensions', $output);
-        $this->assertStringContainsString('Upgrade preparations successfully executed', $output);
-        $output = $this->executeConsoleCommand('upgrade:prepare');
-        $this->assertStringContainsString('Preparation has been done before, repeating preparation and checking extensions', $output);
-        $this->assertStringContainsString('Upgrade preparations successfully executed', $output);
-    }
-
-    /**
-     * @test
-     */
     public function upgradeListShowsActiveWizards(): void
     {
         self::installFixtureExtensionCode('ext_upgrade');
         try {
             $this->executeConsoleCommand('extension:setup', ['-e', 'ext_upgrade']);
-            $this->executeConsoleCommand('upgrade:prepare');
 
             $output = $this->executeConsoleCommand('upgrade:list');
             $this->assertStringContainsString('normalWizard', $output);
@@ -63,8 +48,6 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
         self::installFixtureExtensionCode('ext_upgrade');
         $this->executeConsoleCommand('extension:setup', ['-e', 'ext_upgrade']);
         try {
-            $this->executeConsoleCommand('upgrade:prepare');
-
             $output = $this->executeConsoleCommand('upgrade:run', ['normalWizard']);
             $this->assertStringContainsString('Successfully executed upgrade wizard "normalWizard"', $output);
 

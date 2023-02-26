@@ -127,9 +127,7 @@ EOH
     {
         $this->upgradeHandling = $this->upgradeHandling ?? new UpgradeHandling();
         if (!$this->upgradeHandling->isUpgradePrepared()) {
-            $output->writeln('<error>Preparation incomplete. Please run upgrade:prepare before running this command.</error>');
-
-            return 1;
+            $this->upgradeHandling->prepareUpgrade();
         }
         [$wizardsToExecute, $confirmations, $denies, $force] = $this->unpackArguments($input);
         $io = new SymfonyStyle($input, $output);

@@ -39,9 +39,7 @@ class UpgradeListCommand extends Command
     {
         $upgradeHandling = new UpgradeHandling();
         if (!$upgradeHandling->isUpgradePrepared()) {
-            $output->writeln('<error>Preparation incomplete. Please run upgrade:prepare before running this command.</error>');
-
-            return 1;
+            $upgradeHandling->prepareUpgrade();
         }
 
         $all = $input->getOption('all');

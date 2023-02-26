@@ -96,7 +96,5 @@ Available Commands
 
    UpgradeList
 
-   UpgradePrepare
-
    UpgradeRun
 
