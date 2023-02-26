@@ -101,16 +101,6 @@ return [
         'class' => \Helhum\Typo3Console\Command\InstallTool\UnlockInstallToolCommand::class,
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
     ],
-    'upgrade:checkextensioncompatibility' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeCheckExtensionCompatibilityCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-    ],
-    'upgrade:checkextensionconstraints' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeCheckExtensionConstraintsCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-    ],
     'upgrade:list' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeListCommand::class,

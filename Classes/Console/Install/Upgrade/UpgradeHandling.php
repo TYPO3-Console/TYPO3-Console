@@ -14,15 +14,10 @@ namespace Helhum\Typo3Console\Install\Upgrade;
  *
  */
 
-use Helhum\Typo3Console\Extension\ExtensionCompatibilityCheck;
-use Helhum\Typo3Console\Extension\ExtensionConstraintCheck;
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Service\Configuration\ConfigurationService;
 use Symfony\Component\Console\Style\OutputStyle;
-use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Information\Typo3Version;
-use TYPO3\CMS\Core\Package\PackageManager;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Updates\ConfirmableInterface;
 
 class UpgradeHandling
@@ -58,21 +53,6 @@ class UpgradeHandling
     private $configurationService;
 
     /**
-     * @var PackageManager
-     */
-    private $packageManager;
-
-    /**
-     * @var ExtensionConstraintCheck
-     */
-    private $extensionConstraintCheck;
-
-    /**
-     * @var ExtensionCompatibilityCheck
-     */
-    private $extensionCompatibilityCheck;
-
-    /**
      * Flag for same process
      *
      * @var bool
@@ -88,9 +68,6 @@ class UpgradeHandling
         SilentConfigurationUpgrade $silentConfigurationUpgrade = null,
         CommandDispatcher $commandDispatcher = null,
         ConfigurationService $configurationService = null,
-        PackageManager $packageManager = null,
-        ExtensionConstraintCheck $extensionConstraintCheck = null,
-        ExtensionCompatibilityCheck $extensionCompatibilityCheck = null
     ) {
         $this->factory = $factory ?: new UpgradeWizardFactory();
         $this->executor = $executor ?: new UpgradeWizardExecutor($this->factory);
@@ -98,9 +75,6 @@ class UpgradeHandling
         $this->silentConfigurationUpgrade = $silentConfigurationUpgrade ?: new SilentConfigurationUpgrade();
         $this->commandDispatcher = $commandDispatcher ?: CommandDispatcher::createFromCommandRun();
         $this->configurationService = $configurationService ?: new ConfigurationService();
-        $this->packageManager = $packageManager ?: GeneralUtility::makeInstance(PackageManager::class);
-        $this->extensionConstraintCheck = $extensionConstraintCheck ?: new ExtensionConstraintCheck();
-        $this->extensionCompatibilityCheck = $extensionCompatibilityCheck ?: new ExtensionCompatibilityCheck($this->packageManager, $this->commandDispatcher);
         $this->typo3Version = new Typo3Version();
     }
 
@@ -150,36 +124,16 @@ class UpgradeHandling
         ];
     }
 
-    public function matchExtensionConstraints(string $extensionKey, string $typo3Version): string
-    {
-        return $this->extensionConstraintCheck->matchConstraints($this->packageManager->getPackage($extensionKey), $typo3Version);
-    }
-
-    public function matchAllExtensionConstraints(string $typo3Version): array
-    {
-        return $this->extensionConstraintCheck->matchAllConstraints($this->packageManager->getActivePackages(), $typo3Version);
-    }
-
-    public function isCompatible(string $extensionKey, bool $configOnly = false): bool
-    {
-        return $this->extensionCompatibilityCheck->isCompatible($extensionKey, $configOnly);
-    }
-
-    public function findIncompatible(): array
-    {
-        return $this->extensionCompatibilityCheck->findIncompatible();
-    }
-
     public function prepareUpgrade(): array
     {
-        $this->configurationService->setLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone', $this->typo3Version->getBranch(), 'string');
         $this->commandDispatcher->executeCommand('install:fixfolderstructure');
         $this->silentConfigurationUpgrade->executeSilentConfigurationUpgradesIfNeeded();
         $this->commandDispatcher->executeCommand('cache:flush', ['--group', 'system']);
         $this->commandDispatcher->executeCommand('database:updateschema');
         $this->commandDispatcher->executeCommand('cache:flush');
+        $this->configurationService->setLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone', $this->typo3Version->getBranch(), 'string');
 
-        return $this->checkExtensionCompatibility();
+        return [];
     }
 
     public function isUpgradePrepared(): bool
@@ -189,22 +143,5 @@ class UpgradeHandling
                 $this->configurationService->hasLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone')
                 && $this->configurationService->getLocal('EXTCONF/helhum-typo3-console/initialUpgradeDone') === $this->typo3Version->getBranch()
             );
-    }
-
-    private function checkExtensionCompatibility(): array
-    {
-        $messages = [];
-        $failedPackageMessages = $this->matchAllExtensionConstraints($this->typo3Version->getVersion());
-        foreach ($failedPackageMessages as $extensionKey => $constraintMessage) {
-            !Environment::isComposerMode() && $this->packageManager->deactivatePackage($extensionKey);
-            $messages[] = sprintf('<error>%s</error>', $constraintMessage);
-            $messages[] = sprintf('<info>Deactivated extension "%s".</info>', $extensionKey);
-        }
-        foreach ($this->extensionCompatibilityCheck->findIncompatible() as $extensionKey) {
-            $messages[] = sprintf('<error>Extension "%s" seems to be not compatible or broken</error>', $extensionKey);
-            $messages[] = sprintf('<info>Deactivated extension "%s".</info>', $extensionKey);
-        }
-
-        return $messages;
     }
 }

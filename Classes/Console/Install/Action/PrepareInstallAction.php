@@ -92,7 +92,7 @@ class PrepareInstallAction implements InstallActionInterface
             $this->output->outputLine();
             $this->output->outputLine('<error>Unable to delete configuration file!</error>');
             $this->output->outputLine('<error>Installation aborted!</error>');
-            throw new InstallationFailedException('Installation aborted because of insufficient premissions', 1529926810);
+            throw new InstallationFailedException('Installation aborted because of insufficient permissions', 1529926810);
         }
     }
 }
