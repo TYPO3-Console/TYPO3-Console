@@ -27,14 +27,6 @@ return [
         'class' => \Helhum\Typo3Console\Command\Database\DatabaseImportCommand::class,
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
     ],
-    'install:defaultconfiguration' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Install\InstallDefaultConfigurationCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
-        'bootingSteps' => [
-            'helhum.typo3console:persistence',
-        ],
-    ],
     'upgrade:list' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Upgrade\UpgradeListCommand::class,
