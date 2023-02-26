@@ -14,24 +14,17 @@ namespace Typo3Console\CreateReferenceCommand\Command;
  *
  */
 
-/*                                                                        *
- * This script belongs to the Flow package "TYPO3.DocTools".              *
- *                                                                        *
- * It is free software; you can redistribute it and/or modify it under    *
- * the terms of the GNU Lesser General Public License, either version 3   *
- * of the License, or (at your option) any later version.                 *
- *                                                                        *
- * The TYPO3 project - inspiring people to share!                         *
- *                                                                        */
-
 use Helhum\Typo3Console\Command\RelatableCommandInterface;
-use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
-use Symfony\Component\Console\Descriptor\ApplicationDescription;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\CMS\Core\Console\CommandRegistry;
+use TYPO3\CMS\Core\Core\BootService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
@@ -39,7 +32,7 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  * "Command Reference" command controller for the Documentation package.
  * Used to create reference documentation for TYPO3 Console CLI commands.
  */
-class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\Command
+class CommandReferenceRenderCommand extends Command
 {
     private const consoleCommands = [
         'backend:createadmin',
@@ -79,7 +72,14 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
 
     private $skipCommands = [
         'server:run',
+        'help',
+        'list',
     ];
+
+    public function __construct(private readonly ContainerInterface $failsafeContainer, private readonly BootService $bootService)
+    {
+        parent::__construct('commandreference:render');
+    }
 
     public function isEnabled()
     {
@@ -119,20 +119,24 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
     protected function renderReference(OutputInterface $output): int
     {
         putenv('TYPO3_CONSOLE_RENDERING_REFERENCE=1');
-        $_SERVER['PHP_SELF'] = Application::COMMAND_NAME;
+        $_SERVER['PHP_SELF'] = 'typo3cms';
         $commandReferenceDir = getenv('TYPO3_PATH_COMPOSER_ROOT') . '/Documentation/CommandReference/';
         GeneralUtility::rmdir($commandReferenceDir, true);
         GeneralUtility::mkdir($commandReferenceDir);
+
+        $container = $this->bootService->getContainer();
+        $commandRegistry = $container->get(CommandRegistry::class);
         $application = $this->getApplication();
         assert($application instanceof Application);
-        $applicationDescription = new ApplicationDescription($application, null, true);
-        $commands = $applicationDescription->getCommands();
         $allCommands = [];
-        foreach ($commands as $command) {
-            $commandName = $command->getName();
+        foreach ($commandRegistry->getNames() as $commandName) {
             if (in_array($commandName, $this->skipCommands, true)
                 || !in_array($commandName, self::consoleCommands, true)
             ) {
+                continue;
+            }
+            $command = $commandRegistry->get($commandName);
+            if (!$command->isEnabled()) {
                 continue;
             }
 
@@ -167,11 +171,11 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
                     if (count($commandParts) === 3) {
                         $shortCommandIdentifier = $commandParts[1] . ':' . $commandParts[2];
                     }
-                    if (isset($commands[$relatedCommandIdentifier])) {
-                        $relatedCommand = $commands[$relatedCommandIdentifier];
+                    if ($commandRegistry->has($relatedCommandIdentifier)) {
+                        $relatedCommand = $commandRegistry->get($relatedCommandIdentifier);
                         $relatedCommands[$relatedCommandIdentifier] = str_replace(':', '-', $relatedCommand->getName());
-                    } elseif (isset($commands[$shortCommandIdentifier])) {
-                        $relatedCommand = $commands[$shortCommandIdentifier];
+                    } elseif ($commandRegistry->has($shortCommandIdentifier)) {
+                        $relatedCommand = $commandRegistry->get($shortCommandIdentifier);
                         $relatedCommands[$shortCommandIdentifier] = str_replace(':', '-', $relatedCommand->getName());
                     } else {
                         $relatedCommands[$relatedCommandIdentifier] = '*Command not available*';
@@ -215,7 +219,7 @@ class CommandReferenceRenderCommand extends \Symfony\Component\Console\Command\C
         $standaloneView->assignMultiple(
             [
                 'title' => 'Command Reference',
-                'commandName' => Application::COMMAND_NAME,
+                'commandName' => 'typo3cms',
                 'applicationOptions' => $applicationOptions,
                 'allCommandsByPackageKey' => ['typo3_console' => $allCommands],
             ]
