@@ -23,7 +23,7 @@ Application Options
 The following options can be used with every command:
 
 `--help|-h`
-   Display this help message
+   Display help for the given command. When no command is given display help for the `list` command
 
 `--quiet|-q`
    Do not output any message
@@ -31,11 +31,11 @@ The following options can be used with every command:
 `--verbose|-v|-vv|-vvv`
    Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
-`--ansi`
-   Force ANSI output
+`--version|-V`
+   Display this application version
 
-`--no-ansi`
-   Disable ANSI output
+`--ansi`
+   Force (or disable --no-ansi) ANSI output
 
 `--no-interaction|-n`
    Do not ask any interactive question
@@ -52,10 +52,6 @@ Available Commands
    :titlesonly:
 
 
-   Help
-
-   List
-
    BackendCreateadmin
 
    BackendLockforeditors
@@ -66,13 +62,19 @@ Available Commands
 
    CacheListgroups
 
-   ConfigurationRemove
-
-   ConfigurationSet
+   ConfigurationShowactive
 
    ConfigurationShow
 
-   ConfigurationShowactive
+   FrontendRequest
+
+   UpgradeRun
+
+   UpgradeList
+
+   ConfigurationRemove
+
+   ConfigurationSet
 
    ConfigurationShowlocal
 
@@ -82,19 +84,13 @@ Available Commands
 
    DatabaseUpdateschema
 
-   FrontendRequest
-
-   InstallExtensionsetupifpossible
+   InstallSetup
 
    InstallFixfolderstructure
 
+   InstallExtensionsetupifpossible
+
    InstallLock
 
-   InstallSetup
-
    InstallUnlock
-
-   UpgradeList
-
-   UpgradeRun
 

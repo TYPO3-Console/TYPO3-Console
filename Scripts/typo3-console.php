@@ -13,8 +13,6 @@ declare(strict_types=1);
         echo 'Could not find autoload.php file. TYPO3 Console needs to be installed with composer' . PHP_EOL;
         exit(1);
     }
-
-    $kernel = new \Helhum\Typo3Console\Core\Kernel(new \Helhum\Typo3Console\CompatibilityClassLoader($classLoader));
-    $exitCode = $kernel->handle(new \Helhum\Typo3Console\Mvc\Cli\Symfony\Input\ArgvInput());
-    $kernel->terminate($exitCode);
+    \TYPO3\CMS\Core\Core\SystemEnvironmentBuilder::run(1, \TYPO3\CMS\Core\Core\SystemEnvironmentBuilder::REQUESTTYPE_CLI);
+    \TYPO3\CMS\Core\Core\Bootstrap::init($classLoader, true)->get(\TYPO3\CMS\Core\Console\CommandApplication::class)->run();
 })();

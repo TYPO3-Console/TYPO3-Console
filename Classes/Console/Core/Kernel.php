@@ -20,7 +20,6 @@ use Helhum\Typo3Console\Core\Booting\RunLevel;
 use Helhum\Typo3Console\Core\Booting\Scripts;
 use Helhum\Typo3Console\Exception;
 use Helhum\Typo3Console\Mvc\Cli\CommandCollection;
-use Helhum\Typo3Console\Mvc\Cli\CommandConfiguration;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Helhum\Typo3Console\Mvc\Cli\Typo3CommandRegistry;
 use Psr\Container\ContainerInterface;
@@ -90,10 +89,8 @@ class Kernel
     {
         $this->initialize();
 
-        $commandConfiguration = new CommandConfiguration();
         $typo3CommandRegistry = new Typo3CommandRegistry($this->container->get(CommandRegistry::class));
         $commandCollection = new CommandCollection(
-            $commandConfiguration,
             $typo3CommandRegistry
         );
         $commandCollection->initializeRunLevel($this->runLevel);

@@ -2,7 +2,7 @@
     "name": "typo3-console/create-reference-command",
     "description": "TYPO3 Console command that creates the command reference",
     "license": "GPL-2.0-or-later",
-    "type": "typo3-console-command",
+    "type": "typo3-cms-extension",
     "authors": [
         {
             "name": "Helmut Hummel",
@@ -12,6 +12,16 @@
     "autoload": {
         "psr-4": {
             "Typo3Console\\CreateReferenceCommand\\": "src/"
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "Package": {
+                "serviceProvider": "Typo3Console\\CreateReferenceCommand\\ServiceProvider",
+                "protected": true,
+                "partOfMinimalUsableSystem": true
+            },
+            "extension-key": "typo3_console_create_reference"
         }
     }
 }

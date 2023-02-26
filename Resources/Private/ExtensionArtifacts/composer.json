@@ -70,8 +70,5 @@
         "symfony/debug": "*",
         "symfony/polyfill-mbstring": "*",
         "symfony/polyfill-php80": ">=1.23.1"
-    },
-    "scripts": {
-        "post-autoload-dump": "Helhum\\Typo3Console\\Composer\\PopulateCommands::populate"
     }
 }
