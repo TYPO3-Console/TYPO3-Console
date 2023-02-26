@@ -12,3 +12,5 @@ declare(strict_types=1);
     getenv('TYPO3_PATH_WEB') . '/index.php',
     'NIX'
 );
+
+DG\BypassFinals::enable();
