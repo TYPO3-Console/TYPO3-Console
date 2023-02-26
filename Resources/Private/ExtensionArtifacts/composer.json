@@ -56,6 +56,7 @@
     },
     "replace": {
         "typo3/cms-backend": "*",
+        "typo3/cms-composer-installers": "*",
         "typo3/cms-core": "*",
         "typo3/cms-extbase": "*",
         "typo3/cms-extensionmanager": "*",
