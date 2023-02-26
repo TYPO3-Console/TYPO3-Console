@@ -23,7 +23,7 @@ LocalConfiguration.php and not be overridden elsewhere.
 
 .. code-block:: shell
 
-   typo3cms configuration:remove DB,EXT/EXTCONF/realurl
+   typo3 configuration:remove DB,EXT/EXTCONF/realurl
 
 
 Arguments

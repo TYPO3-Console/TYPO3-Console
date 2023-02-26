@@ -15,10 +15,7 @@ TYPO3 Console
 
 ----
 
-TYPO3 Console provides a clean way to register commands and
-a sane way to call these commands through a command line tool called `typo3cms`.
-
-It ships many commands to execute TYPO3 actions, which otherwise would only be accessible via the TYPO3 backend.
+TYPO3 Console ships many commands to execute TYPO3 actions, which otherwise would only be accessible via the TYPO3 backend.
 This makes TYPO3 Console a perfect companion for development, deployment, Docker setups, continuous integration
 workflows or anything else where automation is required or beneficial.
 

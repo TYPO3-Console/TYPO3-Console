@@ -63,6 +63,7 @@ class CommandDispatcher
      */
     public static function createFromComposerRun(...$arguments): self
     {
+        throw new \RuntimeException('Currently not implemented', 1677436170);
         if (isset($arguments[0]) && $arguments[0] instanceof ScriptEvent) {
             // Calling createFromComposerRun with ScriptEvent as first argument is deprecated and will be removed with 6.0
             array_shift($arguments);
@@ -114,7 +115,7 @@ class CommandDispatcher
         if (!isset($_SERVER['argv'][0]) || strpos($_SERVER['argv'][0], 'phpunit') === false) {
             throw new RuntimeException(sprintf('Tried to create %s command runner from wrong context', Application::COMMAND_NAME), 1493570522);
         }
-        $typo3CommandPath = $typo3CommandPath ?: dirname(__DIR__, 4) . '/' . Application::COMMAND_NAME;
+        $typo3CommandPath = $typo3CommandPath ?? dirname(__DIR__, 4) . '/' . Application::COMMAND_NAME;
 
         return self::create($typo3CommandPath);
     }

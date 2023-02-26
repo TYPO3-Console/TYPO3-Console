@@ -21,7 +21,7 @@ Shows the configuration value that is currently effective, no matter where and h
 
 .. code-block:: shell
 
-   typo3cms configuration:showactive DB --json
+   typo3 configuration:showactive DB --json
 
 
 Arguments

@@ -23,21 +23,21 @@ This obviously only works when MySQL is used as DBMS.
 
 .. code-block:: shell
 
-   ssh remote.server '/path/to/typo3cms database:export' | typo3cms database:import
+   ssh remote.server '/path/to/typo3 database:export' | typo3 database:import
 
 **Example (select):**
 
 
 .. code-block:: shell
 
-   echo 'SELECT username from be_users WHERE admin=1;' | typo3cms database:import
+   echo 'SELECT username from be_users WHERE admin=1;' | typo3 database:import
 
 **Example (interactive):**
 
 
 .. code-block:: shell
 
-   typo3cms database:import --interactive
+   typo3 database:import --interactive
 
 
 

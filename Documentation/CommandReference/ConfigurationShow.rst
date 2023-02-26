@@ -22,7 +22,7 @@ the difference between these values is shown.
 
 .. code-block:: shell
 
-   typo3cms configuration:show DB
+   typo3 configuration:show DB
 
 
 Arguments

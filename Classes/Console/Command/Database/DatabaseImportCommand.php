@@ -45,7 +45,7 @@ This obviously only works when MySQL is used as DBMS.
 
 <b>Example (import):</b>
 
-  <code>ssh remote.server '/path/to/typo3cms database:export' | %command.full_name%</code>
+  <code>ssh remote.server '/path/to/typo3 database:export' | %command.full_name%</code>
 
 <b>Example (select):</b>
 

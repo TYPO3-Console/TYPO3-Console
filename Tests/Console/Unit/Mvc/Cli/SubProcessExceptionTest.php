@@ -33,7 +33,7 @@ class SubProcessExceptionTest extends TestCase
                 'line' => 42,
                 'file' => __FILE__,
                 'previous' => null,
-                'commandline' => 'typo3cms test',
+                'commandline' => 'typo3 test',
                 'output' => 'output',
                 'error' => 'error output',
             ]
@@ -59,7 +59,7 @@ class SubProcessExceptionTest extends TestCase
                 'line' => 42,
                 'file' => __FILE__,
                 'previous' => null,
-                'commandline' => 'typo3cms test',
+                'commandline' => 'typo3 test',
                 'output' => 'output',
                 'error' => 'error output',
             ]

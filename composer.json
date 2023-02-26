@@ -87,9 +87,6 @@
             "typo3/cms-composer-installers": true
         }
     },
-    "bin": [
-        "typo3cms"
-    ],
     "scripts": {
         "set-version": [
             "Helhum\\Typo3Console\\Composer\\ScriptHelper::setVersion"

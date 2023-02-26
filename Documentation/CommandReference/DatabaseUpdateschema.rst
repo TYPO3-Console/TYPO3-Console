@@ -42,19 +42,19 @@ To avoid shell matching all types with wildcards should be quoted.
 
 .. code-block:: shell
 
-   typo3cms database:updateschema "*.add,*.change"
+   typo3 database:updateschema "*.add,*.change"
 
 
 
 .. code-block:: shell
 
-   typo3cms database:updateschema "*.add" --raw
+   typo3 database:updateschema "*.add" --raw
 
 
 
 .. code-block:: shell
 
-   typo3cms database:updateschema "*" --verbose
+   typo3 database:updateschema "*" --verbose
 
 
 Arguments

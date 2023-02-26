@@ -16,9 +16,6 @@ install:fixfolderstructure
 Automatically create files and folders, required for a TYPO3 installation.
 
 This command creates the required folder structure needed for TYPO3 including extensions.
-It is recommended to be executed **after** executing
-`typo3cms install:generatepackagestates`, to ensure proper generation of
-required folders for all active extensions.
 
 
 

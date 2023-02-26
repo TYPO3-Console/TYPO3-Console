@@ -42,7 +42,7 @@ use TYPO3\CMS\Core\Information\Typo3Version;
 class Application extends BaseApplication
 {
     const TYPO3_CONSOLE_VERSION = '7.1.6';
-    const COMMAND_NAME = 'typo3cms';
+    const COMMAND_NAME = 'typo3';
 
     /**
      * @var RunLevel

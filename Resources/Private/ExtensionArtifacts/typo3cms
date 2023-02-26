@@ -1,4 +1,0 @@
-#!/usr/bin/env php
-<?php
-// Proxy script in case people prefer linking the binary instead of having it copied
-require __DIR__ . '/Libraries/helhum/typo3-console/Scripts/typo3-console.php';

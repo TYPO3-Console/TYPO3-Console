@@ -9,9 +9,9 @@ Command Reference
 
 .. note::
 
-   This reference uses `typo3cms` as the command to invoke. If you are on
-   Windows, this will probably not work, there you need to use `typo3cms.bat`
-   instead. In Composer based installations, the `typo3cms` binary will be
+   This reference uses `typo3` as the command to invoke. If you are on
+   Windows, this will probably not work, there you need to use `typo3.bat`
+   instead. In Composer based installations, the `typo3` binary will be
    located in the binary directory specified in the root composer.json (by
    default `vendor/bin`)
 

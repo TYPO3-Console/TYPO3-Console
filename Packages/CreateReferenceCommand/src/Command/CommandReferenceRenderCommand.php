@@ -119,7 +119,7 @@ class CommandReferenceRenderCommand extends Command
     protected function renderReference(OutputInterface $output): int
     {
         putenv('TYPO3_CONSOLE_RENDERING_REFERENCE=1');
-        $_SERVER['PHP_SELF'] = 'typo3cms';
+        $_SERVER['PHP_SELF'] = 'typo3';
         $commandReferenceDir = getenv('TYPO3_PATH_COMPOSER_ROOT') . '/Documentation/CommandReference/';
         GeneralUtility::rmdir($commandReferenceDir, true);
         GeneralUtility::mkdir($commandReferenceDir);
@@ -219,7 +219,7 @@ class CommandReferenceRenderCommand extends Command
         $standaloneView->assignMultiple(
             [
                 'title' => 'Command Reference',
-                'commandName' => 'typo3cms',
+                'commandName' => 'typo3',
                 'applicationOptions' => $applicationOptions,
                 'allCommandsByPackageKey' => ['typo3_console' => $allCommands],
             ]
