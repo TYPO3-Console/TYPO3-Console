@@ -40,6 +40,9 @@ The following options can be used with every command:
 `--no-interaction|-n`
    Do not ask any interactive question
 
+`--site`
+   The site identifier for the site, the command is associated with. Not all commands evaluate this option.
+
 
 
 .. _`Command Reference: typo3_console`:
