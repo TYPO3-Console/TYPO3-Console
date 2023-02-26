@@ -68,10 +68,6 @@ Available Commands
 
    FrontendRequest
 
-   UpgradeRun
-
-   UpgradeList
-
    ConfigurationRemove
 
    ConfigurationSet

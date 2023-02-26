@@ -18,6 +18,11 @@ use TYPO3\CMS\Install\Updates\RowUpdater\WorkspaceVersionRecordsMigration;
 
 class UpgradeCommandControllerTest extends AbstractCommandTest
 {
+    protected function setUp(): void
+    {
+        self::markTestSkipped('Not sure if it is worth trying to provide improved upgrade commands');
+    }
+
     /**
      * @test
      */

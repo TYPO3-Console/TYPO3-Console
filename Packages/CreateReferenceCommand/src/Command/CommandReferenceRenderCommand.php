@@ -61,9 +61,6 @@ class CommandReferenceRenderCommand extends Command
         'install:actionneedsexecution',
         'install:lock',
         'install:unlock',
-        'upgrade:list',
-        'upgrade:prepare',
-        'upgrade:run',
         'help',
         'list',
     ];
