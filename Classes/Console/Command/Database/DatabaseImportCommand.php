@@ -23,6 +23,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DatabaseImportCommand extends Command
 {
+    public function __construct(private readonly bool $applicationIsReady, private readonly ConnectionConfiguration $connectionConfiguration)
+    {
+        parent::__construct('database:import');
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->applicationIsReady || getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') !== false;
+    }
+
     protected function configure()
     {
         $this->setDescription('Import mysql queries from stdin');
@@ -68,15 +78,14 @@ EOH
         $interactive = $input->getOption('interactive');
         $connection = (string)$input->getOption('connection');
 
-        $connectionConfiguration = new ConnectionConfiguration();
-        $availableConnectionNames = $connectionConfiguration->getAvailableConnectionNames('mysql');
+        $availableConnectionNames = $this->connectionConfiguration->getAvailableConnectionNames('mysql');
         if (empty($availableConnectionNames) || !in_array($connection, $availableConnectionNames, true)) {
             $output->writeln('<error>No suitable MySQL connection found for import.</error>');
 
             return 2;
         }
 
-        $mysqlCommand = new MysqlCommand($connectionConfiguration->build($connection), $output);
+        $mysqlCommand = new MysqlCommand($this->connectionConfiguration->build($connection), $output);
         $exitCode = $mysqlCommand->mysql(
             $interactive ? [] : ['--skip-column-names'],
             STDIN,

@@ -27,15 +27,14 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class DatabaseExportCommand extends Command
 {
-    /**
-     * @var ConnectionConfiguration
-     */
-    private $connectionConfiguration;
-
-    public function __construct(string $name = null, ConnectionConfiguration $connectionConfiguration = null)
+    public function __construct(private readonly bool $applicationIsReady, private readonly ConnectionConfiguration $connectionConfiguration)
     {
-        parent::__construct($name);
-        $this->connectionConfiguration = $connectionConfiguration ?: new ConnectionConfiguration();
+        parent::__construct('database:export');
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->applicationIsReady || getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') !== false;
     }
 
     protected function configure()

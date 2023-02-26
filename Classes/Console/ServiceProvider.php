@@ -5,6 +5,8 @@ namespace Helhum\Typo3Console;
 use Helhum\Typo3Console\Command\Configuration\ConfigurationRemoveCommand;
 use Helhum\Typo3Console\Command\Configuration\ConfigurationSetCommand;
 use Helhum\Typo3Console\Command\Configuration\ConfigurationShowLocalCommand;
+use Helhum\Typo3Console\Command\Database\DatabaseExportCommand;
+use Helhum\Typo3Console\Command\Database\DatabaseImportCommand;
 use Helhum\Typo3Console\Command\Database\DatabaseUpdateSchemaCommand;
 use Helhum\Typo3Console\Command\Install\InstallActionNeedsExecutionCommand;
 use Helhum\Typo3Console\Command\Install\InstallDatabaseConnectCommand;
@@ -17,6 +19,7 @@ use Helhum\Typo3Console\Command\Install\InstallFixFolderStructureCommand;
 use Helhum\Typo3Console\Command\Install\InstallSetupCommand;
 use Helhum\Typo3Console\Command\InstallTool\LockInstallToolCommand;
 use Helhum\Typo3Console\Command\InstallTool\UnlockInstallToolCommand;
+use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
 use Psr\Container\ContainerInterface;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Console\CommandRegistry;
@@ -37,6 +40,8 @@ class ServiceProvider extends AbstractServiceProvider
             ConfigurationRemoveCommand::class => [ static::class, 'getConfigurationRemoveCommand' ],
             ConfigurationSetCommand::class => [ static::class, 'getConfigurationSetCommand' ],
             ConfigurationShowLocalCommand::class => [ static::class, 'getConfigurationShowLocalCommand' ],
+            DatabaseExportCommand::class => [ static::class, 'getDatabaseExportCommand' ],
+            DatabaseImportCommand::class => [ static::class, 'getDatabaseImportCommand' ],
             DatabaseUpdateSchemaCommand::class => [ static::class, 'getDatabaseUpdateSchemaCommand' ],
             InstallSetupCommand::class => [ static::class, 'getInstallSetupCommand' ],
             InstallFixFolderStructureCommand::class => [ static::class, 'getInstallFixFolderStructureCommand' ],
@@ -74,9 +79,27 @@ class ServiceProvider extends AbstractServiceProvider
         return new ConfigurationShowLocalCommand(self::applicationIsReady($container));
     }
 
+    public static function getDatabaseExportCommand(ContainerInterface $container): DatabaseExportCommand
+    {
+        return new DatabaseExportCommand(
+            self::applicationIsReady($container),
+            new ConnectionConfiguration()
+        );
+    }
+
+    public static function getDatabaseImportCommand(ContainerInterface $container): DatabaseImportCommand
+    {
+        return new DatabaseImportCommand(
+            self::applicationIsReady($container),
+            new ConnectionConfiguration()
+        );
+    }
+
     public static function getDatabaseUpdateSchemaCommand(ContainerInterface $container): DatabaseUpdateSchemaCommand
     {
-        return new DatabaseUpdateSchemaCommand($container->get(BootService::class));
+        return new DatabaseUpdateSchemaCommand(
+            $container->get(BootService::class)
+        );
     }
 
     public static function getInstallSetupCommand(): InstallSetupCommand
@@ -139,6 +162,8 @@ class ServiceProvider extends AbstractServiceProvider
         $commandRegistry->addLazyCommand('configuration:remove', ConfigurationRemoveCommand::class, 'Remove configuration value');
         $commandRegistry->addLazyCommand('configuration:set', ConfigurationSetCommand::class, 'Set configuration value');
         $commandRegistry->addLazyCommand('configuration:showlocal', ConfigurationShowLocalCommand::class, 'Show local configuration value');
+        $commandRegistry->addLazyCommand('database:export', DatabaseExportCommand::class, 'Export database to stdout');
+        $commandRegistry->addLazyCommand('database:import', DatabaseImportCommand::class, 'Import mysql queries from stdin');
         $commandRegistry->addLazyCommand('database:updateschema', DatabaseUpdateSchemaCommand::class, 'Update database schema (TYPO3 Database Compare)');
         $commandRegistry->addLazyCommand('install:setup', InstallSetupCommand::class, 'TYPO3 Setup');
         $commandRegistry->addLazyCommand('install:fixfolderstructure', InstallFixFolderStructureCommand::class, 'Fix folder structure');
