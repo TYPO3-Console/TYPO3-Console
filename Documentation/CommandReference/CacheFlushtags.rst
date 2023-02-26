@@ -20,7 +20,7 @@ Flushes caches by tags, optionally only caches in specified groups.
 
 .. code-block:: shell
 
-   typo3cms cache:flushtags news_123 --groups pages,all
+   typo3 cache:flushtags news_123 --groups pages,all
 
 
 Arguments

@@ -14,7 +14,7 @@ A clear and concise description of what you expected to happen.
 
 **TYPO3 Console command executed**
 ```
-typo3cms command:name --option argument
+typo3 command:name --option argument
 ```
 
 **TYPO3 Console command output**

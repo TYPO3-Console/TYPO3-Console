@@ -33,14 +33,11 @@ abstract class AbstractCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        if (!file_exists(getenv('TYPO3_PATH_ROOT') . '/index.php')
-            && strpos(getenv('TYPO3_PATH_ROOT'), '/public') === false
-        ) {
-            throw new \RuntimeException('TYPO3_PATH_ROOT is not properly set!', 1493574402);
+        $typo3CommandPath = getenv('TYPO3_PATH_COMPOSER_ROOT') . '/vendor/bin/typo3';
+        if (!file_exists($typo3CommandPath)) {
+            throw new \RuntimeException('TYPO3_PATH_COMPOSER_ROOT is not properly set!', 1493574402);
         }
-        putenv('TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS=core');
-        $_ENV['TYPO3_ACTIVE_FRAMEWORK_EXTENSIONS'] = 'core';
-        $this->commandDispatcher = CommandDispatcher::createFromTestRun();
+        $this->commandDispatcher = CommandDispatcher::createFromTestRun($typo3CommandPath);
     }
 
     /**

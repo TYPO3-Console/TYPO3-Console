@@ -30,9 +30,6 @@ class InstallFixFolderStructureCommand extends Command
 Automatically create files and folders, required for a TYPO3 installation.
 
 This command creates the required folder structure needed for TYPO3 including extensions.
-It is recommended to be executed <b>after</b> executing
-<code>typo3cms install:generatepackagestates</code>, to ensure proper generation of
-required folders for all active extensions.
 EOH
         );
     }

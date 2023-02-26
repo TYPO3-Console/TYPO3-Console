@@ -32,7 +32,7 @@ To achieve this, you need to acquire the TYPO3 Console source code:
 You can run the test suite by executing `ddev exec vendor/bin/phpunit`.
 
 Before you submit a pull request with a new or changed command,
-make sure you run `ddev exec ./typo3cms commandreference:render` beforehand
+make sure you run `ddev exec vendor/bin/typo3 commandreference:render` beforehand
 and include the changes in the PR
 
 Contributing policy

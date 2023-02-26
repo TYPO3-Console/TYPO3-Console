@@ -23,32 +23,32 @@ When no identifier is specified a select UI is presented to select a wizard out 
 
 .. code-block:: shell
 
-   typo3cms upgrade:run all
+   typo3 upgrade:run all
 
 
 .. code-block:: shell
 
-   typo3cms upgrade:run all --confirm all
+   typo3 upgrade:run all --confirm all
 
 
 .. code-block:: shell
 
-   typo3cms upgrade:run argon2iPasswordHashes --confirm all
+   typo3 upgrade:run argon2iPasswordHashes --confirm all
 
 
 .. code-block:: shell
 
-   typo3cms upgrade:run all --confirm all --deny typo3DbLegacyExtension --deny funcExtension
+   typo3 upgrade:run all --confirm all --deny typo3DbLegacyExtension --deny funcExtension
 
 
 .. code-block:: shell
 
-   typo3cms upgrade:run all --deny all
+   typo3 upgrade:run all --deny all
 
 
 .. code-block:: shell
 
-   typo3cms upgrade:run all --no-interaction --deny all --confirm argon2iPasswordHashes
+   typo3 upgrade:run all --no-interaction --deny all --confirm argon2iPasswordHashes
 
 
 Arguments

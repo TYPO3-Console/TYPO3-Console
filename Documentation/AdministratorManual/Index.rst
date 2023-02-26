@@ -36,9 +36,6 @@ just issue the following Composer command in your project root directory::
 
    composer require helhum/typo3-console
 
-The `typo3cms` binary will be installed by Composer in the specified bin-dir
-(by default `vendor/bin`).
-
 In case you are unsure how to create a Composer based TYPO3 project, you can
 check out this `TYPO3 distribution
 <https://github.com/helhum/TYPO3-Distribution>`_, which already provides TYPO3
@@ -52,11 +49,6 @@ For the extension to work, it **must** be installed in the `typo3conf/ext/`
 directory **not** in any other possible extension location. This is the default
 location when downloading it from TER with the Extension Manager.
 
-The `typo3cms` script will be copied to your TYPO3 root directory, when you
-activate it. When you symlink the `typo3cms` script to a location of your
-preference, TYPO3 Console will work, even when it is not marked as active in
-the Extension Manager.
-
 
 
 Shell auto complete
@@ -68,7 +60,7 @@ Install the package and make the binary available in your path. Please read the
 installation instructions of this package on how to do that.
 
 To temporary activate auto complete in the current shell session, type `eval
-"$(symfony-autocomplete --aliases=typo3cms)"` You can also put this into your
+"$(symfony-autocomplete --aliases=typo3)"` You can also put this into your
 `.profile` or `.bashrc` file to have it always available. Auto completion is
 then always dynamic and reflects the commands you have available in your TYPO3
 installation.

@@ -49,7 +49,7 @@ class ConfigurationShowLocalCommand extends Command implements RelatableCommandI
             <<<'EOH'
 Shows local configuration option value by path.
 Shows the value which is stored in LocalConfiguration.php.
-Note that this value could be overridden. Use <code>typo3cms configuration:show <path></code> to see if this is the case.
+Note that this value could be overridden. Use <code>typo3 configuration:show <path></code> to see if this is the case.
 
 <b>Example:</b>
 
