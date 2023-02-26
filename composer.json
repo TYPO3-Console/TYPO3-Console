@@ -132,6 +132,11 @@
             "dev-main": "8.0.x-dev"
         },
         "typo3/cms": {
+            "Package": {
+                "serviceProvider": "Helhum\\Typo3Console\\ServiceProvider",
+                "protected": true,
+                "partOfMinimalUsableSystem": true
+            },
             "extension-key": "typo3_console",
             "ignore-as-root": false
         }

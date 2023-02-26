@@ -35,36 +35,6 @@ return [
             'helhum.typo3console:persistence',
         ],
     ],
-    'install:setup' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Install\InstallSetupCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-    ],
-    'install:fixfolderstructure' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Install\InstallFixFolderStructureCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-    ],
-    'install:extensionsetupifpossible' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Install\InstallExtensionSetupIfPossibleCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-    ],
-    'install:environmentandfolders' => [
-        'class' => \Helhum\Typo3Console\Command\Install\InstallEnvironmentAndFoldersCommand::class,
-        'vendor' => 'typo3_console',
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-    ],
-    'install:databaseconnect' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Install\InstallDatabaseConnectCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-    ],
-    'install:databaseselect' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Install\InstallDatabaseSelectCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-    ],
     'install:databasedata' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Install\InstallDatabaseDataCommand::class,
@@ -80,21 +50,6 @@ return [
         'bootingSteps' => [
             'helhum.typo3console:persistence',
         ],
-    ],
-    'install:actionneedsexecution' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Install\InstallActionNeedsExecutionCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-    ],
-    'install:lock' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\InstallTool\LockInstallToolCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-    ],
-    'install:unlock' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\InstallTool\UnlockInstallToolCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
     ],
     'upgrade:list' => [
         'vendor' => 'typo3_console',
