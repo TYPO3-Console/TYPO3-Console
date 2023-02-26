@@ -14,7 +14,7 @@ configuration:showlocal
 **Show local configuration value**
 
 Shows local configuration option value by path.
-Shows the value which is stored in LocalConfiguration.php.
+Shows the value which is stored in system configuration file.
 Note that this value could be overridden. Use `typo3 configuration:show <path>` to see if this is the case.
 
 **Example:**

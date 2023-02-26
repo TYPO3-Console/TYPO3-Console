@@ -38,8 +38,8 @@ class ConsoleRenderer
     {
         $diff = new Diff(new Paragraph(), new DiffConsoleRenderer());
 
-        $result = '<del>-- LocalConfiguration.php</del>' . PHP_EOL;
-        $result .= '<ins>++ AdditionalConfiguration.php</ins>' . PHP_EOL;
+        $result = '<del>-- system configuration</del>' . PHP_EOL;
+        $result .= '<ins>++ overridden configuration</ins>' . PHP_EOL;
 
         $result .= $diff->render($this->getConfigurationAsString($localConfig), $this->getConfigurationAsString($activeConfig));
 

@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Tests\Functional\Command;
  */
 
 use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
+use Helhum\Typo3Console\Typo3CompatibilityBridge;
 
 class ConfigurationCommandControllerTest extends AbstractCommandTest
 {
@@ -24,7 +25,7 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     public function configurationCanBeShown()
     {
         $output = $this->executeConsoleCommand('configuration:show', ['BE/installToolPassword']);
-        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $config = require Typo3CompatibilityBridge::getSystemConfigurationFileLocation();
         $this->assertStringContainsString($config['BE']['installToolPassword'], $output);
     }
 
@@ -33,9 +34,9 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
      */
     public function configurationShowsDiff()
     {
-        $output = $this->executeConsoleCommand('configuration:show', ['SC_OPTIONS/"ext/install"']);
-        $this->assertStringContainsString('update', $output);
-        $this->assertStringContainsString('++ AdditionalConfiguration.php', $output);
+        $output = $this->executeConsoleCommand('configuration:show', ['SC_OPTIONS/"t3lib/class.t3lib_tcemain.php"']);
+        $this->assertStringContainsString('processDatamapClass', $output);
+        $this->assertStringContainsString('++ overridden configuration', $output);
     }
 
     /**
@@ -44,7 +45,7 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     public function localConfigurationCanBeShown()
     {
         $output = $this->executeConsoleCommand('configuration:showlocal', ['BE/installToolPassword']);
-        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $config = require Typo3CompatibilityBridge::getSystemConfigurationFileLocation();
         $this->assertStringContainsString($config['BE']['installToolPassword'], $output);
     }
 
@@ -54,7 +55,7 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     public function localConfigurationCanBeShownAsJson()
     {
         $output = $this->executeConsoleCommand('configuration:showlocal', ['BE/installToolPassword', '--json']);
-        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $config = require Typo3CompatibilityBridge::getSystemConfigurationFileLocation();
         $this->assertSame($config['BE']['installToolPassword'], \json_decode($output));
     }
 
@@ -64,7 +65,7 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     public function activeConfigurationCanBeShown()
     {
         $output = $this->executeConsoleCommand('configuration:showactive', ['BE/installToolPassword']);
-        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $config = require Typo3CompatibilityBridge::getSystemConfigurationFileLocation();
         $this->assertStringContainsString($config['BE']['installToolPassword'], $output);
     }
 
@@ -74,7 +75,7 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     public function activeConfigurationCanBeShownAsJson()
     {
         $output = $this->executeConsoleCommand('configuration:showactive', ['BE/installToolPassword', '--json']);
-        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $config = require Typo3CompatibilityBridge::getSystemConfigurationFileLocation();
         $this->assertSame($config['BE']['installToolPassword'], \json_decode($output));
     }
 
@@ -83,13 +84,13 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
      */
     public function configurationCanBeSet()
     {
-        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $config = require Typo3CompatibilityBridge::getSystemConfigurationFileLocation();
         $oldPassword = $config['BE']['installToolPassword'];
         $this->executeConsoleCommand('configuration:set', ['BE/installToolPassword', 'foobar']);
-        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $config = require Typo3CompatibilityBridge::getSystemConfigurationFileLocation();
         $this->assertSame('foobar', $config['BE']['installToolPassword']);
         $this->executeConsoleCommand('configuration:set', ['BE/installToolPassword', $oldPassword]);
-        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $config = require Typo3CompatibilityBridge::getSystemConfigurationFileLocation();
         $this->assertSame($oldPassword, $config['BE']['installToolPassword']);
     }
 
@@ -98,13 +99,13 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
      */
     public function configurationCanBeRemovedAndSetAgainWithoutKeyPresent()
     {
-        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $config = require Typo3CompatibilityBridge::getSystemConfigurationFileLocation();
         $oldPassword = $config['BE']['installToolPassword'];
         $this->executeConsoleCommand('configuration:remove', ['BE/installToolPassword', '--force']);
-        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $config = require Typo3CompatibilityBridge::getSystemConfigurationFileLocation();
         $this->assertArrayNotHasKey('installToolPassword', $config['BE']);
         $this->executeConsoleCommand('configuration:set', ['BE/installToolPassword', $oldPassword]);
-        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $config = require Typo3CompatibilityBridge::getSystemConfigurationFileLocation();
         $this->assertSame($oldPassword, $config['BE']['installToolPassword']);
     }
 
@@ -114,7 +115,7 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     public function numericalIndexedArraysCanBeSet()
     {
         $this->executeConsoleCommand('configuration:set', ['EXTCONF/lang/availableLanguages/0', 'fr_FR']);
-        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $config = require Typo3CompatibilityBridge::getSystemConfigurationFileLocation();
         $this->assertSame('fr_FR', $config['EXTCONF']['lang']['availableLanguages'][0]);
     }
 
@@ -124,7 +125,7 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     public function associativeArraysCanBeSet()
     {
         $this->executeConsoleCommand('configuration:set', ['EXTCONF/foo/bar', 'baz']);
-        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $config = require Typo3CompatibilityBridge::getSystemConfigurationFileLocation();
         $this->assertSame('baz', $config['EXTCONF']['foo']['bar']);
     }
 
@@ -134,7 +135,7 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     public function arraysCanBeSetAsJson()
     {
         $this->executeConsoleCommand('configuration:set', ['EXTCONF/foo/baz', '["baz"]', '--json']);
-        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $config = require Typo3CompatibilityBridge::getSystemConfigurationFileLocation();
         $this->assertSame(['baz'], $config['EXTCONF']['foo']['baz']);
     }
 
@@ -144,7 +145,7 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     public function booleanCanBeSetAsJson()
     {
         $this->executeConsoleCommand('configuration:set', ['EXTCONF/foo/bool', 'true', '--json']);
-        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $config = require Typo3CompatibilityBridge::getSystemConfigurationFileLocation();
         $this->assertTrue($config['EXTCONF']['foo']['bool']);
     }
 
@@ -154,7 +155,7 @@ class ConfigurationCommandControllerTest extends AbstractCommandTest
     public function nullCanBeSetAsJson()
     {
         $this->executeConsoleCommand('configuration:set', ['EXTCONF/foo/null', 'null', '--json']);
-        $config = require getenv('TYPO3_PATH_ROOT') . '/typo3conf/LocalConfiguration.php';
+        $config = require Typo3CompatibilityBridge::getSystemConfigurationFileLocation();
         $this->assertNull($config['EXTCONF']['foo']['null']);
     }
 
