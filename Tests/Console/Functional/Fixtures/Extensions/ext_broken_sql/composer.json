@@ -1,5 +1,7 @@
 {
-    "name": "typo3-console/tests-ext-roken-sqlb",
+    "name": "typo3-console/tests-ext_broken_sql",
+    "type": "typo3-cms-extension",
+    "version": "0.1.0",
     "extra": {
         "typo3/cms": {
             "extension-key": "ext_broken_sql"

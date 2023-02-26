@@ -3,6 +3,10 @@
         "local": {
             "type": "path",
             "url": "Packages/*"
+        },
+        "fixtures": {
+            "type": "path",
+            "url": "Tests/Console/Functional/Fixtures/Extensions/*"
         }
     },
     "name": "helhum/typo3-console",

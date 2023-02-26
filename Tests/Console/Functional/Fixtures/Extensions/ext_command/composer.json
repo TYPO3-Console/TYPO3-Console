@@ -1,11 +1,10 @@
 {
-    "name": "typo3-console/ext-command",
+    "name": "typo3-console/tests-ext_command",
+    "type": "typo3-cms-extension",
+    "version": "0.1.0",
     "license": "GPL-2.0-or-later",
     "type": "typo3-cms-extension",
     "description": "Test extension with command",
-    "require": {
-        "typo3/cms-core": "*"
-    },
     "autoload": {
         "psr-4": {
             "Helhum\\Typo3Console\\Tests\\Functional\\Fixtures\\Extensions\\ext_command\\": ""

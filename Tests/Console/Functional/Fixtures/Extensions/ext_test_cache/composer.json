@@ -1,5 +1,7 @@
 {
-    "name": "typo3-console/tests-ext-test-cache",
+    "name": "typo3-console/tests-ext_test_cache",
+    "type": "typo3-cms-extension",
+    "version": "0.1.0",
     "extra": {
         "typo3/cms": {
             "extension-key": "ext_test_cache"
