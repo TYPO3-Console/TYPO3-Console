@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace Helhum\Typo3Console;
 
+use Helhum\Typo3Console\Command\Database\DatabaseUpdateSchemaCommand;
 use Helhum\Typo3Console\Command\Install\InstallActionNeedsExecutionCommand;
 use Helhum\Typo3Console\Command\Install\InstallDatabaseConnectCommand;
 use Helhum\Typo3Console\Command\Install\InstallDatabaseSelectCommand;
@@ -13,6 +14,7 @@ use Helhum\Typo3Console\Command\InstallTool\LockInstallToolCommand;
 use Helhum\Typo3Console\Command\InstallTool\UnlockInstallToolCommand;
 use Psr\Container\ContainerInterface;
 use TYPO3\CMS\Core\Console\CommandRegistry;
+use TYPO3\CMS\Core\Core\BootService;
 use TYPO3\CMS\Core\Package\AbstractServiceProvider;
 
 class ServiceProvider extends AbstractServiceProvider
@@ -25,6 +27,7 @@ class ServiceProvider extends AbstractServiceProvider
     public function getFactories(): array
     {
         return [
+            DatabaseUpdateSchemaCommand::class => [ static::class, 'getDatabaseUpdateSchemaCommand' ],
             InstallSetupCommand::class => [ static::class, 'getInstallSetupCommand' ],
             InstallFixFolderStructureCommand::class => [ static::class, 'getInstallFixFolderStructureCommand' ],
             InstallExtensionSetupIfPossibleCommand::class => [ static::class, 'getInstallExtensionSetupIfPossibleCommand' ],
@@ -42,6 +45,11 @@ class ServiceProvider extends AbstractServiceProvider
         return [
             CommandRegistry::class => [ static::class, 'configureCommands' ],
         ] + parent::getExtensions();
+    }
+
+    public static function getDatabaseUpdateSchemaCommand(ContainerInterface $container): DatabaseUpdateSchemaCommand
+    {
+        return new DatabaseUpdateSchemaCommand($container->get(BootService::class));
     }
 
     public static function getInstallSetupCommand(): InstallSetupCommand
@@ -91,6 +99,7 @@ class ServiceProvider extends AbstractServiceProvider
 
     public static function configureCommands(ContainerInterface $container, CommandRegistry $commandRegistry): CommandRegistry
     {
+        $commandRegistry->addLazyCommand('database:updateschema', DatabaseUpdateSchemaCommand::class, 'Update database schema (TYPO3 Database Compare)');
         $commandRegistry->addLazyCommand('install:setup', InstallSetupCommand::class, 'TYPO3 Setup');
         $commandRegistry->addLazyCommand('install:fixfolderstructure', InstallFixFolderStructureCommand::class, 'Fix folder structure');
         $commandRegistry->addLazyCommand('install:extensionsetupifpossible', InstallExtensionSetupIfPossibleCommand::class, 'Fix folder structure');
