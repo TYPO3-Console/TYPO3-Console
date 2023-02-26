@@ -25,6 +25,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ConfigurationShowLocalCommand extends Command implements RelatableCommandInterface
 {
+    public function __construct(private readonly bool $applicationIsReady)
+    {
+        parent::__construct('configuration:showlocal');
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->applicationIsReady || getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') !== false;
+    }
+
     public function getRelatedCommandNames(): array
     {
         return [

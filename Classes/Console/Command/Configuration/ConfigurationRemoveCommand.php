@@ -25,9 +25,19 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class ConfigurationRemoveCommand extends Command
 {
+    public function __construct(private readonly bool $applicationIsReady)
+    {
+        parent::__construct('configuration:remove');
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->applicationIsReady || getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') !== false;
+    }
+
     protected function configure()
     {
-        $this->setDescription('Remove configuration option');
+        $this->setDescription('Remove configuration value');
         $this->setHelp(
             <<<'EOH'
 Removes a system configuration option by path.
