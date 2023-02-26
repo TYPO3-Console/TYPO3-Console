@@ -19,15 +19,12 @@ use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * Class ConfigurationService
- */
 class ConfigurationService implements SingletonInterface
 {
     const EXCEPTION_CODE_ARRAY_KEY_NOT_FOUND = 1341397869;
 
     /**
-     * @var \TYPO3\CMS\Core\Configuration\ConfigurationManager
+     * @var ConfigurationManager
      */
     protected $configurationManager;
 
@@ -155,7 +152,7 @@ class ConfigurationService implements SingletonInterface
     }
 
     /**
-     * Sets a value in LocalConfiguration.php
+     * Sets a value in system configuration file
      *
      * But only if types are compatible and local config is active
      *
@@ -176,7 +173,7 @@ class ConfigurationService implements SingletonInterface
     }
 
     /**
-     * Returns true if the value is stored in the LocalConfiguration.php file and
+     * Returns true if the value is stored in the system configuration file and
      * is NOT overridden later (e.g. in AdditionalConfiguration.php)
      *
      * @param string $path

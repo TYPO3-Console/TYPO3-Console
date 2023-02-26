@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Install\Upgrade;
  *
  */
 
+use Helhum\Typo3Console\Typo3CompatibilityBridge;
 use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
@@ -22,7 +23,7 @@ use TYPO3\CMS\Install\Service\Exception\ConfigurationChangedException;
 use TYPO3\CMS\Install\Service\SilentConfigurationUpgradeService;
 
 /**
- * Used to migrate deprecated LocalConfiguration.php values to new values
+ * Used to migrate deprecated system configuration values to new values
  * It is a wrapper around the TYPO3 class to properly handle redirect exceptions
  */
 class SilentConfigurationUpgrade
@@ -45,7 +46,7 @@ class SilentConfigurationUpgrade
      */
     public function executeSilentConfigurationUpgradesIfNeeded()
     {
-        if (!file_exists($this->configurationManager->getLocalConfigurationFileLocation())) {
+        if (!file_exists(Typo3CompatibilityBridge::getSystemConfigurationFileLocation())) {
             return;
         }
 

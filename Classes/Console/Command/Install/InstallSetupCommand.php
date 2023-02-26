@@ -57,13 +57,13 @@ EOH
                 'force',
                 'f',
                 InputOption::VALUE_NONE,
-                'Force installation of TYPO3, even if `LocalConfiguration.php` file already exists.'
+                'Force installation of TYPO3, even if system configuration file already exists.'
             ),
             new InputOption(
                 'skip-integrity-check',
                 null,
                 InputOption::VALUE_NONE,
-                'Skip the checking for clean state before executing setup. This allows a pre-defined `LocalConfiguration.php` to be present. Handle with care. It might lead to unexpected or broken installation results.'
+                'Skip the checking for clean state before executing setup. This allows a pre-defined system configuration file to be present. Handle with care. It might lead to unexpected or broken installation results.'
             ),
             new InputOption(
                 'skip-extension-setup',

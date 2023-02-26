@@ -16,7 +16,7 @@ configuration:remove
 Removes a system configuration option by path.
 
 For this command to succeed, the configuration option(s) must be in
-LocalConfiguration.php and not be overridden elsewhere.
+system configuration file and not be overridden elsewhere.
 
 **Example:**
 

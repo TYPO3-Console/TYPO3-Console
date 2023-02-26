@@ -16,6 +16,7 @@ namespace Helhum\Typo3Console\Install\Action;
 
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
+use Helhum\Typo3Console\Typo3CompatibilityBridge;
 use TYPO3\CMS\Core\Core\Environment;
 
 class PrepareInstallAction implements InstallActionInterface
@@ -54,7 +55,7 @@ class PrepareInstallAction implements InstallActionInterface
     }
 
     /**
-     * Handles the case when LocalConfiguration.php file already exists
+     * Handles the case when system configuration file already exists
      *
      * @param array $options
      * @throws InstallationFailedException
@@ -69,15 +70,15 @@ class PrepareInstallAction implements InstallActionInterface
         $isInteractive = $options['interactive'] ?? $this->output->getSymfonyConsoleInput()->isInteractive();
         $forceInstall = $options['forceInstall'] ?? false;
 
-        $localConfFile = Environment::getLegacyConfigPath() . '/LocalConfiguration.php';
+        $localConfFile = Typo3CompatibilityBridge::getSystemConfigurationFileLocation();
         if (!$forceInstall && file_exists($localConfFile)) {
             $this->output->outputLine();
             $this->output->outputLine('<error>TYPO3 seems to be already set up!</error>');
             $proceed = $isInteractive;
             if ($isInteractive) {
                 $this->output->outputLine();
-                $this->output->outputLine('<info>If you continue, your <code>typo3conf/LocalConfiguration.php</code></info>');
-                $this->output->outputLine('<info>file will be deleted!</info>');
+                $this->output->outputLine('<info>If you continue, your system configuration file</info>');
+                $this->output->outputLine('<warning>will be deleted!</warning>');
                 $this->output->outputLine();
                 $proceed = $this->output->askConfirmation('<info>Do you really want to proceed?</info> (<comment>no</comment>) ', false);
             }
