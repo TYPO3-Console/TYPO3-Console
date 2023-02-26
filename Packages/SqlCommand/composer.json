@@ -2,7 +2,7 @@
     "name": "typo3-console/sql-command",
     "description": "TYPO3 Console command that executes SQL",
     "license": "GPL-2.0-or-later",
-    "type": "typo3-console-command",
+    "type": "typo3-cms-extension",
     "authors": [
         {
             "name": "Helmut Hummel",

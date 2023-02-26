@@ -38,6 +38,11 @@ class ServiceProvider extends AbstractServiceProvider
         return __DIR__ . '/../../';
     }
 
+    protected static function getPackageName(): string
+    {
+        return 'helhum/typo3-console';
+    }
+
     public function getFactories(): array
     {
         return [

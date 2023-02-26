@@ -1,5 +1,7 @@
 {
-    "name": "typo3-console/tests-ext-upgrade",
+    "name": "typo3-console/tests-ext_upgrade",
+    "type": "typo3-cms-extension",
+    "version": "0.1.0",
     "extra": {
         "typo3/cms": {
             "extension-key": "ext_upgrade"

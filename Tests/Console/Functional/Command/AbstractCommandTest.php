@@ -22,7 +22,6 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 abstract class AbstractCommandTest extends TestCase
 {
@@ -140,11 +139,7 @@ abstract class AbstractCommandTest extends TestCase
      */
     protected static function installFixtureExtensionCode($extensionKey)
     {
-        $sourcePath = dirname(__DIR__) . '/Fixtures/Extensions/' . $extensionKey;
-        $targetPath = getenv('TYPO3_PATH_ROOT') . '/typo3conf/ext/' . $extensionKey;
-        self::copyDirectory($sourcePath, $targetPath);
-        GeneralUtility::rmdir(getenv('TYPO3_PATH_APP') . '/var/cache', true);
-        self::executeComposerCommand(['du']);
+        self::executeComposerCommand(['req', '--dev', 'typo3-console/tests-' . $extensionKey, '0.1.0', '--no-interaction']);
     }
 
     /**
@@ -181,9 +176,7 @@ abstract class AbstractCommandTest extends TestCase
      */
     protected static function removeFixtureExtensionCode($extensionKey)
     {
-        self::removeDirectory(getenv('TYPO3_PATH_ROOT') . '/typo3conf/ext/' . $extensionKey);
-        GeneralUtility::rmdir(getenv('TYPO3_PATH_APP') . '/var/cache', true);
-        self::executeComposerCommand(['du']);
+        self::executeComposerCommand(['remove', '--dev', 'typo3-console/tests-' . $extensionKey, '--no-interaction']);
     }
 
     /**

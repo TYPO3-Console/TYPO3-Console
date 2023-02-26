@@ -28,7 +28,7 @@ databaseData:
         adminUserName:
             value: 'admin'
         adminPassword:
-            value: 'password'
+            value: 'Password1!'
         siteName:
             value: 'New TYPO3 Console site'
 

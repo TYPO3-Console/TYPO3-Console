@@ -5,9 +5,10 @@ if (PHP_SAPI !== 'cli') {
 
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
-    ->exclude('vendor')
+    ->exclude('config')
     ->exclude('public')
     ->exclude('var')
+    ->exclude('vendor')
     ->exclude('Documentation')
     ->exclude('Libraries')
     ->notName('ext_emconf.php')

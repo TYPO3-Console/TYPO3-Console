@@ -14,6 +14,11 @@ class ServiceProvider extends AbstractServiceProvider
         return __DIR__ . '/../';
     }
 
+    protected static function getPackageName(): string
+    {
+        return 'typo3-console/sql-command';
+    }
+
     public function getFactories(): array
     {
         return [

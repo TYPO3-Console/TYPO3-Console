@@ -8,7 +8,9 @@ declare(strict_types=1);
     getenv('TYPO3_PATH_APP'),
     getenv('TYPO3_PATH_WEB'),
     getenv('TYPO3_PATH_APP') . '/var',
-    getenv('TYPO3_PATH_APP') . '/typo3conf',
+    getenv('TYPO3_PATH_APP') . '/config',
     getenv('TYPO3_PATH_WEB') . '/index.php',
     'NIX'
 );
+
+DG\BypassFinals::enable();

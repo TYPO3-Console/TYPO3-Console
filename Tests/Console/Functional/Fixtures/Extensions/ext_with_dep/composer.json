@@ -1,5 +1,7 @@
 {
-    "name": "typo3-console/tests-ext-with-dep",
+    "name": "typo3-console/tests-ext_with_dep",
+    "type": "typo3-cms-extension",
+    "version": "0.1.0",
     "extra": {
         "typo3/cms": {
             "extension-key": "ext_with_dep"

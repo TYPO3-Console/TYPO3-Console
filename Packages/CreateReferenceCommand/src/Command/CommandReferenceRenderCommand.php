@@ -25,6 +25,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Console\CommandRegistry;
 use TYPO3\CMS\Core\Core\BootService;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
@@ -50,7 +51,6 @@ class CommandReferenceRenderCommand extends Command
         'database:updateschema',
         'frontend:request',
         'install:setup',
-        'install:generatepackagestates',
         'install:fixfolderstructure',
         'install:extensionsetupifpossible',
         'install:environmentandfolders',
@@ -61,8 +61,6 @@ class CommandReferenceRenderCommand extends Command
         'install:actionneedsexecution',
         'install:lock',
         'install:unlock',
-        'upgrade:checkextensioncompatibility',
-        'upgrade:checkextensionconstraints',
         'upgrade:list',
         'upgrade:prepare',
         'upgrade:run',
@@ -158,7 +156,7 @@ class CommandReferenceRenderCommand extends Command
                     'acceptValue' => $option->acceptValue() ? 'yes' : 'no',
                     'isValueRequired' => $option->isValueRequired() ? 'yes' : 'no',
                     'isMultiple' => $option->isArray() ? 'yes' : 'no',
-                    'default' => str_replace(["\n", TYPO3_version], ['', '<Current-TYPO3-Version>'], var_export($option->getDefault(), true)),
+                    'default' => str_replace(["\n", (string)(new Typo3Version())], ['', '<Current-TYPO3-Version>'], var_export($option->getDefault(), true)),
                 ];
             }
 
