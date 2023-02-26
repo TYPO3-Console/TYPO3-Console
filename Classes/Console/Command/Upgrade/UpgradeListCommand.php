@@ -21,9 +21,15 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\CMS\Core\Core\BootService;
 
 class UpgradeListCommand extends Command
 {
+    public function __construct(private readonly BootService $bootService)
+    {
+        parent::__construct('upgrade:list');
+    }
+
     protected function configure()
     {
         $this->setDescription('List upgrade wizards');
@@ -37,6 +43,8 @@ class UpgradeListCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->bootService->loadExtLocalconfDatabaseAndExtTables();
+
         $upgradeHandling = new UpgradeHandling();
         if (!$upgradeHandling->isUpgradePrepared()) {
             $upgradeHandling->prepareUpgrade();

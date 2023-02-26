@@ -19,6 +19,8 @@ use Helhum\Typo3Console\Command\Install\InstallFixFolderStructureCommand;
 use Helhum\Typo3Console\Command\Install\InstallSetupCommand;
 use Helhum\Typo3Console\Command\InstallTool\LockInstallToolCommand;
 use Helhum\Typo3Console\Command\InstallTool\UnlockInstallToolCommand;
+use Helhum\Typo3Console\Command\Upgrade\UpgradeListCommand;
+use Helhum\Typo3Console\Command\Upgrade\UpgradeRunCommand;
 use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
 use Psr\Container\ContainerInterface;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
@@ -26,6 +28,8 @@ use TYPO3\CMS\Core\Console\CommandRegistry;
 use TYPO3\CMS\Core\Core\BootService;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\AbstractServiceProvider;
+use TYPO3\CMS\Install\Command\UpgradeWizardListCommand;
+use TYPO3\CMS\Install\Command\UpgradeWizardRunCommand;
 
 class ServiceProvider extends AbstractServiceProvider
 {
@@ -54,6 +58,8 @@ class ServiceProvider extends AbstractServiceProvider
             InstallActionNeedsExecutionCommand::class => [ static::class, 'getInstallActionNeedsExecutionCommand' ],
             LockInstallToolCommand::class => [ static::class, 'getLockInstallToolCommand' ],
             UnlockInstallToolCommand::class => [ static::class, 'getUnlockInstallToolCommand' ],
+            UpgradeWizardListCommand::class => [ static::class, 'getUpgradeListCommand' ],
+            UpgradeWizardRunCommand::class => [ static::class, 'getUpgradeRunCommand' ],
         ];
     }
 
@@ -155,6 +161,16 @@ class ServiceProvider extends AbstractServiceProvider
     public static function getUnlockInstallToolCommand(): UnlockInstallToolCommand
     {
         return new UnlockInstallToolCommand('install:unlock');
+    }
+
+    public static function getUpgradeListCommand(ContainerInterface $container): UpgradeListCommand
+    {
+        return new UpgradeListCommand($container->get(BootService::class));
+    }
+
+    public static function getUpgradeRunCommand(ContainerInterface $container): UpgradeRunCommand
+    {
+        return new UpgradeRunCommand($container->get(BootService::class));
     }
 
     public static function configureCommands(ContainerInterface $container, CommandRegistry $commandRegistry): CommandRegistry

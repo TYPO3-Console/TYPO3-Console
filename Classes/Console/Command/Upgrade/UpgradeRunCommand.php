@@ -25,6 +25,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use TYPO3\CMS\Core\Core\BootService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Service\UpgradeWizardsService;
 use TYPO3\CMS\Install\Updates\DatabaseRowsUpdateWizard;
@@ -32,6 +33,13 @@ use TYPO3\CMS\Install\Updates\DatabaseRowsUpdateWizard;
 class UpgradeRunCommand extends Command
 {
     private const allWizardsOrConfirmations = 'all';
+
+    private bool $booted = false;
+
+    public function __construct(private readonly BootService $bootService)
+    {
+        parent::__construct('upgrade:run');
+    }
 
     /**
      * @var UpgradeHandling
@@ -97,6 +105,8 @@ EOH
 
     protected function interact(InputInterface $input, OutputInterface $output)
     {
+        $this->ensureBooted();
+
         $this->upgradeHandling = new UpgradeHandling();
         if (empty($input->getArgument('wizardIdentifiers'))) {
             $scheduledWizards = $this->upgradeHandling->listWizards()['scheduled'];
@@ -125,6 +135,8 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->ensureBooted();
+
         $this->upgradeHandling = $this->upgradeHandling ?? new UpgradeHandling();
         if (!$this->upgradeHandling->isUpgradePrepared()) {
             $this->upgradeHandling->prepareUpgrade();
@@ -142,6 +154,15 @@ EOH
         (new UpgradeWizardResultRenderer())->render($results, new ConsoleOutput($output, $input));
 
         return 0;
+    }
+
+    private function ensureBooted(): void
+    {
+        if ($this->booted) {
+            return;
+        }
+        $this->bootService->loadExtLocalconfDatabaseAndExtTables();
+        $this->booted = true;
     }
 
     private function unpackArguments(InputInterface $input): array
