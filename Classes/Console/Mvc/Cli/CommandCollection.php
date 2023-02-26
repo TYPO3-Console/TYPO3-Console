@@ -32,28 +32,17 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class CommandCollection implements CommandLoaderInterface
 {
     /**
-     * @var CommandConfiguration
-     */
-    private $commandConfiguration;
-
-    /**
      * @var array|BaseCommand[]
      */
     private $commands = [];
-
-    /**
-     * @var string[]
-     */
-    private $replaces = [];
 
     /**
      * @var Typo3CommandRegistry
      */
     private $typo3CommandRegistry;
 
-    public function __construct(CommandConfiguration $commandConfiguration, Typo3CommandRegistry $typo3CommandRegistry)
+    public function __construct(Typo3CommandRegistry $typo3CommandRegistry)
     {
-        $this->commandConfiguration = $commandConfiguration;
         $this->typo3CommandRegistry = $typo3CommandRegistry;
         $this->populateCommands();
     }
@@ -166,9 +155,7 @@ class CommandCollection implements CommandLoaderInterface
 
     private function populateCommands(): void
     {
-        $definitions = array_merge($this->commandConfiguration->getCommandDefinitions(), $this->getTypo3ServiceDefinitions());
-        $this->replaces = $this->commandConfiguration->getReplaces();
-        foreach ($definitions as $commandConfig) {
+        foreach ($this->getTypo3ServiceDefinitions() as $commandConfig) {
             $this->add($commandConfig);
         }
     }
@@ -218,9 +205,6 @@ class CommandCollection implements CommandLoaderInterface
                 throw new RuntimeException(sprintf('Command "%s" is registered as service. Setting runLevel via configuration is not supported in that case.', $finalCommandName), 1589019018);
             }
             // Command is also registered as service. Ignoring legacy registration
-            return;
-        }
-        if (in_array($commandConfig['class'], $this->replaces, true)) {
             return;
         }
         if (isset($this->commands[$finalCommandName])) {
