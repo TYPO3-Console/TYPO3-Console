@@ -40,11 +40,6 @@ return [
         'class' => \Helhum\Typo3Console\Command\Install\InstallSetupCommand::class,
         'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
     ],
-    'install:generatepackagestates' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Install\InstallGeneratePackageStatesCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_COMPILE,
-    ],
     'install:fixfolderstructure' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Install\InstallFixFolderStructureCommand::class,
