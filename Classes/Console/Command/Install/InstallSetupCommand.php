@@ -213,8 +213,9 @@ EOH
     private function getNormalizedInstallStepArguments(InputInterface $input): array
     {
         $normalizedArguments = [];
+        $input = new ArgvInput($input);
         foreach ($input->getOptions() as $optionName => $value) {
-            if ($value !== null && $input instanceof ArgvInput && $input->hasGivenOption($optionName)) {
+            if ($value !== null && $input->hasGivenOption($optionName)) {
                 $normalizedArguments[$this->dashedToLowerCamelCase($optionName)] = $value;
             }
         }

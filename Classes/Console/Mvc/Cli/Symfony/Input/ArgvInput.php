@@ -14,19 +14,24 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony\Input;
  *
  */
 
+use Symfony\Component\Console\Input\InputInterface;
+
 class ArgvInput extends \Symfony\Component\Console\Input\ArgvInput
 {
-    /**
-     * @return bool
-     */
+    public function __construct(InputInterface $input)
+    {
+        if ($input instanceof \Symfony\Component\Console\Input\ArgvInput) {
+            $this->options = $input->options;
+            $this->arguments = $input->arguments;
+        }
+        parent::__construct();
+    }
+
     public function hasGivenOption(string $name): bool
     {
         return array_key_exists($name, $this->options);
     }
 
-    /**
-     * @return bool
-     */
     public function hasGivenArgument(string $name): bool
     {
         return array_key_exists($name, $this->arguments);

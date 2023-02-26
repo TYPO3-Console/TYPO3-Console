@@ -44,6 +44,9 @@ EOH
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        // TYPO3 cli bootstrap initializes a user,
+        // which will cause a fatal error when trying to store the flash messages in the user session.
+        unset($GLOBALS['BE_USER']);
         $folderStructureFactory = GeneralUtility::makeInstance(DefaultFactory::class);
         $messages = $folderStructureFactory
             ->getStructure()
