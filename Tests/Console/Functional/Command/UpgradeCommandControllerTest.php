@@ -21,32 +21,6 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
-    public function checkExtensionCompatibilityReportsBrokenCodeInExtTables(): void
-    {
-        self::installFixtureExtensionCode('ext_broken_ext_tables');
-
-        $output = $this->commandDispatcher->executeCommand('upgrade:checkextensioncompatibility', ['ext_broken_ext_tables']);
-        $this->assertSame('false', $output);
-
-        self::removeFixtureExtensionCode('ext_broken_ext_tables');
-    }
-
-    /**
-     * @test
-     */
-    public function checkExtensionCompatibilityDoeNotReportBrokenCodeInExtTablesWithConfigOnlyCheck(): void
-    {
-        self::installFixtureExtensionCode('ext_broken_ext_tables');
-
-        $output = $this->commandDispatcher->executeCommand('upgrade:checkextensioncompatibility', ['ext_broken_ext_tables', '--config-only']);
-        $this->assertSame('true', $output);
-
-        self::removeFixtureExtensionCode('ext_broken_ext_tables');
-    }
-
-    /**
-     * @test
-     */
     public function upgradePrepareCanBeRun(): void
     {
         $this->executeConsoleCommand('configuration:remove', ['EXTCONF/helhum-typo3-console', '--force']);

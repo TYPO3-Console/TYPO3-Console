@@ -96,8 +96,6 @@ Available Commands
 
    InstallUnlock
 
-   UpgradeCheckextensionconstraints
-
    UpgradeList
 
    UpgradePrepare
