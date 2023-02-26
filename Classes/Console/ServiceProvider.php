@@ -5,6 +5,7 @@ namespace Helhum\Typo3Console;
 use Helhum\Typo3Console\Command\Database\DatabaseUpdateSchemaCommand;
 use Helhum\Typo3Console\Command\Install\InstallActionNeedsExecutionCommand;
 use Helhum\Typo3Console\Command\Install\InstallDatabaseConnectCommand;
+use Helhum\Typo3Console\Command\Install\InstallDatabaseDataCommand;
 use Helhum\Typo3Console\Command\Install\InstallDatabaseSelectCommand;
 use Helhum\Typo3Console\Command\Install\InstallEnvironmentAndFoldersCommand;
 use Helhum\Typo3Console\Command\Install\InstallExtensionSetupIfPossibleCommand;
@@ -33,6 +34,7 @@ class ServiceProvider extends AbstractServiceProvider
             InstallExtensionSetupIfPossibleCommand::class => [ static::class, 'getInstallExtensionSetupIfPossibleCommand' ],
             InstallEnvironmentAndFoldersCommand::class => [ static::class, 'getInstallEnvironmentAndFoldersCommand' ],
             InstallDatabaseConnectCommand::class => [ static::class, 'getInstallDatabaseConnectCommand' ],
+            InstallDatabaseDataCommand::class => [ static::class, 'getInstallDatabaseDataCommand' ],
             InstallDatabaseSelectCommand::class => [ static::class, 'getInstallDatabaseSelectCommand' ],
             InstallActionNeedsExecutionCommand::class => [ static::class, 'getInstallActionNeedsExecutionCommand' ],
             LockInstallToolCommand::class => [ static::class, 'getLockInstallToolCommand' ],
@@ -77,6 +79,11 @@ class ServiceProvider extends AbstractServiceProvider
         return new InstallDatabaseConnectCommand('install:databaseconnect');
     }
 
+    public static function getInstallDatabaseDataCommand(ContainerInterface $container): InstallDatabaseDataCommand
+    {
+        return new InstallDatabaseDataCommand($container->get(BootService::class));
+    }
+
     public static function getInstallDatabaseSelectCommand(): InstallDatabaseSelectCommand
     {
         return new InstallDatabaseSelectCommand('install:databaseselect');
@@ -105,6 +112,7 @@ class ServiceProvider extends AbstractServiceProvider
         $commandRegistry->addLazyCommand('install:extensionsetupifpossible', InstallExtensionSetupIfPossibleCommand::class, 'Fix folder structure');
         $commandRegistry->addLazyCommand('install:environmentandfolders', InstallEnvironmentAndFoldersCommand::class, 'Check environment / create folders');
         $commandRegistry->addLazyCommand('install:databaseconnect', InstallDatabaseConnectCommand::class, 'Connect to database');
+        $commandRegistry->addLazyCommand('install:databasedata', InstallDatabaseDataCommand::class, 'Add database data');
         $commandRegistry->addLazyCommand('install:databaseselect', InstallDatabaseSelectCommand::class, 'Select database');
         $commandRegistry->addLazyCommand('install:actionneedsexecution', InstallActionNeedsExecutionCommand::class, 'Calls needs execution on the given action and returns the result');
         $commandRegistry->addLazyCommand('install:lock', LockInstallToolCommand::class, 'Lock Install Tool');
