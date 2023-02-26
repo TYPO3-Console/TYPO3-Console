@@ -88,8 +88,6 @@ Available Commands
 
    InstallFixfolderstructure
 
-   InstallGeneratepackagestates
-
    InstallLock
 
    InstallSetup
