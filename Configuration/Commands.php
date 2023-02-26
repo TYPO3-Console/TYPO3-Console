@@ -2,21 +2,6 @@
 declare(strict_types=1);
 
 return [
-    'configuration:remove' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Configuration\ConfigurationRemoveCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
-    ],
-    'configuration:set' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Configuration\ConfigurationSetCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
-    ],
-    'configuration:showlocal' => [
-        'vendor' => 'typo3_console',
-        'class' => \Helhum\Typo3Console\Command\Configuration\ConfigurationShowLocalCommand::class,
-        'runLevel' => \Helhum\Typo3Console\Core\Booting\RunLevel::LEVEL_MINIMAL,
-    ],
     'database:export' => [
         'vendor' => 'typo3_console',
         'class' => \Helhum\Typo3Console\Command\Database\DatabaseExportCommand::class,

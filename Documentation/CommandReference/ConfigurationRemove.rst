@@ -11,7 +11,7 @@ configuration:remove
 ====================
 
 
-**Remove configuration option**
+**Remove configuration value**
 
 Removes a system configuration option by path.
 
