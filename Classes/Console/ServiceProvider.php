@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace Helhum\Typo3Console;
 
+use Helhum\Typo3Console\Command\CommandApplication;
 use Helhum\Typo3Console\Command\Configuration\ConfigurationRemoveCommand;
 use Helhum\Typo3Console\Command\Configuration\ConfigurationSetCommand;
 use Helhum\Typo3Console\Command\Configuration\ConfigurationShowLocalCommand;
@@ -22,14 +23,17 @@ use Helhum\Typo3Console\Command\InstallTool\UnlockInstallToolCommand;
 use Helhum\Typo3Console\Command\Upgrade\UpgradeListCommand;
 use Helhum\Typo3Console\Command\Upgrade\UpgradeRunCommand;
 use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
+use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Psr\Container\ContainerInterface;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
+use TYPO3\CMS\Core\Console\CommandApplication as CoreCommandApplication;
 use TYPO3\CMS\Core\Console\CommandRegistry;
 use TYPO3\CMS\Core\Core\BootService;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\AbstractServiceProvider;
 use TYPO3\CMS\Install\Command\UpgradeWizardListCommand;
 use TYPO3\CMS\Install\Command\UpgradeWizardRunCommand;
+use TYPO3\SymfonyPsrEventDispatcherAdapter\EventDispatcherAdapter as SymfonyEventDispatcher;
 
 class ServiceProvider extends AbstractServiceProvider
 {
@@ -72,6 +76,7 @@ class ServiceProvider extends AbstractServiceProvider
     {
         return [
             CommandRegistry::class => [ static::class, 'configureCommands' ],
+            CoreCommandApplication::class => [ static::class, 'configureCoreCommandApplication' ],
         ] + parent::getExtensions();
     }
 
@@ -176,6 +181,20 @@ class ServiceProvider extends AbstractServiceProvider
     public static function getUpgradeRunCommand(ContainerInterface $container): UpgradeRunCommand
     {
         return new UpgradeRunCommand($container->get(BootService::class));
+    }
+
+    public static function configureCoreCommandApplication(ContainerInterface $container, CoreCommandApplication $commandApplication): CoreCommandApplication
+    {
+        $commandRegistry = $container->get(CommandRegistry::class);
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setDispatcher($container->get(SymfonyEventDispatcher::class));
+        $application->setCommandLoader($commandRegistry);
+        // Replace default list command with TYPO3 override
+        $application->add($commandRegistry->get('list'));
+        CommandApplication::overrideApplication($commandApplication, $application);
+
+        return $commandApplication;
     }
 
     public static function configureCommands(ContainerInterface $container, CommandRegistry $commandRegistry): CommandRegistry

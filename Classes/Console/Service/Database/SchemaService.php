@@ -17,8 +17,6 @@ namespace Helhum\Typo3Console\Service\Database;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateInterface;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateResult;
 use Helhum\Typo3Console\Database\Schema\SchemaUpdateType;
-use Helhum\Typo3Console\Extension\DatabaseSchemaUpdateEvent;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use TYPO3\CMS\Core\SingletonInterface;
 
 /**
@@ -31,15 +29,9 @@ class SchemaService implements SingletonInterface
      */
     private $schemaUpdate;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    public function __construct(SchemaUpdateInterface $schemaUpdate, EventDispatcherInterface $eventDispatcher = null)
+    public function __construct(SchemaUpdateInterface $schemaUpdate)
     {
         $this->schemaUpdate = $schemaUpdate;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -83,18 +75,6 @@ class SchemaService implements SingletonInterface
             }
         }
 
-        $this->emitDatabaseEvent($updateResult);
-
         return $updateResult;
-    }
-
-    private function emitDatabaseEvent($updateResult): void
-    {
-        if (!$this->eventDispatcher) {
-            return;
-        }
-        $event = new DatabaseSchemaUpdateEvent();
-        $event->result = $updateResult;
-        $this->eventDispatcher->dispatch($event);
     }
 }
