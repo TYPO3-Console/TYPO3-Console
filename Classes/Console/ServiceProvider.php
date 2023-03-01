@@ -25,6 +25,7 @@ use Helhum\Typo3Console\Command\Upgrade\UpgradeRunCommand;
 use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher as SymfonyEventDispatcher;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Console\CommandApplication as CoreCommandApplication;
 use TYPO3\CMS\Core\Console\CommandRegistry;
@@ -33,7 +34,7 @@ use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Package\AbstractServiceProvider;
 use TYPO3\CMS\Install\Command\UpgradeWizardListCommand;
 use TYPO3\CMS\Install\Command\UpgradeWizardRunCommand;
-use TYPO3\SymfonyPsrEventDispatcherAdapter\EventDispatcherAdapter as SymfonyEventDispatcher;
+use TYPO3\SymfonyPsrEventDispatcherAdapter\EventDispatcherAdapter as SymfonyEventDispatcherAdapter;
 
 class ServiceProvider extends AbstractServiceProvider
 {
@@ -188,7 +189,7 @@ class ServiceProvider extends AbstractServiceProvider
         $commandRegistry = $container->get(CommandRegistry::class);
         $application = new Application();
         $application->setAutoExit(false);
-        $application->setDispatcher($container->get(SymfonyEventDispatcher::class));
+        $application->setDispatcher(self::getSymfonyEventDispatcher($container));
         $application->setCommandLoader($commandRegistry);
         // Replace default list command with TYPO3 override
         $application->add($commandRegistry->get('list'));
@@ -218,6 +219,16 @@ class ServiceProvider extends AbstractServiceProvider
         $commandRegistry->addLazyCommand('install:unlock', UnlockInstallToolCommand::class, 'Unlock Install Tool');
 
         return $commandRegistry;
+    }
+
+    private static function getSymfonyEventDispatcher(ContainerInterface $container): SymfonyEventDispatcher | SymfonyEventDispatcherAdapter
+    {
+        if (class_exists(SymfonyEventDispatcherAdapter::class)) {
+            // @deprecated can be removed when TYPO3 11 compatibility is removed
+            return $container->get(SymfonyEventDispatcherAdapter::class);
+        }
+
+        return $container->get(SymfonyEventDispatcher::class);
     }
 
     private static function applicationIsReady(ContainerInterface $container): bool
