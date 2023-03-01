@@ -52,7 +52,7 @@
     },
     "require": {
         "helhum/typo3-console": "@dev",
-        "typo3/cms-core": "^11.5.3 || dev-main"
+        "typo3/cms-core": "^11.5.3 || ^12.2 || dev-main"
     },
     "replace": {
         "typo3/cms-backend": "*",

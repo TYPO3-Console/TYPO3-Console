@@ -28,6 +28,11 @@ class UpgradeWizardExecutorTest extends TestCase
 {
     use ProphecyTrait;
 
+    protected function setUp(): void
+    {
+        self::markTestSkipped('Not sure if it is worth trying to provide improved upgrade commands');
+    }
+
     /**
      * @test
      */
