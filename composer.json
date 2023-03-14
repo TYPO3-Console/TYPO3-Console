@@ -67,6 +67,9 @@
         "friendsofphp/php-cs-fixer": "^3.2",
         "dg/bypass-finals": "^1.4"
     },
+    "conflict": {
+        "typo3/cms-core": "11.5.25"
+    },
     "autoload": {
         "psr-4": {
             "Helhum\\Typo3Console\\": [

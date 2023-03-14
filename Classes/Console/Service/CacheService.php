@@ -14,13 +14,9 @@ namespace Helhum\Typo3Console\Service;
  *
  */
 
-use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheGroupException;
-use TYPO3\CMS\Core\Core\Bootstrap;
-use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Cache Service handles all cache clearing related tasks
@@ -51,27 +47,6 @@ class CacheService implements SingletonInterface
     public function flush()
     {
         $this->cacheManager->flushCaches();
-    }
-
-    /**
-     * Flushes caches using the data handler.
-     * Although we trigger the cache flush API here, the real intention is to trigger
-     * hook subscribers, so that they can do their job (flushing "other" caches when cache is flushed).
-     *
-     * We use "all" because this method is only called from "flush" command which is indeed meant
-     * to flush all caches. Besides that, "all" is really all caches starting from TYPO3 8.x
-     * thus it would make sense for the hook subscribers to act on that cache clear type.
-     *
-     * However if you find a valid use case for us to also call "pages" here, then please create
-     * a pull request and describe this case.
-     */
-    public function flushCachesWithDataHandler(): void
-    {
-        Bootstrap::initializeBackendUser(CommandLineUserAuthentication::class);
-        Bootstrap::initializeBackendAuthentication();
-        $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
-        $dataHandler->start([], []);
-        $dataHandler->clear_cacheCmd('all');
     }
 
     /**
