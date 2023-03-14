@@ -24,7 +24,7 @@ use Symfony\Component\Process\Process;
 /**
  * This class can be used to execute console commands in a sub process
  * It is especially useful during initial TYPO3 setup, but also when commands
- * need a minimal bootstrap first, but the execute some actions with a fill bootstrap
+ * need a minimal bootstrap first, but need to execute some actions with a fill bootstrap
  * like e.g. the cache:flush command
  */
 class CommandDispatcher
@@ -53,28 +53,13 @@ class CommandDispatcher
 
     /**
      * Create the dispatcher from within a composer plugin context
-     *
-     * @param array $arguments
-     * @internal param ScriptEvent $event (deprecated) Possibly given but deprecated event
-     * @internal param array $commandLine
-     * @internal param array $environmentVars
-     * @internal param PhpExecutableFinder $phpFinder
-     * @return CommandDispatcher
      */
-    public static function createFromComposerRun(...$arguments): self
+    public static function createFromComposerRun(ScriptEvent|string $scriptEventOrCommandPath, array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null): self
     {
-        throw new \RuntimeException('Currently not implemented', 1677436170);
-        if (isset($arguments[0]) && $arguments[0] instanceof ScriptEvent) {
-            // Calling createFromComposerRun with ScriptEvent as first argument is deprecated and will be removed with 6.0
-            array_shift($arguments);
+        $typo3CommandPath = $scriptEventOrCommandPath;
+        if ($scriptEventOrCommandPath instanceof ScriptEvent) {
+            $typo3CommandPath = $scriptEventOrCommandPath->getComposer()->getConfig()->get('bin-dir') . '/typo3';
         }
-
-        $commandLine = $arguments[0] ?? [];
-        $environmentVars = $arguments[1] ?? [];
-        $phpFinder = $arguments[2] ?? null;
-
-        // should be Application::COMMAND_NAME, but our Application class currently conflicts with symfony/console 2.7, which is used by Composer
-        $typo3CommandPath = dirname(__DIR__, 4) . '/typo3cms';
         $environmentVars['TYPO3_CONSOLE_PLUGIN_RUN'] = true;
 
         return self::create($typo3CommandPath, $commandLine, $environmentVars, $phpFinder);
