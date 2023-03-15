@@ -25,4 +25,3 @@
 *.txt text eol=lf
 *.yaml text eol=lf
 *.yml text eol=lf
-typo3cms text eol=lf
