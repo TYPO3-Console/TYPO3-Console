@@ -10,7 +10,12 @@
 # TYPO3 Console
 
 TYPO3 Console (helhum/typo3-console) provides a clean way to register commands and
-a sane way to call these commands through a command line tool called `typo3cms`.
+a sane way to call these commands through the TYPO3 core command line tool called `typo3`.
+
+### Important information for longtime users
+**Since version 8.0.0 the extra binary `typo3cms` is removed and superseded with the core binary `typo3`.
+Commands that were called e.g. `typo3cms database:updateschema` before,
+must now be called with `typo3 database:updateschema`.**
 
 It ships many commands to execute TYPO3 actions, which otherwise would only be accessible via the TYPO3 backend.
 This makes TYPO3 Console a perfect companion for development, deployment, Docker setups, continuous integration
@@ -18,17 +23,8 @@ workflows or anything else where automation is required or beneficial.
 
 Examples for such commands are:
 
-* `typo3cms install:setup` to completely set up TYPO3 from command line
-* `typo3cms upgrade:run` to execute upgrades from command line
-* `typo3cms extension:setupactive` to set up all active extensions (database schema update, data import, …)
-
-and the features include:
-
-* TYPO3 installation and upgrades from command line
-* Flexible bootstrap for commands (not every command needs a fully bootstrapped framework)
-* Reliable cache flush commands
-* Many commands useful for deployment
-* Support for Symfony commands registered within TYPO3 extensions and Composer packages
+* `typo3 install:setup` to completely set up TYPO3 from command line
+* `typo3 database:updateschema` to perform granular database schema updates
 
 |                  | URL                                                       |
 |------------------|-----------------------------------------------------------|
