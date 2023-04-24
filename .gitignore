@@ -5,7 +5,7 @@
 /Classes/Console/Hook/*
 /Configuration/ComposerPackagesCommands.php
 /Documentation-GENERATED-temp
-/Libraries/vendor
+/Resources/Private/ExtensionArtifacts/Libraries
 /Resources/Public/*
 
 /.php-cs-fixer.cache

@@ -99,31 +99,26 @@
         "set-version": [
             "Helhum\\Typo3Console\\Composer\\ScriptHelper::setVersion"
         ],
-        "extension-verify-composer-json": [
-            "Helhum\\Typo3Console\\Composer\\ScriptHelper::verifyComposerJsonOfExtension"
-        ],
         "extension-copy": [
             "@extension-clean",
             "mkdir -p ../extension",
-            "cp -r Resources/Private/ExtensionArtifacts/* ../extension/"
+            "cp -r ./* ../extension/",
+            "mv ../extension/Resources/Private/ExtensionArtifacts/ext_emconf.php ../extension"
         ],
         "extension-build": [
             "@extension-copy",
-            "@composer config repositories.console '{\"type\": \"path\", \"url\": \"'$(pwd)'\", \"options\": {\"symlink\": false}}' -d ../extension",
-            "@composer update -d ../extension/"
+            "@composer install -d ../extension/Resources/Private/ExtensionArtifacts/"
         ],
         "extension-release": [
             "@extension-build",
-            "sed -i.bak -e 's/\"typo3-console\\/extension\"/\"helhum\\/typo3-console\"/g' ../extension/composer.json",
-            "rm ../extension/composer.lock",
-            "rm ../extension/composer.json.bak",
-            "rm -rf ../extension/Libraries/bin/",
-            "rm -rf ../extension/Libraries/helhum/typo3-console/Packages/",
-            "rm -rf ../extension/Libraries/helhum/typo3-console/Resources/Private/ExtensionArtifacts/",
-            "rm -rf ../extension/Libraries/helhum/typo3-console/Resources/Private/Patches/",
-            "rm -rf ../extension/Libraries/helhum/typo3-console/Tests/",
-            "rm -rf ../extension/Libraries/helhum/typo3-console/.github/",
-            "mv ../extension/Libraries/helhum/typo3-console/Documentation/ ../extension/"
+            "rm -rf ../extension/vendor/",
+            "rm -rf ../extension/public/",
+            "rm -rf ../extension/Packages/",
+            "mv ../extension/Resources/Private/ExtensionArtifacts/Resources/Public ../extension/Resources/",
+            "rm -rf ../extension/Resources/Private/ExtensionArtifacts/Resources ../extension/Resources/Private/ExtensionArtifacts/composer.*",
+            "rm -rf ../extension/Resources/Private/Patches/",
+            "rm -rf ../extension/Tests/",
+            "rm ../extension/sonar-project.properties  ../extension/phpunit.xml.dist"
         ],
         "extension-clean": [
             "rm -rf ../extension/*"

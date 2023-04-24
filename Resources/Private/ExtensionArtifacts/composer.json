@@ -1,40 +1,5 @@
 {
-    "extra": {
-        "Hint": "This composer.json is automatically generated and invalid after the process. Don't rely on its content whatsoever.",
-        "typo3/cms": {
-            "extension-key": "typo3_console",
-            "Package": {
-                "partOfMinimalUsableSystem": true
-            }
-        }
-    },
-    "repositories": {
-        "console": {"type": "path", "url": "../typo3_console/", "options": {"symlink": false}}
-    },
-    "name": "typo3-console/extension",
-    "description": "A reliable and powerful command line interface for TYPO3 CMS",
-    "type": "typo3-cms-extension",
-    "keywords": [
-        "TYPO3",
-        "cli",
-        "console",
-        "command",
-        "commandline"
-    ],
-    "homepage": "https://insight.helhum.io/post/104528981610/about-the-beauty-and-power-of-typo3-console",
-    "support": {
-        "issues": "https://github.com/TYPO3-Console/TYPO3-Console/issues",
-        "source": "https://github.com/TYPO3-Console/TYPO3-Console",
-        "docs": "https://docs.typo3.org/p/helhum/typo3-console/main/en-us/"
-    },
-    "authors": [
-        {
-            "name": "Helmut Hummel",
-            "email": "info@helhum.io",
-            "role": "Developer",
-            "homepage": "https://helhum.io"
-        }
-    ],
+    "name": "typo3-console/libs",
     "license": "GPL-2.0-or-later",
     "config": {
         "vendor-dir": "Libraries",
@@ -43,32 +8,8 @@
         },
         "classmap-authoritative": true
     },
-    "autoload": {
-        "psr-4": {
-            "Helhum\\Typo3Console\\": [
-                "Classes/Console/"
-            ]
-        }
-    },
     "require": {
-        "helhum/typo3-console": "@dev",
-        "typo3/cms-core": "^11.5.3 || ^12.2 || dev-main"
-    },
-    "replace": {
-        "typo3/cms-backend": "*",
-        "typo3/cms-composer-installers": "*",
-        "typo3/cms-core": "<11.5.25 || >11.5.25",
-        "typo3/cms-extbase": "*",
-        "typo3/cms-extensionmanager": "*",
-        "typo3/cms-fluid": "*",
-        "typo3/cms-frontend": "*",
-        "typo3/cms-install": "*",
-        "typo3/cms-saltedpasswords": "*",
-
-        "psr/log": "*",
-        "symfony/console": "*",
-        "symfony/debug": "*",
-        "symfony/polyfill-mbstring": "*",
-        "symfony/polyfill-php80": ">=1.23.1"
+        "symfony/process": "^6.2",
+        "helhum/config-loader": "^0.12.5"
     }
 }

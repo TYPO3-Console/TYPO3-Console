@@ -54,7 +54,7 @@ class CliMessageRenderer
             case 'error':
             case 'warning':
                 $subject = sprintf('<%1$s>' . $subject . '</%1$s>', $severity);
-            break;
+                break;
             default:
         }
         $this->output->outputLine($subject);

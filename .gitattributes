@@ -1,14 +1,14 @@
-/Libraries/ export-ignore
 /Packages/ export-ignore
 /Resources/Private/ExtensionArtifacts/ export-ignore
-/Resources/Private/deploy_rsa.enc export-ignore
+/Resources/Private/Patches/ export-ignore
 /Tests/ export-ignore
+/.ddev export-ignore
+/.editorconfig export-ignore
 /.gitattributes export-ignore
 /.github/ export-ignore
 /.gitignore export-ignore
-/.php_cs.dist export-ignore
+/.php-cs-fixer.php export-ignore
 /.styleci.yml export-ignore
-/.travis.yml export-ignore
 /phpunit.xml.dist export-ignore
 /sonar-project.properties export-ignore
 

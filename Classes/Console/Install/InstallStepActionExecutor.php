@@ -60,7 +60,7 @@ class InstallStepActionExecutor
                         'values' => $values,
                     ],
                 ]
-            // The TYPO3 code used to install is nor prepared to run on cli, so we provide a fake web request here
+                // The TYPO3 code used to install is nor prepared to run on cli, so we provide a fake web request here
             )->withAttribute(
                 'normalizedParams',
                 NormalizedParams::createFromServerParams(

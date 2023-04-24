@@ -88,8 +88,8 @@ class UpgradeCommandControllerTest extends AbstractCommandTest
             $this->executeMysqlQuery('DELETE FROM sys_registry WHERE entry_namespace = \'installUpdate\' AND entry_key NOT LIKE \'%Argon2iPasswordHashes\'');
             $output = $this->executeConsoleCommand('upgrade:run', ['all', '--deny', 'all']);
             //TODO: FIXME
-//            $this->assertStringContainsString('pagesLanguageOverlayBeGroupsAccessRights', $output);
-//            $this->assertStringContainsString('Skipped wizard "typo3DbLegacyExtension"', $output);
+            //            $this->assertStringContainsString('pagesLanguageOverlayBeGroupsAccessRights', $output);
+            //            $this->assertStringContainsString('Skipped wizard "typo3DbLegacyExtension"', $output);
             $this->assertStringContainsString('Skipped wizard "anotherConfirmableUpgradeWizard"', $output);
             $this->assertStringContainsString('Skipped wizard "confirmableWizard" but it needs confirmation', $output);
             $output = $this->executeConsoleCommand('upgrade:run', ['all', '--confirm', 'all']);

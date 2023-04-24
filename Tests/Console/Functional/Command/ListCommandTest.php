@@ -18,15 +18,15 @@ use Helhum\Typo3Console\Mvc\Cli\FailedSubProcessCommandException;
 
 class ListCommandTest extends AbstractCommandTest
 {
-//    public static function setUpBeforeClass(): void
-//    {
-//        self::installFixtureExtensionCode('ext_command');
-//    }
-//
-//    public static function tearDownAfterClass(): void
-//    {
-//        self::removeFixtureExtensionCode('ext_command');
-//    }
+    //    public static function setUpBeforeClass(): void
+    //    {
+    //        self::installFixtureExtensionCode('ext_command');
+    //    }
+    //
+    //    public static function tearDownAfterClass(): void
+    //    {
+    //        self::removeFixtureExtensionCode('ext_command');
+    //    }
 
     public function setUp(): void
     {
