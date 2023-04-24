@@ -1,0 +1,138 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "8cc7f3c40f7f7d93b540762b98a2e1d4",
+    "packages": [
+        {
+            "name": "helhum/config-loader",
+            "version": "v0.12.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/helhum/config-loader.git",
+                "reference": "f761ab3fcf888b9d17d679d94b14aca24fe6bfab"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/helhum/config-loader/zipball/f761ab3fcf888b9d17d679d94b14aca24fe6bfab",
+                "reference": "f761ab3fcf888b9d17d679d94b14aca24fe6bfab",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "php-parallel-lint/php-parallel-lint": "^1.2",
+                "phpunit/phpunit": "^8.5",
+                "symfony/yaml": "^2.8 || ^3.3 || ^4.0 || ^5.0"
+            },
+            "suggest": {
+                "ext-yaml": "For improved performance when parsing yaml files you should use the PECL YAML Parser php extension",
+                "symfony/yaml": "To be able to parse yaml files, you will need symfony/yaml"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Helhum\\ConfigLoader\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Generic config loader with context and environment support.",
+            "support": {
+                "issues": "https://github.com/helhum/config-loader/issues",
+                "source": "https://github.com/helhum/config-loader/tree/v0.12.5"
+            },
+            "funding": [
+                {
+                    "url": "https://www.paypal.me/helhum/19.99",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/helhum",
+                    "type": "github"
+                }
+            ],
+            "time": "2022-02-21T15:32:39+00:00"
+        },
+        {
+            "name": "symfony/process",
+            "version": "v6.2.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/process.git",
+                "reference": "75ed64103df4f6615e15a7fe38b8111099f47416"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/process/zipball/75ed64103df4f6615e15a7fe38b8111099f47416",
+                "reference": "75ed64103df4f6615e15a7fe38b8111099f47416",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Process\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Executes commands in sub-processes",
+            "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/process/tree/v6.2.8"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2023-03-09T16:20:02+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "2.3.0"
+}

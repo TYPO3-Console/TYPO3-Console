@@ -51,10 +51,6 @@ jobs:
                     composer set-version $(echo ${{ steps.github-ref.outputs.tag }} | sed s/^v//g)
                     test -z "$(git diff --shortstat 2> /dev/null | tail -n1)";
 
-            -   name: Compare extension composer.json with main composer.json
-                run: |
-                    composer extension-verify-composer-json
-
             -   name: Build extension artifact
                 run: |
                     composer extension-release

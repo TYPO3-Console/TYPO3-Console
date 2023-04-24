@@ -33,7 +33,7 @@ class ScriptHelper
         if (!preg_match('/(\d+)\.(\d+)\.(\d+)/', $version, $matches)) {
             throw new Exception('No valid version number provided!', 1468672604);
         }
-        [, $major, $minor, ] = $matches;
+        [, $major, $minor] = $matches;
         $branchVersion = sprintf('%d.%d.x-dev', $major, $minor);
 
         $docConfigFile = __DIR__ . '/../../../Documentation/Settings.cfg';
@@ -70,23 +70,5 @@ class ScriptHelper
         $content = file_get_contents($sonarConfigFile);
         $content = preg_replace('/(sonar.projectVersion)=\d+\.\d+\.\d+/', '$1=' . $version, $content);
         file_put_contents($sonarConfigFile, $content);
-    }
-
-    /**
-     * @throws Exception
-     * @throws \JsonException
-     */
-    public static function verifyComposerJsonOfExtension(): void
-    {
-        $main = json_decode(file_get_contents('composer.json') ?: '', true, 512, JSON_THROW_ON_ERROR);
-        $extension = json_decode(file_get_contents('Resources/Private/ExtensionArtifacts/composer.json') ?: '', true, 512, JSON_THROW_ON_ERROR);
-        foreach (['description', 'keywords', 'support', 'homepage', 'authors', 'license'] as $name) {
-            if ($main[$name] !== $extension[$name]) {
-                throw new Exception(sprintf('Property "%s" is not the same', $name));
-            }
-        }
-        if ($main['require']['typo3/cms-core'] !== $extension['require']['typo3/cms-core']) {
-            throw new Exception('Extension core version does not match main core version');
-        }
     }
 }

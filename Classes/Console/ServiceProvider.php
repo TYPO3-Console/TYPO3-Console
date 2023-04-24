@@ -24,12 +24,14 @@ use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher as SymfonyEventDispatcher;
+use Symfony\Component\Process\Process;
 use TYPO3\CMS\Core\Adapter\EventDispatcherAdapter as SymfonyEventDispatcherCoreAdapter;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Console\CommandApplication as CoreCommandApplication;
 use TYPO3\CMS\Core\Console\CommandRegistry;
 use TYPO3\CMS\Core\Core\BootService;
 use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Package\AbstractServiceProvider;
 use TYPO3\SymfonyPsrEventDispatcherAdapter\EventDispatcherAdapter as SymfonyEventDispatcherAdapter;
 
@@ -47,6 +49,10 @@ class ServiceProvider extends AbstractServiceProvider
 
     public function getFactories(): array
     {
+        if (!class_exists(Process::class) && !Environment::isComposerMode()) {
+            require __DIR__ . '/../../Resources/Private/ExtensionArtifacts/Libraries/autoload.php';
+        }
+
         return [
             ConfigurationRemoveCommand::class => [ static::class, 'getConfigurationRemoveCommand' ],
             ConfigurationSetCommand::class => [ static::class, 'getConfigurationSetCommand' ],
