@@ -82,8 +82,12 @@ class WriteWebServerConfigAction implements InstallActionInterface
 
     private function getInstallPackagePath(): string
     {
-        $installPackagePath = InstalledVersions::getInstallPath('typo3/cms-install');
-        if ($installPackagePath !== null) {
+        try {
+            $installPackagePath = InstalledVersions::getInstallPath('typo3/cms-install');
+        } catch (\OutOfBoundsException $e) {
+            // non composer mode
+        }
+        if (isset($installPackagePath)) {
             return $installPackagePath;
         }
 
