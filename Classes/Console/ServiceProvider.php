@@ -194,12 +194,12 @@ class ServiceProvider extends AbstractServiceProvider
         $commandRegistry->addLazyCommand('install:setup', InstallSetupCommand::class, 'TYPO3 Setup');
         $commandRegistry->addLazyCommand('install:fixfolderstructure', InstallFixFolderStructureCommand::class, 'Fix folder structure');
         $commandRegistry->addLazyCommand('install:extensionsetupifpossible', InstallExtensionSetupIfPossibleCommand::class, 'Fix folder structure');
-        $commandRegistry->addLazyCommand('install:environmentandfolders', InstallEnvironmentAndFoldersCommand::class, 'Check environment / create folders');
-        $commandRegistry->addLazyCommand('install:databaseconnect', InstallDatabaseConnectCommand::class, 'Connect to database');
-        $commandRegistry->addLazyCommand('install:databasedata', InstallDatabaseDataCommand::class, 'Add database data');
-        $commandRegistry->addLazyCommand('install:databaseselect', InstallDatabaseSelectCommand::class, 'Select database');
-        $commandRegistry->addLazyCommand('install:defaultconfiguration', InstallDefaultConfigurationCommand::class, 'Write default configuration');
-        $commandRegistry->addLazyCommand('install:actionneedsexecution', InstallActionNeedsExecutionCommand::class, 'Calls needs execution on the given action and returns the result');
+        $commandRegistry->addLazyCommand('install:environmentandfolders', InstallEnvironmentAndFoldersCommand::class, 'Check environment / create folders', true);
+        $commandRegistry->addLazyCommand('install:databaseconnect', InstallDatabaseConnectCommand::class, 'Connect to database', true);
+        $commandRegistry->addLazyCommand('install:databasedata', InstallDatabaseDataCommand::class, 'Add database data', true);
+        $commandRegistry->addLazyCommand('install:databaseselect', InstallDatabaseSelectCommand::class, 'Select database', true);
+        $commandRegistry->addLazyCommand('install:defaultconfiguration', InstallDefaultConfigurationCommand::class, 'Write default configuration', true);
+        $commandRegistry->addLazyCommand('install:actionneedsexecution', InstallActionNeedsExecutionCommand::class, 'Calls needs execution on the given action and returns the result', true);
         $commandRegistry->addLazyCommand('install:lock', LockInstallToolCommand::class, 'Lock Install Tool');
         $commandRegistry->addLazyCommand('install:unlock', UnlockInstallToolCommand::class, 'Unlock Install Tool');
 
