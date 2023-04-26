@@ -10,6 +10,7 @@
 /.php-cs-fixer.php export-ignore
 /.styleci.yml export-ignore
 /phpunit.xml.dist export-ignore
+/render-documentation.yml export-ignore
 /sonar-project.properties export-ignore
 
 # Enforce checkout with linux lf consistent over all plattforms
