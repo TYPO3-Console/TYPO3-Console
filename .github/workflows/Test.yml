@@ -24,11 +24,11 @@ jobs:
                 uses: actions/cache@v3
                 with:
                     path: ${{ steps.composer-cache-vars.outputs.dir }}
-                    key: ${{ runner.os }}-composer-^11.5.3-stable-8.1-${{ steps.composer-cache-vars.outputs.timestamp }}
+                    key: ${{ runner.os }}-composer-^11.5.26-stable-8.1-${{ steps.composer-cache-vars.outputs.timestamp }}
                     restore-keys: |
-                        ${{ runner.os }}-composer-^11.5.3-stable-8.1-
-                        ${{ runner.os }}-composer-^11.5.3-stable-
-                        ${{ runner.os }}-composer-^11.5.3-
+                        ${{ runner.os }}-composer-^11.5.26-stable-8.1-
+                        ${{ runner.os }}-composer-^11.5.26-stable-
+                        ${{ runner.os }}-composer-^11.5.26-
                         ${{ runner.os }}-composer-
 
             -   name: Set up PHP Version 8.1
@@ -63,7 +63,7 @@ jobs:
             fail-fast: false
             matrix:
                 os: [ 'ubuntu-latest' ]
-                typo3: [ '^11.5.3', '^12.2' ]
+                typo3: [ '^11.5.26', '^12.4' ]
                 php: [ '8.1', '8.2' ]
                 dependency-version: [ lowest, stable ]
                 experimental: [ false ]
@@ -75,7 +75,7 @@ jobs:
                         experimental: true
                     -   os: 'windows-latest'
                         php: 8.1
-                        typo3: '^11.5.3'
+                        typo3: '^11.5.26'
                         dependency-version: stable
                         experimental: false
 

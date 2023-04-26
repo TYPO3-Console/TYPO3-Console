@@ -24,8 +24,7 @@ use Helhum\Typo3Console\Command\InstallTool\UnlockInstallToolCommand;
 use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher as SymfonyEventDispatcher;
-use TYPO3\CMS\Core\Adapter\EventDispatcherAdapter as SymfonyEventDispatcherCoreAdapter;
+use TYPO3\CMS\Core\Adapter\EventDispatcherAdapter as SymfonyEventDispatcherAdapter;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Console\CommandApplication as CoreCommandApplication;
 use TYPO3\CMS\Core\Console\CommandRegistry;
@@ -33,7 +32,7 @@ use TYPO3\CMS\Core\Core\BootService;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Package\AbstractServiceProvider;
-use TYPO3\SymfonyPsrEventDispatcherAdapter\EventDispatcherAdapter as SymfonyEventDispatcherAdapter;
+use TYPO3\SymfonyPsrEventDispatcherAdapter\EventDispatcherAdapter as LegacySymfonyEventDispatcherAdapter;
 
 class ServiceProvider extends AbstractServiceProvider
 {
@@ -212,19 +211,14 @@ class ServiceProvider extends AbstractServiceProvider
         return $commandRegistry;
     }
 
-    private static function getSymfonyEventDispatcher(ContainerInterface $container): SymfonyEventDispatcher | SymfonyEventDispatcherAdapter | SymfonyEventDispatcherCoreAdapter
+    private static function getSymfonyEventDispatcher(ContainerInterface $container): LegacySymfonyEventDispatcherAdapter | SymfonyEventDispatcherAdapter
     {
-        if (class_exists(SymfonyEventDispatcherCoreAdapter::class)) {
-            // @deprecated class_exists check can be removed once this is merged https://review.typo3.org/77996 and TYPO3 11 support is removed
-            return $container->get(SymfonyEventDispatcherCoreAdapter::class);
-        }
-        if (class_exists(SymfonyEventDispatcherAdapter::class)) {
-            // @deprecated can be removed when TYPO3 11 compatibility is removed
-            return $container->get(SymfonyEventDispatcherAdapter::class);
+        if (class_exists(LegacySymfonyEventDispatcherAdapter::class)) {
+            // @deprecated can be removed once  TYPO3 11 support is removed
+            return $container->get(LegacySymfonyEventDispatcherAdapter::class);
         }
 
-        // @deprecated can be removed when TYPO3 12.2 compatibility is removed
-        return $container->get(SymfonyEventDispatcher::class);
+        return $container->get(SymfonyEventDispatcherAdapter::class);
     }
 
     private static function applicationIsReady(ContainerInterface $container): bool
