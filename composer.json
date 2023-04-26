@@ -103,7 +103,8 @@
             "@extension-clean",
             "mkdir -p ../extension",
             "cp -r ./* ../extension/",
-            "mv ../extension/Resources/Private/ExtensionArtifacts/ext_emconf.php ../extension"
+            "mv ../extension/Resources/Private/ExtensionArtifacts/ext_emconf.php ../extension",
+            "mv ../extension/Resources/Private/ExtensionArtifacts/activate ../extension"
         ],
         "extension-build": [
             "@extension-copy",
@@ -118,7 +119,7 @@
             "rm -rf ../extension/Resources/Private/ExtensionArtifacts/Resources ../extension/Resources/Private/ExtensionArtifacts/composer.*",
             "rm -rf ../extension/Resources/Private/Patches/",
             "rm -rf ../extension/Tests/",
-            "rm ../extension/sonar-project.properties  ../extension/phpunit.xml.dist"
+            "rm ../extension/sonar-project.properties ../extension/phpunit.xml.dist ../extension/render-documentation.yml"
         ],
         "extension-clean": [
             "rm -rf ../extension/*"

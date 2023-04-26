@@ -42,13 +42,23 @@ check out this `TYPO3 distribution
 Console integration.
 
 
-2. Installation with Extension Manager
---------------------------------------
+2. Non Composer installation
+----------------------------
 
-For the extension to work, it **must** be installed in the `typo3conf/ext/`
+For the extension to work, it **must** be installed in the
 directory **not** in any other possible extension location. This is the default
 location when downloading it from TER with the Extension Manager.
 
+In order for it to work properly in not installed TYPO3 (extracted sources,
+extension is placed in `typo3conf/ext/`), the following binary must be executed:
+
+`typo3conf/ext/typo3_console/activate`
+
+It is a PHP binary like the `typo3` binary, thus, if you need a dedicated PHP binary
+to be used, put it in front like so: `/path/to/php typo3conf/ext/typo3_console/activate`
+
+When your TYPO3 installation is already set up, use `typo3 extension:activate typo3_console`,
+to activate the extension and get all commands from it.
 
 
 Shell auto complete
