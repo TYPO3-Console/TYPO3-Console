@@ -38,14 +38,14 @@
         "php": ">=8.1",
         "composer-runtime-api": "^2.1",
 
-        "typo3/cms-backend": "^11.5.3 || ^12.2 || dev-main",
+        "typo3/cms-backend": "^11.5.26 || ^12.4 || dev-main",
         "typo3/cms-composer-installers": "^4.0@rc || >=5.0",
-        "typo3/cms-core": "^11.5.3 || ^12.2 || dev-main",
-        "typo3/cms-extbase": "^11.5.3 || ^12.2 || dev-main",
-        "typo3/cms-extensionmanager": "^11.5.3 || ^12.2 || dev-main",
-        "typo3/cms-fluid": "^11.5.3 || ^12.2 || dev-main",
-        "typo3/cms-frontend": "^11.5.3 || ^12.2 || dev-main",
-        "typo3/cms-install": "^11.5.3 || ^12.2 || dev-main",
+        "typo3/cms-core": "^11.5.26 || ^12.4 || dev-main",
+        "typo3/cms-extbase": "^11.5.26 || ^12.4 || dev-main",
+        "typo3/cms-extensionmanager": "^11.5.26 || ^12.4 || dev-main",
+        "typo3/cms-fluid": "^11.5.26 || ^12.4 || dev-main",
+        "typo3/cms-frontend": "^11.5.26 || ^12.4 || dev-main",
+        "typo3/cms-install": "^11.5.26 || ^12.4 || dev-main",
 
         "symfony/console": "^5.4 || ^6.1",
         "symfony/process": "^5.4 || ^6.1",
@@ -53,9 +53,9 @@
         "helhum/php-error-reporting": "^1.0"
     },
     "require-dev": {
-        "typo3/cms-filemetadata": "^11.5.3 || ^12.2 || dev-main",
-        "typo3/cms-recordlist": "^11.5.3 || ^12.2 || dev-main",
-        "typo3/cms-reports": "^11.5.3 || ^12.2 || dev-main",
+        "typo3/cms-filemetadata": "^11.5.26 || ^12.4 || dev-main",
+        "typo3/cms-recordlist": "^11.5.26 || ^12.4 || dev-main",
+        "typo3/cms-reports": "^11.5.26 || ^12.4 || dev-main",
         "typo3-console/create-reference-command": "@dev",
         "symfony/expression-language": "^5.4 || ^6.1",
         "symfony/filesystem": "^5.4 || ^6.1",
@@ -66,9 +66,6 @@
         "phpspec/prophecy-phpunit": "^2.0",
         "friendsofphp/php-cs-fixer": "^3.2",
         "dg/bypass-finals": "^1.4"
-    },
-    "conflict": {
-        "typo3/cms-core": "11.5.25"
     },
     "autoload": {
         "psr-4": {
