@@ -25,7 +25,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     {
         $output = $this->executeConsoleCommand('database:updateschema');
         $this->assertStringContainsString('No schema updates were performed for update types:', $output);
-        $this->assertStringContainsString('"field.add", "field.change", "table.add", "table.change"', $output);
+        $this->assertStringContainsString('"table.add", "table.change", "field.add", "field.change"', $output);
     }
 
     /**
@@ -35,7 +35,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     {
         $output = $this->executeConsoleCommand('database:updateschema', ['field.add,table.add', '--verbose']);
         $this->assertStringContainsString('No schema updates were performed for update types:', $output);
-        $this->assertStringContainsString('"field.add", "table.add"', $output);
+        $this->assertStringContainsString('"table.add", "field.add"', $output);
     }
 
     /**
@@ -45,7 +45,7 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     {
         $output = $this->executeConsoleCommand('database:updateschema', ['*', '--verbose']);
         $this->assertStringContainsString('No schema updates were performed for update types:', $output);
-        $this->assertStringContainsString('"field.add", "field.change", "field.prefix", "field.drop", "table.add", "table.change", "table.prefix", "table.drop"', $output);
+        $this->assertStringContainsString('"table.add", "table.change", "field.add", "field.change", "field.prefix", "field.drop", "table.prefix", "table.drop"', $output);
     }
 
     /**

@@ -23,6 +23,16 @@ use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 class SchemaUpdateType extends Enumeration
 {
     /**
+     * Add a table
+     */
+    const TABLE_ADD = 'table.add';
+
+    /**
+     * Change a table
+     */
+    const TABLE_CHANGE = 'table.change';
+
+    /**
      * Add a field
      */
     const FIELD_ADD = 'field.add';
@@ -41,16 +51,6 @@ class SchemaUpdateType extends Enumeration
      * Drop a field
      */
     const FIELD_DROP = 'field.drop';
-
-    /**
-     * Add a table
-     */
-    const TABLE_ADD = 'table.add';
-
-    /**
-     * Change a table
-     */
-    const TABLE_CHANGE = 'table.change';
 
     /**
      * Prefix a table
@@ -87,10 +87,10 @@ class SchemaUpdateType extends Enumeration
         self::TABLE_PREFIX => ['change_table' => self::GROUP_DESTRUCTIVE],
         self::TABLE_DROP => ['drop_table' => self::GROUP_DESTRUCTIVE],
         self::GROUP_SAFE => [
-            self::FIELD_ADD,
-            self::FIELD_CHANGE,
             self::TABLE_ADD,
             self::TABLE_CHANGE,
+            self::FIELD_ADD,
+            self::FIELD_CHANGE,
         ],
         self::GROUP_DESTRUCTIVE => [
             self::FIELD_PREFIX,
@@ -99,12 +99,12 @@ class SchemaUpdateType extends Enumeration
             self::TABLE_DROP,
         ],
         '*' => [
+            self::TABLE_ADD,
+            self::TABLE_CHANGE,
             self::FIELD_ADD,
             self::FIELD_CHANGE,
             self::FIELD_PREFIX,
             self::FIELD_DROP,
-            self::TABLE_ADD,
-            self::TABLE_CHANGE,
             self::TABLE_PREFIX,
             self::TABLE_DROP,
         ],

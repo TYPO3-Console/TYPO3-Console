@@ -29,12 +29,12 @@ class SchemaUpdateTypeTest extends TestCase
             'all' => [
                 ['*'],
                 [
+                    'table.add',
+                    'table.change',
                     'field.add',
                     'field.change',
                     'field.prefix',
                     'field.drop',
-                    'table.add',
-                    'table.change',
                     'table.prefix',
                     'table.drop',
                 ],
@@ -42,12 +42,12 @@ class SchemaUpdateTypeTest extends TestCase
             'all double' => [
                 ['*', '*'],
                 [
+                    'table.add',
+                    'table.change',
                     'field.add',
                     'field.change',
                     'field.prefix',
                     'field.drop',
-                    'table.add',
-                    'table.change',
                     'table.prefix',
                     'table.drop',
                 ],
@@ -73,15 +73,15 @@ class SchemaUpdateTypeTest extends TestCase
             'all add' => [
                 ['*.add'],
                 [
-                    'field.add',
                     'table.add',
+                    'field.add',
                 ],
             ],
             'all change' => [
                 ['*.change'],
                 [
-                    'field.change',
                     'table.change',
+                    'field.change',
                 ],
             ],
             'all prefix' => [
@@ -101,10 +101,10 @@ class SchemaUpdateTypeTest extends TestCase
             'all safe' => [
                 ['safe'],
                 [
-                    'field.add',
-                    'field.change',
                     'table.add',
                     'table.change',
+                    'field.add',
+                    'field.change',
                 ],
             ],
             'all destructive' => [
