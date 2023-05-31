@@ -33,7 +33,7 @@ use TYPO3\CMS\Core\Information\Typo3Version;
  */
 class Application extends BaseApplication
 {
-    const TYPO3_CONSOLE_VERSION = '8.0.2';
+    const TYPO3_CONSOLE_VERSION = '8.0.3';
     const COMMAND_NAME = 'typo3';
 
     public function __construct()

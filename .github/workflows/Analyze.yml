@@ -51,7 +51,7 @@ jobs:
             -   name: Test
                 run: |
                     if [ -n "${{ secrets.SONAR_TOKEN }}" ]; then
-                        export COMPOSER_ROOT_VERSION=8.0.2
+                        export COMPOSER_ROOT_VERSION=8.0.3
                         composer update
                         vendor/bin/phpunit --whitelist Classes --coverage-clover var/clover.xml --log-junit var/junit.xml
                     fi
