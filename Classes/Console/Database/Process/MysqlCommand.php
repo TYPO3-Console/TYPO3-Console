@@ -116,6 +116,9 @@ class MysqlCommand
             $arguments[] = '-S';
             $arguments[] = $this->dbConfig['unix_socket'];
         }
+        if (isset($this->dbConfig['driverOptions']['flags']) && (int)$this->dbConfig['driverOptions']['flags'] === MYSQLI_CLIENT_SSL) {
+            $arguments[] = '--ssl';
+        }
         $arguments[] = $this->dbConfig['dbname'];
 
         return $arguments;
