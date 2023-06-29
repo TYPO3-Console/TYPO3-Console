@@ -48,7 +48,7 @@ Set system configuration option value by path.
 
   <code>%command.full_name% EXTCONF/lang/availableLanguages '["de", "fr"]' --json</code>
 
-  <code>%command.full_name% configuration:set BE/adminOnly -- -1</code>
+  <code>%command.full_name% BE/adminOnly -- -1</code>
 EOH
         );
         $this->setDefinition([
