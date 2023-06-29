@@ -35,7 +35,7 @@ Set system configuration option value by path.
 
 .. code-block:: shell
 
-   typo3 configuration:set configuration:set BE/adminOnly -- -1
+   typo3 configuration:set BE/adminOnly -- -1
 
 
 Arguments
