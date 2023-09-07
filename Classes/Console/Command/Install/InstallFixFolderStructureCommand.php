@@ -15,15 +15,21 @@ namespace Helhum\Typo3Console\Command\Install;
  */
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\FolderStructure\DefaultFactory;
+use TYPO3\CMS\Install\WebserverType;
 
 class InstallFixFolderStructureCommand extends Command
 {
+    protected array $validWebserverOptions;
+
     protected function configure()
     {
+        $this->validWebserverOptions = array_column(WebserverType::cases(), 'value');
+
         $this->setDescription('Fix folder structure');
         $this->setHelp(
             <<<'EOH'
@@ -31,6 +37,14 @@ Automatically create files and folders, required for a TYPO3 installation.
 
 This command creates the required folder structure needed for TYPO3 including extensions.
 EOH
+        );
+        $this->addOption(
+            'server-type',
+            's',
+            InputArgument::OPTIONAL,
+            'Web server type. One of: "' .
+                implode('", "', $this->validWebserverOptions) . '". ' .
+                'If empty, the value will be fetched from the enviroment variable named TYPO3_SERVER_TYPE.'
         );
     }
 
@@ -44,9 +58,15 @@ EOH
         // TYPO3 cli bootstrap initializes a user,
         // which will cause a fatal error when trying to store the flash messages in the user session.
         unset($GLOBALS['BE_USER']);
+
+        $webserverType = $this->getWebserverType($input);
+        if (!$webserverType) {
+            $output->writeln('Error: unable to determine web server type. Use --help option to see how you can specify one.');
+            return 1;
+        }
         $folderStructureFactory = GeneralUtility::makeInstance(DefaultFactory::class);
         $messages = $folderStructureFactory
-            ->getStructure()
+            ->getStructure($webserverType)
             ->fix()
             ->getAllMessagesAndFlush();
 
@@ -60,5 +80,26 @@ EOH
         }
 
         return 0;
+    }
+
+    /**
+     * Determines the web server type either from the command like argument or via
+     * the environment variable named TYPO3_SERVER_TYPE.
+     *
+     * @param InputInterface $input
+     * @return ?WebserverType
+     * @see \TYPO3\CMS\Install\Command\SetupCommand::getServerType()
+     */
+    protected function getWebserverType(InputInterface $input): ?WebserverType
+    {
+        $option = $input->getOption('server-type');
+        if (empty($option)) {
+            $option = $_ENV['TYPO3_SERVER_TYPE'] ?? '';
+        }
+        if (in_array($option, $this->validWebserverOptions)) {
+            return WebserverType::fromType($option);
+        }
+
+        return null;
     }
 }
