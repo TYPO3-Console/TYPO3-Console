@@ -43,10 +43,23 @@ class SchemaService implements SingletonInterface
      */
     public function updateSchema(array $schemaUpdateTypes, $dryRun = false)
     {
-        $updateStatements = [
-            SchemaUpdateType::GROUP_SAFE => $this->schemaUpdate->getSafeUpdates(),
-            SchemaUpdateType::GROUP_DESTRUCTIVE => $this->schemaUpdate->getDestructiveUpdates(),
+        $select = [
+            SchemaUpdateType::GROUP_SAFE => false,
+            SchemaUpdateType::GROUP_DESTRUCTIVE => false,
         ];
+        foreach ($schemaUpdateTypes as $schemaUpdateType) {
+            foreach ($schemaUpdateType->getStatementTypes() as $statementGroup) {
+                $select[$statementGroup] = true;
+            }
+        }
+
+        $updateStatements = [];
+        if ($select[SchemaUpdateType::GROUP_SAFE]) {
+            $updateStatements[SchemaUpdateType::GROUP_SAFE] = $this->schemaUpdate->getSafeUpdates();
+        }
+        if ($select[SchemaUpdateType::GROUP_DESTRUCTIVE]) {
+            $updateStatements[SchemaUpdateType::GROUP_DESTRUCTIVE] = $this->schemaUpdate->getDestructiveUpdates();
+        }
 
         $updateResult = new SchemaUpdateResult();
 
