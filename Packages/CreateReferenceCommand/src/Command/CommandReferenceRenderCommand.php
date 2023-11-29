@@ -50,6 +50,7 @@ class CommandReferenceRenderCommand extends Command
         'database:import',
         'database:updateschema',
         'frontend:request',
+        'frontend:asseturl',
         'install:setup',
         'install:fixfolderstructure',
         'install:extensionsetupifpossible',
