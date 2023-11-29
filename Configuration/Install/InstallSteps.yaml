@@ -115,7 +115,7 @@ defaultConfiguration:
                 site: 'Create root page'
             value: '%env(TYPO3_INSTALL_SITE_SETUP_TYPE)%'
             default: 'no'
-        siteUrl:
+        siteBaseUrl:
             condition: 'siteSetupType == "site"'
             description: 'Specify the site base url'
             option: '--site-base-url'
