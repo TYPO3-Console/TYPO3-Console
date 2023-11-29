@@ -10,6 +10,7 @@ use Helhum\Typo3Console\Command\Configuration\ConfigurationShowLocalCommand;
 use Helhum\Typo3Console\Command\Database\DatabaseExportCommand;
 use Helhum\Typo3Console\Command\Database\DatabaseImportCommand;
 use Helhum\Typo3Console\Command\Database\DatabaseUpdateSchemaCommand;
+use Helhum\Typo3Console\Command\Frontend\FrontendAssetUrlCommand;
 use Helhum\Typo3Console\Command\Install\InstallActionNeedsExecutionCommand;
 use Helhum\Typo3Console\Command\Install\InstallDatabaseConnectCommand;
 use Helhum\Typo3Console\Command\Install\InstallDatabaseDataCommand;
@@ -32,6 +33,7 @@ use TYPO3\CMS\Core\Core\BootService;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Package\AbstractServiceProvider;
+use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\SymfonyPsrEventDispatcherAdapter\EventDispatcherAdapter as LegacySymfonyEventDispatcherAdapter;
 
 class ServiceProvider extends AbstractServiceProvider
@@ -70,6 +72,7 @@ class ServiceProvider extends AbstractServiceProvider
             InstallActionNeedsExecutionCommand::class => [ static::class, 'getInstallActionNeedsExecutionCommand' ],
             LockInstallToolCommand::class => [ static::class, 'getLockInstallToolCommand' ],
             UnlockInstallToolCommand::class => [ static::class, 'getUnlockInstallToolCommand' ],
+            FrontendAssetUrlCommand::class => [ static::class, 'getFrontendAssetUrlCommand' ],
         ];
     }
 
@@ -174,6 +177,11 @@ class ServiceProvider extends AbstractServiceProvider
         return new UnlockInstallToolCommand('install:unlock');
     }
 
+    public static function getFrontendAssetUrlCommand(ContainerInterface $container): FrontendAssetUrlCommand
+    {
+        return new FrontendAssetUrlCommand($container->get(PackageManager::class));
+    }
+
     public static function configureCoreCommandApplication(ContainerInterface $container, CoreCommandApplication $commandApplication): CoreCommandApplication
     {
         $commandRegistry = $container->get(CommandRegistry::class);
@@ -207,6 +215,7 @@ class ServiceProvider extends AbstractServiceProvider
         $commandRegistry->addLazyCommand('install:actionneedsexecution', InstallActionNeedsExecutionCommand::class, 'Calls needs execution on the given action and returns the result', true);
         $commandRegistry->addLazyCommand('install:lock', LockInstallToolCommand::class, 'Lock Install Tool');
         $commandRegistry->addLazyCommand('install:unlock', UnlockInstallToolCommand::class, 'Unlock Install Tool');
+        $commandRegistry->addLazyCommand('frontend:asseturl', FrontendAssetUrlCommand::class, 'Show asset URL for TYPO3 extension(s)');
 
         return $commandRegistry;
     }
