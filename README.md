@@ -9,11 +9,11 @@
 
 # TYPO3 Console
 
-TYPO3 Console (helhum/typo3-console) provides a clean way to register commands and
+TYPO3 Console (`helhum/typo3-console`) provides a clean way to register commands and
 a sane way to call these commands through the TYPO3 core command line tool called `typo3`.
 
 ### Important information for longtime users
-**Since version 8.0.0 the extra binary `typo3cms` is removed and superseded with the core binary `typo3`.
+**Since version 8.0.0, the extra binary `typo3cms` is removed and superseded with the core binary `typo3`.
 Commands that were called e.g. `typo3cms database:updateschema` before,
 must now be called with `typo3 database:updateschema`.**
 
