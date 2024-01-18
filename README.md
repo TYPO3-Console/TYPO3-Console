@@ -1,5 +1,6 @@
 [![Latest Stable Version](https://poser.pugx.org/helhum/typo3-console/v/stable.svg)](https://packagist.org/packages/helhum/typo3-console)
 [![TYPO3 11](https://img.shields.io/badge/TYPO3-11-orange.svg?style=flat-square)](https://get.typo3.org/version/11)
+[![TYPO3 12](https://img.shields.io/badge/TYPO3-12-orange.svg?style=flat-square)](https://get.typo3.org/version/12)
 [![Total Downloads](https://poser.pugx.org/helhum/typo3-console/downloads.svg)](https://packagist.org/packages/helhum/typo3-console)
 [![Monthly Downloads](https://poser.pugx.org/helhum/typo3-console/d/monthly)](https://packagist.org/packages/helhum/typo3-console)
 [![Build Status](https://github.com/TYPO3-Console/TYPO3-Console/actions/workflows/Test.yml/badge.svg?branch=main)](https://github.com/TYPO3-Console/TYPO3-Console/actions/workflows/Test.yml)
