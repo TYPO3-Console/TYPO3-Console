@@ -7,6 +7,7 @@
 /Documentation-GENERATED-temp
 /Resources/Private/ExtensionArtifacts/Libraries
 /Resources/Public/*
+!/Resources/Public/Icons/Extension.png
 
 /.php-cs-fixer.cache
 /.phpunit.result.cache
