@@ -25,7 +25,7 @@ use TYPO3\CMS\Core\Core\Environment;
 
 class InstallSetupCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('TYPO3 Setup');
         $this->setHelp(

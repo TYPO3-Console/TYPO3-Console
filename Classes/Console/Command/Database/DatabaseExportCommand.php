@@ -37,7 +37,7 @@ class DatabaseExportCommand extends Command
         return $this->applicationIsReady || getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') !== false;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Export database to stdout');
         $this->setHelp(

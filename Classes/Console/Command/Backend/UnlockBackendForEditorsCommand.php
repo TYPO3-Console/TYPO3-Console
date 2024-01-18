@@ -31,7 +31,7 @@ class UnlockBackendForEditorsCommand extends Command implements RelatableCommand
         ];
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Unlock backend for editors');
         $this->setHelp('Allow backend access for editors again (e.g. after having been locked with backend:lockforeditors command).');

@@ -23,7 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class InstallDatabaseConnectCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setHidden(true);
         $this->setDescription('Connect to database');
@@ -72,7 +72,7 @@ class InstallDatabaseConnectCommand extends Command
         );
     }
 
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') === false;
     }

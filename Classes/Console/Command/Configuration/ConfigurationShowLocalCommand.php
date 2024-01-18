@@ -42,7 +42,7 @@ class ConfigurationShowLocalCommand extends Command implements RelatableCommandI
         ];
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Show local configuration value');
         $this->setHelp(

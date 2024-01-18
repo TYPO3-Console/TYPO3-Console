@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class CacheListGroupsCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('List cache groups');
         $this->setHelp('Lists all registered cache groups.');

@@ -45,12 +45,12 @@ class TrackableOutput extends ConsoleOutput
         parent::__construct();
     }
 
-    public function startTracking()
+    public function startTracking(): void
     {
         $this->outputTracked = false;
     }
 
-    public function emitOutputTracked()
+    public function emitOutputTracked(): void
     {
         $this->outputTracked = true;
     }
@@ -72,26 +72,26 @@ class TrackableOutput extends ConsoleOutput
         return new self($this->output, $this);
     }
 
-    public function setErrorOutput(OutputInterface $error)
+    public function setErrorOutput(OutputInterface $error): void
     {
         parent::setErrorOutput(new self($error, $this));
     }
 
-    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
+    public function write($messages, $newline = false, $options = self::OUTPUT_NORMAL): void
     {
         $this->outputTracked = true;
         if ($this->parentOutput) {
             $this->parentOutput->emitOutputTracked();
         }
-        $this->output->write($messages, $newline, $type);
+        $this->output->write($messages, $newline, $options);
     }
 
-    public function writeln($messages, $type = self::OUTPUT_NORMAL)
+    public function writeln($messages, $type = self::OUTPUT_NORMAL): void
     {
         $this->write($messages, true, $type);
     }
 
-    public function setVerbosity($level)
+    public function setVerbosity($level): void
     {
         $this->output->setVerbosity($level);
     }
@@ -101,7 +101,7 @@ class TrackableOutput extends ConsoleOutput
         return $this->output->getVerbosity();
     }
 
-    public function setDecorated($decorated)
+    public function setDecorated($decorated): void
     {
         $this->output->setDecorated($decorated);
     }
@@ -111,7 +111,7 @@ class TrackableOutput extends ConsoleOutput
         return $this->output->isDecorated();
     }
 
-    public function setFormatter(OutputFormatterInterface $formatter)
+    public function setFormatter(OutputFormatterInterface $formatter): void
     {
         $this->output->setFormatter($formatter);
     }

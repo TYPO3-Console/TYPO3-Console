@@ -23,7 +23,7 @@ use TYPO3\CMS\Core\Core\Environment;
 
 class FrontendRequestCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Submit frontend request');
         $this->setHelp(

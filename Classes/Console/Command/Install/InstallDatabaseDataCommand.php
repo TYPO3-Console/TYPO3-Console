@@ -30,7 +30,7 @@ class InstallDatabaseDataCommand extends Command
         parent::__construct('install:databasedata');
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setHidden(true);
         $this->setDescription('Add database data');
@@ -56,7 +56,7 @@ class InstallDatabaseDataCommand extends Command
         );
     }
 
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') === false;
     }

@@ -33,7 +33,7 @@ class ConfigurationSetCommand extends Command
         return $this->applicationIsReady || getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') !== false;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Set configuration value');
         $this->setHelp(

@@ -22,7 +22,7 @@ use TYPO3\CMS\Install\FolderStructure\DefaultFactory;
 
 class InstallFixFolderStructureCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Fix folder structure');
         $this->setHelp(

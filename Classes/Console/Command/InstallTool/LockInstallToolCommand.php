@@ -30,7 +30,7 @@ class LockInstallToolCommand extends Command implements RelatableCommandInterfac
         ];
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Lock Install Tool');
         $this->setHelp(

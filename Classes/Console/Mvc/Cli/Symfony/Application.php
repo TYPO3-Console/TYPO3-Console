@@ -117,7 +117,7 @@ class Application extends BaseApplication
      * @param InputInterface $input
      * @param OutputInterface $output
      */
-    protected function configureIO(InputInterface $input, OutputInterface $output)
+    protected function configureIO(InputInterface $input, OutputInterface $output): void
     {
         parent::configureIO($input, $output);
         $output->getFormatter()->setStyle('b', new OutputFormatterStyle(null, null, ['bold']));

@@ -23,7 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ConfigurationShowCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Show configuration value');
         $this->setHelp(

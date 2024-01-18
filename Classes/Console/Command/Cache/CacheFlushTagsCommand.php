@@ -25,7 +25,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CacheFlushTagsCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Flush cache by tags');
         $this->setHelp(
