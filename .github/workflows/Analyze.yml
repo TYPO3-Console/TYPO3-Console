@@ -22,7 +22,7 @@ jobs:
                 run: sudo /etc/init.d/mysql start
 
             -   name: Checkout
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
                 with:
                     fetch-depth: 0
 
@@ -33,7 +33,7 @@ jobs:
                     echo "timestamp=$(date +"%s")" >> $GITHUB_OUTPUT
 
             -   name: Cache Composer dependencies
-                uses: actions/cache@v3
+                uses: actions/cache@v4
                 with:
                     path: ${{ steps.composer-cache-vars.outputs.dir }}
                     key: ${{ runner.os }}-composer-^11.5.26-stable-8.1-${{ steps.composer-cache-vars.outputs.timestamp }}
@@ -56,7 +56,7 @@ jobs:
                         vendor/bin/phpunit --whitelist Classes --coverage-clover var/clover.xml --log-junit var/junit.xml
                     fi
 
-            -   uses: actions/setup-java@v3
+            -   uses: actions/setup-java@v4
                 with:
                     distribution: 'temurin'
                     java-version: '17'
