@@ -12,7 +12,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             -   name: Checkout
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
 
             -   name: Composer Cache Vars
                 id: composer-cache-vars
@@ -21,7 +21,7 @@ jobs:
                     echo "timestamp=$(date +"%s")" >> $GITHUB_OUTPUT
 
             -   name: Cache Composer dependencies
-                uses: actions/cache@v3
+                uses: actions/cache@v4
                 with:
                     path: ${{ steps.composer-cache-vars.outputs.dir }}
                     key: ${{ runner.os }}-composer-^11.5.26-stable-8.1-${{ steps.composer-cache-vars.outputs.timestamp }}
@@ -64,7 +64,7 @@ jobs:
             matrix:
                 os: [ 'ubuntu-latest' ]
                 typo3: [ '^11.5.26', '^12.4' ]
-                php: [ '8.1', '8.2' ]
+                php: [ '8.1', '8.2', '8.3' ]
                 dependency-version: [ lowest, stable ]
                 experimental: [ false ]
                 include:
@@ -74,8 +74,8 @@ jobs:
 #                        dependency-version: stable
 #                        experimental: true
                     -   os: 'windows-latest'
-                        php: 8.1
-                        typo3: '^11.5.26'
+                        php: '8.2'
+                        typo3: '^12.4'
                         dependency-version: stable
                         experimental: false
 
@@ -87,7 +87,7 @@ jobs:
                 run: sudo /etc/init.d/mysql start
 
             -   name: Checkout
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
 
             -   name: Composer Cache Vars
                 id: composer-cache-vars
@@ -96,7 +96,7 @@ jobs:
                     echo "timestamp=$(date +"%s")" >> $GITHUB_OUTPUT
 
             -   name: Cache Composer dependencies
-                uses: actions/cache@v3
+                uses: actions/cache@v4
                 with:
                     path: ${{ steps.composer-cache-vars.outputs.dir }}
                     key: ${{ runner.os }}-composer-${{ matrix.typo3 }}-${{ matrix.dependency-version }}-${{ matrix.php }}-${{ steps.composer-cache-vars.outputs.timestamp }}

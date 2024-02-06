@@ -14,12 +14,12 @@ jobs:
 
         steps:
             -   name: Checkout main repo
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
                 with:
                     path: ./typo3-console
 
             -   name: Checkout extension repo
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
                 with:
                     repository: TYPO3-Console/Extension
                     token: ${{ secrets.EXTENSION_UPDATE_TOKEN }}
@@ -32,7 +32,7 @@ jobs:
                     echo "timestamp=$(date +"%s")" >> $GITHUB_OUTPUT
 
             -   name: Cache Composer dependencies
-                uses: actions/cache@v3
+                uses: actions/cache@v4
                 with:
                     path: ${{ steps.composer-cache-vars.outputs.dir }}
                     key: ${{ runner.os }}-composer-^11.5.26-stable-8.1-${{ steps.composer-cache-vars.outputs.timestamp }}
