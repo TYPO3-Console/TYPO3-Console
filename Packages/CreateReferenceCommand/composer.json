@@ -3,6 +3,7 @@
     "description": "TYPO3 Console command that creates the command reference",
     "license": "GPL-2.0-or-later",
     "type": "typo3-cms-extension",
+    "version": "1.0.0",
     "authors": [
         {
             "name": "Helmut Hummel",
