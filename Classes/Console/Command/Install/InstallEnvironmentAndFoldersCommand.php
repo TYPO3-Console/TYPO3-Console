@@ -22,7 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class InstallEnvironmentAndFoldersCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setHidden(true);
         $this->setDescription('Check environment / create folders');
@@ -33,7 +33,7 @@ EOH
         );
     }
 
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') === false;
     }

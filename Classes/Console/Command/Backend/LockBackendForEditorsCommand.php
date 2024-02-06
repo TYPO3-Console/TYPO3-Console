@@ -33,7 +33,7 @@ class LockBackendForEditorsCommand extends Command implements RelatableCommandIn
         ];
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Lock backend for editors');
         $this->setHelp('Deny backend access, but only for editors.

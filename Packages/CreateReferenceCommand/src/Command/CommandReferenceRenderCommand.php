@@ -77,12 +77,12 @@ class CommandReferenceRenderCommand extends Command
         parent::__construct('commandreference:render');
     }
 
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') === false;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDefinition(
             new InputDefinition(
@@ -99,7 +99,7 @@ class CommandReferenceRenderCommand extends Command
         ->setDescription('Renders command reference documentation from source code');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->skipCommands = $input->getArgument('skipCommands') ?: $this->skipCommands;
 

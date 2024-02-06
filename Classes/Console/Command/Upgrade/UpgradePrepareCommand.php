@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UpgradePrepareCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Executes preparational upgrade steps and checks basic extension compatibility');
     }

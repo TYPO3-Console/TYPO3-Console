@@ -46,7 +46,7 @@ class UpgradeRunCommand extends Command
      */
     private $upgradeHandling;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Run a single upgrade wizard, or all wizards that are scheduled for execution');
         $this->setHelp(
@@ -103,7 +103,7 @@ EOH
         );
     }
 
-    protected function interact(InputInterface $input, OutputInterface $output)
+    protected function interact(InputInterface $input, OutputInterface $output): void
     {
         $this->ensureBooted();
 

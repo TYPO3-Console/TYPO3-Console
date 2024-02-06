@@ -30,7 +30,7 @@ class UnlockInstallToolCommand extends Command implements RelatableCommandInterf
         ];
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Unlock Install Tool');
         $this->setHelp('Allow install tool access.');

@@ -49,7 +49,7 @@ class HelpCommand extends \Symfony\Component\Console\Command\HelpCommand
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this->setAliases([]);
@@ -75,7 +75,7 @@ EOF
      *
      * @param Command $command The command to set
      */
-    public function setCommand(Command $command)
+    public function setCommand(Command $command): void
     {
         $this->command = $command;
         parent::setCommand($command);

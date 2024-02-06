@@ -27,7 +27,7 @@ use Symfony\Component\Console\Terminal;
 
 class ListCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('list');
         $this->setDefinition([

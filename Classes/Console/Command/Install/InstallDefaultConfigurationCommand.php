@@ -30,7 +30,7 @@ class InstallDefaultConfigurationCommand extends Command
         parent::__construct('install:defaultconfiguration');
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setHidden(true);
         $this->setDescription('Write default configuration');
@@ -62,7 +62,7 @@ EOH
         );
     }
 
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') === false;
     }

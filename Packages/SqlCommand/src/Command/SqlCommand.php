@@ -25,12 +25,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SqlCommand extends Command
 {
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') === false;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addOption(
             'no-db',
@@ -40,7 +40,7 @@ class SqlCommand extends Command
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $sql = '';
         while ($f = fgets(STDIN)) {

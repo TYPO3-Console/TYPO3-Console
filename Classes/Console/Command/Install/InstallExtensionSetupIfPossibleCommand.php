@@ -23,7 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class InstallExtensionSetupIfPossibleCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->addOption(
             'fail-on-error',

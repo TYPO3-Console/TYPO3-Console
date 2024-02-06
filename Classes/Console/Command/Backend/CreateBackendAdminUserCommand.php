@@ -31,7 +31,7 @@ class CreateBackendAdminUserCommand extends Command
 {
     private $passwordAsArgument = true;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Create admin backend user');
         $this->setHelp('Create a new user with administrative access.');
@@ -51,7 +51,7 @@ class CreateBackendAdminUserCommand extends Command
         );
     }
 
-    protected function interact(InputInterface $input, OutputInterface $output)
+    protected function interact(InputInterface $input, OutputInterface $output): void
     {
         $io = new SymfonyStyle($input, $output);
         if (empty($input->getArgument('username'))) {

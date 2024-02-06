@@ -33,7 +33,7 @@ class DatabaseImportCommand extends Command
         return $this->applicationIsReady || getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') !== false;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Import mysql queries from stdin');
         $this->setHelp(

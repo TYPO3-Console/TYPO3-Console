@@ -23,7 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class InstallActionNeedsExecutionCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setHidden(true);
         $this->setDescription('Calls needs execution on the given action and returns the result');
@@ -33,7 +33,7 @@ class InstallActionNeedsExecutionCommand extends Command
         );
     }
 
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return getenv('TYPO3_CONSOLE_RENDERING_REFERENCE') === false;
     }

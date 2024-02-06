@@ -30,7 +30,7 @@ class UpgradeListCommand extends Command
         parent::__construct('upgrade:list');
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('List upgrade wizards');
         $this->addOption(

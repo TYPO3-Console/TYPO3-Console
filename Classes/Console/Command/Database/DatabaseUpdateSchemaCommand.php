@@ -35,7 +35,7 @@ class DatabaseUpdateSchemaCommand extends Command
         parent::__construct('database:updateschema');
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Update database schema (TYPO3 Database Compare)');
         $this->setHelp(

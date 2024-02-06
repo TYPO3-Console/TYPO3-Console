@@ -24,7 +24,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ConfigurationShowActiveCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Show active configuration value');
         $this->setHelp(
