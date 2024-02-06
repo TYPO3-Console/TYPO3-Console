@@ -99,7 +99,7 @@
         "extension-copy": [
             "@extension-clean",
             "mkdir -p ../extension",
-            "cp -r ./* ../extension/",
+            "rsync -r  --times --perms --links --delete --verbose --exclude /config --exclude /public --exclude /var --exclude /vendor --exclude .git --exclude /Tests --exclude /.ddev --exclude /.github --exclude '/.*' --exclude '/phpunit*' --exclude '/sonar*' --exclude '/render*' ./ ../extension/",
             "mv ../extension/Resources/Private/ExtensionArtifacts/ext_emconf.php ../extension",
             "mv ../extension/Resources/Private/ExtensionArtifacts/activate ../extension"
         ],
@@ -109,14 +109,7 @@
         ],
         "extension-release": [
             "@extension-build",
-            "rm -rf ../extension/vendor/",
-            "rm -rf ../extension/public/",
-            "rm -rf ../extension/Packages/",
-            "mv ../extension/Resources/Private/ExtensionArtifacts/Resources/Public ../extension/Resources/",
-            "rm -rf ../extension/Resources/Private/ExtensionArtifacts/Resources ../extension/Resources/Private/ExtensionArtifacts/composer.*",
-            "rm -rf ../extension/Resources/Private/Patches/",
-            "rm -rf ../extension/Tests/",
-            "rm ../extension/sonar-project.properties ../extension/phpunit.xml.dist ../extension/render-documentation.yml"
+            "rm ../extension/Resources/Private/ExtensionArtifacts/composer.*"
         ],
         "extension-clean": [
             "rm -rf ../extension/*"
