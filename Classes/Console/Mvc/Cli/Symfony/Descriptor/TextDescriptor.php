@@ -23,11 +23,11 @@ namespace Helhum\Typo3Console\Mvc\Cli\Symfony\Descriptor;
  * file that was distributed with this source code.
  */
 
-use Helhum\Typo3Console\SymfonyCompatibilityBridge;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Descriptor\ApplicationDescription;
 use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
@@ -46,7 +46,7 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
      */
     protected function describeInputArgument(InputArgument $argument, array $options = []): void
     {
-        $totalWidth = isset($options['total_width']) ? $options['total_width'] : SymfonyCompatibilityBridge::helperLength($argument->getName());
+        $totalWidth = isset($options['total_width']) ? $options['total_width'] : Helper::length($argument->getName());
         $spacingWidth = $totalWidth - strlen($argument->getName());
 
         // + 4 = 2 spaces before <info>, 2 spaces after </info>
@@ -98,7 +98,7 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
             sprintf('--%s%s', $option->getName(), $value)
         );
 
-        $spacingWidth = $totalWidth - SymfonyCompatibilityBridge::helperLength($synopsis);
+        $spacingWidth = $totalWidth - Helper::length($synopsis);
         $maxWidth = isset($options['screen_width']) ? ($options['screen_width'] - $indent) : null;
         $this->writeText(sprintf(
             '  <info>%s</info>  %s%s%s%s',
@@ -222,7 +222,7 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
                 $maxWidth = isset($options['screen_width']) ? ($options['screen_width'] - $indent) : null;
                 foreach ($namespace['commands'] as $name) {
                     $this->writeText("\n");
-                    $spacingWidth = $width - SymfonyCompatibilityBridge::helperLength($name);
+                    $spacingWidth = $width - Helper::length($name);
                     $command = $commands[$name];
                     $this->writeText(sprintf('  <info>%s</info>%s%s', $name, str_repeat(' ', $spacingWidth), $this->wordWrap((string)$command->getDescription(), $indent, $maxWidth)), $options);
                 }
@@ -293,12 +293,12 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
 
         foreach ($commands as $command) {
             if ($command instanceof Command) {
-                $widths[] = SymfonyCompatibilityBridge::helperLength($command->getName());
+                $widths[] = Helper::length($command->getName());
                 foreach ($command->getAliases() as $alias) {
-                    $widths[] = SymfonyCompatibilityBridge::helperLength($alias);
+                    $widths[] = Helper::length($alias);
                 }
             } else {
-                $widths[] = SymfonyCompatibilityBridge::helperLength($command);
+                $widths[] = Helper::length($command);
             }
         }
 
@@ -315,10 +315,10 @@ class TextDescriptor extends \Symfony\Component\Console\Descriptor\TextDescripto
         $totalWidth = 0;
         foreach ($options as $option) {
             // "-" + shortcut + ", --" + name
-            $nameLength = 1 + max(SymfonyCompatibilityBridge::helperLength($option->getShortcut()), 1) + 4 + SymfonyCompatibilityBridge::helperLength($option->getName());
+            $nameLength = 1 + max(Helper::length($option->getShortcut()), 1) + 4 + Helper::length($option->getName());
 
             if ($option->acceptValue()) {
-                $valueLength = 1 + SymfonyCompatibilityBridge::helperLength($option->getName()); // = + value
+                $valueLength = 1 + Helper::length($option->getName()); // = + value
                 $valueLength += $option->isValueOptional() ? 2 : 0; // [ + ]
 
                 $nameLength += $valueLength;
