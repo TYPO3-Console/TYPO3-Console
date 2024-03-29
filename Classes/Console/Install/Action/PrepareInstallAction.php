@@ -46,7 +46,6 @@ class PrepareInstallAction implements InstallActionInterface
         $this->ensureInstallationIsPossible($options);
 
         // We don't use Environment API here, because this code is called from Composer plugins
-        // TYPO3_PATH_ROOT is ensured to be set correctly in CompatibilityClassLoader for non Composer installs
         $typo3RootPath = getenv('TYPO3_PATH_ROOT');
         $firstInstallPath = $typo3RootPath . '/FIRST_INSTALL';
         touch($firstInstallPath);
