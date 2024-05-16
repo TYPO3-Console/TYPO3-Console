@@ -95,7 +95,7 @@ class InstallDatabaseConnectCommand extends Command
                     'databaseConnect',
                     [
                         'host' => $databaseHostName,
-                        'port' => $databasePort,
+                        'port' => $databasePort ? (int)$databasePort : null,
                         'username' => $databaseUserName,
                         'password' => $databaseUserPassword,
                         'socket' => $databaseSocket,
