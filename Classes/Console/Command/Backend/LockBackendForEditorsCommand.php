@@ -37,7 +37,7 @@ class LockBackendForEditorsCommand extends Command implements RelatableCommandIn
     {
         $this->setDescription('Lock backend for editors');
         $this->setHelp('Deny backend access, but only for editors.
-Admins will still be able to log in and work with the backend.');
+Admins will still be able to log in and work with the backend. CLI access (commands/scheduler) is allowed as well.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

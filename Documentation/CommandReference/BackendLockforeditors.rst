@@ -14,7 +14,7 @@ backend:lockforeditors
 **Lock backend for editors**
 
 Deny backend access, but only for editors.
-Admins will still be able to log in and work with the backend.
+Admins will still be able to log in and work with the backend. CLI access (commands/scheduler) is allowed as well.
 
 
 
