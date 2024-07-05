@@ -34,4 +34,3 @@ workflows or anything else where automation is required or beneficial.
    :hidden:
 
    Sitemap
-   genindex
