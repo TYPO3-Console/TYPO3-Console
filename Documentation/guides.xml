@@ -13,6 +13,9 @@
              interlink-shortcode="helhum/typo3-console"
              typo3-core-preferred="stable"
   />
-  <project title="TYPO3 Console" release="8.1.1" version="8.1.1"
-           copyright="since 2014 by Helmut Hummel &amp; Contributors"/>
+  <project title="TYPO3 Console"
+           release="main"
+           version="main"
+           copyright="since 2014 by Helmut Hummel &amp; Contributors"
+  />
 </guides>

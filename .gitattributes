@@ -12,7 +12,6 @@
 /phpunit.xml.dist export-ignore
 /render-documentation.yml export-ignore
 /sonar-project.properties export-ignore
-/Makefile export-ignore
 
 # Enforce checkout with linux lf consistent over all plattforms
 *.cfg text eol=lf

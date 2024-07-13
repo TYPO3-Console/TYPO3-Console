@@ -114,8 +114,11 @@
         "extension-clean": [
             "rm -rf ../extension/*"
         ],
+        "docs:test-render": [
+            "docker run --rm --pull always -v $(pwd):/project ghcr.io/typo3-documentation/render-guides:latest --config=Documentation --no-progress --fail-on-log"
+        ],
         "docs:render": [
-            "docker-compose -f render-documentation.yml up"
+            "docker run --rm --pull always -v $(pwd):/project ghcr.io/typo3-documentation/render-guides:latest --config=Documentation"
         ]
     },
     "extra": {
