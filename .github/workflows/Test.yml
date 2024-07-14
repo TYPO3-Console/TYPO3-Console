@@ -55,6 +55,11 @@ jobs:
                 run: |
                     composer extension-release
 
+            - name: Documentation will render without warnings
+              run: |
+                  composer docs:test-render
+                  rm -rf Documentation-GENERATED-temp
+
     Tests:
         name: 'T3 ${{ matrix.typo3 }} - ${{ matrix.os }} - PHP ${{ matrix.php }} - ${{ matrix.dependency-version }}'
         runs-on: ${{ matrix.os }}
