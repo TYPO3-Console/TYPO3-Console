@@ -37,7 +37,6 @@
     "require": {
         "php": ">=8.1",
         "composer-runtime-api": "^2.1",
-
         "typo3/cms-backend": "^11.5.26 || ^12.4 || dev-main",
         "typo3/cms-composer-installers": "^4.0@rc || >=5.0",
         "typo3/cms-core": "^11.5.26 || ^12.4 || dev-main",
@@ -46,7 +45,6 @@
         "typo3/cms-fluid": "^11.5.26 || ^12.4 || dev-main",
         "typo3/cms-frontend": "^11.5.26 || ^12.4 || dev-main",
         "typo3/cms-install": "^11.5.26 || ^12.4 || dev-main",
-
         "symfony/console": "^5.4 || ^6.4 || ^7.0",
         "symfony/process": "^5.4 || ^6.4 || ^7.0",
         "helhum/config-loader": ">=0.9 <0.13",
@@ -89,7 +87,9 @@
         },
         "allow-plugins": {
             "typo3/class-alias-loader": true,
-            "typo3/cms-composer-installers": true
+            "typo3/cms-composer-installers": true,
+            "cweagans/composer-patches": true,
+            "gilbertsoft/typo3-core-patches": true
         }
     },
     "scripts": {
@@ -130,6 +130,20 @@
             },
             "extension-key": "typo3_console",
             "ignore-as-root": false
+        },
+        "patches": {
+            "typo3/cms-core": {
+                "Fix composer PackageArtifact packagePath resolve for root pkgs": "patches/typo3-cms-core-review-85198.patch"
+            }
+        },
+        "gilbertsoft/typo3-core-patches": {
+            "applied-changes": {
+                "85198": {
+                    "packages": [
+                        "typo3/cms-core"
+                    ]
+                }
+            }
         }
     }
 }
