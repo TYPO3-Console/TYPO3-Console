@@ -15,6 +15,7 @@ namespace Helhum\Typo3Console\Database\Schema;
  */
 
 use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Information\Typo3Version;
 
 class TableMatcher
 {
@@ -33,8 +34,15 @@ class TableMatcher
 
     private function matchSingle(Connection $connection, string $expression): array
     {
+        $tableNames = [];
+        if ((new Typo3Version())->getMajorVersion() > 12) {
+            $tableNames = $connection->createSchemaManager()->listTableNames();
+        } else {
+            $tableNames = $connection->getSchemaManager()->listTableNames();
+        }
+
         return array_filter(
-            $connection->getSchemaManager()->listTableNames(),
+            $tableNames,
             function ($tableName) use ($expression) {
                 return fnmatch($expression, $tableName);
             }

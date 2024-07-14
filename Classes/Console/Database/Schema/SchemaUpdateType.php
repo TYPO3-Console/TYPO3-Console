@@ -14,14 +14,24 @@ namespace Helhum\Typo3Console\Database\Schema;
  *
  */
 
-use TYPO3\CMS\Core\Type\Enumeration;
+use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationDefinitionException;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 
 /**
  * List of database schema update types
  */
-class SchemaUpdateType extends Enumeration
+class SchemaUpdateType
 {
+    /**
+     * @var mixed
+     */
+    protected $value;
+
+    /**
+     * @var array
+     */
+    protected static $enumConstants;
+
     /**
      * Add a field
      */
@@ -111,6 +121,27 @@ class SchemaUpdateType extends Enumeration
     ];
 
     /**
+     * @param mixed $value
+     */
+    public function __construct($value = null)
+    {
+        if ($value === null && !defined('static::__default')) {
+            throw new InvalidEnumerationValueException(
+                sprintf('A value for enumeration "%s" is required if no __default is defined.', static::class),
+                1381512753
+            );
+        }
+        static::loadValues();
+        if (!$this->isValid($value)) {
+            throw new InvalidEnumerationValueException(
+                sprintf('Invalid value "%s" for enumeration "%s"', $value, static::class),
+                1381512761
+            );
+        }
+        $this->setValue($value);
+    }
+
+    /**
      * Expands wildcards in schema update types, e.g. field.* or *.change
      *
      * @param array $schemaUpdateTypes List of schema update types
@@ -187,5 +218,145 @@ class SchemaUpdateType extends Enumeration
     public function getStatementTypes()
     {
         return self::$schemaUpdateTypesStatementTypesMapping[(string)$this];
+    }
+
+    /**
+     * Get the valid values for this enum
+     * Defaults to constants you define in your subclass
+     * override to provide custom functionality
+     *
+     * @param bool $include_default
+     * @return array
+     */
+    public static function getConstants($include_default = false)
+    {
+        static::loadValues();
+        $enumConstants = static::$enumConstants[static::class];
+        if (!$include_default) {
+            unset($enumConstants['__default']);
+        }
+
+        return $enumConstants;
+    }
+
+    /**
+     * Cast value to enumeration type
+     *
+     * @param mixed $value Value that has to be casted
+     * @return static
+     */
+    public static function cast($value)
+    {
+        if (!is_object($value) || get_class($value) !== static::class) {
+            $value = new static($value);
+        }
+
+        return $value;
+    }
+
+    /**
+     * @internal param string $class
+     */
+    protected static function loadValues()
+    {
+        $class = static::class;
+
+        if (isset(static::$enumConstants[$class])) {
+            return;
+        }
+
+        $reflection = new \ReflectionClass($class);
+        $constants = $reflection->getConstants();
+        $defaultValue = null;
+        if (isset($constants['__default'])) {
+            $defaultValue = $constants['__default'];
+            unset($constants['__default']);
+        }
+        if (empty($constants)) {
+            throw new InvalidEnumerationValueException(
+                sprintf(
+                    'No constants defined in enumeration "%s"',
+                    $class
+                ),
+                1381512807
+            );
+        }
+        foreach ($constants as $constant => $value) {
+            if (!is_int($value) && !is_string($value)) {
+                throw new InvalidEnumerationDefinitionException(
+                    sprintf(
+                        'Constant value "%s" of enumeration "%s" must be of type integer or string, got "%s" instead',
+                        $constant,
+                        $class,
+                        get_debug_type($value)
+                    ),
+                    1381512797
+                );
+            }
+        }
+        $constantValueCounts = array_count_values($constants);
+        arsort($constantValueCounts, SORT_NUMERIC);
+        $constantValueCount = current($constantValueCounts);
+        $constant = key($constantValueCounts);
+        if ($constantValueCount > 1) {
+            throw new InvalidEnumerationDefinitionException(
+                sprintf(
+                    'Constant value "%s" of enumeration "%s" is not unique (defined %d times)',
+                    $constant,
+                    $class,
+                    $constantValueCount
+                ),
+                1381512859
+            );
+        }
+        if ($defaultValue !== null) {
+            $constants['__default'] = $defaultValue;
+        }
+        static::$enumConstants[$class] = $constants;
+    }
+
+    /**
+     * Set the Enumeration value to the associated enumeration value by a loose comparison.
+     * The value, that is used as the enumeration value, will be of the same type like defined in the enumeration
+     *
+     * @param mixed $value
+     * @throws Exception\InvalidEnumerationValueException
+     */
+    protected function setValue($value)
+    {
+        $enumKey = array_search((string)$value, static::$enumConstants[static::class]);
+        if ($enumKey === false) {
+            throw new InvalidEnumerationValueException(
+                sprintf('Invalid value "%s" for enumeration "%s"', $value, __CLASS__),
+                1381615295
+            );
+        }
+        $this->value = static::$enumConstants[static::class][$enumKey];
+    }
+
+    /**
+     * Check if the value on this enum is a valid value for the enum
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    protected function isValid($value)
+    {
+        $value = (string)$value;
+        foreach (static::$enumConstants[static::class] as $constantValue) {
+            if ($value === (string)$constantValue) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->value;
     }
 }

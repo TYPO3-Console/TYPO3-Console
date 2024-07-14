@@ -18,7 +18,9 @@ use Helhum\Typo3Console\Install\Upgrade\SilentConfigurationUpgrade;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Http\NormalizedParams;
 use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Controller\InstallerController;
 
@@ -102,7 +104,7 @@ class InstallStepActionExecutor
             } catch (\Throwable $e) {
                 $messages = [
                     [
-                        'severity' => AbstractMessage::ERROR,
+                        'severity' => ((new Typo3Version())->getMajorVersion() > 12 ? ContextualFeedbackSeverity::ERROR : AbstractMessage::ERROR),
                         'message' => $e->getMessage(),
                     ],
                 ];
