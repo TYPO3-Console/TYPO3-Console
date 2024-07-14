@@ -122,11 +122,19 @@ jobs:
             -   name: Validate composer.json and composer.lock
                 run: composer validate
 
+            -   name: Patch latest TYPO3
+                if: matrix.typo3 == '^12.4' && matrix.dependency-version == 'stable'
+                run: composer require --dev --no-update gilbertsoft/typo3-core-patches
+
             -   name: Install
                 env:
                     COMPOSER_ROOT_VERSION: 8.1.1
                 run: |
                     composer update --with "typo3/cms-core:${{ matrix.typo3 }}" --prefer-${{ matrix.dependency-version }} --prefer-dist --no-interaction
+
+            -   name: Patch latest TYPO3 (reset git)
+                if: matrix.typo3 == '^12.4' && matrix.dependency-version == 'stable'
+                run: git checkout .
 
             -   name: Lint
                 run: php vendor/bin/parallel-lint  --exclude vendor --exclude var --exclude public .
