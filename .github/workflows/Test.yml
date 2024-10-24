@@ -31,10 +31,10 @@ jobs:
                         ${{ runner.os }}-composer-^11.5.26-
                         ${{ runner.os }}-composer-
 
-            -   name: Set up PHP Version 8.1
+            -   name: Set up PHP Version 8.3
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: 8.1
+                    php-version: 8.3
                     tools: composer:v2
                     coverage: none
 
