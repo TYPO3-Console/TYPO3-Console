@@ -63,7 +63,7 @@ class SqlCommand extends Command
             'driver' => getenv('TYPO3_INSTALL_DB_DRIVER'),
             'host' => getenv('TYPO3_INSTALL_DB_HOST'),
             'password' => getenv('TYPO3_INSTALL_DB_PASSWORD'),
-            'port' => getenv('TYPO3_INSTALL_DB_PORT') ?: '3306',
+            'port' => (int)(getenv('TYPO3_INSTALL_DB_PORT') ?: 3306),
             'user' => getenv('TYPO3_INSTALL_DB_USER'),
         ];
         if ($input->getOption('no-db')) {

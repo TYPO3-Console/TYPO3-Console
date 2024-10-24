@@ -12,7 +12,7 @@ databaseConnect:
         databaseHostName:
             value: '127.0.0.1'
         databasePort:
-            value: 3306'
+            value: 3306
         databaseSocket:
             value: ''
 

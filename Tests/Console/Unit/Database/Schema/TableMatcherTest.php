@@ -19,6 +19,7 @@ use Helhum\Typo3Console\Database\Schema\TableMatcher;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Information\Typo3Version;
 
 class TableMatcherTest extends TestCase
 {
@@ -116,7 +117,11 @@ class TableMatcherTest extends TestCase
         $connectionProphecy = $this->prophesize(Connection::class);
         $schemaManagerProphecy = $this->prophesize(AbstractSchemaManager::class);
         $schemaManagerProphecy->listTableNames()->willReturn($tables)->shouldBeCalled();
-        $connectionProphecy->getSchemaManager()->willReturn($schemaManagerProphecy->reveal())->shouldBeCalled();
+        if ((new Typo3Version())->getMajorVersion() > 12) {
+            $connectionProphecy->createSchemaManager()->willReturn($schemaManagerProphecy->reveal())->shouldBeCalled();
+        } else {
+            $connectionProphecy->getSchemaManager()->willReturn($schemaManagerProphecy->reveal())->shouldBeCalled();
+        }
 
         $tableMatcher = new TableMatcher();
         $matchedTables = $tableMatcher->match($connectionProphecy->reveal(), $expression);
@@ -153,7 +158,11 @@ class TableMatcherTest extends TestCase
         $connectionProphecy = $this->prophesize(Connection::class);
         $schemaManagerProphecy = $this->prophesize(AbstractSchemaManager::class);
         $schemaManagerProphecy->listTableNames()->willReturn($tables)->shouldBeCalled();
-        $connectionProphecy->getSchemaManager()->willReturn($schemaManagerProphecy->reveal())->shouldBeCalled();
+        if ((new Typo3Version())->getMajorVersion() > 12) {
+            $connectionProphecy->createSchemaManager()->willReturn($schemaManagerProphecy->reveal())->shouldBeCalled();
+        } else {
+            $connectionProphecy->getSchemaManager()->willReturn($schemaManagerProphecy->reveal())->shouldBeCalled();
+        }
 
         $tableMatcher = new TableMatcher();
         $matchedTables = $tableMatcher->match($connectionProphecy->reveal(), 'cf_*', 'cache_*');

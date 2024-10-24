@@ -9,7 +9,7 @@
         "classmap-authoritative": true
     },
     "require": {
-        "symfony/process": "^6.2",
+        "symfony/process": "^7.1",
         "helhum/config-loader": "^0.12.5"
     }
 }

@@ -31,10 +31,10 @@ jobs:
                         ${{ runner.os }}-composer-^11.5.26-
                         ${{ runner.os }}-composer-
 
-            -   name: Set up PHP Version 8.1
+            -   name: Set up PHP Version 8.3
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: 8.1
+                    php-version: 8.3
                     tools: composer:v2
                     coverage: none
 
@@ -68,23 +68,17 @@ jobs:
             fail-fast: false
             matrix:
                 os: [ 'ubuntu-latest' ]
-                typo3: [ '^11.5.26', '^12.4' ]
-                php: [ '8.1', '8.2', '8.3' ]
+                typo3: [ '^11.5.26', '^12.4', '^13.4' ]
+                php: [ 8.1, 8.2, 8.3 ]
                 dependency-version: [ lowest, stable ]
-                experimental: [ false ]
+                exclude:
+                    - typo3: "^13.4"
+                      php: 8.1
                 include:
-#                    -   os: 'ubuntu-latest'
-#                        php: 8.2
-#                        typo3: dev-main
-#                        dependency-version: stable
-#                        experimental: true
                     -   os: 'windows-latest'
-                        php: '8.2'
-                        typo3: '^12.4'
+                        php: 8.3
+                        typo3: '^13.4'
                         dependency-version: stable
-                        experimental: false
-
-        continue-on-error: ${{ matrix.experimental }}
 
         steps:
             -   name: Start database server
@@ -146,26 +140,22 @@ jobs:
 
             # This fails when command reference is not up to date
             -   name: Test Command Reference
-                if: matrix.os == 'ubuntu-latest' && !matrix.experimental
+                if: matrix.os == 'ubuntu-latest'
                 run: |
                     vendor/bin/typo3 commandreference:render
                     git diff --exit-code
 
             -   name: Test Install (Unix)
-                if: matrix.os == 'ubuntu-latest' && !matrix.experimental
+                if: matrix.os == 'ubuntu-latest'
                 run: 'php vendor/bin/typo3 install:setup --install-steps-config=Tests/Console/Functional/Fixtures/Install/mysql-install.yaml --no-interaction -vvv'
 
             -   name: Test Install (Windows)
-                if: matrix.os == 'windows-latest' && !matrix.experimental
+                if: matrix.os == 'windows-latest'
                 run: 'php vendor/bin/typo3 install:setup --install-steps-config=Tests/Console/Functional/Fixtures/Install/sqlite-install.yaml --no-interaction -vvv'
 
             -   name: Test
-                if: matrix.os == 'ubuntu-latest' && !matrix.experimental
+                if: matrix.os == 'ubuntu-latest'
                 run: vendor/bin/phpunit
-
-            -   name: Test - allow failure
-                if: matrix.experimental
-                run: vendor/bin/phpunit || true
 
             -   name: Test - Windows
                 if: matrix.os == 'windows-latest'
