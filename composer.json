@@ -87,9 +87,7 @@
         },
         "allow-plugins": {
             "typo3/class-alias-loader": true,
-            "typo3/cms-composer-installers": true,
-            "cweagans/composer-patches": true,
-            "gilbertsoft/typo3-core-patches": true
+            "typo3/cms-composer-installers": true
         }
     },
     "scripts": {
@@ -133,20 +131,6 @@
             },
             "extension-key": "typo3_console",
             "ignore-as-root": false
-        },
-        "patches": {
-            "typo3/cms-core": {
-                "Fix composer PackageArtifact packagePath resolve for root pkgs": "patches/typo3-cms-core-review-85198.patch"
-            }
-        },
-        "gilbertsoft/typo3-core-patches": {
-            "applied-changes": {
-                "85198": {
-                    "packages": [
-                        "typo3/cms-core"
-                    ]
-                }
-            }
         }
     }
 }
