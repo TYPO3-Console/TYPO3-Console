@@ -35,6 +35,10 @@ return (new PhpCsFixer\Config)
         'blank_line_before_statement' => [
             'statements' => ['return'],
         ],
+        'blank_lines_before_namespace' => [
+            'min_line_breaks' => 1,
+            'max_line_breaks' => 1,
+        ],
         'cast_spaces' => ['space' => 'none'],
         'concat_space' => [
             'spacing' => 'one',
@@ -42,7 +46,6 @@ return (new PhpCsFixer\Config)
         'declare_equal_normalize' => ['space' => 'none'],
         'declare_strict_types' => true,
         'dir_constant' => true,
-        'function_typehint_space' => true,
         'single_line_comment_style' => [
             'comment_types' => ['hash'],
         ],
@@ -52,11 +55,10 @@ return (new PhpCsFixer\Config)
             'elements' => ['const' => 'none', 'method' => 'one', 'property' => 'one', 'trait_import' => 'one', 'case' => 'one'],
         ],
         'native_function_casing' => true,
-        'new_with_braces' => true,
+        'new_with_parentheses' => true,
         'no_alias_functions' => true,
         'no_blank_lines_after_class_opening' => true,
         'no_blank_lines_after_phpdoc' => true,
-        'no_blank_lines_before_namespace' => true,
         'no_empty_comment' => true,
         'no_empty_phpdoc' => true,
         'no_empty_statement' => true,
@@ -68,8 +70,7 @@ return (new PhpCsFixer\Config)
         'no_short_bool_cast' => true,
         'no_singleline_whitespace_before_semicolons' => true,
         'no_superfluous_elseif' => true,
-        'no_trailing_comma_in_list_call' => true,
-        'no_trailing_comma_in_singleline_array' => true,
+        'no_trailing_comma_in_singleline' => true,
         'no_unneeded_control_parentheses' => true,
         'no_unreachable_default_argument_value' => true,
         'no_unused_imports' => true,
@@ -101,8 +102,9 @@ return (new PhpCsFixer\Config)
         'standardize_not_equals' => true,
         'ternary_operator_spaces' => true,
         'trailing_comma_in_multiline' => [
-            'elements' => ['arrays']
+            'elements' => ['arrays'],
         ],
+        'type_declaration_spaces' => true,
         'whitespace_after_comma_in_array' => true,
     ])
     ->setFinder($finder);
