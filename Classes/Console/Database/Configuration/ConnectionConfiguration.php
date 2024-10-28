@@ -22,7 +22,7 @@ class ConnectionConfiguration
      * @param string|null $name
      * @return array
      */
-    public function build(string $name = null): array
+    public function build(?string $name = null): array
     {
         if ($name === null) {
             return $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default'];

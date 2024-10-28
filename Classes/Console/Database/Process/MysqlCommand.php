@@ -35,7 +35,7 @@ class MysqlCommand
      */
     private $output;
 
-    public function __construct(array $dbConfig, ConsoleOutput $output = null)
+    public function __construct(array $dbConfig, ?ConsoleOutput $output = null)
     {
         $this->dbConfig = $dbConfig;
         $this->output = $output ?: new ConsoleOutput(); // output being optional is @deprecated. Will become required in 6.0

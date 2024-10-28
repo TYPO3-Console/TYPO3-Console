@@ -35,7 +35,7 @@ class TrackableOutput extends ConsoleOutput
      */
     private $parentOutput;
 
-    public function __construct(OutputInterface $output, self $parentOutput = null)
+    public function __construct(OutputInterface $output, ?self $parentOutput = null)
     {
         $this->output = $output;
         $this->parentOutput = $parentOutput;

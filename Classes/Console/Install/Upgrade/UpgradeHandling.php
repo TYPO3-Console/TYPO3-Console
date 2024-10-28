@@ -62,12 +62,12 @@ class UpgradeHandling
     private Typo3Version $typo3Version;
 
     public function __construct(
-        UpgradeWizardFactory $factory = null,
-        UpgradeWizardExecutor $executor = null,
-        UpgradeWizardList $upgradeWizardList = null,
-        SilentConfigurationUpgrade $silentConfigurationUpgrade = null,
-        CommandDispatcher $commandDispatcher = null,
-        ConfigurationService $configurationService = null,
+        ?UpgradeWizardFactory $factory = null,
+        ?UpgradeWizardExecutor $executor = null,
+        ?UpgradeWizardList $upgradeWizardList = null,
+        ?SilentConfigurationUpgrade $silentConfigurationUpgrade = null,
+        ?CommandDispatcher $commandDispatcher = null,
+        ?ConfigurationService $configurationService = null,
     ) {
         $this->factory = $factory ?: new UpgradeWizardFactory();
         $this->executor = $executor ?: new UpgradeWizardExecutor($this->factory);

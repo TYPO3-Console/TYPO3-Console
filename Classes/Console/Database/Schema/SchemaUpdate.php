@@ -40,7 +40,7 @@ class SchemaUpdate implements SchemaUpdateInterface, SingletonInterface
      * @param SqlReader $sqlReader
      * @param SchemaMigrator $schemaMigrator
      */
-    public function __construct(SqlReader $sqlReader = null, SchemaMigrator $schemaMigrator = null)
+    public function __construct(?SqlReader $sqlReader = null, ?SchemaMigrator $schemaMigrator = null)
     {
         $this->sqlReader = $sqlReader ?: GeneralUtility::makeInstance(SqlReader::class);
         $this->schemaMigrator = $schemaMigrator ?: GeneralUtility::makeInstance(SchemaMigrator::class);

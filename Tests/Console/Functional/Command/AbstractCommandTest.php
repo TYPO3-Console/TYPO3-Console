@@ -193,7 +193,7 @@ abstract class AbstractCommandTest extends TestCase
         $fileSystem->remove($targetPath);
     }
 
-    protected function executeConsoleCommand($command, array $arguments = [], array $environment = [], string $stdIn = null)
+    protected function executeConsoleCommand($command, array $arguments = [], array $environment = [], ?string $stdIn = null)
     {
         try {
             return $this->commandDispatcher->executeCommand($command, $arguments, $environment, $stdIn);

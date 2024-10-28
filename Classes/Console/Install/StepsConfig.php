@@ -24,12 +24,12 @@ class StepsConfig
      */
     private $baseConfigFile;
 
-    public function __construct(string $baseConfigFile = null)
+    public function __construct(?string $baseConfigFile = null)
     {
         $this->baseConfigFile = $baseConfigFile ?: __DIR__ . '/../../../Configuration/Install/InstallSteps.yaml';
     }
 
-    public function getInstallSteps(string $stepsConfigFile = null): array
+    public function getInstallSteps(?string $stepsConfigFile = null): array
     {
         $stepsConfigFile = $stepsConfigFile ?: (string)getenv('TYPO3_INSTALL_SETUP_STEPS') ?: $this->baseConfigFile;
         $stepsConfigFile = (string)realpath($stepsConfigFile);

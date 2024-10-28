@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace  Helhum\Typo3Console\Tests\Unit\Command\Frontend;
+namespace Helhum\Typo3Console\Tests\Unit\Command\Frontend;
 
 use Helhum\Typo3Console\Command\Frontend\FrontendRequestCommand;
 use PHPUnit\Framework\TestCase;

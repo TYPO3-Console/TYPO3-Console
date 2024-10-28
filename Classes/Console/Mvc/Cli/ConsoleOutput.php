@@ -73,7 +73,7 @@ class ConsoleOutput
      * @param Output|null $output
      * @param Input|null $input
      */
-    public function __construct(Output $output = null, Input $input = null)
+    public function __construct(?Output $output = null, ?Input $input = null)
     {
         $this->output = new TrackableOutput($output ?: new SymfonyConsoleOutput());
         $this->output->getFormatter()->setStyle('b', new OutputFormatterStyle(null, null, ['bold']));
@@ -216,7 +216,7 @@ class ConsoleOutput
      * @throws \Symfony\Component\Console\Exception\RuntimeException
      * @return string The user answer
      */
-    public function ask($question, $default = null, array $autocomplete = null)
+    public function ask($question, $default = null, ?array $autocomplete = null)
     {
         $question = (new Question($question, $default))
             ->setAutocompleterValues($autocomplete);
@@ -275,7 +275,7 @@ class ConsoleOutput
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      * @return mixed
      */
-    public function askAndValidate($question, $validator, $attempts = false, $default = null, array $autocomplete = null)
+    public function askAndValidate($question, $validator, $attempts = false, $default = null, ?array $autocomplete = null)
     {
         $question = (new Question($question, $default))
             ->setValidator($validator)

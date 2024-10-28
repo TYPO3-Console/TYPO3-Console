@@ -51,10 +51,10 @@ class UpgradeWizardList
     private $upgradeWizardsService;
 
     public function __construct(
-        UpgradeWizardFactory $factory = null,
-        Registry $registry = null,
+        ?UpgradeWizardFactory $factory = null,
+        ?Registry $registry = null,
         array $wizardRegistry = [],
-        UpgradeWizardsService $upgradeWizardsService = null
+        ?UpgradeWizardsService $upgradeWizardsService = null
     ) {
         $this->factory = $factory ?: new UpgradeWizardFactory();
         $this->registry = $registry ?: GeneralUtility::makeInstance(Registry::class);

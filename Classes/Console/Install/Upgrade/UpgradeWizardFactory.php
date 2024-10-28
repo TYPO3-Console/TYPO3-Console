@@ -41,8 +41,8 @@ class UpgradeWizardFactory
      * @param array $wizardRegistry
      */
     public function __construct(
-        ContainerInterface $container = null,
-        array $wizardRegistry = null
+        ?ContainerInterface $container = null,
+        ?array $wizardRegistry = null
     ) {
         $this->container = $container ?: new class() implements ContainerInterface {
             public function get(string $id)
