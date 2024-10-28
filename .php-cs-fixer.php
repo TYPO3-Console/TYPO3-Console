@@ -23,6 +23,7 @@ $configFinder = PhpCsFixer\Finder::create()
 $finder->append($configFinder);
 
 return (new PhpCsFixer\Config)
+    ->setParallelConfig(PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
     ->setRiskyAllowed(true)
     ->setRules([
         '@PSR2' => true,
