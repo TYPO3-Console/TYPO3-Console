@@ -14,7 +14,7 @@ class ExtCommand extends Command
      */
     private $registry;
 
-    public function __construct(string $name = null, CommandRegistry $registry = null)
+    public function __construct(?string $name = null, ?CommandRegistry $registry = null)
     {
         $this->registry = $registry;
         parent::__construct($name);

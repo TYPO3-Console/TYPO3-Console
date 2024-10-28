@@ -48,7 +48,7 @@ class InstallStepActionExecutor
     /**
      * @param SilentConfigurationUpgrade $silentConfigurationUpgrade
      */
-    public function __construct(SilentConfigurationUpgrade $silentConfigurationUpgrade, InstallerController $installerController = null, callable $requestFactory = null)
+    public function __construct(SilentConfigurationUpgrade $silentConfigurationUpgrade, ?InstallerController $installerController = null, ?callable $requestFactory = null)
     {
         $this->silentConfigurationUpgrade = $silentConfigurationUpgrade;
         $this->installerController = $installerController ?? GeneralUtility::makeInstance(InstallerController::class);

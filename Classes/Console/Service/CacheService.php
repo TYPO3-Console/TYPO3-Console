@@ -33,7 +33,7 @@ class CacheService implements SingletonInterface
      */
     protected $cacheConfiguration;
 
-    public function __construct(array $cacheConfiguration = null)
+    public function __construct(?array $cacheConfiguration = null)
     {
         // We need a new instance here to get the real caches instead of the disabled ones
         $this->cacheManager = new CacheManager();
@@ -88,7 +88,7 @@ class CacheService implements SingletonInterface
      * @param array $groups
      * @throws NoSuchCacheGroupException
      */
-    public function flushByTagsAndGroups(array $tags, array $groups = null): void
+    public function flushByTagsAndGroups(array $tags, ?array $groups = null): void
     {
         if ($groups === null) {
             $this->flushByTags($tags);

@@ -54,7 +54,7 @@ class CommandDispatcher
     /**
      * Create the dispatcher from within a composer plugin context
      */
-    public static function createFromComposerRun(ScriptEvent|string $scriptEventOrCommandPath, array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null): self
+    public static function createFromComposerRun(ScriptEvent|string $scriptEventOrCommandPath, array $commandLine = [], array $environmentVars = [], ?PhpExecutableFinder $phpFinder = null): self
     {
         $typo3CommandPath = $scriptEventOrCommandPath;
         if ($scriptEventOrCommandPath instanceof ScriptEvent) {
@@ -76,7 +76,7 @@ class CommandDispatcher
      * @throws RuntimeException
      * @return CommandDispatcher
      */
-    public static function createFromCommandRun(array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null): self
+    public static function createFromCommandRun(array $commandLine = [], array $environmentVars = [], ?PhpExecutableFinder $phpFinder = null): self
     {
         if (!isset($_SERVER['argv'][0]) || strpos($_SERVER['argv'][0], Application::COMMAND_NAME) === false) {
             throw new RuntimeException('Tried to create typo3 command runner from wrong context', 1484945065);
@@ -115,7 +115,7 @@ class CommandDispatcher
      * @throws RuntimeException
      * @return CommandDispatcher
      */
-    public static function create($typo3CommandPath, array $commandLine = [], array $environmentVars = [], PhpExecutableFinder $phpFinder = null): self
+    public static function create($typo3CommandPath, array $commandLine = [], array $environmentVars = [], ?PhpExecutableFinder $phpFinder = null): self
     {
         $environmentVars['TYPO3_CONSOLE_SUB_PROCESS'] = $environmentVars['TYPO3_CONSOLE_SUB_PROCESS'] ?? '1';
         $phpFinder = $phpFinder ?: new PhpExecutableFinder();

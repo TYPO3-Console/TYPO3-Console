@@ -11,7 +11,7 @@ class ExtAlias extends ExtCommand
      */
     private static $instanceCount = 0;
 
-    public function __construct(string $name = null, CommandRegistry $registry = null)
+    public function __construct(?string $name = null, ?CommandRegistry $registry = null)
     {
         if (getenv('THROWS_CONSTRUCT_EXCEPTION')) {
             throw new \Exception('Error occurred during object creation', 1589036051);

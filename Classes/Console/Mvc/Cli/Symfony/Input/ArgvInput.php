@@ -18,7 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 
 class ArgvInput extends \Symfony\Component\Console\Input\ArgvInput
 {
-    public function __construct(InputInterface $input = null)
+    public function __construct(?InputInterface $input = null)
     {
         if ($input instanceof \Symfony\Component\Console\Input\ArgvInput) {
             $this->options = $input->options;

@@ -32,7 +32,7 @@ class ExceptionRenderer
      */
     private $renderingWidth;
 
-    public function __construct(int $renderingWidth = null)
+    public function __construct(?int $renderingWidth = null)
     {
         if ($renderingWidth === null) {
             $terminal = new Terminal();
@@ -48,7 +48,7 @@ class ExceptionRenderer
      * @param OutputInterface $output
      * @param Application|null $application
      */
-    public function render(\Throwable $exception, OutputInterface $output, Application $application = null)
+    public function render(\Throwable $exception, OutputInterface $output, ?Application $application = null)
     {
         if ($output instanceof ConsoleOutput) {
             $output = $output->getErrorOutput();
@@ -187,7 +187,7 @@ class ExceptionRenderer
         }
     }
 
-    private function outputSynopsis(OutputInterface $output, Application $application = null)
+    private function outputSynopsis(OutputInterface $output, ?Application $application = null)
     {
         if (!$application || getenv('TYPO3_CONSOLE_SUB_PROCESS')) {
             return;
@@ -271,7 +271,7 @@ class ExceptionRenderer
      * @param \Throwable $exception
      * @return array|null
      */
-    private function serializeException(\Throwable $exception = null)
+    private function serializeException(?\Throwable $exception = null)
     {
         $serializedException = null;
         if ($exception) {

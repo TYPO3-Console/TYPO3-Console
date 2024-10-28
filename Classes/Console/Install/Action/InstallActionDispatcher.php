@@ -42,10 +42,10 @@ class InstallActionDispatcher
     private $installActionFactory;
 
     public function __construct(
-        ConsoleOutput $output = null,
-        CommandDispatcher $commandDispatcher = null,
-        StepsConfig $stepsConfig = null,
-        InstallActionFactory $installActionFactory = null
+        ?ConsoleOutput $output = null,
+        ?CommandDispatcher $commandDispatcher = null,
+        ?StepsConfig $stepsConfig = null,
+        ?InstallActionFactory $installActionFactory = null
     ) {
         $this->output = $output ?: new ConsoleOutput();
         $commandDispatcher = $commandDispatcher ?: CommandDispatcher::createFromCommandRun();
@@ -53,7 +53,7 @@ class InstallActionDispatcher
         $this->installActionFactory = $installActionFactory ?: new InstallActionFactory($this->output, $commandDispatcher);
     }
 
-    public function dispatch(array $givenArguments, array $options = [], string $stepsConfigFile = null): bool
+    public function dispatch(array $givenArguments, array $options = [], ?string $stepsConfigFile = null): bool
     {
         try {
             $installSteps = $this->stepsConfig->getInstallSteps($stepsConfigFile);

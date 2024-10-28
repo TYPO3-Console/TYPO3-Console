@@ -37,7 +37,7 @@ class UpgradeWizardExecutor
      */
     private $upgradeWizardsService;
 
-    public function __construct(UpgradeWizardFactory $factory = null, UpgradeWizardsService $upgradeWizardsService = null)
+    public function __construct(?UpgradeWizardFactory $factory = null, ?UpgradeWizardsService $upgradeWizardsService = null)
     {
         $this->factory = $factory ?? new UpgradeWizardFactory();
         $this->upgradeWizardsService = $upgradeWizardsService ?? GeneralUtility::makeInstance(UpgradeWizardsService::class);
