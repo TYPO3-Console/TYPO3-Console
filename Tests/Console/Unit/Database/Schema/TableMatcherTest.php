@@ -17,14 +17,11 @@ namespace Helhum\Typo3Console\Tests\Unit\Database\Schema;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Helhum\Typo3Console\Database\Schema\TableMatcher;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Information\Typo3Version;
 
 class TableMatcherTest extends TestCase
 {
-    use ProphecyTrait;
-
     public function matchReturnsCorrectTableMatchesDataProvider(): array
     {
         return [
@@ -114,17 +111,17 @@ class TableMatcherTest extends TestCase
             'fe_sessions',
             'be_sessions',
         ];
-        $connectionProphecy = $this->prophesize(Connection::class);
-        $schemaManagerProphecy = $this->prophesize(AbstractSchemaManager::class);
-        $schemaManagerProphecy->listTableNames()->willReturn($tables)->shouldBeCalled();
+        $connectionMock = $this->createMock(Connection::class);
+        $schemaManagerMock = $this->createMock(AbstractSchemaManager::class);
+        $schemaManagerMock->expects($this->atLeastOnce())->method('listTableNames')->willReturn($tables);
         if ((new Typo3Version())->getMajorVersion() > 12) {
-            $connectionProphecy->createSchemaManager()->willReturn($schemaManagerProphecy->reveal())->shouldBeCalled();
+            $connectionMock->expects($this->atLeastOnce())->method('createSchemaManager')->willReturn($schemaManagerMock);
         } else {
-            $connectionProphecy->getSchemaManager()->willReturn($schemaManagerProphecy->reveal())->shouldBeCalled();
+            $connectionMock->expects($this->atLeastOnce())->method('getSchemaManager')->willReturn($schemaManagerMock);
         }
 
         $tableMatcher = new TableMatcher();
-        $matchedTables = $tableMatcher->match($connectionProphecy->reveal(), $expression);
+        $matchedTables = $tableMatcher->match($connectionMock, $expression);
 
         foreach ($expectedMatches as $expectedMatch) {
             $this->assertTrue(in_array($expectedMatch, $matchedTables, true), sprintf('Expected table %s is not found in match result', $expectedMatch));
@@ -155,17 +152,17 @@ class TableMatcherTest extends TestCase
             'cache_foo',
             'cache_foo_tags',
         ];
-        $connectionProphecy = $this->prophesize(Connection::class);
-        $schemaManagerProphecy = $this->prophesize(AbstractSchemaManager::class);
-        $schemaManagerProphecy->listTableNames()->willReturn($tables)->shouldBeCalled();
+        $connectionMock = $this->createMock(Connection::class);
+        $schemaManagerMock = $this->createMock(AbstractSchemaManager::class);
+        $schemaManagerMock->expects($this->atLeastOnce())->method('listTableNames')->willReturn($tables);
         if ((new Typo3Version())->getMajorVersion() > 12) {
-            $connectionProphecy->createSchemaManager()->willReturn($schemaManagerProphecy->reveal())->shouldBeCalled();
+            $connectionMock->expects($this->atLeastOnce())->method('createSchemaManager')->willReturn($schemaManagerMock);
         } else {
-            $connectionProphecy->getSchemaManager()->willReturn($schemaManagerProphecy->reveal())->shouldBeCalled();
+            $connectionMock->expects($this->atLeastOnce())->method('getSchemaManager')->willReturn($schemaManagerMock);
         }
 
         $tableMatcher = new TableMatcher();
-        $matchedTables = $tableMatcher->match($connectionProphecy->reveal(), 'cf_*', 'cache_*');
+        $matchedTables = $tableMatcher->match($connectionMock, 'cf_*', 'cache_*');
 
         foreach ($expectedMatches as $expectedMatch) {
             $this->assertTrue(in_array($expectedMatch, $matchedTables, true), sprintf('Expected table %s is not found in match result', $expectedMatch));
