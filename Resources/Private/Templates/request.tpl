@@ -5,7 +5,7 @@ class Helhum_TYPO3_Console_RequestBootstrap
     /**
      * @return void
      */
-    public static function setGlobalVariables(array $requestArguments = null)
+    public static function setGlobalVariables(?array $requestArguments = null)
     {
         if (empty($requestArguments)) {
             die('No JSON encoded arguments given');

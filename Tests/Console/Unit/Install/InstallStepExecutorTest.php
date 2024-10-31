@@ -17,24 +17,21 @@ namespace Helhum\Typo3Console\Tests\Unit\Install;
 use Helhum\Typo3Console\Install\InstallStepActionExecutor;
 use Helhum\Typo3Console\Install\Upgrade\SilentConfigurationUpgrade;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
 use TYPO3\CMS\Core\Http\JsonResponse;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Install\Controller\InstallerController;
 
 class InstallStepExecutorTest extends TestCase
 {
-    use ProphecyTrait;
-
     /**
      * @test
      */
     public function actionIsNeverExecutedIfNotNeeded()
     {
         $silentConfigUpgradeMock = $this->getMockBuilder(SilentConfigurationUpgrade::class)->disableOriginalConstructor()->getMock();
-        $installerControllerProphecy = $this->prophesize(InstallerController::class);
-        $installerControllerProphecy->checkEnvironmentAndFoldersAction()->willReturn(new JsonResponse(['success' => true]));
-        $executor = new InstallStepActionExecutor($silentConfigUpgradeMock, $installerControllerProphecy->reveal());
+        $installerControllerMock = $this->createMock(InstallerController::class);
+        $installerControllerMock->method('checkEnvironmentAndFoldersAction')->willReturn(new JsonResponse(['success' => true]));
+        $executor = new InstallStepActionExecutor($silentConfigUpgradeMock, $installerControllerMock);
         $response = $executor->executeActionWithArguments('environmentAndFolders');
         $this->assertFalse($response->actionNeedsExecution());
     }
@@ -45,9 +42,9 @@ class InstallStepExecutorTest extends TestCase
     public function actionIsNeverExecutedIfDryRun()
     {
         $silentConfigUpgradeMock = $this->getMockBuilder(SilentConfigurationUpgrade::class)->disableOriginalConstructor()->getMock();
-        $installerControllerProphecy = $this->prophesize(InstallerController::class);
-        $installerControllerProphecy->checkEnvironmentAndFoldersAction()->willReturn(new JsonResponse(['success' => false]));
-        $executor = new InstallStepActionExecutor($silentConfigUpgradeMock, $installerControllerProphecy->reveal());
+        $installerControllerMock = $this->createMock(InstallerController::class);
+        $installerControllerMock->method('checkEnvironmentAndFoldersAction')->willReturn(new JsonResponse(['success' => false]));
+        $executor = new InstallStepActionExecutor($silentConfigUpgradeMock, $installerControllerMock);
         $response = $executor->executeActionWithArguments('environmentAndFolders', [], true);
         $this->assertTrue($response->actionNeedsExecution());
     }
@@ -68,10 +65,10 @@ class InstallStepExecutorTest extends TestCase
             return $request;
         };
         $silentConfigUpgradeMock = $this->getMockBuilder(SilentConfigurationUpgrade::class)->disableOriginalConstructor()->getMock();
-        $installerControllerProphecy = $this->prophesize(InstallerController::class);
-        $installerControllerProphecy->checkEnvironmentAndFoldersAction()->willReturn(new JsonResponse(['success' => false]));
-        $installerControllerProphecy->executeEnvironmentAndFoldersAction($request)->willReturn(new JsonResponse(['success' => true]));
-        $executor = new InstallStepActionExecutor($silentConfigUpgradeMock, $installerControllerProphecy->reveal(), $requestFactory);
+        $installerControllerMock = $this->createMock(InstallerController::class);
+        $installerControllerMock->method('checkEnvironmentAndFoldersAction')->willReturn(new JsonResponse(['success' => false]));
+        $installerControllerMock->method('executeEnvironmentAndFoldersAction')->with($request)->willReturn(new JsonResponse(['success' => true]));
+        $executor = new InstallStepActionExecutor($silentConfigUpgradeMock, $installerControllerMock, $requestFactory);
         $response = $executor->executeActionWithArguments('environmentAndFolders');
         $this->assertFalse($response->actionNeedsExecution());
     }
