@@ -41,7 +41,6 @@
         "typo3/cms-composer-installers": "^4.0@rc || >=5.0",
         "typo3/cms-core": "^11.5.26 || ^12.4.18 || ^13.1",
         "typo3/cms-extbase": "^11.5.26 || ^12.4.18 || ^13.1",
-        "typo3/cms-extensionmanager": "^11.5.26 || ^12.4.18 || ^13.1",
         "typo3/cms-fluid": "^11.5.26 || ^12.4.18 || ^13.1",
         "typo3/cms-frontend": "^11.5.26 || ^12.4.18 || ^13.1",
         "typo3/cms-install": "^11.5.26 || ^12.4.18 || ^13.1",
@@ -51,6 +50,7 @@
         "helhum/php-error-reporting": "^1.0"
     },
     "require-dev": {
+        "typo3/cms-extensionmanager": "^11.5.26 || ^12.4.18 || ^13.1",
         "typo3/cms-filemetadata": "^11.5.26 || ^12.4.18 || ^13.1",
         "typo3/cms-recordlist": "^11.5.26 || ^12.4.18 || ^13.1",
         "typo3/cms-reports": "^11.5.26 || ^12.4.18 || ^13.1",
