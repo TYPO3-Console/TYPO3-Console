@@ -51,7 +51,7 @@ class MysqlCommand
     public function mysql(array $additionalArguments = [], $inputStream = STDIN, $outputCallback = null, $interactive = false)
     {
         $commandLine = ['mysql'];
-        $commandLine = array_merge($commandLine, $this->buildConnectionArguments('mysqldump'), $additionalArguments);
+        $commandLine = array_merge($commandLine, $this->buildConnectionArguments(), $additionalArguments);
         $process = new Process($commandLine, null, null, $inputStream, 0.0);
         if ($interactive) {
             // I did not figure out how to change pipes with symfony/process
@@ -72,7 +72,7 @@ class MysqlCommand
     public function mysqldump(array $additionalArguments = [], $outputCallback = null, string $connectionName = 'Default'): int
     {
         $commandLine = ['mysqldump'];
-        $commandLine = array_merge($commandLine, $this->buildConnectionArguments($commandLine[0]), $additionalArguments);
+        $commandLine = array_merge($commandLine, $this->buildConnectionArguments(), $additionalArguments);
         $process = new Process($commandLine, null, null, null, 0.0);
 
         echo  chr(10) . sprintf('-- Dump of TYPO3 Connection "%s"', $connectionName) . chr(10);
@@ -89,7 +89,7 @@ class MysqlCommand
     public function mariadbdump(array $additionalArguments = [], $outputCallback = null, string $connectionName = 'Default'): int
     {
         $commandLine = ['mariadb-dump'];
-        $commandLine = array_merge($commandLine, $this->buildConnectionArguments($commandLine[0]), $additionalArguments);
+        $commandLine = array_merge($commandLine, $this->buildConnectionArguments(), $additionalArguments);
         $process = new Process($commandLine, null, null, null, 0.0);
 
         echo  chr(10) . sprintf('-- Dump of TYPO3 Connection "%s"', $connectionName) . chr(10);
@@ -116,9 +116,9 @@ class MysqlCommand
         return $outputCallback;
     }
 
-    private function buildConnectionArguments(string $binary): array
+    private function buildConnectionArguments(): array
     {
-        if ($configFile = $this->createTemporaryMysqlConfigurationFile($binary)) {
+        if ($configFile = $this->createTemporaryMysqlConfigurationFile()) {
             $arguments[] = '--defaults-file=' . $configFile;
         }
         if (!empty($this->dbConfig['host'])) {
@@ -141,7 +141,7 @@ class MysqlCommand
         return $arguments;
     }
 
-    private function createTemporaryMysqlConfigurationFile(string $binary)
+    private function createTemporaryMysqlConfigurationFile()
     {
         if (empty($this->dbConfig['user']) && !isset($this->dbConfig['password'])) {
             return null;
@@ -158,10 +158,6 @@ class MysqlCommand
             $passwordDefinition = sprintf('password="%s"', addcslashes($this->dbConfig['password'], '"\\'));
         }
         $confFileContent = <<<EOF
-[' . $binary . ']
-$userDefinition
-$passwordDefinition
-
 [client]
 $userDefinition
 $passwordDefinition
