@@ -21,6 +21,7 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class SqlCommand extends Command
@@ -42,8 +43,12 @@ class SqlCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $inputStream = ($input instanceof StreamableInputInterface)
+            ? ($input->getStream() ?? STDIN)
+            : STDIN;
+
         $sql = '';
-        while ($f = fgets(STDIN)) {
+        while ($f = fgets($inputStream)) {
             $sql .= $f;
         }
 

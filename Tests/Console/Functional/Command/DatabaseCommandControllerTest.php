@@ -165,6 +165,17 @@ class DatabaseCommandControllerTest extends AbstractCommandTest
     /**
      * @test
      */
+    public function sqlCanBeImportedWithSpecifiedConnectionAndSpecialSymfonyFormattingInstructions()
+    {
+        $this->skipOnSqlite();
+        $sql = 'SELECT "<error>I shouldn\'t be styled because I\'m user data</error>";';
+        $output = $this->executeConsoleCommand('database:import', ['--connection', 'Default'], [], $sql);
+        $this->assertSame('<error>I shouldn\'t be styled because I\'m user data</error>', $output);
+    }
+
+    /**
+     * @test
+     */
     public function databaseImportFailsWithNotExistingConnection()
     {
         $this->skipOnSqlite();
