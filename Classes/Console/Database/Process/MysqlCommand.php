@@ -16,6 +16,8 @@ namespace Helhum\Typo3Console\Database\Process;
 
 use Helhum\Typo3Console\Mvc\Cli\InteractiveProcess;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
 class MysqlCommand
@@ -35,7 +37,7 @@ class MysqlCommand
      */
     private $output;
 
-    public function __construct(array $dbConfig, ?ConsoleOutput $output = null)
+    public function __construct(array $dbConfig, ?OutputInterface $output = null)
     {
         $this->dbConfig = $dbConfig;
         $this->output = $output ?: new ConsoleOutput(); // output being optional is @deprecated. Will become required in 6.0
@@ -89,9 +91,12 @@ class MysqlCommand
         if (!is_callable($outputCallback)) {
             $outputCallback = function ($type, $data) {
                 if (Process::OUT === $type) {
-                    echo $data;
+                    $this->output->write($data, false, OutputInterface::OUTPUT_RAW);
                 } elseif (Process::ERR === $type) {
-                    $this->output->getErrorOutput()->write($data);
+                    $errorOutput = $this->output instanceof ConsoleOutputInterface
+                        ? $this->output->getErrorOutput()
+                        : $this->output;
+                    $errorOutput->write($data);
                 }
             };
         }
