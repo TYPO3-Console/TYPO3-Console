@@ -41,7 +41,6 @@ This obviously only works when MySQL is used as DBMS.
 
 
 
-
 Options
 =======
 
@@ -60,8 +59,3 @@ Options
 - Is value required: yes
 - Is multiple: no
 - Default: 'Default'
-
-
-
-
-

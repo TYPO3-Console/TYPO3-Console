@@ -17,12 +17,7 @@ Allow backend access for editors again (e.g. after having been locked with backe
 
 
 
-
-
 Related commands
 ================
 
-
 *   :ref:`typo3_console-command-reference-backend-lockforeditors`
-
-

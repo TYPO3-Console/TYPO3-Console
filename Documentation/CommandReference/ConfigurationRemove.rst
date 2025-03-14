@@ -26,6 +26,7 @@ system configuration file and not be overridden elsewhere.
    typo3 configuration:remove DB,EXT/EXTCONF/realurl
 
 
+
 Arguments
 =========
 
@@ -44,8 +45,3 @@ Options
 - Is value required: no
 - Is multiple: no
 - Default: false
-
-
-
-
-

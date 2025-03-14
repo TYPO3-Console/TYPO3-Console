@@ -15,6 +15,8 @@ backend:createadmin
 
 Create a new user with administrative access.
 
+
+
 Arguments
 =========
 
@@ -22,9 +24,3 @@ Arguments
    Username of the user
 `password`
    Password of the user
-
-
-
-
-
-

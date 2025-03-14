@@ -17,12 +17,7 @@ Allow install tool access.
 
 
 
-
-
 Related commands
 ================
 
-
 *   :ref:`typo3_console-command-reference-install-lock`
-
-

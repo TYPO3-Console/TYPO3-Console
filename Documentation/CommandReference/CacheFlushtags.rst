@@ -23,6 +23,7 @@ Flushes caches by tags, optionally only caches in specified groups.
    typo3 cache:flushtags news_123 --groups pages,all
 
 
+
 Arguments
 =========
 
@@ -40,9 +41,3 @@ Options
 - Accept value: yes
 - Is value required: yes
 - Is multiple: no
-
-
-
-
-
-

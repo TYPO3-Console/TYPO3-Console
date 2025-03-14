@@ -38,6 +38,7 @@ Set system configuration option value by path.
    typo3 configuration:set BE/adminOnly -- -1
 
 
+
 Arguments
 =========
 
@@ -58,8 +59,3 @@ Options
 - Is value required: no
 - Is multiple: no
 - Default: false
-
-
-
-
-

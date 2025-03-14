@@ -1,4 +1,5 @@
-﻿.. include:: /Includes.rst.txt
+﻿
+.. include:: /Includes.rst.txt
 .. highlight:: shell
 
 
@@ -74,4 +75,3 @@ To temporary activate auto complete in the current shell session, type `eval
 `.profile` or `.bashrc` file to have it always available. Auto completion is
 then always dynamic and reflects the commands you have available in your TYPO3
 installation.
-

@@ -33,6 +33,7 @@ Tables to be excluded from the export can be specified fully qualified or with w
    typo3 database:export database:export -c Default -- --column-statistics=0
 
 
+
 Arguments
 =========
 
@@ -58,9 +59,3 @@ Options
 - Accept value: yes
 - Is value required: yes
 - Is multiple: no
-
-
-
-
-
-

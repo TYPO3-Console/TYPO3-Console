@@ -43,8 +43,3 @@ Options
 - Is value required: no
 - Is multiple: no
 - Default: false
-
-
-
-
-

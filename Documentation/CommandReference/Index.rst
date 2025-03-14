@@ -91,4 +91,3 @@ Available Commands
    InstallUnlock
 
    FrontendAsseturl
-

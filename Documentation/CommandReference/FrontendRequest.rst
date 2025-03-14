@@ -15,14 +15,10 @@ frontend:request
 
 Submits a frontend request to TYPO3 on the specified URL.
 
+
+
 Arguments
 =========
 
 `requestUrl`
    URL to make a frontend request
-
-
-
-
-
-

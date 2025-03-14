@@ -57,6 +57,7 @@ To avoid shell matching all types with wildcards should be quoted.
    typo3 database:updateschema "*" --verbose
 
 
+
 Arguments
 =========
 
@@ -83,8 +84,3 @@ Options
 - Is value required: no
 - Is multiple: no
 - Default: false
-
-
-
-
-

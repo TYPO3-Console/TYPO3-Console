@@ -25,14 +25,9 @@ the difference between these values is shown.
    typo3 configuration:show DB
 
 
+
 Arguments
 =========
 
 `path`
    Path to system configuration
-
-
-
-
-
-

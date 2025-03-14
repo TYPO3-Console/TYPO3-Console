@@ -1,4 +1,5 @@
 {namespace d=Typo3Console\CreateReferenceCommand\ViewHelpers}
+
 .. include:: /Includes.rst.txt
 
 .. The following reference was automatically generated from code. It should not

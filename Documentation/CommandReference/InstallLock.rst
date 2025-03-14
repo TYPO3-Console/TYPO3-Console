@@ -17,12 +17,7 @@ Block install tool access again (e.g. after having been unlocked with install:un
 
 
 
-
-
 Related commands
 ================
 
-
 *   :ref:`typo3_console-command-reference-install-unlock`
-
-

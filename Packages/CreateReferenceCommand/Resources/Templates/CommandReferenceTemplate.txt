@@ -1,4 +1,5 @@
 {namespace d=Typo3Console\CreateReferenceCommand\ViewHelpers}
+
 .. include:: /Includes.rst.txt
 
 .. _typo3_console-command-reference:

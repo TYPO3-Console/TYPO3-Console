@@ -18,12 +18,7 @@ Admins will still be able to log in and work with the backend. CLI access (comma
 
 
 
-
-
 Related commands
 ================
 
-
 *   :ref:`typo3_console-command-reference-backend-unlockforeditors`
-
-

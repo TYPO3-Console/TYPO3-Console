@@ -24,6 +24,7 @@ Shows the configuration value that is currently effective, no matter where and h
    typo3 configuration:showactive DB --json
 
 
+
 Arguments
 =========
 
@@ -42,8 +43,3 @@ Options
 - Is value required: no
 - Is multiple: no
 - Default: false
-
-
-
-
-

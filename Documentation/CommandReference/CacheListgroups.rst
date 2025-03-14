@@ -14,9 +14,3 @@ cache:listgroups
 **List cache groups**
 
 Lists all registered cache groups.
-
-
-
-
-
-

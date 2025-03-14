@@ -25,6 +25,7 @@ Note that this value could be overridden. Use `typo3 configuration:show <path>` 
    typo3 configuration:showlocal DB
 
 
+
 Arguments
 =========
 
@@ -46,11 +47,7 @@ Options
 
 
 
-
 Related commands
 ================
 
-
 *   :ref:`typo3_console-command-reference-configuration-show`
-
-

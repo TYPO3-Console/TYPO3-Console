@@ -182,8 +182,3 @@ Options
 - Is value required: yes
 - Is multiple: no
 - Default: '/'
-
-
-
-
-
