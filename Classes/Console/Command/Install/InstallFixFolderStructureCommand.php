@@ -15,10 +15,12 @@ namespace Helhum\Typo3Console\Command\Install;
  */
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\FolderStructure\DefaultFactory;
+use TYPO3\CMS\Install\WebserverType;
 
 class InstallFixFolderStructureCommand extends Command
 {
@@ -31,6 +33,12 @@ Automatically create files and folders, required for a TYPO3 installation.
 
 This command creates the required folder structure needed for TYPO3 including extensions.
 EOH
+        );
+        $this->addArgument(
+            'webServerConfig',
+            InputArgument::OPTIONAL,
+            'Web server config file to install in document root (`none`, `apache`, `iis`)',
+            'none'
         );
     }
 
@@ -46,7 +54,7 @@ EOH
         unset($GLOBALS['BE_USER']);
         $folderStructureFactory = GeneralUtility::makeInstance(DefaultFactory::class);
         $messages = $folderStructureFactory
-            ->getStructure()
+            ->getStructure(WebserverType::fromType($input->getArgument('webServerConfig')))
             ->fix()
             ->getAllMessagesAndFlush();
 
