@@ -66,8 +66,6 @@ Available Commands
 
    ConfigurationShow
 
-   FrontendRequest
-
    ConfigurationRemove
 
    ConfigurationSet
@@ -79,6 +77,10 @@ Available Commands
    DatabaseImport
 
    DatabaseUpdateschema
+   
+   FrontendAsseturl
+
+   FrontendRequest
 
    InstallSetup
 
@@ -89,6 +91,4 @@ Available Commands
    InstallLock
 
    InstallUnlock
-
-   FrontendAsseturl
 
