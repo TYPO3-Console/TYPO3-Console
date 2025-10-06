@@ -17,6 +17,7 @@ namespace Helhum\Typo3Console\Command\Database;
 use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
 use Helhum\Typo3Console\Database\Process\MysqlCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -49,7 +50,7 @@ This obviously only works when MySQL is used as DBMS.
 
 <b>Example (select):</b>
 
-  <code>echo 'SELECT username from be_users WHERE admin=1;' | %command.full_name%</code>
+  <code>echo 'SELECT username from be_users WHERE admin=1;' | %command.full_name% -- --skip-ssl</code>
 
 <b>Example (interactive):</b>
 
@@ -70,11 +71,18 @@ EOH
                 'TYPO3 database connection name',
                 'Default'
             ),
+            new InputArgument(
+                'additionalMysqlArguments',
+                InputArgument::IS_ARRAY,
+                'Pass one or more additional arguments to the mysql command; see examples',
+                []
+            ),
         ]);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $additionalMysqlArguments = $input->getArgument('additionalMysqlArguments');
         $interactive = $input->getOption('interactive');
         $connection = (string)$input->getOption('connection');
 
@@ -87,7 +95,7 @@ EOH
 
         $mysqlCommand = new MysqlCommand($this->connectionConfiguration->build($connection), $output);
         $exitCode = $mysqlCommand->mysql(
-            $interactive ? [] : ['--skip-column-names'],
+            array_merge($interactive ? [] : ['--skip-column-names'], $additionalMysqlArguments),
             STDIN,
             null,
             $interactive

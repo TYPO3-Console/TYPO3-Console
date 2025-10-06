@@ -30,7 +30,7 @@ This obviously only works when MySQL is used as DBMS.
 
 .. code-block:: shell
 
-   echo 'SELECT username from be_users WHERE admin=1;' | typo3 database:import
+   echo 'SELECT username from be_users WHERE admin=1;' | typo3 database:import -- --skip-ssl
 
 **Example (interactive):**
 
@@ -39,6 +39,12 @@ This obviously only works when MySQL is used as DBMS.
 
    typo3 database:import --interactive
 
+
+Arguments
+=========
+
+`additionalMysqlArguments`
+   Pass one or more additional arguments to the mysql command; see examples
 
 
 
