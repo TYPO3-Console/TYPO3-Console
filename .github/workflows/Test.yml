@@ -125,7 +125,7 @@ jobs:
 
             -   name: Install
                 env:
-                    COMPOSER_ROOT_VERSION: 8.2.2
+                    COMPOSER_ROOT_VERSION: 8.2.3
                 run: |
                     composer update --with "typo3/cms-core:${{ matrix.typo3 }}" --prefer-${{ matrix.dependency-version }} --prefer-dist --no-interaction
 
