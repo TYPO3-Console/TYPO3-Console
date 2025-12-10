@@ -80,6 +80,9 @@
         "typo3-ter/typo3-console": "self.version"
     },
     "config": {
+        "audit": {
+            "block-insecure": false
+        },
         "preferred-install": {
             "*": "dist"
         },
