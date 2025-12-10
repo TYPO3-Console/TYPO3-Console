@@ -11,17 +11,9 @@ cache:flushtags
 ===============
 
 
-**Flush cache by tags**
+**Flush TYPO3 caches with tags.**
 
-Flushes caches by tags, optionally only caches in specified groups.
-
-**Example:**
-
-
-.. code-block:: shell
-
-   typo3 cache:flushtags news_123 --groups pages,all
-
+This command can be used to clear the caches with specific tags, for example after code updates in local development and after deployments.
 
 Arguments
 =========
@@ -34,13 +26,13 @@ Arguments
 Options
 =======
 
-`--groups`
-   Optional array of groups (specified as comma separated values) for which to flush tags. If no group is specified, caches of all groups are flushed.
+`--groups|-g`
+   Array of groups (specified as comma separated values) for which to flush tags. If no group is specified, caches of all groups are flushed.
 
 - Accept value: yes
 - Is value required: yes
 - Is multiple: no
-
+- Default: 'all'
 
 
 

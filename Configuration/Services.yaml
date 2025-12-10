@@ -33,7 +33,7 @@ services:
             -
                 name: 'console.command'
                 command: 'cache:flushtags'
-                description: 'Flush cache by tags'
+                description: 'Flush TYPO3 caches with tags.'
 
     Helhum\Typo3Console\Command\Cache\CacheListGroupsCommand:
         tags:
