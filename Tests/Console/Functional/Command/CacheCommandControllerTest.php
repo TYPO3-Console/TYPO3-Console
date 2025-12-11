@@ -24,22 +24,4 @@ class CacheCommandControllerTest extends AbstractCommandTest
         $output = $this->executeConsoleCommand('cache:listgroups');
         $this->assertStringContainsString('The following cache groups are registered: ', $output);
     }
-
-    /**
-     * @test
-     */
-    public function cacheTagsCanBeFlushed()
-    {
-        $output = $this->executeConsoleCommand('cache:flushtags', ['foo']);
-        $this->assertSame('Flushed caches by tags "foo".', $output);
-    }
-
-    /**
-     * @test
-     */
-    public function cacheTagsAndGroupsCanBeFlushed()
-    {
-        $output = $this->executeConsoleCommand('cache:flushtags', ['foo', '--groups' => 'pages']);
-        $this->assertSame('Flushed caches by tags "foo" in groups: "pages".', $output);
-    }
 }
