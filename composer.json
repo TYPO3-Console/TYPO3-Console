@@ -122,7 +122,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "8.2.x-dev"
+            "dev-main": "8.3.x-dev"
         },
         "typo3/cms": {
             "Package": {
