@@ -18,6 +18,7 @@ use Helhum\Typo3Console\Typo3CompatibilityBridge;
 use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Service\SilentConfigurationUpgradeService as SilentConfigurationUpgradeService14;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Service\Exception\ConfigurationChangedException;
 use TYPO3\CMS\Install\Service\SilentConfigurationUpgradeService;
@@ -50,7 +51,9 @@ class SilentConfigurationUpgrade
             return;
         }
 
-        $upgradeService = new SilentConfigurationUpgradeService($this->configurationManager);
+        $upgradeService = class_exists(SilentConfigurationUpgradeService14::class)
+            ? new SilentConfigurationUpgradeService14($this->configurationManager)
+            : new SilentConfigurationUpgradeService($this->configurationManager);
         $count = 0;
         do {
             try {

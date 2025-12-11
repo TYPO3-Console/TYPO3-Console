@@ -32,7 +32,7 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  */
 class IndentViewHelper extends AbstractViewHelper
 {
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         $this->registerArgument('indent', 'string', 'String used to indent', false, "\t");
         $this->registerArgument('inline', 'boolean', 'If TRUE, the first line will not be indented', false, false);
@@ -41,7 +41,7 @@ class IndentViewHelper extends AbstractViewHelper
     /**
      * @return string The formatted value
      */
-    public function render()
+    public function render(): string
     {
         $indent = $this->arguments['indent'];
         $inline = $this->arguments['inline'];

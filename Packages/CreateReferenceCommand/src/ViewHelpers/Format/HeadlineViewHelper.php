@@ -32,7 +32,7 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  */
 class HeadlineViewHelper extends AbstractViewHelper
 {
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         $this->registerArgument('lineCharacter', 'string', 'The headline string', false, '-');
         $this->registerArgument('withOverline', 'bool', 'Add overline', false, false);
@@ -41,7 +41,7 @@ class HeadlineViewHelper extends AbstractViewHelper
     /**
      * @return string The formatted value
      */
-    public function render()
+    public function render(): string
     {
         $lineCharacter = $this->arguments['lineCharacter'];
         $withOverline = $this->arguments['withOverline'];

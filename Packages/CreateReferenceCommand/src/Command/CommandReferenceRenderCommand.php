@@ -27,6 +27,8 @@ use TYPO3\CMS\Core\Console\CommandRegistry;
 use TYPO3\CMS\Core\Core\BootService;
 use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\View\ViewFactoryData;
+use TYPO3\CMS\Core\View\ViewFactoryInterface;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
@@ -189,9 +191,16 @@ class CommandReferenceRenderCommand extends Command
                 'docDirectory' => str_replace(':', '', ucwords($commandName, ':')),
             ];
 
-            $standaloneView = new StandaloneView();
             $templatePathAndFilename = __DIR__ . '/../../Resources/Templates/CommandTemplate.txt';
-            $standaloneView->setTemplatePathAndFilename($templatePathAndFilename);
+            if (class_exists(ViewFactoryData::class)) {
+                $viewFactoryData = new ViewFactoryData(
+                    templatePathAndFilename: $templatePathAndFilename
+                );
+                $standaloneView = GeneralUtility::makeInstance(ViewFactoryInterface::class)->create($viewFactoryData);
+            } else {
+                $standaloneView = GeneralUtility::makeInstance(StandaloneView::class);
+                $standaloneView->setTemplatePathAndFilename($templatePathAndFilename);
+            }
             $standaloneView->assignMultiple(['command' => $allCommands[$commandName]]);
 
             $renderedOutputFile = $commandReferenceDir . $allCommands[$commandName]['docDirectory'] . '.rst';
@@ -209,9 +218,16 @@ class CommandReferenceRenderCommand extends Command
             ];
         }
 
-        $standaloneView = new StandaloneView();
         $templatePathAndFilename = __DIR__ . '/../../Resources/Templates/CommandReferenceTemplate.txt';
-        $standaloneView->setTemplatePathAndFilename($templatePathAndFilename);
+        if (class_exists(ViewFactoryData::class)) {
+            $viewFactoryData = new ViewFactoryData(
+                templatePathAndFilename: $templatePathAndFilename
+            );
+            $standaloneView = GeneralUtility::makeInstance(ViewFactoryInterface::class)->create($viewFactoryData);
+        } else {
+            $standaloneView = GeneralUtility::makeInstance(StandaloneView::class);
+            $standaloneView->setTemplatePathAndFilename($templatePathAndFilename);
+        }
         $standaloneView->assignMultiple(
             [
                 'title' => 'Command Reference',

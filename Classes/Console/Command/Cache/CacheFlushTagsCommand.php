@@ -27,16 +27,8 @@ class CacheFlushTagsCommand extends Command
 {
     protected function configure(): void
     {
-        $this->setDescription('Flush cache by tags');
-        $this->setHelp(
-            <<<'EOH'
-Flushes caches by tags, optionally only caches in specified groups.
-
-<b>Example:</b>
-
-  <code>%command.full_name% news_123 --groups pages,all</code>
-EOH
-        );
+        $this->setDescription('Flush TYPO3 caches with tags.');
+        $this->setHelp('This command can be used to clear the caches with specific tags, for example after code updates in local development and after deployments.');
         $this->setDefinition([
             new InputArgument(
                 'tags',
@@ -45,9 +37,10 @@ EOH
             ),
             new InputOption(
                 'groups',
-                null,
+                'g',
                 InputOption::VALUE_REQUIRED,
-                'Optional array of groups (specified as comma separated values) for which to flush tags. If no group is specified, caches of all groups are flushed.'
+                'Array of groups (specified as comma separated values) for which to flush tags. If no group is specified, caches of all groups are flushed.',
+                'all'
             ),
         ]);
     }
@@ -55,7 +48,7 @@ EOH
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $tags = GeneralUtility::trimExplode(',', $input->getArgument('tags'), true);
-        if ($input->getOption('groups') !== null) {
+        if ($input->getOption('groups') !== 'all') {
             $groups = GeneralUtility::trimExplode(',', $input->getOption('groups'), true);
         } else {
             $groups = null;

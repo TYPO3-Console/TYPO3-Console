@@ -68,13 +68,15 @@ jobs:
             fail-fast: false
             matrix:
                 os: [ 'ubuntu-latest' ]
-                typo3: [ '^11.5.26', '^12.4', '^13.4' ]
+                typo3: [ '^11.5.26', '^12.4', '^13.4', '^14.0' ]
                 php: [ 8.1, 8.2, 8.3, 8.4 ]
                 dependency-version: [ lowest, stable ]
                 exclude:
                     - typo3: "^11.5.26"
                       php: 8.4
                     - typo3: "^13.4"
+                      php: 8.1
+                    - typo3: "^14.0"
                       php: 8.1
                 include:
                     -   os: 'windows-latest'
