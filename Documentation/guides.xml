@@ -14,8 +14,8 @@
              typo3-core-preferred="stable"
   />
   <project title="TYPO3 Console"
-           release="8.3.0"
-           version="8.3.0"
+           release="8.3.1"
+           version="8.3.1"
            copyright="since 2014 by Helmut Hummel &amp; Contributors"
   />
 </guides>
