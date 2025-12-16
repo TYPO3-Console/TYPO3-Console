@@ -83,6 +83,23 @@ class MysqlCommand
     }
 
     /**
+     * @param array $additionalArguments
+     * @param callable|null $outputCallback @deprecated will be removed with 6.0
+     * @param string $connectionName
+     * @return int
+     */
+    public function mariadbdump(array $additionalArguments = [], $outputCallback = null, string $connectionName = 'Default'): int
+    {
+        $commandLine = ['mariadb-dump'];
+        $commandLine = array_merge($commandLine, $this->buildConnectionArguments(), $additionalArguments);
+        $process = new Process($commandLine, null, null, null, 0.0);
+
+        echo  chr(10) . sprintf('-- Dump of TYPO3 Connection "%s"', $connectionName) . chr(10);
+
+        return $process->run($this->buildDefaultOutputCallback($outputCallback));
+    }
+
+    /**
      * @param callable $outputCallback
      * @return callable
      */
@@ -146,10 +163,6 @@ class MysqlCommand
             $passwordDefinition = sprintf('password="%s"', addcslashes($this->dbConfig['password'], '"\\'));
         }
         $confFileContent = <<<EOF
-[mysqldump]
-$userDefinition
-$passwordDefinition
-
 [client]
 $userDefinition
 $passwordDefinition

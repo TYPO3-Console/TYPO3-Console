@@ -14,6 +14,7 @@ namespace Helhum\Typo3Console\Command\Database;
  *
  */
 
+use Doctrine\DBAL\Platforms\MariaDBPlatform;
 use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
 use Helhum\Typo3Console\Database\Process\MysqlCommand;
 use Helhum\Typo3Console\Database\Schema\TableMatcher;
@@ -97,12 +98,23 @@ EOH
         }
 
         foreach ($availableConnectionNames as $mysqlConnectionName) {
+            $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName($mysqlConnectionName);
+            $instance = $connection->getDatabasePlatform();
+
             $mysqlCommand = new MysqlCommand($this->connectionConfiguration->build($mysqlConnectionName), $output);
-            $exitCode = $mysqlCommand->mysqldump(
-                array_merge($this->buildArguments($mysqlConnectionName, $excludes, $output), $additionalMysqlDumpArguments),
-                null,
-                $mysqlConnectionName
-            );
+            if ($instance instanceof MariaDBPlatform) {
+                $exitCode = $mysqlCommand->mariadbdump(
+                    array_merge($this->buildArguments($mysqlConnectionName, $excludes, $output), $additionalMysqlDumpArguments),
+                    null,
+                    $mysqlConnectionName
+                );
+            } else {
+                $exitCode = $mysqlCommand->mysqldump(
+                    array_merge($this->buildArguments($mysqlConnectionName, $excludes, $output), $additionalMysqlDumpArguments),
+                    null,
+                    $mysqlConnectionName
+                );
+            }
 
             if ($exitCode !== 0) {
                 $output->writeln(sprintf('<error>Could not dump SQL for connection "%s",</error>', $mysqlConnectionName));
