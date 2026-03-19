@@ -123,6 +123,8 @@ class MysqlCommand
         }
         if (isset($this->dbConfig['driverOptions']['flags']) && (int)$this->dbConfig['driverOptions']['flags'] === MYSQLI_CLIENT_SSL) {
             $arguments[] = '--ssl';
+        } else {
+            $arguments[] = '--skip-ssl';
         }
         $arguments[] = $this->dbConfig['dbname'];
 
