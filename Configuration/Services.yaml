@@ -7,6 +7,13 @@ services:
     Helhum\Typo3Console\:
         resource: '../Classes/Console/*'
 
+    Helhum\Typo3Console\Command\Backend\SetBackendUserPasswordCommand:
+        tags:
+            -
+                name: 'console.command'
+                command: 'backend:setpassword'
+                description: 'Set password for a backend user'
+
     Helhum\Typo3Console\Command\Backend\CreateBackendAdminUserCommand:
         tags:
             -
