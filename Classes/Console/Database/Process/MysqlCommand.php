@@ -37,6 +37,24 @@ class MysqlCommand
      */
     private $output;
 
+    /**
+     * @var array
+     */
+    private $commandOptions = [
+        'mysql' => [
+            'ssl' => '--ssl',
+            'nossl' => '--skip-ssl',
+        ],
+        'mariadb' => [
+            'ssl' => '--ssl',
+            'nossl' => '--skip-ssl',
+        ],
+        'mysql8' => [
+            'ssl' => '--ssl-mode=REQUIRED',
+            'nossl' => '--ssl-mode=DISABLED',
+        ],
+    ];
+
     public function __construct(array $dbConfig, ?OutputInterface $output = null)
     {
         $this->dbConfig = $dbConfig;
@@ -106,8 +124,26 @@ class MysqlCommand
 
     private function buildConnectionArguments(): array
     {
+        // Assume mysql < 8 as default to keep existing behavior
+        if (isset($this->dbConfig['msyqlType'])) {
+            $mysqlType = $this->dbConfig['msyqlType'];
+        } else {
+            $mysqlType = 'mysql';
+        }
         if ($configFile = $this->createTemporaryMysqlConfigurationFile()) {
-            $arguments[] = '--defaults-file=' . $configFile;
+            if (isset($this->dbConfig['msyqlKeepSystemDefaults'])
+                &&
+                    (
+                        ($this->dbConfig['msyqlKeepSystemDefaults'] === true)
+                     || ($this->dbConfig['msyqlKeepSystemDefaults'] === 'true')
+                     || ($this->dbConfig['msyqlKeepSystemDefaults'] === 1)
+                     || ($this->dbConfig['msyqlKeepSystemDefaults'] === '1')
+                    )
+            ) {
+                $arguments[] = '--defaults-extra-file=' . $configFile;
+            } else {
+                $arguments[] = '--defaults-file=' . $configFile;
+            }
         }
         if (!empty($this->dbConfig['host'])) {
             $arguments[] = '-h';
@@ -121,8 +157,10 @@ class MysqlCommand
             $arguments[] = '-S';
             $arguments[] = $this->dbConfig['unix_socket'];
         }
-        if (isset($this->dbConfig['driverOptions']['flags']) && (int)$this->dbConfig['driverOptions']['flags'] === MYSQLI_CLIENT_SSL) {
-            $arguments[] = '--ssl';
+        if (isset($this->dbConfig['driverOptions']['flags']) && ($this->dbConfig['driverOptions']['flags'] === MYSQLI_CLIENT_SSL)) {
+            $arguments[] = $this->commandOptions[$mysqlType]['ssl'];
+        } else {
+            $arguments[] = $this->commandOptions[$mysqlType]['nossl'];
         }
         $arguments[] = $this->dbConfig['dbname'];
 
