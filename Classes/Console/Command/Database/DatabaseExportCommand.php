@@ -16,14 +16,11 @@ namespace Helhum\Typo3Console\Command\Database;
 
 use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
 use Helhum\Typo3Console\Database\Process\MysqlCommand;
-use Helhum\Typo3Console\Database\Schema\TableMatcher;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class DatabaseExportCommand extends Command
 {
@@ -127,20 +124,10 @@ EOH
             $arguments[] = '--verbose';
         }
 
-        foreach ($this->matchTables($excludes, $mysqlConnectionName) as $table) {
+        foreach ($this->connectionConfiguration->matchTables($excludes, $mysqlConnectionName) as $table) {
             $arguments[] = sprintf('--ignore-table=%s.%s', $dbConfig['dbname'], $table);
         }
 
         return $arguments;
-    }
-
-    private function matchTables(array $excludes, string $connection): array
-    {
-        if (empty($excludes)) {
-            return [];
-        }
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName($connection);
-
-        return (new TableMatcher())->match($connection, ...$excludes);
     }
 }

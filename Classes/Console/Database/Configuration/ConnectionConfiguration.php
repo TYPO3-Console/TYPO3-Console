@@ -14,32 +14,41 @@ namespace Helhum\Typo3Console\Database\Configuration;
  *
  */
 
+use Helhum\Typo3Console\Database\Schema\TableMatcher;
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 class ConnectionConfiguration
 {
     /**
      * Returns a normalized DB configuration array
-     *
-     * @param string|null $name
-     * @return array
      */
-    public function build(?string $name = null): array
+    public function build(string $connectionName = 'Default'): array
     {
-        if ($name === null) {
-            return $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default'];
-        }
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName($connectionName);
 
-        return $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections'][$name];
+        return $connection->getParams();
     }
 
     public function getAvailableConnectionNames(string $type): array
     {
-        return array_keys(
-            array_filter(
-                $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections'],
-                function (array $connectionConfig) use ($type) {
-                    return strpos($connectionConfig['driver'] ?? '', $type) !== false;
-                }
-            )
+        return array_filter(
+            GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionNames(),
+            function (string $connectionName) use ($type) {
+                $driverName = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName($connectionName)->getParams()['driver'] ?? '';
+
+                return strpos($driverName, $type) !== false;
+            }
         );
+    }
+
+    public function matchTables(array $excludes, string $connectionName): array
+    {
+        if (empty($excludes)) {
+            return [];
+        }
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName($connectionName);
+
+        return (new TableMatcher())->match($connection, ...$excludes);
     }
 }
