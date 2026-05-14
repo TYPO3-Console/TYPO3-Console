@@ -65,15 +65,33 @@ class InstallStepActionExecutor
                 // The TYPO3 code used to install is nor prepared to run on cli, so we provide a fake web request here
             )->withAttribute(
                 'normalizedParams',
-                NormalizedParams::createFromServerParams(
+                $this->createNormalizedParams($values['siteUrl'] ?? '/'),
+            );
+        };
+    }
+
+    private function createNormalizedParams(string $siteUrl): NormalizedParams
+    {
+        return new class($siteUrl) extends NormalizedParams {
+            public function __construct(private readonly string $siteUrlOverride)
+            {
+                parent::__construct(
                     [
                         'REMOTE_ADDR' => '127.0.0.1',
                         'SCRIPT_NAME' => 'typo3/sysext/core/bin/typo3',
                         'HTTP_HOST' => 'localhost',
                         'HTTPS' => 'On',
-                    ]
-                )
-            );
+                    ],
+                    $GLOBALS['TYPO3_CONF_VARS']['SYS'] ?? [],
+                    Environment::getCurrentScript(),
+                    Environment::getPublicPath()
+                );
+            }
+
+            public function getSiteUrl(): string
+            {
+                return $this->siteUrlOverride;
+            }
         };
     }
 
