@@ -51,11 +51,6 @@ class ScriptHelper
         $content = preg_replace('/(const TYPO3_CONSOLE_VERSION = \')\d+\.\d+\.\d+/', 'const TYPO3_CONSOLE_VERSION = \'' . $version, $content);
         file_put_contents($applicationFile, $content);
 
-        $githubWorkflowFileSonar = __DIR__ . '/../../../.github/workflows/Analyze.yml';
-        $content = file_get_contents($githubWorkflowFileSonar);
-        $content = preg_replace('/(export COMPOSER_ROOT_VERSION)=\d+\.\d+\.\d+/', '$1=' . $version, $content);
-        file_put_contents($githubWorkflowFileSonar, $content);
-
         $githubWorkflowFileTests = __DIR__ . '/../../../.github/workflows/Test.yml';
         $content = file_get_contents($githubWorkflowFileTests);
         $content = preg_replace('/(COMPOSER_ROOT_VERSION): \d+\.\d+\.\d+/', '$1: ' . $version, $content);
@@ -66,10 +61,5 @@ class ScriptHelper
         $content = preg_replace('/("dev-main": )"\d+\.\d+\.x-dev/', '$1"' . $branchVersion, $content);
         $content = preg_replace('/("version": )"\d+\.\d+\.\d+/', '$1"' . $version, $content);
         file_put_contents($composerJson, $content);
-
-        $sonarConfigFile = __DIR__ . '/../../../sonar-project.properties';
-        $content = file_get_contents($sonarConfigFile);
-        $content = preg_replace('/(sonar.projectVersion)=\d+\.\d+\.\d+/', '$1=' . $version, $content);
-        file_put_contents($sonarConfigFile, $content);
     }
 }

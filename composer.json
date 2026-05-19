@@ -123,7 +123,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "8.3.x-dev"
+            "dev-main": "9.0.x-dev"
         },
         "typo3/cms": {
             "Package": {
@@ -132,7 +132,7 @@
                 "partOfMinimalUsableSystem": true
             },
             "extension-key": "typo3_console",
-            "version": "8.3.1",
+            "version": "9.0.0",
             "providesPackages": {
                 "symfony/console": "Resources/Private/ExtensionArtifacts/Libraries/",
                 "helhum/config-loader": ""
