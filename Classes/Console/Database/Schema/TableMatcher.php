@@ -34,7 +34,6 @@ class TableMatcher
 
     private function matchSingle(Connection $connection, string $expression): array
     {
-        $tableNames = [];
         if ((new Typo3Version())->getMajorVersion() > 12) {
             $tableNames = $connection->createSchemaManager()->listTableNames();
         } else {
@@ -43,7 +42,7 @@ class TableMatcher
 
         return array_filter(
             $tableNames,
-            function ($tableName) use ($expression) {
+            static function ($tableName) use ($expression) {
                 return fnmatch($expression, $tableName);
             }
         );

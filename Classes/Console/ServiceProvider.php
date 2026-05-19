@@ -22,7 +22,7 @@ use Helhum\Typo3Console\Command\Install\InstallFixFolderStructureCommand;
 use Helhum\Typo3Console\Command\Install\InstallSetupCommand;
 use Helhum\Typo3Console\Command\InstallTool\LockInstallToolCommand;
 use Helhum\Typo3Console\Command\InstallTool\UnlockInstallToolCommand;
-use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
+use Helhum\Typo3Console\Database\Configuration\ConnectionConfigurationFactory;
 use Helhum\Typo3Console\Mvc\Cli\Symfony\Application;
 use Psr\Container\ContainerInterface;
 use TYPO3\CMS\Core\Adapter\EventDispatcherAdapter as SymfonyEventDispatcherAdapter;
@@ -32,6 +32,7 @@ use TYPO3\CMS\Core\Console\CommandRegistry;
 use TYPO3\CMS\Core\Core\BootService;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Package\AbstractServiceProvider;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\SymfonyPsrEventDispatcherAdapter\EventDispatcherAdapter as LegacySymfonyEventDispatcherAdapter;
@@ -103,7 +104,7 @@ class ServiceProvider extends AbstractServiceProvider
     {
         return new DatabaseExportCommand(
             self::applicationIsReady($container),
-            new ConnectionConfiguration()
+            new ConnectionConfigurationFactory($container->get(ConnectionPool::class))
         );
     }
 
@@ -111,7 +112,7 @@ class ServiceProvider extends AbstractServiceProvider
     {
         return new DatabaseImportCommand(
             self::applicationIsReady($container),
-            new ConnectionConfiguration()
+            new ConnectionConfigurationFactory($container->get(ConnectionPool::class))
         );
     }
 
