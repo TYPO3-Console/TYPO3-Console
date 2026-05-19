@@ -21,7 +21,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Core\BootService;
-use TYPO3\CMS\Core\Information\Typo3Version;
 
 class InstallDatabaseDataCommand extends Command
 {
@@ -63,8 +62,7 @@ class InstallDatabaseDataCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // @deprecated with TYPO3 12, this version check can be removed
-        $this->bootService->loadExtLocalconfDatabaseAndExtTables(allowCaching: (new Typo3Version())->getMajorVersion() > 11);
+        $this->bootService->loadExtLocalconfDatabaseAndExtTables();
 
         $adminUserName = $input->getOption('admin-user-name');
         $adminPassword = $input->getOption('admin-password');

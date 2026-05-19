@@ -16,7 +16,7 @@ namespace Helhum\Typo3Console\Install\Action;
 
 use Helhum\Typo3Console\Mvc\Cli\CommandDispatcher;
 use Helhum\Typo3Console\Mvc\Cli\ConsoleOutput;
-use Helhum\Typo3Console\Typo3CompatibilityBridge;
+use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Core\Environment;
 
 class PrepareInstallAction implements InstallActionInterface
@@ -69,7 +69,7 @@ class PrepareInstallAction implements InstallActionInterface
         $isInteractive = $options['interactive'] ?? $this->output->getSymfonyConsoleInput()->isInteractive();
         $forceInstall = $options['forceInstall'] ?? false;
 
-        $localConfFile = Typo3CompatibilityBridge::getSystemConfigurationFileLocation();
+        $localConfFile = (new ConfigurationManager())->getSystemConfigurationFileLocation();
         if (!$forceInstall && file_exists($localConfFile)) {
             $this->output->outputLine();
             $this->output->outputLine('<error>TYPO3 seems to be already set up!</error>');

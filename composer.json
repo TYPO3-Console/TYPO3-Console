@@ -35,26 +35,25 @@
     ],
     "license": "GPL-2.0-or-later",
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "composer-runtime-api": "^2.1",
-        "typo3/cms-backend": "^11.5.26 || ^12.4.18 || ^13.1 || ^14.3",
+        "typo3/cms-backend": "^12.4.18 || ^13.1 || ^14.3",
         "typo3/cms-composer-installers": "^4.0@rc || >=5.0",
-        "typo3/cms-core": "^11.5.26 || ^12.4.18 || ^13.1 || ^14.3",
-        "typo3/cms-extbase": "^11.5.26 || ^12.4.18 || ^13.1 || ^14.3",
-        "typo3/cms-fluid": "^11.5.26 || ^12.4.18 || ^13.1 || ^14.3",
-        "typo3/cms-frontend": "^11.5.26 || ^12.4.18 || ^13.1 || ^14.3",
-        "typo3/cms-install": "^11.5.26 || ^12.4.18 || ^13.1 || ^14.3",
+        "typo3/cms-core": "^12.4.18 || ^13.1 || ^14.3",
+        "typo3/cms-extbase": "^12.4.18 || ^13.1 || ^14.3",
+        "typo3/cms-fluid": "^12.4.18 || ^13.1 || ^14.3",
+        "typo3/cms-frontend": "^12.4.18 || ^13.1 || ^14.3",
+        "typo3/cms-install": "^12.4.18 || ^13.1 || ^14.3",
         "symfony/console": "^5.4 || ^6.4 || ^7.0",
         "symfony/process": "^5.4 || ^6.4 || ^7.0",
-        "helhum/config-loader": ">=0.9 <0.13",
-        "helhum/php-error-reporting": "^1.0"
+        "helhum/config-loader": ">=0.9 <0.13"
     },
     "require-dev": {
-        "typo3/cms-extensionmanager": "^11.5.26 || ^12.4.18 || ^13.1 || ^14.3",
-        "typo3/cms-filemetadata": "^11.5.26 || ^12.4.18 || ^13.1 || ^14.3",
-        "typo3/cms-fluid-styled-content": "^11.5.26 || ^12.4.18 || ^13.1 || ^14.3",
-        "typo3/cms-recordlist": "^11.5.26 || ^12.4.18 || ^13.1 || ^14.3",
-        "typo3/cms-reports": "^11.5.26 || ^12.4.18 || ^13.1 || ^14.3",
+        "typo3/cms-extensionmanager": "^12.4.18 || ^13.1 || ^14.3",
+        "typo3/cms-filemetadata": "^12.4.18 || ^13.1 || ^14.3",
+        "typo3/cms-fluid-styled-content": "^12.4.18 || ^13.1 || ^14.3",
+        "typo3/cms-recordlist": "^12.4.18 || ^13.1 || ^14.3",
+        "typo3/cms-reports": "^12.4.18 || ^13.1 || ^14.3",
         "typo3-console/create-reference-command": "^1.0",
         "symfony/expression-language": "^5.4 || ^6.4 || ^7.0",
         "symfony/filesystem": "^5.4 || ^6.4 || ^7.0",
@@ -62,7 +61,8 @@
         "php-parallel-lint/php-parallel-lint": "^1.2",
         "typo3-console/sql-command": "^1.0",
         "friendsofphp/php-cs-fixer": "^3.57",
-        "dg/bypass-finals": "^1.4"
+        "dg/bypass-finals": "^1.4",
+        "paragonie/sodium_compat_ext_sodium": "^1.0"
     },
     "autoload": {
         "psr-4": {
@@ -132,7 +132,11 @@
                 "partOfMinimalUsableSystem": true
             },
             "extension-key": "typo3_console",
-            "ignore-as-root": false
+            "version": "8.3.1",
+            "providesPackages": {
+                "symfony/console": "Resources/Private/ExtensionArtifacts/Libraries/",
+                "helhum/config-loader": ""
+            }
         }
     }
 }
