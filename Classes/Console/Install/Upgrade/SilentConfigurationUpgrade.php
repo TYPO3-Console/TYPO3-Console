@@ -14,10 +14,10 @@ namespace Helhum\Typo3Console\Install\Upgrade;
  *
  */
 
-use Helhum\Typo3Console\Typo3CompatibilityBridge;
 use Symfony\Component\Console\Exception\RuntimeException;
 use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Service\Exception\ConfigurationChangedException as ConfigurationChangedException14;
 use TYPO3\CMS\Core\Service\SilentConfigurationUpgradeService as SilentConfigurationUpgradeService14;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Install\Service\Exception\ConfigurationChangedException;
@@ -47,7 +47,7 @@ class SilentConfigurationUpgrade
      */
     public function executeSilentConfigurationUpgradesIfNeeded()
     {
-        if (!file_exists(Typo3CompatibilityBridge::getSystemConfigurationFileLocation())) {
+        if (!file_exists((new ConfigurationManager())->getSystemConfigurationFileLocation())) {
             return;
         }
 
@@ -60,7 +60,7 @@ class SilentConfigurationUpgrade
                 $count++;
                 $upgradeService->execute();
                 $redirect = false;
-            } catch (ConfigurationChangedException $e) {
+            } catch (ConfigurationChangedException | ConfigurationChangedException14 $e) {
                 $redirect = true;
                 $this->configurationManager->exportConfiguration();
                 if ($count > 20) {

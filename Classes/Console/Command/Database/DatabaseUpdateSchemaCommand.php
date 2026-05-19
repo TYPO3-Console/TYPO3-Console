@@ -25,7 +25,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Core\BootService;
-use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 
 class DatabaseUpdateSchemaCommand extends Command
@@ -97,8 +96,7 @@ EOH
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // @deprecated with TYPO3 12, this version check can be removed
-        $this->bootService->loadExtLocalconfDatabaseAndExtTables(allowCaching: (new Typo3Version())->getMajorVersion() > 11);
+        $this->bootService->loadExtLocalconfDatabaseAndExtTables();
 
         $schemaService = new SchemaService(new SchemaUpdate());
         $schemaUpdateResultRenderer = new SchemaUpdateResultRenderer();

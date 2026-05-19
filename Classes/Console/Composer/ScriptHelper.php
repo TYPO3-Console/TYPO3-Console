@@ -64,6 +64,7 @@ class ScriptHelper
         $composerJson = __DIR__ . '/../../../composer.json';
         $content = file_get_contents($composerJson);
         $content = preg_replace('/("dev-main": )"\d+\.\d+\.x-dev/', '$1"' . $branchVersion, $content);
+        $content = preg_replace('/("version": )"\d+\.\d+\.\d+/', '$1"' . $version, $content);
         file_put_contents($composerJson, $content);
 
         $sonarConfigFile = __DIR__ . '/../../../sonar-project.properties';

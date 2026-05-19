@@ -15,7 +15,7 @@ namespace Helhum\Typo3Console\Tests\Functional\Command\Install;
  */
 
 use Helhum\Typo3Console\Tests\Functional\Command\AbstractCommandTest;
-use Helhum\Typo3Console\Typo3CompatibilityBridge;
+use TYPO3\CMS\Core\Configuration\ConfigurationManager;
 
 class InstallCommandControllerTest extends AbstractCommandTest
 {
@@ -38,7 +38,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
             $this->markTestSkipped('Cannot execute SQLite test, when SQLite module is disabled');
         }
         @unlink(getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php');
-        @unlink(Typo3CompatibilityBridge::getSystemConfigurationFileLocation());
+        @unlink((new ConfigurationManager())->getSystemConfigurationFileLocation());
         $output = $this->executeConsoleCommand(
             'install:setup',
             [
@@ -62,7 +62,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
             $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
         }
         @unlink(getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php');
-        @unlink(Typo3CompatibilityBridge::getSystemConfigurationFileLocation());
+        @unlink((new ConfigurationManager())->getSystemConfigurationFileLocation());
         $output = $this->executeConsoleCommand(
             'install:setup',
             [
@@ -83,7 +83,7 @@ class InstallCommandControllerTest extends AbstractCommandTest
             $this->executeMysqlQuery('DROP DATABASE IF EXISTS ' . getenv('TYPO3_INSTALL_DB_DBNAME'), false);
         }
         @unlink(getenv('TYPO3_PATH_ROOT') . '/typo3conf/PackageStates.php');
-        @unlink(Typo3CompatibilityBridge::getSystemConfigurationFileLocation());
+        @unlink((new ConfigurationManager())->getSystemConfigurationFileLocation());
         $output = $this->executeConsoleCommand(
             'install:setup',
             [
