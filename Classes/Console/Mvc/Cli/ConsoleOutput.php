@@ -23,7 +23,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\Input;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput as SymfonyConsoleOutput;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -38,7 +38,7 @@ use Symfony\Component\Console\Terminal;
 class ConsoleOutput
 {
     /**
-     * @var ArgvInput
+     * @var InputInterface
      */
     protected $input;
 
@@ -69,11 +69,8 @@ class ConsoleOutput
 
     /**
      * Creates and initializes the Symfony I/O instances
-     *
-     * @param Output|null $output
-     * @param Input|null $input
      */
-    public function __construct(?Output $output = null, ?Input $input = null)
+    public function __construct(?OutputInterface $output = null, ?InputInterface $input = null)
     {
         $this->output = new TrackableOutput($output ?: new SymfonyConsoleOutput());
         $this->output->getFormatter()->setStyle('b', new OutputFormatterStyle(null, null, ['bold']));
@@ -93,25 +90,20 @@ class ConsoleOutput
     /**
      * @return SymfonyConsoleOutput|TrackableOutput
      */
-    public function getSymfonyConsoleOutput()
+    public function getSymfonyConsoleOutput(): TrackableOutput
     {
         return $this->output;
     }
 
-    /**
-     * @return Input
-     */
-    public function getSymfonyConsoleInput(): Input
+    public function getSymfonyConsoleInput(): InputInterface
     {
         return $this->getInput();
     }
 
     /**
      * Returns the desired maximum line length for console output.
-     *
-     * @return int
      */
-    public function getMaximumLineLength()
+    public function getMaximumLineLength(): int
     {
         return $this->terminal->getWidth() - 2;
     }
@@ -186,7 +178,7 @@ class ConsoleOutput
     /**
      * Asks the user to select a value
      *
-     * @param string|array $question The question to ask. If an array each array item is turned into one line of a multi-line question
+     * @param string|array $questionString The question to ask. If an array each array item is turned into one line of a multi-line question
      * @param array $choices List of choices to pick from
      * @param bool $default The default answer if the user enters nothing
      * @param bool $multiSelect If true the result will be an array with the selected options. Multiple options can be given separated by commas
@@ -195,9 +187,9 @@ class ConsoleOutput
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      * @return int|string|array The selected value or values (the key of the choices array)
      */
-    public function select($question, $choices, $default = null, $multiSelect = false, $attempts = false)
+    public function select($questionString, $choices, $default = null, $multiSelect = false, $attempts = false)
     {
-        $question = (new ChoiceQuestion($question, $choices, $default))
+        $question = (new ChoiceQuestion($questionString, $choices, $default))
             ->setMultiselect($multiSelect)
             ->setMaxAttempts($attempts)
             ->setErrorMessage('Value "%s" is invalid');
@@ -208,7 +200,7 @@ class ConsoleOutput
     /**
      * Asks a question to the user
      *
-     * @param string|array $question The question to ask. If an array each array item is turned into one line of a multi-line question
+     * @param string|array $questionString The question to ask. If an array each array item is turned into one line of a multi-line question
      * @param string $default The default answer if none is given by the user
      * @param array $autocomplete List of values to autocomplete. This only works if "stty" is installed
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
@@ -216,9 +208,9 @@ class ConsoleOutput
      * @throws \Symfony\Component\Console\Exception\RuntimeException
      * @return string The user answer
      */
-    public function ask($question, $default = null, ?array $autocomplete = null)
+    public function ask($questionString, $default = null, ?array $autocomplete = null)
     {
-        $question = (new Question($question, $default))
+        $question = (new Question($questionString, $default))
             ->setAutocompleterValues($autocomplete);
 
         return $this->getQuestionHelper()->ask($this->getInput(), $this->output, $question);
@@ -229,13 +221,13 @@ class ConsoleOutput
      *
      * The question will be asked until the user answers by nothing, yes, or no.
      *
-     * @param string|array $question The question to ask. If an array each array item is turned into one line of a multi-line question
+     * @param string|array $questionString The question to ask. If an array each array item is turned into one line of a multi-line question
      * @param bool $default The default answer if the user enters nothing
      * @return bool true if the user has confirmed, false otherwise
      */
-    public function askConfirmation($question, $default = true)
+    public function askConfirmation($questionString, $default = true)
     {
-        $question = new ConfirmationQuestion($question, $default);
+        $question = new ConfirmationQuestion($questionString, $default);
 
         return $this->getQuestionHelper()->ask($this->getInput(), $this->output, $question);
     }
@@ -243,15 +235,15 @@ class ConsoleOutput
     /**
      * Asks a question to the user, the response is hidden
      *
-     * @param string|array $question The question. If an array each array item is turned into one line of a multi-line question
+     * @param string|array $questionString The question. If an array each array item is turned into one line of a multi-line question
      * @param bool $fallback In case the response can not be hidden, whether to fallback on non-hidden question or not
      * @throws \Symfony\Component\Console\Exception\LogicException
      * @throws \Symfony\Component\Console\Exception\RuntimeException
      * @return string The answer
      */
-    public function askHiddenResponse($question, $fallback = true)
+    public function askHiddenResponse($questionString, $fallback = true)
     {
-        $question = (new Question($question))
+        $question = (new Question($questionString))
             ->setHidden(true)
             ->setHiddenFallback($fallback);
 
@@ -265,7 +257,7 @@ class ConsoleOutput
      * validated data when the data is valid and throw an exception
      * otherwise.
      *
-     * @param string|array $question The question to ask. If an array each array item is turned into one line of a multi-line question
+     * @param string|array $questionString The question to ask. If an array each array item is turned into one line of a multi-line question
      * @param callable $validator A PHP callback that gets a value and is expected to return the (transformed) value or throw an exception if it wasn't valid
      * @param int|bool $attempts Max number of times to ask before giving up (false by default, which means infinite)
      * @param string $default The default answer if none is given by the user
@@ -275,9 +267,9 @@ class ConsoleOutput
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      * @return mixed
      */
-    public function askAndValidate($question, $validator, $attempts = false, $default = null, ?array $autocomplete = null)
+    public function askAndValidate($questionString, $validator, $attempts = false, $default = null, ?array $autocomplete = null)
     {
-        $question = (new Question($question, $default))
+        $question = (new Question($questionString, $default))
             ->setValidator($validator)
             ->setMaxAttempts($attempts)
             ->setAutocompleterValues($autocomplete);
@@ -292,7 +284,7 @@ class ConsoleOutput
      * validated data when the data is valid and throw an exception
      * otherwise.
      *
-     * @param string|array $question The question to ask. If an array each array item is turned into one line of a multi-line question
+     * @param string|array $questionString The question to ask. If an array each array item is turned into one line of a multi-line question
      * @param callable $validator A PHP callback that gets a value and is expected to return the (transformed) value or throw an exception if it wasn't valid
      * @param int|bool $attempts Max number of times to ask before giving up (false by default, which means infinite)
      * @param bool $fallback In case the response can not be hidden, whether to fallback on non-hidden question or not
@@ -301,9 +293,9 @@ class ConsoleOutput
      * @throws \Symfony\Component\Console\Exception\RuntimeException
      * @return string The response
      */
-    public function askHiddenResponseAndValidate($question, $validator, $attempts = false, $fallback = true)
+    public function askHiddenResponseAndValidate($questionString, $validator, $attempts = false, $fallback = true)
     {
-        $question = (new Question($question))
+        $question = (new Question($questionString))
             ->setValidator($validator)
             ->setMaxAttempts($attempts)
             ->setHidden(true)
@@ -354,9 +346,8 @@ class ConsoleOutput
 
     /**
      * @throws RuntimeException
-     * @return ArgvInput
      */
-    protected function getInput()
+    protected function getInput(): InputInterface
     {
         if ($this->input === null) {
             if (!isset($_SERVER['argv'])) {

@@ -14,7 +14,7 @@ namespace Helhum\Typo3Console\Command\Database;
  *
  */
 
-use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
+use Helhum\Typo3Console\Database\Configuration\ConnectionConfigurationFactory;
 use Helhum\Typo3Console\Database\Process\MysqlCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -25,7 +25,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DatabaseImportCommand extends Command
 {
-    public function __construct(private readonly bool $applicationIsReady, private readonly ConnectionConfiguration $connectionConfiguration)
+    public function __construct(private readonly bool $applicationIsReady, private readonly ConnectionConfigurationFactory $connectionConfigurationFactory)
     {
         parent::__construct('database:import');
     }
@@ -87,23 +87,27 @@ EOH
         $interactive = $input->getOption('interactive');
         $connection = (string)$input->getOption('connection');
 
-        $availableConnectionNames = $this->connectionConfiguration->getAvailableConnectionNames('mysql');
+        $availableConnectionNames = $this->connectionConfigurationFactory->getAvailableConnectionNames();
         if (empty($availableConnectionNames) || !in_array($connection, $availableConnectionNames, true)) {
             $output->writeln('<error>No suitable MySQL connection found for import.</error>');
 
             return 2;
         }
 
-        $mysqlCommand = new MysqlCommand($this->connectionConfiguration->build($connection), $output);
-        $exitCode = $mysqlCommand->mysql(
+        $mysqlCommand = new MysqlCommand(
+            $this->connectionConfigurationFactory->build(
+                $connection,
+                $this->getName(),
+            ),
+            $output,
+        );
+
+        return $mysqlCommand->mysql(
             array_merge($interactive ? [] : ['--skip-column-names'], $additionalMysqlArguments),
             ($input instanceof StreamableInputInterface)
                 ? ($input->getStream() ?? STDIN)
                 : STDIN,
-            null,
             $interactive
         );
-
-        return $exitCode;
     }
 }

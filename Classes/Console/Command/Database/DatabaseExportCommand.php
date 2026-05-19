@@ -14,7 +14,7 @@ namespace Helhum\Typo3Console\Command\Database;
  *
  */
 
-use Helhum\Typo3Console\Database\Configuration\ConnectionConfiguration;
+use Helhum\Typo3Console\Database\Configuration\ConnectionConfigurationFactory;
 use Helhum\Typo3Console\Database\Process\MysqlCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -24,7 +24,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DatabaseExportCommand extends Command
 {
-    public function __construct(private readonly bool $applicationIsReady, private readonly ConnectionConfiguration $connectionConfiguration)
+    public function __construct(private readonly bool $applicationIsReady, private readonly ConnectionConfigurationFactory $connectionConfigurationFactory)
     {
         parent::__construct('database:export');
     }
@@ -81,7 +81,7 @@ EOH
         $connection = $input->getOption('connection');
         $excludes = $input->getOption('exclude');
 
-        $availableConnectionNames = $connectionNames = $this->connectionConfiguration->getAvailableConnectionNames('mysql');
+        $availableConnectionNames = $connectionNames = $this->connectionConfigurationFactory->getAvailableConnectionNames();
         $failureReason = '';
         if ($connection !== null) {
             $availableConnectionNames = array_intersect($connectionNames, [$connection]);
@@ -90,15 +90,22 @@ EOH
         if (empty($availableConnectionNames)) {
             $output->writeln(sprintf('<error>No MySQL connections found to export.%s</error>', $failureReason));
 
-            return 2;
+            return self::INVALID;
         }
-
+        if ($output->isVerbose()) {
+            $additionalMysqlDumpArguments[] = '--verbose';
+        }
         foreach ($availableConnectionNames as $mysqlConnectionName) {
-            $mysqlCommand = new MysqlCommand($this->connectionConfiguration->build($mysqlConnectionName), $output);
+            $mysqlCommand = new MysqlCommand(
+                $this->connectionConfigurationFactory->build(
+                    $mysqlConnectionName,
+                    $this->getName(),
+                ),
+                $output,
+            );
             $exitCode = $mysqlCommand->mysqldump(
-                array_merge($this->buildArguments($mysqlConnectionName, $excludes, $output), $additionalMysqlDumpArguments),
-                null,
-                $mysqlConnectionName
+                $additionalMysqlDumpArguments,
+                $excludes
             );
 
             if ($exitCode !== 0) {
@@ -108,26 +115,6 @@ EOH
             }
         }
 
-        return 0;
-    }
-
-    private function buildArguments(string $mysqlConnectionName, array $excludes, OutputInterface $output): array
-    {
-        $dbConfig = $this->connectionConfiguration->build($mysqlConnectionName);
-        $arguments = [
-            '--opt',
-            '--single-transaction',
-            '--no-tablespaces',
-        ];
-
-        if ($output->isVerbose()) {
-            $arguments[] = '--verbose';
-        }
-
-        foreach ($this->connectionConfiguration->matchTables($excludes, $mysqlConnectionName) as $table) {
-            $arguments[] = sprintf('--ignore-table=%s.%s', $dbConfig['dbname'], $table);
-        }
-
-        return $arguments;
+        return self::SUCCESS;
     }
 }

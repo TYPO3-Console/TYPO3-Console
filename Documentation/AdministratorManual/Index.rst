@@ -75,3 +75,161 @@ To temporary activate auto complete in the current shell session, type `eval
 then always dynamic and reflects the commands you have available in your TYPO3
 installation.
 
+Configuring `database:import` and `database:export` commands
+============================================================
+
+The `database:import` and `database:export` commands are thin wrappers
+around MySQL-compatible CLI tools such as:
+
+- mysql / mariadb
+- mysqldump / mariadb-dump
+
+All CLI arguments are now fully configurable via TYPO3_CONF_VARS.
+
+This includes:
+
+- binary selection
+- default CLI arguments
+- additional CLI arguments
+- system defaults handling
+- per-command scope configuration
+
+------------------------------------------------------------
+Default configuration
+------------------------------------------------------------
+
+.. code-block:: php
+    :caption: system/additional.php
+
+    <?php
+    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['typo3_console'] = [
+        'commandOptions' => [
+            'database:import' => [
+                // Database connection name as key
+                // "Default" also acts as default configuration and
+                // is used when other named connections are not configured here
+                'Default' => [
+                    // Can be `mysql` or `mariadb`. Do NOT abuse!
+                    'binary' => 'mysql',
+                    // Whether a `my.ini` config on the system should be respected or not
+                    'useSystemDefaults' => false,
+                    // If this is set, the default options will be overridden
+                    'arguments' => [],
+                    // These arguments are on top of the `arguments`
+                    'additionalArguments' => [],
+                ],
+            ],
+            'database:export' => [
+                'Default' => [
+                    'binary' => 'mysqldump',
+                    'useSystemDefaults' => false,
+                    'arguments' => [
+                        '--opt',
+                        '--single-transaction',
+                        '--no-tablespaces',
+                    ],
+                    'additionalArguments' => [],
+                ],
+            ],
+        ],
+    ];
+
+------------------------------------------------------------
+Example: MariaDB clients with SSL disabled
+------------------------------------------------------------
+
+.. code-block:: php
+    :caption: system/additional.php
+
+    <?php
+    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['typo3_console'] = [
+        'commandOptions' => [
+            'database:import' => [
+                'Default' => [
+                    'binary' => 'mariadb',
+                    'additionalArguments' => ['--skip-ssl'],
+                ],
+            ],
+            'database:export' => [
+                'Default' => [
+                    'binary' => 'mariadb-dump',
+                    'additionalArguments' => ['--skip-ssl'],
+                ],
+            ],
+        ],
+    ];
+
+------------------------------------------------------------
+Example: Enabling SSL explicitly
+------------------------------------------------------------
+
+.. code-block:: php
+    :caption: system/additional.php
+
+    <?php
+    $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['typo3_console'] = [
+        'commandOptions' => [
+            'database:import' => [
+                'Default' => [
+                    'additionalArguments' => ['--ssl'],
+                ],
+            ],
+            'database:export' => [
+                'Default' => [
+                    'additionalArguments' => ['--ssl'],
+                ],
+            ],
+        ],
+    ];
+
+------------------------------------------------------------
+How the final CLI command looks
+------------------------------------------------------------
+
+Given this configuration:
+
+.. code-block:: php
+
+    'database:export' => [
+        'Default' => [
+            'binary' => 'mysqldump',
+            'arguments' => [
+                '--opt',
+                '--single-transaction',
+                '--no-tablespaces',
+            ],
+            'additionalArguments' => ['--verbose'],
+        ],
+    ],
+
+The resulting command becomes:
+
+.. code-block:: bash
+
+    mysqldump --defaults-file=/tmp/typo3_console_my_cnf_XXXX \
+      --opt \
+      --single-transaction \
+      --no-tablespaces \
+      --verbose \
+      dbname
+
+------------------------------------------------------------
+
+Given this configuration with MariaDB client:
+
+.. code-block:: php
+
+    'database:import' => [
+        'Default' => [
+            'binary' => 'mariadb',
+            'additionalArguments' => ['--skip-ssl'],
+        ],
+    ],
+
+The resulting command becomes:
+
+.. code-block:: bash
+
+    mariadb --defaults-file=/tmp/typo3_console_my_cnf_XXXX \
+      --skip-ssl \
+      dbname
