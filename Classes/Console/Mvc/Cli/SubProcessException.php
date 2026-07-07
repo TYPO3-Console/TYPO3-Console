@@ -99,7 +99,6 @@ class SubProcessException extends \Exception
         $this->file = $previousExceptionFile;
         array_shift($previousExceptionTrace);
         $traceReflection = new \ReflectionProperty(\Exception::class, 'trace');
-        $traceReflection->setAccessible(true);
         $traceReflection->setValue($this, $previousExceptionTrace);
     }
 
