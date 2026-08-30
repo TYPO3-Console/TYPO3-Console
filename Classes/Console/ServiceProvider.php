@@ -191,7 +191,13 @@ class ServiceProvider extends AbstractServiceProvider
         $application->setDispatcher(self::getSymfonyEventDispatcher($container));
         $application->setCommandLoader($commandRegistry);
         // Replace default list command with TYPO3 override
-        $application->add($commandRegistry->get('list'));
+        $listCommand = $commandRegistry->get('list');
+        if (method_exists($application, 'addCommand')) {
+            // Application::add() is deprecated since symfony/console 7.4 and will be removed in 8.0
+            $application->addCommand($listCommand);
+        } else {
+            $application->add($listCommand);
+        }
         CommandApplication::overrideApplication($commandApplication, $application);
 
         return $commandApplication;
